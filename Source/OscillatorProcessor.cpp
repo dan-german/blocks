@@ -71,7 +71,6 @@ void OscillatorProcessor::noteStopped(bool allowTailOff) {
   currentEnvelope->noteOff();
 }
 
-int a = 0;
 
 inline void OscillatorProcessor::updateTune() {
   auto transpose = getParameter(Parameters::pTranspose)->getValue(phase);
@@ -80,16 +79,12 @@ inline void OscillatorProcessor::updateTune() {
   float phaseIncrement = (frequency / sampleRate) * semitonesToRatio(transpose + fine);
   stacks = static_cast<int>(getParameter(Parameters::pUnison)->getValue(phase));
 
-  a++;
   if (stacks > 1) {
     float spread = getParameter(Parameters::pSpread)->getValue(phase) * 6;
     for (int i = 0; i < stacks; i++) {
       float spreadAddition = std::lerp(-spread, spread, i / float(stacks));
       float spreadSemitones = semitonesToRatio(spreadAddition);
       waveTableControllers[i].setPhaseIncrement(phaseIncrement * spreadSemitones);
-      // if (a % 1000 == 0) { 
-      //   DBG("i = " << i << ", spreadAddition = " << spreadAddition << ", spreadSemitones = " << spreadSemitones);
-      // }
     }
   } else {
     waveTableControllers[0].setPhaseIncrement(phaseIncrement);
