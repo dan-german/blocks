@@ -1,0 +1,57 @@
+# This starter workflow is for a CMake project running on a single platform. There is a different starter workflow if you need cross-platform coverage.
+# See: https://github.com/actions/starter-workflows/blob/main/ci/cmake-multi-platform.yml
+name: Build MacOS
+
+on:
+  push:
+    branches: [ "main" ]
+env:
+  BUILD_TYPE: Release
+jobs:
+  build:
+    runs-on: macos-13
+    steps:
+    - uses: actions/checkout@v3
+      with: 
+        submodules: 'true'
+    - name: Create mixpanel_project_token.key file
+      run: echo "${{ secrets.MIXPANEL_PROJECT_TOKEN }}" > Assets/mixpanel_project_token.key
+    - name: Configure CMake
+      run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+    - name: Build
+      run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
+    - name: Import certificates)
+      uses: apple-actions/import-codesign-certs@v1
+      with:
+        p12-file-base64: ${{ secrets.DEV_ID_APP_CERT }}
+        p12-password: ${{ secrets.DEV_ID_APP_PASSWORD }}
+    - name: Codesign (macOS)
+      run: |
+        codesign --force -s "${{ secrets.DEVELOPER_ID_APPLICATION }}" -v /Users/runner/work/blocks/blocks/build/blocks_artefacts/Release/Standalone/blocks.app --deep --strict --options=runtime --timestamp
+        codesign --force -s "${{ secrets.DEVELOPER_ID_APPLICATION }}" -v /Users/runner/work/blocks/blocks/build/blocks_artefacts/Release/AU/blocks.component --deep --strict --options=runtime --timestamp
+        codesign --force -s "${{ secrets.DEVELOPER_ID_APPLICATION }}" -v /Users/runner/work/blocks/blocks/build/blocks_artefacts/Release/VST3/blocks.vst3 --deep --strict --options=runtime --timestamp
+    - name: Create DMG, Notarize and Staple (macOS)
+      run: |
+        npm install -g appdmg
+        mkdir -p packaging/dmg
+        
+        # Create directories for the dmg symlinks
+        sudo mkdir -m 755 -p /Library/Audio/Plug-Ins/Components && sudo mkdir -m 755 -p /Library/Audio/Plug-Ins/VST3 && sudo mkdir -m 755 -p /Applications
+        ln -s /Library/Audio/Plug-Ins/Components "packaging/dmg/Your Mac's Component folder"
+        ln -s /Library/Audio/Plug-Ins/VST3 "packaging/dmg/Your Mac's VST3 folder"
+        ln -s /Applications "packaging/dmg/Your Mac's Applications folder"
+
+        mv "/Users/runner/work/blocks/blocks/build/blocks_artefacts/Release/VST3/blocks.vst3" packaging/dmg
+        mv "/Users/runner/work/blocks/blocks/build/blocks_artefacts/Release/AU/blocks.component" packaging/dmg
+        mv "/Users/runner/work/blocks/blocks/build/blocks_artefacts/Release/Standalone/blocks.app" packaging/dmg
+        
+        # Run appdmg to create the .dmg
+        cd packaging && appdmg dmg.json blocks.dmg
+        codesign -s "${{ secrets.DEVELOPER_ID_APPLICATION }}" --timestamp -i com.soonth.blocks --force blocks.dmg
+        xcrun notarytool submit blocks.dmg --apple-id ${{ secrets.NOTARIZATION_USERNAME }} --password ${{ secrets.NOTARIZATION_PASSWORD }} --team-id ${{ secrets.TEAM_ID }} --wait
+        xcrun stapler staple blocks.dmg
+    - name: Upload built files
+      uses: actions/upload-artifact@v3.1.2
+      with: 
+        name: blocks.dmg
+        path: packaging/blocks.dmg

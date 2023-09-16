@@ -1,0 +1,89 @@
+/*
+  ==============================================================================
+
+    ModulatorComponent.h
+    Created: 29 Oct 2021 2:44:00am
+    Author:  Dan German
+
+  ==============================================================================
+*/
+
+#pragma once
+#include "DragIndicatorComponent.h"
+#include "DotComponent.h"
+#include "OscillatorPainter.h"
+#include "EnvelopePath.h"
+#include "ExitButton.h"
+#include "ThemeManager.h"
+
+class ModulatorComponent: public Component, Slider::Listener, ThemeListener {
+private:
+  ExitButton exitButton;
+  DragIndicatorComponent dragIndicatorComponent;
+  Component modulatorDragComponent;
+  Component slidersContainer;
+  Rectangle<int> bounds;
+  const int sliderHeight = 19;
+  const int dragIndicatorHeight = 21;
+  const int dragIndicatorBottomSpacing = 6;
+  const int sliderSpacing = 6;
+  const int columns = 2;
+  const int topSpacing = 16;
+  const int sliderHorizontalSpacing = 3;
+  const int offset = 0;
+  int sliderHorizontalInsets = 6;
+  Colour colour;
+
+  void sliderValueChanged(Slider* slider) override;
+  void sliderDragStarted(Slider* slider) override;
+  void sliderDragEnded(Slider* slider) override;
+
+  int currentSliderIndex = -1;
+public:
+  struct Listener;
+  Listener* delegate;
+  OwnedArray<LabeledSlider> sliders;
+  Label title;
+  EnvelopePath envelopePath;
+  OscillatorPainter oscillatorPainter;
+  std::function<void(int, float)> onSliderValueChange;
+  int row = -1;
+
+  ModulatorComponent();
+  ~ModulatorComponent() override;
+
+  int calculateHeight();
+  void paint(Graphics& g) override;
+  void resized() override;
+  void resizeSliders() const;
+  void resizeTitle();
+  void setupTitle();
+  void setupSliders();
+  void resizeSliderContainer();
+  void resizeDragIndicator();
+  void setColour(Colour colour);
+  Colour getColour() { return colour; }
+  void mouseDown(const MouseEvent& event) override;
+  void mouseDrag(const MouseEvent& event) override;
+  void mouseUp(const MouseEvent& event) override;
+  void mouseEnter(const MouseEvent& event) override;
+  void mouseExit(const MouseEvent& event) override;
+  inline static String dragComponentIdentifier = "dragComponentIdentifier";
+  void resizeOscillatorPainter();
+  void resizeExitButton();
+  void setupRemoveButton();
+  void drawBottomLine(Graphics& g) const;
+  void resizeEnvelopePath();
+  void themeChanged(Theme theme) override;
+};
+
+struct ModulatorComponent::Listener {
+  virtual ~Listener() = default;
+  virtual void modulatorEndedDrag(ModulatorComponent* modulatorComponent, const MouseEvent& event) = 0;
+  virtual void modulatorIsDragging(ModulatorComponent* modulatorComponent, const MouseEvent& event) = 0;
+  virtual void modulatorStartedDrag(ModulatorComponent* modulatorComponent, const MouseEvent& event) = 0;
+  virtual void modulatorStartedAdjusting(ModulatorComponent* modulatorComponent, int index) = 0;
+  virtual void modulatorEndedAdjusting(ModulatorComponent* modulatorComponent, int index) = 0;
+  virtual void modulatorIsAdjusting(ModulatorComponent* modulatorComponent, int index, float value) = 0;
+  virtual void modulatorRemoved(ModulatorComponent* modulatorComponent) = 0;
+};

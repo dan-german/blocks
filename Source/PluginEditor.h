@@ -1,0 +1,27 @@
+/*
+  ==============================================================================
+
+    This file was auto-generated!
+
+    It contains the basic framework code for a JUCE plugin editor.
+
+  ==============================================================================
+*/
+
+#pragma once
+
+#include "PluginProcessor.h"
+#include "MainComponent.h"
+
+class PluginEditor: public AudioProcessorEditor, juce::Timer {
+private:
+  PluginProcessor& processor;
+  JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PluginEditor)
+public:
+  MainComponent mainComponent;
+  PluginEditor(PluginProcessor& processor);
+  ~PluginEditor();
+  void paint(Graphics&) override;
+  void resized() override;
+  void timerCallback() override;
+};
