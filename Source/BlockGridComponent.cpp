@@ -147,7 +147,7 @@ void BlockGridComponent::resized() {
 }
 
 void BlockGridComponent::hideDotsAroundIndex(GridItemComponent* blockComponent, Index index, int length, bool visible) {
-  if (!isIndexInside(*previousPlaceholderIndex)) return;
+  if (previousPlaceholderIndex.has_value() && !isIndexInside(*previousPlaceholderIndex)) return;
   for (int column = index.column; column < index.column + 1 + length; column++)
     for (int row = 0; row <= 1; row++)
       dots.getUnchecked(index.row + row)->getUnchecked(column)->setVisible(visible);
