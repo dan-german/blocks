@@ -36,5 +36,4 @@
 /.vscode/*
 
 .DS_Store
-/Assets/mixpanel_project_token.key
 CMakeFiles
