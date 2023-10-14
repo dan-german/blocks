@@ -1,9 +1,5 @@
 name: Build Windows
-on:
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+on: [workflow_dispatch]
 env:
   BUILD_TYPE: Release
 jobs:
