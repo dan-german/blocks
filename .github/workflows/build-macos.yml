@@ -2,9 +2,7 @@
 # See: https://github.com/actions/starter-workflows/blob/main/ci/cmake-multi-platform.yml
 name: Build MacOS
 
-on:
-  push:
-    branches: [ "main" ]
+on: [workflow_dispatch]
 env:
   BUILD_TYPE: Release
 jobs:
