@@ -16,7 +16,6 @@
 #include "ModuleContainer.h"
 
 using namespace Model;
-using namespace std;
 
 struct ModulePool {
 public:
@@ -26,20 +25,20 @@ public:
   ModuleContainer<Module> modulators;
   ModuleContainer<Tab> tabs;
 
-  Array<shared_ptr<Module>> allModules;
-  Array<shared_ptr<Module>> parameterToModuleMap;
-  Array<shared_ptr<Modulation>> connections;
+  Array<std::shared_ptr<Module>> allModules;
+  Array<std::shared_ptr<Module>> parameterToModuleMap;
+  Array<std::shared_ptr<Modulation>> connections;
 
   ModulePool();
   ~ModulePool();
 
-  shared_ptr<Tab> getTab(Type code, int number);
-  shared_ptr<Block> getBlock(Type code, int number);
-  shared_ptr<Module> getModulator(Type code, int number, int colourId);
-  shared_ptr<Modulation> getModulation(int number = -1);
+  std::shared_ptr<Tab> getTab(Type code, int number);
+  std::shared_ptr<Block> getBlock(Type code, int number);
+  std::shared_ptr<Module> getModulator(Type code, int number, int colourId);
+  std::shared_ptr<Modulation> getModulation(int number = -1);
 
-  void retire(shared_ptr<Modulation> modulationConnection);
-  void retire(shared_ptr<Block> block);
-  void retire(shared_ptr<Module> modulator);
-  void retire(shared_ptr<Tab> tab);
+  void retire(std::shared_ptr<Modulation> modulationConnection);
+  void retire(std::shared_ptr<Block> block);
+  void retire(std::shared_ptr<Module> modulator);
+  void retire(std::shared_ptr<Tab> tab);
 };

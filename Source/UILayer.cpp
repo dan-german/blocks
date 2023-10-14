@@ -133,12 +133,12 @@ void UILayer::showModulatorsSideMenu() {
   modulators.setVisible(false);
 }
 
-void UILayer::setModulations(Array<shared_ptr<Modulation>> modulationConnections) {
+void UILayer::setModulations(Array<std::shared_ptr<Modulation>> modulationConnections) {
   modulationsListBoxModel.setConnections(modulationConnections);
   if (matrix.listBox.isVisible()) matrix.listBox.updateContent();
 }
 
-void UILayer::setModulators(Array<shared_ptr<Module>> newModulators) {
+void UILayer::setModulators(Array<std::shared_ptr<Module>> newModulators) {
   modulators.modulatorsListModel.setModulators(newModulators);
   if (modulators.listBox.isVisible()) modulators.listBox.updateContent();
 }

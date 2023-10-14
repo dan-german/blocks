@@ -11,7 +11,7 @@
 #include "ModulationInput.h"
 #include "Processor.h"
 
-ModulationInput::ModulationInput(shared_ptr<Processor> modulator, shared_ptr<Modulation> connection): source(modulator), connection(connection) {}
+ModulationInput::ModulationInput(std::shared_ptr<Processor> modulator, std::shared_ptr<Modulation> connection): source(modulator), connection(connection) {}
 ModulationInput::~ModulationInput() { }
 bool ModulationInput::isActive() { return source->isActive(); }
 

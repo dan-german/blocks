@@ -24,7 +24,7 @@ ProcessorPool::ProcessorPool() {
   }
 }
 
-shared_ptr<Processor> ProcessorPool::getProcessor(shared_ptr<Module> module) {
+std::shared_ptr<Processor> ProcessorPool::getProcessor(std::shared_ptr<Module> module) {
   auto processor = processors[module->id.type].removeAndReturn(0);
 
   if (processor) {

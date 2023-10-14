@@ -13,7 +13,6 @@
 #include <juce_audio_processors/juce_audio_processors.h>
 
 using namespace juce;
-using namespace std;
 
 namespace Model {
   class Module;
@@ -22,14 +21,14 @@ namespace Model {
     Modulation(int number);
     ~Modulation();
 
-    shared_ptr<RangedAudioParameter> magnitudeParameter;
-    shared_ptr<RangedAudioParameter> bipolarParameter;
+    std::shared_ptr<RangedAudioParameter> magnitudeParameter;
+    std::shared_ptr<RangedAudioParameter> bipolarParameter;
 
     int id = 0;
     int number;
     String name;
-    shared_ptr<Module> source;
-    shared_ptr<Module> target;
+    std::shared_ptr<Module> source;
+    std::shared_ptr<Module> target;
     String parameterID;
     int parameterIndex;
 

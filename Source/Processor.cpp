@@ -42,13 +42,13 @@ float Processor::getNextValue() {
   return value;
 }
 
-void Processor::setModule(shared_ptr<Module> module) {
+void Processor::setModule(std::shared_ptr<Module> module) {
   this->module = module;
   parameters.clear();
 
   for (int i = 0; i < module->parameters.size(); i++) {
     auto audioParameter = module->parameters[i]->audioParameter;
-    auto parameter = make_shared<Parameter>();
+    auto parameter = std::make_shared<Parameter>();
     parameter->juceParameter = audioParameter;
     parameters.add(parameter);
   }

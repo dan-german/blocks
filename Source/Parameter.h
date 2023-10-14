@@ -10,8 +10,6 @@
 
 #include "ModulationInput.h"
 
-using namespace std;
-
 class Parameter { // TODO - rename to ProcessorParameter
 private:
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Parameter)
@@ -19,7 +17,7 @@ private:
 public:
   RangedAudioParameter* juceParameter;
   NormalisableRange<float> range;
-  Array<shared_ptr<ModulationInput>> modulationInputs;
+  Array<std::shared_ptr<ModulationInput>> modulationInputs;
 
   Parameter() { }
   Parameter(float defaultValue, float min, float max): value(defaultValue), range(min, max) { }
@@ -28,8 +26,8 @@ public:
   inline void setValue(float newValue) { value = range.convertTo0to1(newValue); }
   inline void setRange(float min, float max) { range.start = min; range.end = max; }
 
-  inline void connectModulation(shared_ptr<Processor> source, shared_ptr<Modulation> connection) {
-    modulationInputs.add(make_shared<ModulationInput>(source, connection));
+  inline void connectModulation(std::shared_ptr<Processor> source, std::shared_ptr<Modulation> connection) {
+    modulationInputs.add(std::make_shared<ModulationInput>(source, connection));
   }
 
   inline bool hasModulators() { return !modulationInputs.isEmpty(); }
@@ -57,7 +55,7 @@ public:
     return modulationValue;
   }
 
-  void removeModulator(shared_ptr<Processor> modulator) {
+  void removeModulator(std::shared_ptr<Processor> modulator) {
     for (int i = 0; i < modulationInputs.size(); i++)
       if (modulationInputs[i]->source == modulator) modulationInputs.remove(i);
   }

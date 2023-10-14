@@ -12,8 +12,6 @@
 #include "Block.h"
 #include "Tab.h"
 
-using namespace std;
-
 class PresetInfo {
 public:
   struct Module {
@@ -23,15 +21,15 @@ public:
 
   struct Block: public PresetInfo::Module {
     int length = 1;
-    pair<int, int> index = { -1, -1 };
+    std::pair<int, int> index = { -1, -1 };
   };
 
   struct Modulator: public PresetInfo::Module { int colour; };
 
   struct Modulation {
-    string source;
-    string target;
-    string parameter;
+    std::string source;
+    std::string target;
+    std::string parameter;
     float magnitude;
     bool bipolar;
     int number;
@@ -49,11 +47,11 @@ public:
   Array<Modulation> modulations;
 
   static PresetInfo create(String name,
-    Array<shared_ptr<Model::Tab>> tabs,
-    Array<shared_ptr<Model::Block>> blocks,
-    Array<shared_ptr<Model::Module>> modulators,
-    Array<shared_ptr<Model::Modulation>> modulations);
+    Array<std::shared_ptr<Model::Tab>> tabs,
+    Array<std::shared_ptr<Model::Block>> blocks,
+    Array<std::shared_ptr<Model::Module>> modulators,
+    Array<std::shared_ptr<Model::Modulation>> modulations);
 private:
-  static void prepareModule(shared_ptr<Model::Module> module, Module& moduleInfo);
+  static void prepareModule(std::shared_ptr<Model::Module> module, Module& moduleInfo);
 };
 

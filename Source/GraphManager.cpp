@@ -52,11 +52,11 @@ GraphManager::Connections GraphManager::getRouteForIndex(Index index) {
   return connections;
 }
 
-void GraphManager::addNode(shared_ptr<Processor> processor, Index index) {
+void GraphManager::addNode(std::shared_ptr<Processor> processor, Index index) {
   processorMatrix[index.row][index.column] = processor;
   processors.push_back(processor);
   processor->prepareToPlay(graph->getSampleRate(), graph->getBlockSize());
-  nodeMatrix[index.row][index.column] = graph->addNode(make_unique<NodeProcessor>(processor.get()));
+  nodeMatrix[index.row][index.column] = graph->addNode(std::make_unique<NodeProcessor>(processor.get()));
 }
 
 void GraphManager::connectTwoNodes(const Node::Ptr& row, const Node::Ptr& column) {
@@ -77,11 +77,11 @@ void GraphManager::repositionProcessor(Index oldIndex, Index newIndex) {
   reconnect();
 }
 
-shared_ptr<Processor> GraphManager::getModuleProcessor(Index index) {
+std::shared_ptr<Processor> GraphManager::getModuleProcessor(Index index) {
   return processorMatrix[index.row][index.column];
 }
 
-void GraphManager::removeNode(shared_ptr<Processor> moduleProcessor, Index index) {
+void GraphManager::removeNode(std::shared_ptr<Processor> moduleProcessor, Index index) {
   if (auto node = nodeMatrix[index.row][index.column]) {
     graph->removeNode(node->nodeID);
     nodeMatrix[index.row][index.column].reset();

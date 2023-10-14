@@ -13,22 +13,22 @@
 
 class ProcessorPool {
 private:
-  std::map<Model::Type, Array<shared_ptr<Processor>>> processors;
+  std::map<Model::Type, Array<std::shared_ptr<Processor>>> processors;
 public:
   ProcessorPool();
   ~ProcessorPool();
 
-  shared_ptr<Processor> getProcessor(shared_ptr<Module> module);
+  std::shared_ptr<Processor> getProcessor(std::shared_ptr<Module> module);
 
-  void retire(shared_ptr<Processor> processor) {
+  void retire(std::shared_ptr<Processor> processor) {
     processors[processor->module->id.type].add(processor);
   }
 
-  void retire(shared_ptr<Processor> processor, Model::Type code) {
+  void retire(std::shared_ptr<Processor> processor, Model::Type code) {
     processors[code].add(processor);
   }
 
-  shared_ptr<Processor> getProcessor(Model::Type code) {
+  std::shared_ptr<Processor> getProcessor(Model::Type code) {
     return processors[code].isEmpty() ? nullptr : processors[code].removeAndReturn(0);
   }
 };

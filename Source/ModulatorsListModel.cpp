@@ -12,7 +12,7 @@
 #include "ModuleParameter.h"
 #include "LFOModule.h"
 
-void ModulatorsListModel::add(shared_ptr<Module> modulator) { this->modulators.add(modulator); }
+void ModulatorsListModel::add(std::shared_ptr<Module> modulator) { this->modulators.add(modulator); }
 int ModulatorsListModel::getNumRows() { return modulators.size(); }
 void ModulatorsListModel::listBoxItemDoubleClicked(int row, const MouseEvent& event) { ListBoxModel::listBoxItemDoubleClicked(row, event); }
 var ModulatorsListModel::getDragSourceDescription(const SparseSet<int>& rowsToDescribe) { return ListBoxModel::getDragSourceDescription(rowsToDescribe); }
@@ -116,7 +116,7 @@ void ModulatorsListModel::setupModulatorComponent(Module& model, ModulatorCompon
   }
 }
 
-void ModulatorsListModel::setModulators(Array<shared_ptr<Module>> modulators) {
+void ModulatorsListModel::setModulators(Array<std::shared_ptr<Module>> modulators) {
   this->modulators.clear();
   this->modulators = modulators;
 }

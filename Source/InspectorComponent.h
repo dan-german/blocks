@@ -13,7 +13,6 @@
 #include "Module.h"
 #include "InspectorSlider.h"
 
-using namespace std;
 using namespace Model;
 
 class InspectorComponent: public Component, Slider::Listener {
@@ -30,14 +29,14 @@ public:
 
   void resized() override;
 
-  void setConfiguration(shared_ptr<Module> module);
+  void setConfiguration(std::shared_ptr<Module> module);
   void setModulationIndicatorValue(int parameterIndex, int modulatorIndex, float value, float magnitude);
   void setModulationIndicatorPolarity(int parameterIndex, int modulatorIndex, bool bipolar);
   OwnedArray<InspectorSlider>& getSliders();
 private:
   OwnedArray<InspectorSlider> parameterSliders;
 
-  void spawnSlider(shared_ptr<ModuleParameter> model);
+  void spawnSlider(std::shared_ptr<ModuleParameter> model);
   void sliderValueChanged(Slider* slider) override;
   void updateSize();
   void resetInspector();

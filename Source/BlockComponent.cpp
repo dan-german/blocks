@@ -161,7 +161,7 @@ void BlockComponent::setEnvelopePath(Colour colour) {
   envelopePath->colour = colour;
 }
 
-BlockComponent* BlockComponent::create(shared_ptr<Block> block) {
+BlockComponent* BlockComponent::create(std::shared_ptr<Block> block) {
   auto component = new BlockComponent(block->index);
 
   component->setTitle(block->name);
@@ -197,11 +197,11 @@ void BlockComponent::themeChanged(Theme theme) {
     painter->waveColour = selectionColour;
 }
 
-void BlockComponent::setConfig(shared_ptr<Module> m) {
+void BlockComponent::setConfig(std::shared_ptr<Module> m) {
   indicators.reset();
 
-  unordered_set<shared_ptr<Module>> uniqueSources;
-  vector<shared_ptr<Module>> uniqueSourceVector;
+  std::unordered_set<std::shared_ptr<Module>> uniqueSources;
+  std::vector<std::shared_ptr<Module>> uniqueSourceVector;
 
   for (const auto& param : m->parameters)
     for (const auto& connection : param->connections)
