@@ -18,7 +18,6 @@
 using Module = Model::Module;
 using Block = Model::Block;
 using Modulation = Model::Modulation;
-using namespace std;
 
 class EnvelopeModulator;
 class ProcessorPool;
@@ -44,14 +43,14 @@ public:
   Voice(int sampleRate, int bufferSize);
   ~Voice() override;
 
-  shared_ptr<Processor> addBlock(shared_ptr<Block> block);
-  void addModulator(shared_ptr<Module> module);
+  std::shared_ptr<Processor> addBlock(std::shared_ptr<Block> block);
+  void addModulator(std::shared_ptr<Module> module);
   void repositionProcessor(Index oldIndex, Index newIndex);
   void startNote(bool notifyListeners = true);
-  void connect(shared_ptr<Modulation> connection);
-  void disconnect(shared_ptr<Modulation> connection);
+  void connect(std::shared_ptr<Modulation> connection);
+  void disconnect(std::shared_ptr<Modulation> connection);
   void setLfoPhase(int64 seconds);
-  void addChild(shared_ptr<Block> parent, Index index);
+  void addChild(std::shared_ptr<Block> parent, Index index);
   void clear();
   void correctToTime(int64 timeInSeconds);
 
@@ -99,23 +98,23 @@ public:
     return activeColumns;
   }
 
-  shared_ptr<ModulationInput> getModulationInput(shared_ptr<Modulation> modulationConnection);
-  shared_ptr<ModulationInput> getModulationInput(String source, String target, int parameterIndex);
+  std::shared_ptr<ModulationInput> getModulationInput(std::shared_ptr<Modulation> modulationConnection);
+  std::shared_ptr<ModulationInput> getModulationInput(String source, String target, int parameterIndex);
 
   void removeBlock(Index index);
   void removeModulator(int index);
-  shared_ptr<Processor> getProcessor(Index index);
-  shared_ptr<Processor> getModulator(int index);
-  shared_ptr<Processor> getModulator(String name);
-  shared_ptr<Processor> getProcessor(String name);
+  std::shared_ptr<Processor> getProcessor(Index index);
+  std::shared_ptr<Processor> getModulator(int index);
+  std::shared_ptr<Processor> getModulator(String name);
+  std::shared_ptr<Processor> getProcessor(String name);
 
 private:
-  Array<shared_ptr<Processor>> modulators;
-  Array<shared_ptr<Processor>> oscillators;
-  std::map<String, shared_ptr<Processor>> modulatorMap;
-  std::map<String, shared_ptr<Processor>> processorMap;
+  Array<std::shared_ptr<Processor>> modulators;
+  Array<std::shared_ptr<Processor>> oscillators;
+  std::map<String, std::shared_ptr<Processor>> modulatorMap;
+  std::map<String, std::shared_ptr<Processor>> processorMap;
 
-  unique_ptr<ProcessorPool> pool;
+  std::unique_ptr<ProcessorPool> pool;
 
   void processModulators(int samples);
   // void clearInactiveVoices();

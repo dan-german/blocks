@@ -26,14 +26,14 @@ Modulation::Modulation(Module* target,
   parameterIndex(parameterIndex),
   number(number) {
   name = "modulation " + String(number);
-  magnitudeParameter = shared_ptr<AudioParameterFloat>(new AudioParameterFloat(name + " magnitude", name + " magnitude", NormalisableRange(-1.0f, 1.0f, 0.001f), magnitude));
-  bipolarParameter = shared_ptr<AudioParameterBool>(new AudioParameterBool(name + " bipolar", name + " bipolar", bipolar));
+  magnitudeParameter = std::shared_ptr<AudioParameterFloat>(new AudioParameterFloat(name + " magnitude", name + " magnitude", NormalisableRange(-1.0f, 1.0f, 0.001f), magnitude));
+  bipolarParameter = std::shared_ptr<AudioParameterBool>(new AudioParameterBool(name + " bipolar", name + " bipolar", bipolar));
 }
 
 Modulation::Modulation(int number): number(number) {
   name = "modulation " + String(number);
-  magnitudeParameter = shared_ptr<AudioParameterFloat>(new AudioParameterFloat(name + " magnitude", name + " magnitude", NormalisableRange(-1.0f, 1.0f, 0.001f), 1.0f));
-  bipolarParameter = shared_ptr<AudioParameterBool>(new AudioParameterBool(name + " bipolar", name + " bipolar", false));
+  magnitudeParameter = std::shared_ptr<AudioParameterFloat>(new AudioParameterFloat(name + " magnitude", name + " magnitude", NormalisableRange(-1.0f, 1.0f, 0.001f), 1.0f));
+  bipolarParameter = std::shared_ptr<AudioParameterBool>(new AudioParameterBool(name + " bipolar", name + " bipolar", false));
 };
 
 Modulation::~Modulation() { }

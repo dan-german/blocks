@@ -104,7 +104,7 @@ void Analytics::initProfileIfNeeded() {
   juce::Thread::launch(req);
 }
 
-void Analytics::sendEvent(const String& eventName, optional<string> customSessionID, optional<json> extraProperties) {
+void Analytics::sendEvent(const String& eventName, std::optional<std::string> customSessionID, std::optional<json> extraProperties) {
   auto req = [this, eventName, customSessionID, extraProperties] {
     json event;
     event["event"] = eventName.toStdString();

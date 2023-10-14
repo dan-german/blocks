@@ -13,11 +13,10 @@
 #include "ModulatorComponent.h"
 
 using Module = Model::Module;
-using namespace std;
 
 class ModulatorsListModel: public ListBoxModel {
 private:
-  Array<shared_ptr<Module>> modulators;
+  Array<std::shared_ptr<Module>> modulators;
   void setupModulatorComponent(Module& model, ModulatorComponent& component) const;
 public:
   ~ModulatorsListModel() override = default;
@@ -26,9 +25,9 @@ public:
   ModulatorComponent::Listener* modulatorListener;
 
   int getNumRows() override;
-  void add(shared_ptr<Module> modulator);
+  void add(std::shared_ptr<Module> modulator);
   void remove(int index);
-  void setModulators(Array<shared_ptr<Module>> modulators);
+  void setModulators(Array<std::shared_ptr<Module>> modulators);
 protected:
   void paintListBoxItem(int rowNumber, Graphics& g, int width, int height, bool rowIsSelected) override {}
   void listBoxItemDoubleClicked(int row, const MouseEvent& event) override;

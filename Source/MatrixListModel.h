@@ -14,18 +14,17 @@
 #include "ConnectionComponent.h"
 
 using Modulation = Model::Modulation;
-using namespace std;
 
 class ModulationsListBoxModel: public ListBoxModel {
 public:
   int getNumRows() override;
   ~ModulationsListBoxModel() override = default;
   Component* refreshComponentForRow(int rowNumber, bool isRowSelected, Component* existingComponentToUpdate) override;
-  void setConnections(Array<shared_ptr<Modulation>> modulationConnections);
+  void setConnections(Array<std::shared_ptr<Modulation>> modulationConnections);
   Slider::Listener* sliderListener;
   ConnectionComponent::Listener* delegate;
 private:
-  Array<shared_ptr<Modulation>> connections;
+  Array<std::shared_ptr<Modulation>> connections;
 
   void paintListBoxItem(int rowNumber, Graphics& g, int width, int height, bool rowIsSelected) override;
   void listBoxItemClicked(int row, const MouseEvent& event) override;

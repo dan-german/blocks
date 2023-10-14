@@ -27,7 +27,6 @@
 
 using Modulation = Model::Modulation;
 using Module = Model::Module;
-using namespace std;
 
 class UILayer: public juce::Component, ComponentMovementWatcher {
 public:
@@ -51,8 +50,8 @@ public:
   ~UILayer() override;
 
   void resized() override;
-  void setModulations(Array<shared_ptr<Modulation>> modulationConnections);
-  void setModulators(Array<shared_ptr<Module>> modulators);
+  void setModulations(Array<std::shared_ptr<Modulation>> modulationConnections);
+  void setModulators(Array<std::shared_ptr<Module>> modulators);
   void componentMovedOrResized(bool wasMoved, bool wasResized) override {};
   void componentPeerChanged() override {};
   void componentVisibilityChanged() override {};

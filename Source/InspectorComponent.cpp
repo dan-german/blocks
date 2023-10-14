@@ -18,13 +18,13 @@ int InspectorComponent::calculateWidth() { return sliderWidth * (parameterSlider
 void InspectorComponent::sliderDragStarted(Slider* slider) { delegate->inspectorGestureChanged(getIndexOfSlider(slider), true); }
 void InspectorComponent::sliderDragEnded(Slider* slider) { delegate->inspectorGestureChanged(getIndexOfSlider(slider), false); }
 
-void InspectorComponent::setConfiguration(shared_ptr<Module> module) {
+void InspectorComponent::setConfiguration(std::shared_ptr<Module> module) {
   resetInspector();
   for (auto parameter : module->parameters) spawnSlider(parameter);
   updateSize();
 }
 
-void InspectorComponent::spawnSlider(shared_ptr<ModuleParameter> parameter) {
+void InspectorComponent::spawnSlider(std::shared_ptr<ModuleParameter> parameter) {
   auto slider = new InspectorSlider();
   auto audioParameter = parameter->audioParameter;
 

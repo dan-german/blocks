@@ -44,7 +44,6 @@ namespace Model {
     inline const Array<Type> tabs = { noteTab };
   }
 
-  using namespace std;
   class ModuleParameter;
   class Module {
   public:
@@ -53,8 +52,8 @@ namespace Model {
 
     ID id;
     String name;
-    map<String, shared_ptr<ModuleParameter>> parameterMap; // relevant only for automation? 
-    Array<shared_ptr<ModuleParameter>> parameters;
+    std::map<String, std::shared_ptr<ModuleParameter>> parameterMap; // relevant only for automation? 
+    Array<std::shared_ptr<ModuleParameter>> parameters;
     ModuleColour colour = { Colour(237, 237, 237), -1 };
     bool isActive = false;
     bool isChild = false;
@@ -68,9 +67,9 @@ namespace Model {
     inline bool isOscillator() { return id.type == Types::osc; }
 
     virtual void reset();
-    void removeConnection(shared_ptr<Modulation> connection);
+    void removeConnection(std::shared_ptr<Modulation> connection);
     bool operator<(const Module& r) const;
-    inline shared_ptr<ModuleParameter> parameter(int index) { return parameters[(unsigned long)index]; }
+    inline std::shared_ptr<ModuleParameter> parameter(int index) { return parameters[(unsigned long)index]; }
 
   protected:
     struct CreateParameterFloatInput;

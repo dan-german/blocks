@@ -30,7 +30,7 @@ namespace Model {
     bool isModulatable;
     float skew = 1.0f;
     String valueSuffix = "";
-    Array<shared_ptr<Modulation>> connections;
+    Array<std::shared_ptr<Modulation>> connections;
     std::function<String(double)> textFromValueFunction;
     std::function<double(const String&)> valueFromTextFunction;
     ModuleParameter(RangedAudioParameter* audioParameter,
@@ -57,7 +57,7 @@ namespace Model {
       return adjustedValue;
     }
 
-    int getIndexOfConnection(shared_ptr<Modulation> connection) {
+    int getIndexOfConnection(std::shared_ptr<Modulation> connection) {
       for (int i = 0; i < connections.size(); i++)
         if (connection == connections[i])
           return i;
@@ -68,6 +68,6 @@ namespace Model {
     void setValue(float value) {
       audioParameter->setValueNotifyingHost(audioParameter->getNormalisableRange().convertTo0to1(value));
     }
-    void removeConnection(shared_ptr<Modulation> connection) { connections.remove(connections.indexOf(connection)); }
+    void removeConnection(std::shared_ptr<Modulation> connection) { connections.remove(connections.indexOf(connection)); }
   };
 }

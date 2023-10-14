@@ -17,8 +17,8 @@ using Block = Model::Block;
 
 class Processor: public Voice::Listener {
 public:
-  Array<shared_ptr<Parameter>> parameters;
-  shared_ptr<Module> module;
+  Array<std::shared_ptr<Parameter>> parameters;
+  std::shared_ptr<Module> module;
 
   AudioSampleBuffer buffer;
   double bpm = 120;
@@ -28,11 +28,11 @@ public:
 
   float getNextValue();
   float getValue(int index) { return buffer.getSample(0, index); }
-  shared_ptr<Parameter> getParameter(int index) { return parameters[index]; }
+  std::shared_ptr<Parameter> getParameter(int index) { return parameters[index]; }
   void process(int samples);
   void noteStarted(Voice* voice, float frequencyInHertz) override {}
   void noteStopped(bool allowTailOff) override {}
-  void setModule(shared_ptr<Module> module);
+  void setModule(std::shared_ptr<Module> module);
   void process();
 
   virtual bool isActive() { return false; }

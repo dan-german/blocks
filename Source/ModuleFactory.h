@@ -26,23 +26,23 @@ using namespace Model;
 
 class ModuleFactory {
 public:
-  static shared_ptr<Block> createBlock(Model::Type type, int number) {
-    if (type == Types::osc) return make_shared<OscillatorModule>(0, number);
-    if (type == Types::filter) return make_shared<FilterModule>(number);
-    if (type == Types::reverb) return make_shared<ReverbModule>(number);
-    if (type == Types::delay) return make_shared<DelayModule>(number);
-    if (type == Types::drive) return make_shared<DriveModule>(number);
-    if (type == Types::mixer) return make_shared<MixerModule>(number);
+  static std::shared_ptr<Block> createBlock(Model::Type type, int number) {
+    if (type == Types::osc) return std::make_shared<OscillatorModule>(0, number);
+    if (type == Types::filter) return std::make_shared<FilterModule>(number);
+    if (type == Types::reverb) return std::make_shared<ReverbModule>(number);
+    if (type == Types::delay) return std::make_shared<DelayModule>(number);
+    if (type == Types::drive) return std::make_shared<DriveModule>(number);
+    if (type == Types::mixer) return std::make_shared<MixerModule>(number);
     jassert(false);
     return nullptr;
   }
 
-  static shared_ptr<Module> createModulator(Model::Type type, int number) {
-    if (type == Types::lfo) return make_shared<LFOModule>(number);
-    if (type == Types::adsr) return make_shared<EnvelopeModule>(number);
+  static std::shared_ptr<Module> createModulator(Model::Type type, int number) {
+    if (type == Types::lfo) return std::make_shared<LFOModule>(number);
+    if (type == Types::adsr) return std::make_shared<EnvelopeModule>(number);
     jassert(false);
     return nullptr;
   }
 
-  static shared_ptr<Tab> createTab(Model::Type type, int number) { return make_shared<Tab>(type, number); }
+  static std::shared_ptr<Tab> createTab(Model::Type type, int number) { return std::make_shared<Tab>(type, number); }
 };

@@ -19,10 +19,10 @@ class Processor;
 using Modulation = Model::Modulation;
 
 struct ModulationInput {
-  shared_ptr<Modulation> connection;
-  shared_ptr<Processor> source;
+  std::shared_ptr<Modulation> connection;
+  std::shared_ptr<Processor> source;
 
-  ModulationInput(shared_ptr<Processor> source, shared_ptr<Modulation> connection);
+  ModulationInput(std::shared_ptr<Processor> source, std::shared_ptr<Modulation> connection);
   ~ModulationInput();
 
   float getValue(int phase);

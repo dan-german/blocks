@@ -4,7 +4,7 @@ ModuleManager::~ModuleManager() {
   clear();
 }
 
-shared_ptr<Block> ModuleManager::addBlock(Model::Type code, Index index, int number) {
+std::shared_ptr<Block> ModuleManager::addBlock(Model::Type code, Index index, int number) {
   auto block = pool.getBlock(code, number);
   if (block == nullptr) return nullptr;
   block->index = index;
@@ -14,7 +14,7 @@ shared_ptr<Block> ModuleManager::addBlock(Model::Type code, Index index, int num
   return block;
 }
 
-void ModuleManager::removeBlock(shared_ptr<Block> block) {
+void ModuleManager::removeBlock(std::shared_ptr<Block> block) {
   for (auto connection : getConnectionsOfTarget(block))
     removeConnection(connection);
 
@@ -24,7 +24,7 @@ void ModuleManager::removeBlock(shared_ptr<Block> block) {
   pool.retire(block);
 }
 
-shared_ptr<Module> ModuleManager::addModulator(Model::Type code, int number, int colourId) {
+std::shared_ptr<Module> ModuleManager::addModulator(Model::Type code, int number, int colourId) {
   auto modulator = pool.getModulator(code, number, colourId);
   if (modulator == nullptr) { return nullptr; }
   modulators.add(modulator);
@@ -32,8 +32,8 @@ shared_ptr<Module> ModuleManager::addModulator(Model::Type code, int number, int
   return modulator;
 }
 
-Array<shared_ptr<Modulation>> ModuleManager::getConnectionsOfSource(shared_ptr<Module> source) {
-  Array<shared_ptr<Modulation>> sourceConnections;
+Array<std::shared_ptr<Modulation>> ModuleManager::getConnectionsOfSource(std::shared_ptr<Module> source) {
+  Array<std::shared_ptr<Modulation>> sourceConnections;
 
   for (auto connection : connections)
     if (connection->source == source)
@@ -42,8 +42,8 @@ Array<shared_ptr<Modulation>> ModuleManager::getConnectionsOfSource(shared_ptr<M
   return sourceConnections;
 }
 
-Array<shared_ptr<Modulation>> ModuleManager::getConnectionsOfTarget(shared_ptr<Module> target) {
-  Array<shared_ptr<Modulation>> targetConnections;
+Array<std::shared_ptr<Modulation>> ModuleManager::getConnectionsOfTarget(std::shared_ptr<Module> target) {
+  Array<std::shared_ptr<Modulation>> targetConnections;
 
   for (auto connection : connections)
     if (connection->target == target)
@@ -71,7 +71,7 @@ void ModuleManager::repositionBlock(Index oldIndex, Index newIndex) {
   blockMatrix[oldIndex.row][oldIndex.column] = {};
 }
 
-shared_ptr<Modulation> ModuleManager::addConnection(shared_ptr<Module> source, shared_ptr<Module> target, int parameterIndex, int number) {
+std::shared_ptr<Modulation> ModuleManager::addConnection(std::shared_ptr<Module> source, std::shared_ptr<Module> target, int parameterIndex, int number) {
   if (connectionExists(parameterIndex, source, target)) return nullptr;
 
   auto connection = pool.getModulation(number);
@@ -83,7 +83,7 @@ shared_ptr<Modulation> ModuleManager::addConnection(shared_ptr<Module> source, s
   return connection;
 }
 
-bool ModuleManager::connectionExists(int parameterIndex, shared_ptr<Module> source, shared_ptr<Module> target) {
+bool ModuleManager::connectionExists(int parameterIndex, std::shared_ptr<Module> source, std::shared_ptr<Module> target) {
   for (auto connection : connections) {
     bool connectionExists = connection->target == target
       && connection->source == source
@@ -100,19 +100,19 @@ void ModuleManager::removeConnection(int index) {
   pool.retire(connection);
 }
 
-void ModuleManager::removeConnection(shared_ptr<Modulation> connection) {
+void ModuleManager::removeConnection(std::shared_ptr<Modulation> connection) {
   connection->target->removeConnection(connection);
   pool.retire(connections.removeAndReturn(connections.indexOf(connection)));
 }
 
-Array<shared_ptr<Modulation>> ModuleManager::getConnections() {
-  Array<shared_ptr<Modulation>> array;
+Array<std::shared_ptr<Modulation>> ModuleManager::getConnections() {
+  Array<std::shared_ptr<Modulation>> array;
   array.addArray(connections);
   return array;
 }
 
-Array<shared_ptr<Module>> ModuleManager::getModulators() {
-  Array<shared_ptr<Module>> array;
+Array<std::shared_ptr<Module>> ModuleManager::getModulators() {
+  Array<std::shared_ptr<Module>> array;
   for (auto object : modulators) array.add(object);
   return array;
 }
@@ -124,7 +124,7 @@ void ModuleManager::clear() {
   for (int i = modulators.size() - 1; i >= 0; i--) removeModulator(i);
 }
 
-void ModuleManager::removeTab(shared_ptr<Tab> tab) {
+void ModuleManager::removeTab(std::shared_ptr<Tab> tab) {
   for (auto connection : getConnectionsOfTarget(tab))
     removeConnection(connection);
 
@@ -150,7 +150,7 @@ Array<int> ModuleManager::getActiveColumns() {
   return activeColumns;
 }
 
-shared_ptr<Tab> ModuleManager::addTab(Model::Type type, int column, int number) {
+std::shared_ptr<Tab> ModuleManager::addTab(Model::Type type, int column, int number) {
   auto tab = pool.getTab(type, number);
   if (tab == nullptr) return nullptr;
   tab->column = column;
@@ -159,7 +159,7 @@ shared_ptr<Tab> ModuleManager::addTab(Model::Type type, int column, int number) 
   return tab;
 }
 
-shared_ptr<Tab> ModuleManager::getTab(int column) {
+std::shared_ptr<Tab> ModuleManager::getTab(int column) {
   for (auto tab : tabs) {
     if (tab->column == column) return tab;
   }

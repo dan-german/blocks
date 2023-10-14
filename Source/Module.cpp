@@ -31,7 +31,7 @@ namespace Model {
     colour = { Colour(204, 201, 184), -1 };
   }
 
-  void Module::removeConnection(shared_ptr<Modulation> connection) { parameter(connection->parameterIndex)->removeConnection(connection); }
+  void Module::removeConnection(std::shared_ptr<Modulation> connection) { parameter(connection->parameterIndex)->removeConnection(connection); }
   bool Module::operator<(const Module& r) const { return id.number < r.id.number; }
 
   void Module::createIntParameter(Module::CreateParameterIntInput input) {
@@ -50,7 +50,7 @@ namespace Model {
   }
 
   ModuleParameter* Module::createParameter(RangedAudioParameter* audioParameter, String name, bool isAutomatable, float skew, String valueSuffix, std::function<String(float)> textFromValueFunction) {
-    auto shared = make_shared<ModuleParameter>(audioParameter, name, isAutomatable, skew, valueSuffix, textFromValueFunction);
+    auto shared = std::make_shared<ModuleParameter>(audioParameter, name, isAutomatable, skew, valueSuffix, textFromValueFunction);
     parameters.add(shared);
     parameterMap[name] = shared;
     return shared.get();

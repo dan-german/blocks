@@ -55,7 +55,7 @@ Component* ModulationsListBoxModel::refreshComponentForRow(int rowNumber, bool i
   return component;
 }
 
-void ModulationsListBoxModel::setConnections(Array<shared_ptr<Modulation>> modulationConnections) {
+void ModulationsListBoxModel::setConnections(Array<std::shared_ptr<Modulation>> modulationConnections) {
   this->connections.clear();
   this->connections = modulationConnections;
 }

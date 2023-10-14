@@ -14,10 +14,10 @@
 #include "Tab.h"
 
 PresetInfo PresetInfo::create(String name,
-  Array<shared_ptr<Model::Tab>> tabs,
-  Array<shared_ptr<Model::Block>> blocks,
-  Array<shared_ptr<Model::Module>> modulators,
-  Array<shared_ptr<Model::Modulation>> modulations) {
+  Array<std::shared_ptr<Model::Tab>> tabs,
+  Array<std::shared_ptr<Model::Block>> blocks,
+  Array<std::shared_ptr<Model::Module>> modulators,
+  Array<std::shared_ptr<Model::Modulation>> modulations) {
   PresetInfo info;
 
   info.name = name;
@@ -63,7 +63,7 @@ PresetInfo PresetInfo::create(String name,
   return info;
 }
 
-void PresetInfo::prepareModule(shared_ptr<Model::Module> module, Module& moduleInfo) {
+void PresetInfo::prepareModule(std::shared_ptr<Model::Module> module, Module& moduleInfo) {
   moduleInfo.id = {
     .type = module->id.type,
     .number = module->id.number

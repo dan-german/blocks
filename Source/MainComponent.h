@@ -21,7 +21,6 @@
 using Modulation = Model::Modulation;
 using Block = Model::Block;
 using Tab = Model::Tab;
-using namespace std;
 
 class MainComponent final: public Component,
   InspectorComponent::Listener,
@@ -87,10 +86,10 @@ private:
 
   void toggleGridItemSelection(GridComponent* grid, GridItemComponent* item, bool selected);
   void showBlocksPopup(Index index);
-  shared_ptr<Block> addBlock(int code, Index index);
+  std::shared_ptr<Block> addBlock(int code, Index index);
   void removeBlock(GridItemComponent* block);
   void removeTab(GridItemComponent* tab);
-  shared_ptr<Module> getFocusedModule();
+  std::shared_ptr<Module> getFocusedModule();
 
   // Grid Listener
   void clickedOnGrid(GridComponent* grid, Index index) override;
@@ -112,8 +111,8 @@ private:
   void inspectorGestureChanged(int index, bool started) override;
 
   void dismissPopup(ButtonGridPopup& popup);
-  void spawnBlockComponent(shared_ptr<Block> block);
-  void spawnTabComponent(shared_ptr<Tab> tab);
+  void spawnBlockComponent(std::shared_ptr<Block> block);
+  void spawnTabComponent(std::shared_ptr<Tab> tab);
   void graphicsTimerCallback(const float secondsSinceLastUpdate);
   void changeModulePainter(int value);
   PopupMenu spawnModulationMenu(Module& victim);
@@ -126,7 +125,7 @@ private:
   void sliderValueChanged(Slider* slider) override;
   void setupBlockGrid();
   void setupTabGrid();
-  void updateModuleComponentVisuals(int sliderIndex, float value, shared_ptr<Block> block);
+  void updateModuleComponentVisuals(int sliderIndex, float value, std::shared_ptr<Block> block);
   void setupListeners();
   void clickOnGrid(Index& index);
 
@@ -152,7 +151,7 @@ private:
 };
 
 struct MainComponent::Delegate {
-  virtual shared_ptr<Tab> editorAddedTab(int column) = 0;
+  virtual std::shared_ptr<Tab> editorAddedTab(int column) = 0;
   virtual void editorRepositionedTab(int oldColumn, int newColumn) = 0;
   virtual void editorChangedTabLength(int column, int times) = 0;
   virtual void editorRemovedTab(int column) = 0;
@@ -179,15 +178,15 @@ struct MainComponent::Delegate {
 
   virtual std::pair<float, float> editorRequestsModulatorValue(Index moduleIndex, int parameterIndex, int modulatorIndex) = 0;
   virtual std::pair<float, float> editorRequestsModulatorValue(int modulationConnectionIndex) = 0;
-  virtual shared_ptr<Tab> getTab(int column) = 0;
-  virtual shared_ptr<Module> getModulator(int index) = 0;
-  virtual shared_ptr<Module> editorAddedModulator(Model::Type code) = 0;
-  virtual shared_ptr<Block> getBlock(Index index) = 0;
-  virtual shared_ptr<Block> editorAddedBlock(Model::Type code, Index index) = 0;
+  virtual std::shared_ptr<Tab> getTab(int column) = 0;
+  virtual std::shared_ptr<Module> getModulator(int index) = 0;
+  virtual std::shared_ptr<Module> editorAddedModulator(Model::Type code) = 0;
+  virtual std::shared_ptr<Block> getBlock(Index index) = 0;
+  virtual std::shared_ptr<Block> editorAddedBlock(Model::Type code, Index index) = 0;
   virtual Array<int> editorRequestsActiveColumns() = 0;
-  virtual Array<shared_ptr<Module>> getModulators() = 0;
-  virtual Array<shared_ptr<Modulation>> getModulations() = 0;
-  virtual Array<shared_ptr<Modulation>> getConnectionsOfSource(shared_ptr<Module> source) = 0;
+  virtual Array<std::shared_ptr<Module>> getModulators() = 0;
+  virtual Array<std::shared_ptr<Modulation>> getModulations() = 0;
+  virtual Array<std::shared_ptr<Modulation>> getConnectionsOfSource(std::shared_ptr<Module> source) = 0;
 
   virtual ~Delegate() = default;
 };

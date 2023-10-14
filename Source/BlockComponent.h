@@ -23,7 +23,6 @@
 class BlockComponent;
 using Block = Model::Block;
 using Module = Model::Module;
-using namespace std;
 
 class BlockComponent final: public GridItemComponent, ThemeListener {
 public:
@@ -51,8 +50,8 @@ public:
   void setTitleColour(Colour newColour) { this->titleLabel.setColour(Label::ColourIds::textColourId, newColour); }
   EnvelopePath* getEnvelopePath() { return this->envelopePath.get(); }
 
-  static BlockComponent* create(shared_ptr<Block> block);
-  void setConfig(shared_ptr<Module> m);
+  static BlockComponent* create(std::shared_ptr<Block> block);
+  void setConfig(std::shared_ptr<Module> m);
   void animate();
 protected:
   void paint(Graphics& g) override;
