@@ -3,6 +3,8 @@
 #define M_PI 3.14159265358979323846
 #endif
 
+#include "ThemeManager.h"
+
 void BlockGridComponent::highlightColumn(int start, int end) {
   highlight = true;
   GraphicsTimer::start();
@@ -20,9 +22,9 @@ void BlockGridComponent::highlightColumn(int start, int end) {
 }
 
 void BlockGridComponent::reset() {
-  for (auto dotArray : dots)
-    for (auto dot : *dotArray)
-      dot->setColour(DotComponent::defaultColour);
+  // for (auto dotArray : dots)
+    // for (auto dot : *dotArray)
+      // dot->setColour(DotComponent::defaultColour);
 
   hideAllItems(false);
   highlight = false;
@@ -53,6 +55,31 @@ void BlockGridComponent::update(const float secondsSinceLastUpdate) {
 BlockGridComponent::BlockGridComponent(GridComponent::Config config): GridComponent(config) {
   addAndMakeVisible(blockPlaceholder);
   spawnDots();
+
+  dots_animator_.speed = 0.5f;
+  dots_animator_.waveType = ValueAnimator::WaveType::was;
+  dots_animator_.valueAnimatorCallback = [this](float value) {
+    auto dot_columns_to_highlight = highlighted_columns_;
+    auto max_element = *std::max_element(dot_columns_to_highlight.begin(), dot_columns_to_highlight.end());
+    dot_columns_to_highlight.insert(max_element + 1);
+    for (int column : dot_columns_to_highlight) {
+      auto offset = 0.0f;
+      for (auto dot_row : dots) {
+        float sine_value = std::sin(value * M_PI * 2 + offset);
+        offset -= M_PI * 0.8f / (float)dot_row->size();
+        auto dot = dot_row->getUnchecked(column);
+        auto mapped = jmap(sine_value, -1.0f, 1.0f, 0.0f, 2.0f);
+        auto color = ThemeManager::shared()->getCurrent().two.brighter(3.0f).darker(mapped);
+        dot->setColour(color);
+      }
+    }
+  };
+
+  dots_animator_.start();
+}
+
+void BlockGridComponent::SetDownFlowingHighlight(int column, bool active) {
+  highlighted_columns_.insert(column);
 }
 
 void BlockGridComponent::spawnDots() {
@@ -88,7 +115,7 @@ void BlockGridComponent::gridItemStretchEnded(GridItemComponent* item, int offse
 void BlockGridComponent::setDotsHidden(bool hidden) {
   for (auto dotArray : dots) {
     for (auto dot : *dotArray) {
-      dot->setColour(hidden ? DotComponent::defaultColour.withAlpha(0.5f) : DotComponent::defaultColour);
+      // dot->setColour(hidden ? DotComponent::defaultColour.withAlpha(0.5f) : DotComponent::defaultColour);
     }
   }
 }
@@ -222,7 +249,7 @@ void BlockGridComponent::applyMouseHoverEffect() {
       auto distance = pos.getDistanceFrom(getMouseXYRelative());
       if (distance <= threshold) {
         auto mappedDistance = jmap(float(distance), 0.f, threshold, 0.4f, 0.0f);
-        dot->setColour(DotComponent::defaultColour.brighter(mappedDistance));
+        // dot->setColour(DotComponent::defaultColour.brighter(mappedDistance));
       }
     }
   }

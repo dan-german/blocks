@@ -228,7 +228,6 @@ void GridComponent::gridItemIsStretching(GridItemComponent* item, int offset) {
 
   bool isSlotInvalid = isSlotTaken(item->index, item) != nullptr || !isIndexValid(item->index, item->index, newLength);
 
-
   itemHovered(item, !isSlotInvalid, true, newLength, item->index);
   if (isSlotInvalid) return;
   item->length = newLength;

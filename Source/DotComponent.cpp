@@ -11,11 +11,14 @@
 #include "DotComponent.h"
 #include "ThemeManager.h"
 
-DotComponent::DotComponent() { }
+DotComponent::DotComponent() {
+  colour = ThemeManager::shared()->getCurrent().two;
+}
+
 DotComponent::~DotComponent() { setName("DotComponent"); }
 
 void DotComponent::paint(juce::Graphics& g) {
-  g.setColour(ThemeManager::shared()->getCurrent().two);
+  g.setColour(colour);
   g.fillEllipse(getLocalBounds().toFloat());
 }
 

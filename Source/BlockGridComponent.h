@@ -1,6 +1,7 @@
 #include "GridComponent.h"
 #include "GraphicsTimer.h"
 #include "EasingAnimator.h"
+#include "ValueAnimator.h"
 
 class BlockGridComponent: public GridComponent, public GraphicsTimer {
 public:
@@ -17,6 +18,7 @@ public:
   void animateDragMode(GridItemComponent* item, bool enabled = true);
   OwnedArray<OwnedArray<DotComponent>> dots;
   void clear() override;
+  void SetDownFlowingHighlight(int column, bool active);
 protected:
   void itemHovered(GridItemComponent* item, bool valid, bool inside, int proposedLength, Index index) override;
   virtual void itemLandedOutside(GridItemComponent* item, Index index) override;
@@ -35,4 +37,6 @@ private:
   float sineX = 0.0f;
   float defaultAlpha = 0.25f;
   int firstHighlightedColumn, lastHighlightedColumn;
+  ValueAnimator dots_animator_;
+  std::set<int> highlighted_columns_;
 };

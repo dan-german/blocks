@@ -24,6 +24,7 @@ MainComponent::MainComponent(Delegate* delegate): delegate(delegate), uiLayer(th
 
   noteLogger.listener = this;
   ThemeManager::shared()->set(UserSettings::shared()->getInt("theme", 0));
+  blockGrid.SetDownFlowingHighlight(0, true);
 }
 
 void MainComponent::updateDotPosition(const Point<int> position) {
