@@ -108,7 +108,11 @@ target_compile_definitions(blocks
 file(GLOB_RECURSE BinaryAssets CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/Assets/*.ttf" "${CMAKE_CURRENT_SOURCE_DIR}/Assets/*.svg" "${CMAKE_CURRENT_SOURCE_DIR}/Assets/*.key")
 juce_add_binary_data(blocks_binary_data NAMESPACE BinaryData SOURCES ${BinaryAssets})
 
-# `target_link_libraries` links libraries and JUCE modules to other libraries or executables. Here,
+if (UNIX AND NOT APPLE)
+    set_target_properties(blocks_binary_data PROPERTIES POSITION_INDEPENDENT_CODE TRUE)
+endif()
+
+#`target_link_libraries` links libraries and JUCE modules to other libraries or executables. Here,
 # we're linking our executable target to the `juce::juce_audio_utils` module. Inter-module
 # dependencies are resolved automatically, so `juce_core`, `juce_events` and so on will also be
 # linked automatically. If we'd generated a binary data target above, we would need to link to it
