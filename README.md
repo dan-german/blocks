@@ -24,5 +24,9 @@ To the right stands the modulators menu, a space for adding LFOs and envelopes; 
 
 Tabs, placed above the block grid, control which column of blocks activates when a note is played.
 
+## Architecture
+<img src="./packaging/uml.svg" width="100%">
+
+
 ## Contributing 
 If you're interesting in contributing, [**join our discord channel**](https://discord.gg/MjkFj859vW)!
