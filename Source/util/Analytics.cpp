@@ -105,7 +105,6 @@ void Analytics::initProfileIfNeeded() {
 }
 
 void Analytics::sendEvent(const String& eventName, std::optional<std::string> customSessionID, std::optional<json> extraProperties) {
-  return;
   auto req = [this, eventName, customSessionID, extraProperties] {
     json event;
     event["event"] = eventName.toStdString();
