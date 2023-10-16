@@ -267,4 +267,5 @@ WaveTable* WaveTableConstants::getWaveTable(WaveTableConstants::WaveTableType ty
   case WaveTableType::count:
     return nullptr;
   }
+  return nullptr;
 }

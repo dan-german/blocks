@@ -89,6 +89,7 @@ private:
     case WaveformType::noise:
       return 1.0f - 2.0f * rand() / RAND_MAX;
     }
+    return 0.f;
   }
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(OscillatorPainter)
