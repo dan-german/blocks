@@ -1,5 +1,5 @@
 name: Build Windows
-on: [workflow_dispatch]
+on: [workflow_dispatch, pull_request]
 env:
   BUILD_TYPE: Release
 jobs:
