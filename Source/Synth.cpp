@@ -1,5 +1,5 @@
 #include "Synth.h"
-#include "Analytics.h"
+#include "util/Analytics.h"
 
 void Synth::editorAdjustedModulator(int parameter, int modulator, float value) { moduleManager.getModulator(modulator)->parameter(parameter)->setValue(value); }
 void Synth::editorAdjustedBlock(Index index, int parameter, float value) { moduleManager.getBlock(index)->parameter(parameter)->setValue(value); }

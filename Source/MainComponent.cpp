@@ -1,9 +1,9 @@
 #include "MainComponent.h"
 #include "ModuleProcessorFactory.h"
-#include "ModuleFactory.h"
-#include "GridConfigs.h"
-#include "ThemeManager.h"
-#include "UserSettings.h"
+#include "model/ModuleFactory.h"
+#include "settings/GridConfigs.h"
+#include "gui/ThemeManager.h"
+#include "settings/UserSettings.h"
 
 MainComponent::MainComponent(Delegate* delegate): delegate(delegate), uiLayer(this), tabGrid(GridConfigs::tab), blockGrid(GridConfigs::blocks) {
   setWantsKeyboardFocus(false);
