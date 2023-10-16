@@ -9,16 +9,16 @@
 */
 
 #pragma once
-#include "Processor.h"
-#include "Module.h"
-#include "OscillatorProcessor.h"
-#include "LFOModulator.h"
-#include "ReverbProcessor.h"
-#include "EnvelopeModulator.h"
-#include "FilterProcessor.h"
-#include "DelayProcessor.h"
-#include "DriveProcessor.h"
-#include "MixerProcessor.h"
+#include "dsp/Processor.h"
+#include "model/Module.h"
+#include "dsp/OscillatorProcessor.h"
+#include "dsp/LFOModulator.h"
+#include "dsp/ReverbProcessor.h"
+#include "dsp/EnvelopeModulator.h"
+#include "dsp/FilterProcessor.h"
+#include "dsp/DelayProcessor.h"
+#include "dsp/DriveProcessor.h"
+#include "dsp/MixerProcessor.h"
 
 class ModuleProcessorFactory {
 public:

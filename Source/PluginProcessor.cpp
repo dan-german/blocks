@@ -10,9 +10,9 @@
 
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
-#include "WaveTableConstants.h"
-#include "Analytics.h"
-#include "UserSettings.h"
+#include "settings/WaveTableConstants.h"
+#include "util/Analytics.h"
+#include "settings/UserSettings.h"
 
 PluginProcessor::~PluginProcessor() {
   Analytics::shared()->handleQuit();

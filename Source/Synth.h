@@ -10,13 +10,13 @@
 
 #pragma once
 
-#include "Voice.h"
-#include "ProcessorPool.h"
-#include "Modulation.h"
+#include "dsp/Voice.h"
+#include "model/ProcessorPool.h"
+#include "model/Modulation.h"
 #include "MainComponent.h"
-#include "ModuleManager.h"
-#include "PresetManager.h"
-#include "TabDelayManager.h"
+#include "model/ModuleManager.h"
+#include "model/PresetManager.h"
+#include "dsp/TabDelayManager.h"
 
 using Modulation = Model::Modulation;
 using Block = Model::Block;
