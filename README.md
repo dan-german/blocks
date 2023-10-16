@@ -11,7 +11,7 @@
 <a href="https://www.soonth.com"><img src="https://img.shields.io/badge/Download-AAFF00"/></a>
 <br></br>
 	
-**blocks is a modular synthesizer available as standalone, VST3 & AU for Windows and macOS.**
+**blocks is a modular synthesizer available as standalone, VST3 & AU for Windows, macOS & Linux.**
 </div>
 
 ## How to use
