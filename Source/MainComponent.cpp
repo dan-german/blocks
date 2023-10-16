@@ -337,7 +337,6 @@ void MainComponent::setupInspector() {
 void MainComponent::resizeInspector() {
   auto gridY = blockGrid.getY() + blockGrid.getHeight();
   auto gridCenterX = blockGrid.getX() + blockGrid.getWidth() / 2;
-
   int inspectorX = gridCenterX - inspector.calculateWidth() / 2;
   inspector.setBounds(inspectorX, gridY + 60, 1, 220);
 }
@@ -370,9 +369,11 @@ void MainComponent::removeBlock(GridItemComponent* block) {
   }
 
   blockGrid.detachModule(block->index);
+  blockGrid.ResetDotsVisibility();
   blocks.removeFirstMatchingValue(item);
   delegate->editorRemovedBlock(item->index);
   uiLayer.setModulations(delegate->getModulations());
+  ResetDownFlowingDots();
 }
 
 void MainComponent::handleModuleLandedOnInspector(BlockComponent* moduleComponent, const Point<int>& inspectorRelativePosition) {
@@ -449,6 +450,7 @@ void MainComponent::spawnBlockComponent(std::shared_ptr<Block> block) {
   cursor.setAlwaysOnTop(true);
   if (block->length > 1) blockGrid.setItemLength(blockComponent, block->length);
   blockComponent->setConfig(block);
+  ResetDownFlowingDots();
 }
 
 void MainComponent::spawnTabComponent(std::shared_ptr<Tab> tab) {
@@ -521,7 +523,6 @@ void MainComponent::clear() {
   blockGrid.clear();
   blocks.clear();
 
-
   for (auto tab : tabGrid.getItems())
     removeChildComponent(tab);
 
@@ -530,6 +531,7 @@ void MainComponent::clear() {
   uiLayer.presetButton.label.setText("empty", dontSendNotification);
   uiLayer.setModulations(delegate->getModulations());
   uiLayer.setModulators(delegate->getModulators());
+  ResetDownFlowingDots();
 }
 
 void MainComponent::modulationConnectionBipolarPressed(ConnectionComponent* component, bool bipolar) {
@@ -770,6 +772,7 @@ void MainComponent::gridItemRepositioned(GridComponent* grid, GridItemComponent*
     blockMatrix[oldIndex.row][oldIndex.column] = nullptr;
     blockMatrix[item->index.row][item->index.column] = static_cast<BlockComponent*>(item);
     delegate->editorRepositionedBlock(oldIndex, item->index);
+    ResetDownFlowingDots();
   } else if (grid == &tabGrid) {
     delegate->editorRepositionedTab(oldIndex.column, item->index.column);
   }
@@ -801,7 +804,7 @@ void MainComponent::gridItemEndedDrag(GridComponent* grid, GridItemComponent* it
     gridDarkBackground.setVisible(false);
     tabGrid.hideAllItems(false, item);
     blockGrid.reset();
-    blockGrid.resetDots();
+    blockGrid.ResetDotsVisibility();
   }
 }
 
@@ -838,3 +841,20 @@ void MainComponent::notesStarted(Array<int> notes) {
 }
 
 void MainComponent::notesEnded(Array<int> notes) { }
+
+void MainComponent::ResetDownFlowingDots() {
+  std::set<int> columns_with_blocks;
+  for (auto block_component : blocks) { 
+    auto block_model = delegate->getBlock(block_component->index);
+    if (block_model->id.type != Model::Types::osc) continue;
+    columns_with_blocks.insert(block_component->index.column);
+  }
+
+  for (int column = 0; column < GridConfigs::blocks.columns; column++) { 
+    blockGrid.SetDownFlowingHighlight(column, false);
+  }
+  
+  for (auto column : columns_with_blocks) {
+    blockGrid.SetDownFlowingHighlight(column, true);
+  }
+}

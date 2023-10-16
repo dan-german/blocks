@@ -22,9 +22,8 @@ public:
 
   void paint(juce::Graphics&) override;
   void mouseMove(const MouseEvent& event) override;
-  Colour colour = DotComponent::defaultColour;
   void setColour(Colour colour);
-  inline static const Colour defaultColour = Colour(82, 82, 82);
 private:
+  Colour colour;
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(DotComponent)
 };
