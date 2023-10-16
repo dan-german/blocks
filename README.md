@@ -11,7 +11,7 @@
 <a href="https://www.soonth.com"><img src="https://img.shields.io/badge/Download-AAFF00"/></a>
 <br></br>
 	
-**blocks is a modular synthesizer available as standalone, VST3 & AU for Windows and macOS.**
+**blocks is a modular synthesizer available as standalone, VST3 & AU for Windows, macOS & Linux.**
 </div>
 
 ## How to use
@@ -23,6 +23,10 @@ At the center lies the block grid, where you can add sound sources and effects. 
 To the right stands the modulators menu, a space for adding LFOs and envelopes; And to the left you'll find the the modulation matrix, which controls connections between modulators and blocks.
 
 Tabs, placed above the block grid, control which column of blocks activates when a note is played.
+
+## Architecture
+<img src="./packaging/uml.svg" width="100%">
+
 
 ## Contributing 
 If you're interesting in contributing, [**join our discord channel**](https://discord.gg/MjkFj859vW)!

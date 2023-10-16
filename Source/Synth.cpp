@@ -1,5 +1,5 @@
 #include "Synth.h"
-#include "Analytics.h"
+#include "util/Analytics.h"
 
 void Synth::editorAdjustedModulator(int parameter, int modulator, float value) { moduleManager.getModulator(modulator)->parameter(parameter)->setValue(value); }
 void Synth::editorAdjustedBlock(Index index, int parameter, float value) { moduleManager.getBlock(index)->parameter(parameter)->setValue(value); }
@@ -7,12 +7,12 @@ void Synth::editorChangedModulationMagnitude(int index, float magnitude) { modul
 void Synth::editorChangedModulationPolarity(int index, bool bipolar) { moduleManager.getConnection(index)->setPolarity(bipolar); }
 void Synth::editorAdjustedTab(int column, int parameter, float value) { moduleManager.getTab(column)->parameter(parameter)->setValue(value); }
 
-shared_ptr<Module> Synth::getModulator(int index) { return moduleManager.getModulator(index); }
+std::shared_ptr<Module> Synth::getModulator(int index) { return moduleManager.getModulator(index); }
 
-Array<shared_ptr<Modulation>> Synth::getConnectionsOfSource(shared_ptr<Module> source) { return moduleManager.getConnectionsOfSource(source); }
-Array<shared_ptr<Modulation>> Synth::getModulations() { return moduleManager.getConnections(); }
-shared_ptr<Block> Synth::getBlock(Index index) { return (index.row == -1 || index.column == -1) ? nullptr : moduleManager.getBlock(index); }
-shared_ptr<Tab> Synth::getTab(int column) { return moduleManager.getTab(column); }
+Array<std::shared_ptr<Modulation>> Synth::getConnectionsOfSource(std::shared_ptr<Module> source) { return moduleManager.getConnectionsOfSource(source); }
+Array<std::shared_ptr<Modulation>> Synth::getModulations() { return moduleManager.getConnections(); }
+std::shared_ptr<Block> Synth::getBlock(Index index) { return (index.row == -1 || index.column == -1) ? nullptr : moduleManager.getBlock(index); }
+std::shared_ptr<Tab> Synth::getTab(int column) { return moduleManager.getTab(column); }
 Array<MPENote> Synth::editorRequestsCurrentlyPlayingNotes() { return currentlyPlayingNotes; }
 Array<int> Synth::editorRequestsActiveColumns() { return moduleManager.getActiveColumns(); }
 
@@ -40,7 +40,7 @@ void Synth::editorRemovedTab(int column) {
   removeTab(column);
 }
 
-shared_ptr<Tab> Synth::editorAddedTab(int column) {
+std::shared_ptr<Tab> Synth::editorAddedTab(int column) {
   auto type = Model::Types::noteTab;
   Analytics::shared()->countAction(type + " Tab Added");
   return moduleManager.addTab(type, column, -1);
@@ -51,7 +51,7 @@ void Synth::editorRemovedModulator(int index) {
   removeModulator(index);
 }
 
-shared_ptr<Module> Synth::editorAddedModulator(Model::Type code) {
+std::shared_ptr<Module> Synth::editorAddedModulator(Model::Type code) {
   Analytics::shared()->countAction("Modulator Added");
   return addModulator(code);
 }
@@ -61,7 +61,7 @@ void Synth::editorRemovedBlock(Index index) {
   removeBlock(index);
 }
 
-shared_ptr<Block> Synth::editorAddedBlock(Model::Type type, Index index) {
+std::shared_ptr<Block> Synth::editorAddedBlock(Model::Type type, Index index) {
   Analytics::shared()->countAction(type + " Block Added");
   return addBlock(type, index, -1);
 }
@@ -96,8 +96,8 @@ void Synth::editorChangedBlockLength(Index index, int length) {
   }
 }
 
-Array<shared_ptr<Module>> Synth::getModulators() {
-  Array<shared_ptr<Module>> array;
+Array<std::shared_ptr<Module>> Synth::getModulators() {
+  Array<std::shared_ptr<Module>> array;
   for (auto modulator : moduleManager.modulators) array.add(modulator);
   return array;
 }
@@ -290,14 +290,14 @@ void Synth::repositionGroup(const Index& oldIndex, const Index& newIndex) {
   }
 }
 
-void Synth::disconnect(shared_ptr<Modulation> connection) {
+void Synth::disconnect(std::shared_ptr<Modulation> connection) {
   for (auto voice : blockVoices)
     voice->disconnect(connection);
 
   moduleManager.removeConnection(connection);
 }
 
-shared_ptr<Modulation> Synth::connect(int modulatorIndex, String targetName, int parameterIndex, int number) {
+std::shared_ptr<Modulation> Synth::connect(int modulatorIndex, String targetName, int parameterIndex, int number) {
   auto source = moduleManager.getModulator(modulatorIndex);
   auto target = moduleManager.getModule(targetName);
 
@@ -322,7 +322,7 @@ void Synth::removeModulator(int index) {
   }
 }
 
-void Synth::addModulator(shared_ptr<Module> module) {
+void Synth::addModulator(std::shared_ptr<Module> module) {
   for (auto voice : blockVoices) {
     voice->addModulator(module);
   }
@@ -387,7 +387,7 @@ StringArray Synth::editorRequestsPresetNames() {
 }
 
 void Synth::disconnect(int index) {
-  shared_ptr<Modulation> connection = moduleManager.getConnection(index);
+  std::shared_ptr<Modulation> connection = moduleManager.getConnection(index);
 
   for (auto voice : blockVoices)
     voice->disconnect(connection);
@@ -395,7 +395,7 @@ void Synth::disconnect(int index) {
   moduleManager.removeConnection(index);
 }
 
-shared_ptr<Block> Synth::addBlock(Model::Type type, Index index, int number) {
+std::shared_ptr<Block> Synth::addBlock(Model::Type type, Index index, int number) {
   auto block = moduleManager.addBlock(type, index, number);
 
   if (block == nullptr) return nullptr;
@@ -408,7 +408,7 @@ shared_ptr<Block> Synth::addBlock(Model::Type type, Index index, int number) {
   return block;
 }
 
-shared_ptr<Module> Synth::addModulator(Model::Type type, int number, int colourId) {
+std::shared_ptr<Module> Synth::addModulator(Model::Type type, int number, int colourId) {
   auto modulator = moduleManager.addModulator(type, number, colourId);
 
   if (modulator == nullptr) {
@@ -419,7 +419,7 @@ shared_ptr<Module> Synth::addModulator(Model::Type type, int number, int colourI
   return modulator;
 }
 
-void Synth::removeConnectionsFromTarget(shared_ptr<Module> module) {
+void Synth::removeConnectionsFromTarget(std::shared_ptr<Module> module) {
   for (auto connection : moduleManager.getConnectionsOfTarget(module))
     disconnect(connection);
 }

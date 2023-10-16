@@ -1,7 +1,7 @@
 #pragma once
 
-#include "OscillatorProcessor.h"
-#include "ReverbProcessor.h"
+#include "dsp/OscillatorProcessor.h"
+#include "dsp/ReverbProcessor.h"
 #include "Synth.h"
 #include "MainComponent.h"
 #include "MainComponent.h"

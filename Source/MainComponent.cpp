@@ -1,9 +1,9 @@
 #include "MainComponent.h"
 #include "ModuleProcessorFactory.h"
-#include "ModuleFactory.h"
-#include "GridConfigs.h"
-#include "ThemeManager.h"
-#include "UserSettings.h"
+#include "model/ModuleFactory.h"
+#include "settings/GridConfigs.h"
+#include "gui/ThemeManager.h"
+#include "settings/UserSettings.h"
 
 MainComponent::MainComponent(Delegate* delegate): delegate(delegate), uiLayer(this), tabGrid(GridConfigs::tab), blockGrid(GridConfigs::blocks) {
   setWantsKeyboardFocus(false);
@@ -48,7 +48,7 @@ void MainComponent::paint(juce::Graphics& g) {
 }
 
 void MainComponent::inspectorGestureChanged(int index, bool started) {
-  shared_ptr<Module> focusedModule;
+  std::shared_ptr<Module> focusedModule;
 
   auto isTab = tabGrid.containsItem(focusedGridItem);
   if (isTab) {
@@ -303,8 +303,8 @@ void MainComponent::showPopupAt(ButtonGridPopup& popup, std::function<void(Index
   popup.present(callbackWrapper);
 }
 
-shared_ptr<Block> MainComponent::addBlock(int code, Index index) {
-  shared_ptr<Block> block = nullptr;
+std::shared_ptr<Block> MainComponent::addBlock(int code, Index index) {
+  std::shared_ptr<Block> block = nullptr;
 
   switch (code) { // the first row's 5 codes are reserved for different wave types in the block selection menu popup
   case 0:
@@ -393,11 +393,11 @@ void MainComponent::inspectorChangedParameter(int sliderIndex, float value) {
   } else {
     auto module = delegate->getBlock(moduleIndex);
     delegate->editorAdjustedBlock(moduleIndex, sliderIndex, value);
-    updateModuleComponentVisuals(sliderIndex, value, static_cast<shared_ptr<Block>>(module));
+    updateModuleComponentVisuals(sliderIndex, value, static_cast<std::shared_ptr<Block>>(module));
   }
 }
 
-void MainComponent::updateModuleComponentVisuals(int sliderIndex, float value, shared_ptr<Block> block) {
+void MainComponent::updateModuleComponentVisuals(int sliderIndex, float value, std::shared_ptr<Block> block) {
   if (block->id.type == Model::Types::osc) {
     switch (OscillatorModule::Parameters(sliderIndex)) {
     case OscillatorModule::pWave:
@@ -416,7 +416,7 @@ void MainComponent::updateModuleComponentVisuals(int sliderIndex, float value, s
 }
 
 void MainComponent::refreshInspector() {
-  shared_ptr<Module> focusedModule;
+  std::shared_ptr<Module> focusedModule;
 
   auto isTab = tabGrid.containsItem(focusedGridItem);
   if (isTab) {
@@ -440,7 +440,7 @@ PopupMenu MainComponent::spawnModulationMenu(Module& victim) {
   return modulateMenu;
 }
 
-void MainComponent::spawnBlockComponent(shared_ptr<Block> block) {
+void MainComponent::spawnBlockComponent(std::shared_ptr<Block> block) {
   auto blockComponent = BlockComponent::create(block);
 
   blocks.add(blockComponent);
@@ -452,7 +452,7 @@ void MainComponent::spawnBlockComponent(shared_ptr<Block> block) {
   blockComponent->setConfig(block);
 }
 
-void MainComponent::spawnTabComponent(shared_ptr<Tab> tab) {
+void MainComponent::spawnTabComponent(std::shared_ptr<Tab> tab) {
   auto tabComponent = TabComponent::create(*tab, &tabGrid);
   addAndMakeVisible(tabComponent, 5);
   tabComponent->toFront(false);
@@ -632,7 +632,7 @@ void MainComponent::modulatorIsDragging(ModulatorComponent* modulatorComponent, 
   }
 }
 
-shared_ptr<Module> MainComponent::getFocusedModule() {
+std::shared_ptr<Module> MainComponent::getFocusedModule() {
   if (focusedGridItem->grid == &blockGrid)
     return delegate->getBlock(focusedGridItem->index);
   else

@@ -10,17 +10,16 @@
 
 #pragma once
 
-#include "Voice.h"
-#include "ProcessorPool.h"
-#include "Modulation.h"
+#include "dsp/Voice.h"
+#include "model/ProcessorPool.h"
+#include "model/Modulation.h"
 #include "MainComponent.h"
-#include "ModuleManager.h"
-#include "PresetManager.h"
-#include "TabDelayManager.h"
+#include "model/ModuleManager.h"
+#include "model/PresetManager.h"
+#include "dsp/TabDelayManager.h"
 
 using Modulation = Model::Modulation;
 using Block = Model::Block;
-using namespace std;
 
 #define VOICE_COUNT 16
 
@@ -63,19 +62,19 @@ public:
   void removeBlock(Index block);
   void removeTab(int column);
   void repositionProcessor(Index oldIndex, Index newIndex);
-  void disconnect(shared_ptr<Modulation> connection);
+  void disconnect(std::shared_ptr<Modulation> connection);
   void removeModulator(int index);
-  void addModulator(shared_ptr<Module> module);
+  void addModulator(std::shared_ptr<Module> module);
   void reduce(Index index, int times);
   void expand(Index index, int times, bool updateLength = false);
   void reroute(Index index);
   void clear();
   void repositionGroup(const Index& oldIndex, const Index& newIndex);
-  shared_ptr<Modulation> connect(int modulatorIndex, String targetName, int parameterIndex, int number = -1);
+  std::shared_ptr<Modulation> connect(int modulatorIndex, String targetName, int parameterIndex, int number = -1);
   void disconnect(int index);
-  shared_ptr<Block> addBlock(Model::Type type, Index index, int number = -1);
-  shared_ptr<Module> addModulator(Model::Type tpye, int number = -1, int colourId = -1);
-  void removeConnectionsFromTarget(shared_ptr<Module> module);
+  std::shared_ptr<Block> addBlock(Model::Type type, Index index, int number = -1);
+  std::shared_ptr<Module> addModulator(Model::Type tpye, int number = -1, int colourId = -1);
+  void removeConnectionsFromTarget(std::shared_ptr<Module> module);
   PresetInfo changePreset(int index);
   void loadPreset(PresetInfo preset);
   std::string getState();
@@ -84,7 +83,7 @@ public:
   virtual MPESynthesiserVoice* findVoiceToSteal(MPENote noteToStealVoiceFor = MPENote()) const override;
 
   // MainComponent::Delegate
-  shared_ptr<Tab> editorAddedTab(int column) override;
+  std::shared_ptr<Tab> editorAddedTab(int column) override;
   void editorRepositionedTab(int oldColumn, int newColumn) override;
   void editorChangedTabLength(int column, int length) override;
   Array<int> editorRequestsActiveColumns() override;
@@ -104,16 +103,16 @@ public:
   void editorAdjustedModulator(int parameter, int modulator, float value) override;
   void editorRemovedModulator(int index) override;
 
-  shared_ptr<Block> getBlock(Index index) override;
-  shared_ptr<Tab> getTab(int column) override;
-  shared_ptr<Block> editorAddedBlock(Model::Type code, Index index) override;
-  shared_ptr<Module> getModulator(int index) override;
-  shared_ptr<Module> editorAddedModulator(Model::Type code) override;
+  std::shared_ptr<Block> getBlock(Index index) override;
+  std::shared_ptr<Tab> getTab(int column) override;
+  std::shared_ptr<Block> editorAddedBlock(Model::Type code, Index index) override;
+  std::shared_ptr<Module> getModulator(int index) override;
+  std::shared_ptr<Module> editorAddedModulator(Model::Type code) override;
   PresetInfo editorChangedPreset(int index) override;
   PresetInfo getStateRepresentation() override;
-  Array<shared_ptr<Module>> getModulators() override;;
-  Array<shared_ptr<Modulation>> getConnectionsOfSource(shared_ptr<Module> source) override;
-  Array<shared_ptr<Modulation>> getModulations() override;
+  Array<std::shared_ptr<Module>> getModulators() override;
+  Array<std::shared_ptr<Modulation>> getConnectionsOfSource(std::shared_ptr<Module> source) override;
+  Array<std::shared_ptr<Modulation>> getModulations() override;
 
   std::pair<float, float> editorRequestsModulatorValue(Index moduleIndex, int parameterIndex, int modulatorIndex) override;
   std::pair<float, float> editorRequestsModulatorValue(int modulationConnectionIndex) override;
