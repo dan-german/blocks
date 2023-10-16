@@ -13,7 +13,6 @@ public:
   void snapItem(GridItemComponent* item, Index index, bool resetBounds = false) override;
   virtual void setItemLength(GridItemComponent* moduleComponent, int length) override;
   void reset();
-  // void setDotsHidden(bool hidden);
   void animateDragMode(GridItemComponent* item, bool enabled = true);
   OwnedArray<OwnedArray<DotComponent>> dot_matrix_;
   void clear() override;
