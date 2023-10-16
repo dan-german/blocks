@@ -1,29 +1,28 @@
 #include "gui/GridComponent.h"
 #include "gui/GraphicsTimer.h"
 #include "gui/EasingAnimator.h"
-#include "ValueAnimator.h"
+#include "gui/ValueAnimator.h"
+#include "gui/ThemeManager.h"
 
-class BlockGridComponent: public GridComponent, public GraphicsTimer {
+class BlockGridComponent: public GridComponent, public ThemeListener {
 public:
   BlockGridComponent(Config config);
   void highlightColumn(int start, int end);
-  void update(const float secondsSinceLastUpdate) override;
   void gridItemStretchEnded(GridItemComponent* item, int offset) override;
-  void resetDots();
+  void ResetDotsVisibility();
   void snapItem(GridItemComponent* item, Index index, bool resetBounds = false) override;
   virtual void setItemLength(GridItemComponent* moduleComponent, int length) override;
   void reset();
-  void setDotsHidden(bool hidden);
-  void applyMouseHoverEffect();
+  // void setDotsHidden(bool hidden);
   void animateDragMode(GridItemComponent* item, bool enabled = true);
-  OwnedArray<OwnedArray<DotComponent>> dots;
+  OwnedArray<OwnedArray<DotComponent>> dot_matrix_;
   void clear() override;
   void SetDownFlowingHighlight(int column, bool active);
 protected:
   void itemHovered(GridItemComponent* item, bool valid, bool inside, int proposedLength, Index index) override;
-  virtual void itemLandedOutside(GridItemComponent* item, Index index) override;
   virtual void gridItemEndedDrag(GridItemComponent* item, const MouseEvent& mouseEvent) override;
   virtual void gridItemStartedDrag(GridItemComponent* item, const MouseEvent& mouseEvent) override;
+  void themeChanged(Theme theme) override;
 private:
   bool highlight = false;
   Rectangle<int> getBoundsForPlaceholder(Index& index, int length);

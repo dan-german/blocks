@@ -5,13 +5,37 @@
 
 #include "ThemeManager.h"
 
+BlockGridComponent::BlockGridComponent(GridComponent::Config config): GridComponent(config) {
+  addAndMakeVisible(blockPlaceholder);
+  spawnDots();
+
+  dots_animator_.speed = 0.5f;
+  dots_animator_.waveType = ValueAnimator::WaveType::was;
+  dots_animator_.valueAnimatorCallback = [this](float value) {
+    for (int column : highlighted_columns_) {
+      auto offset = 0.0f;
+      for (auto dot_row : dot_matrix_) {
+        float sine_value = std::sin(value * M_PI * 2 + offset);
+        offset -= M_PI * 0.8f / (float)dot_row->size();
+        auto left_dot = dot_row->getUnchecked(column);
+        auto right_dot = dot_row->getUnchecked(column + 1);
+        auto mapped = jmap(sine_value, -1.0f, 1.0f, 0.0f, 2.0f);
+        auto color = ThemeManager::shared()->getCurrent().two.brighter(3.5f).darker(mapped);
+        left_dot->setColour(color);
+        right_dot->setColour(color);
+      }
+    }
+  };
+
+  dots_animator_.start();
+  ThemeManager::shared()->addListener(this);
+}
+
 void BlockGridComponent::highlightColumn(int start, int end) {
   highlight = true;
-  GraphicsTimer::start();
   this->firstHighlightedColumn = start;
   this->lastHighlightedColumn = end;
 
-  setDotsHidden(true);
   hideAllItems(true);
 
   for (int column = start; column < end; column++) {
@@ -22,75 +46,37 @@ void BlockGridComponent::highlightColumn(int start, int end) {
 }
 
 void BlockGridComponent::reset() {
-  // for (auto dotArray : dots)
-    // for (auto dot : *dotArray)
-      // dot->setColour(DotComponent::defaultColour);
+  for (auto dotArray : dot_matrix_)
+    for (auto dot : *dotArray)
+      dot->setColour(ThemeManager::shared()->getCurrent().two);
 
   hideAllItems(false);
   highlight = false;
-  GraphicsTimer::stop();
-}
-
-void BlockGridComponent::update(const float secondsSinceLastUpdate) {
-  if (!highlight) return;
-
-  float speed = 6;
-  sineX += secondsSinceLastUpdate * speed;
-
-  if (sineX >= M_PI * 2.0f) {
-    sineX -= M_PI * 2.0f;
-  }
-
-  for (int row = 0; row <= config.rows; row++) {
-    float offset = 0.3f * row;
-    float y = std::sin(sineX - offset);
-    float alpha = jmap(y, -1.0f, 1.0f, 0.1f, 2.0f);
-    for (int column = firstHighlightedColumn; column < lastHighlightedColumn + 1; column++) {
-      auto dot = dots.getUnchecked(row)->getUnchecked(column);
-      dot->setColour(Colour(95, 95, 95).brighter(alpha));
-    }
-  }
-}
-
-BlockGridComponent::BlockGridComponent(GridComponent::Config config): GridComponent(config) {
-  addAndMakeVisible(blockPlaceholder);
-  spawnDots();
-
-  dots_animator_.speed = 0.5f;
-  dots_animator_.waveType = ValueAnimator::WaveType::was;
-  dots_animator_.valueAnimatorCallback = [this](float value) {
-    auto dot_columns_to_highlight = highlighted_columns_;
-    auto max_element = *std::max_element(dot_columns_to_highlight.begin(), dot_columns_to_highlight.end());
-    dot_columns_to_highlight.insert(max_element + 1);
-    for (int column : dot_columns_to_highlight) {
-      auto offset = 0.0f;
-      for (auto dot_row : dots) {
-        float sine_value = std::sin(value * M_PI * 2 + offset);
-        offset -= M_PI * 0.8f / (float)dot_row->size();
-        auto dot = dot_row->getUnchecked(column);
-        auto mapped = jmap(sine_value, -1.0f, 1.0f, 0.0f, 2.0f);
-        auto color = ThemeManager::shared()->getCurrent().two.brighter(3.0f).darker(mapped);
-        dot->setColour(color);
-      }
-    }
-  };
-
-  dots_animator_.start();
 }
 
 void BlockGridComponent::SetDownFlowingHighlight(int column, bool active) {
-  highlighted_columns_.insert(column);
+  for (auto row : dot_matrix_) {
+    for (auto dot : *row) {
+      dot->setColour(ThemeManager::shared()->getCurrent().two);
+    }
+  }
+
+  if (active) {
+    highlighted_columns_.insert(column);
+  } else {
+    highlighted_columns_.erase(column);
+  }
 }
 
 void BlockGridComponent::spawnDots() {
   int size = Constants::gridDotSize;
 
   for (int row = 0; row <= config.rows; row++) {
-    dots.add(new OwnedArray<DotComponent>());
+    dot_matrix_.add(new OwnedArray<DotComponent>());
     positions.add(Array<Point<int>>());
     for (int column = 0; column <= config.columns; column++) {
       auto dot = new DotComponent();
-      dots[row]->add(dot);
+      dot_matrix_[row]->add(dot);
       addAndMakeVisible(dot);
 
       auto point = pointForIndex(Index(row, column));
@@ -112,36 +98,25 @@ void BlockGridComponent::gridItemStretchEnded(GridItemComponent* item, int offse
   block->animate();
 }
 
-void BlockGridComponent::setDotsHidden(bool hidden) {
-  for (auto dotArray : dots) {
-    for (auto dot : *dotArray) {
-      // dot->setColour(hidden ? DotComponent::defaultColour.withAlpha(0.5f) : DotComponent::defaultColour);
-    }
-  }
-}
-
-void BlockGridComponent::resetDots() {
-  for (auto dotArray : dots) {
-    for (auto dot : *dotArray) {
+void BlockGridComponent::ResetDotsVisibility() {
+  for (auto row : dot_matrix_) {
+    for (auto dot : *row) {
       dot->setVisible(true);
-    }
-  }
-
-  for (auto item : items) {
-    auto index = item->index;
-    for (int column = index.column; column <= index.column + item->length; column++) {
-      for (int row = 0; row <= 1; row++) {
-        dots.getUnchecked(index.row + row)->getUnchecked(column)->setVisible(true);
-      }
     }
   }
 
   for (auto item : items) {
     if (item->length <= 1) continue;
 
-    for (int column = 1; column < item->length; column++) {
-      for (int row = 0; row <= 1; row++) {
-        auto dot = dots.getUnchecked(item->index.row + row)->getUnchecked(item->index.column + column);
+    for (auto row : dot_matrix_) {
+      for (auto dot : *row) {
+        dot->setVisible(true);
+      }
+    }
+
+    for (int row = 0; row <= 1; row++) {
+      for (int column = 1; column < item->length; column++) {
+        auto dot = dot_matrix_.getUnchecked(item->index.row + row)->getUnchecked(item->index.column + column);
         dot->setVisible(false);
       }
     }
@@ -150,7 +125,7 @@ void BlockGridComponent::resetDots() {
 
 void BlockGridComponent::snapItem(GridItemComponent* item, Index index, bool resetBounds) {
   GridComponent::snapItem(item, index, resetBounds);
-  resetDots();
+  ResetDotsVisibility();
   auto block = dynamic_cast<BlockComponent*>(item);
   block->animate();
 }
@@ -158,7 +133,7 @@ void BlockGridComponent::snapItem(GridItemComponent* item, Index index, bool res
 void BlockGridComponent::resizeDots() {
   for (int row = 0; row <= config.rows; row++) {
     for (int column = 0; column <= config.columns; column++) {
-      auto dot = dots.getUnchecked(row)->getUnchecked(column);
+      auto dot = dot_matrix_.getUnchecked(row)->getUnchecked(column);
       auto point = pointForIndex(Index(row, column));
 
       int x = point.getX() - config.edgeSpacing;
@@ -177,14 +152,14 @@ void BlockGridComponent::hideDotsAroundIndex(GridItemComponent* blockComponent, 
   if (previousPlaceholderIndex.has_value() && !isIndexInside(*previousPlaceholderIndex)) return;
   for (int column = index.column; column < index.column + 1 + length; column++)
     for (int row = 0; row <= 1; row++)
-      dots.getUnchecked(index.row + row)->getUnchecked(column)->setVisible(visible);
+      dot_matrix_.getUnchecked(index.row + row)->getUnchecked(column)->setVisible(visible);
 
   for (auto block : items) {
     if (block->length <= 1 || block == blockComponent) continue;
 
     for (int column = 1; column < block->length; column++) {
       for (int row = 0; row <= 1; row++) {
-        auto dot = dots.getUnchecked(block->index.row + row)->getUnchecked(block->index.column + column);
+        auto dot = dot_matrix_.getUnchecked(block->index.row + row)->getUnchecked(block->index.column + column);
         dot->setVisible(false);
       }
     }
@@ -192,7 +167,7 @@ void BlockGridComponent::hideDotsAroundIndex(GridItemComponent* blockComponent, 
 }
 
 void BlockGridComponent::itemHovered(GridItemComponent* item, bool valid, bool inside, int proposedLength, Index index) {
-  resetDots();
+  ResetDotsVisibility();
   auto length = proposedLength;
 
   if (!inside) {
@@ -231,33 +206,12 @@ void BlockGridComponent::gridItemEndedDrag(GridItemComponent* item, const MouseE
 
 void BlockGridComponent::setItemLength(GridItemComponent* item, int length) {
   GridComponent::setItemLength(item, length);
-  resetDots();
-}
-
-void BlockGridComponent::itemLandedOutside(GridItemComponent* item, Index index) {
-  resetDots();
-}
-
-void BlockGridComponent::applyMouseHoverEffect() {
-  const float threshold = 150;
-
-  for (int i = 0; i < dots.size(); i++) {
-    auto dotties = dots.getUnchecked(i);
-    for (int j = 0; j < dotties->size(); j++) {
-      auto dot = dotties->getUnchecked(j);
-      auto pos = dot->getPosition();
-      auto distance = pos.getDistanceFrom(getMouseXYRelative());
-      if (distance <= threshold) {
-        auto mappedDistance = jmap(float(distance), 0.f, threshold, 0.4f, 0.0f);
-        // dot->setColour(DotComponent::defaultColour.brighter(mappedDistance));
-      }
-    }
-  }
+  ResetDotsVisibility();
 }
 
 void BlockGridComponent::clear() {
   GridComponent::clear();
-  resetDots();
+  ResetDotsVisibility();
 }
 
 void BlockGridComponent::gridItemStartedDrag(GridItemComponent* item, const MouseEvent& mouseEvent) {
@@ -297,4 +251,10 @@ void BlockGridComponent::animateDragMode(GridItemComponent* item, bool enabled) 
   };
 
   animator.animate(input);
+}
+
+void BlockGridComponent::themeChanged(Theme theme) {
+  for (auto row : dot_matrix_)
+    for (auto dot : *row)
+      dot->setColour(theme.two);
 }
