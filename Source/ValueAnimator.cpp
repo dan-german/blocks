@@ -34,4 +34,5 @@ float ValueAnimator::getWaveform(float x) {
   case WaveType::was:
     return was(x);
   }
+  return 0.f;
 }
