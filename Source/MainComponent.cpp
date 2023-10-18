@@ -5,7 +5,7 @@
 #include "gui/ThemeManager.h"
 #include "settings/UserSettings.h"
 
-MainComponent::MainComponent(Delegate* delegate): delegate(delegate), uiLayer(this), tabGrid(GridConfigs::tab), blockGrid(GridConfigs::blocks) {
+MainComponent::MainComponent(juce::MidiKeyboardState& keyboard_state, Delegate* delegate): delegate(delegate), uiLayer(keyboard_state, this), tabGrid(GridConfigs::tab), blockGrid(GridConfigs::blocks) {
   setWantsKeyboardFocus(false);
 
   setLookAndFeel(&blocksLookAndFeel);

@@ -10,7 +10,6 @@ using namespace Model;
 
 class PluginProcessor: public AudioProcessor, public AudioProcessorParameter::Listener {
 public:
-  MidiKeyboardState* keyboardState;
   Synth synth;
   double bpm = 120;
 
@@ -56,6 +55,7 @@ public:
   void updateHostInfo(int blockSize);
 
 private:
+  MidiKeyboardState keyboard_state_;
   MainComponent* mainComponent;
   void setup();
 };

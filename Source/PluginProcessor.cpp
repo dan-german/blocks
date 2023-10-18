@@ -23,7 +23,6 @@ PluginProcessor::PluginProcessor(bool): AudioProcessor(BusesProperties().withOut
 
 void PluginProcessor::setup() {
   loadParameters();
-  keyboardState = nullptr;
   WaveTableConstants::load(44100);
   Analytics::shared()->initProfileIfNeeded();
   Analytics::shared()->handleLaunch(getWrapperTypeDescription(wrapperType));
@@ -41,9 +40,7 @@ void PluginProcessor::loadParameters() {
 void PluginProcessor::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessages) {
   updateHostInfo(buffer.getNumSamples());
 
-  if (keyboardState != nullptr && mainComponent != nullptr) {
-    keyboardState->processNextMidiBuffer(midiMessages, 0, buffer.getNumSamples(), true);
-  }
+  keyboard_state_.processNextMidiBuffer(midiMessages, 0, buffer.getNumSamples(), true);
 
   originalSize = buffer.getNumSamples();
   bufferSize = std::min(originalSize, 128);
@@ -127,8 +124,7 @@ void PluginProcessor::parameterValueChanged(int parameterIndex, float newValue) 
 }
 
 AudioProcessorEditor* PluginProcessor::createEditor() {
-  auto editor = new PluginEditor(*this);
-  keyboardState = &editor->mainComponent.uiLayer.keyboardState;
+  auto editor = new PluginEditor(keyboard_state_, *this);
   if (TopLevelWindow::getNumTopLevelWindows() == 1) {
     TopLevelWindow* w = TopLevelWindow::getTopLevelWindow(0);
     w->setUsingNativeTitleBar(true);

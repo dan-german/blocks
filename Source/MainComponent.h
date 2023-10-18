@@ -32,7 +32,7 @@ class MainComponent final: public Component,
 public:
   struct Delegate;
   Delegate* delegate;
-  MainComponent(Delegate* delegate);
+  MainComponent(juce::MidiKeyboardState& keyboard_state, Delegate* delegate);
   ~MainComponent() override;
   void mouseMove(const MouseEvent& event) override;
 
