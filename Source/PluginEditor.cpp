@@ -13,9 +13,8 @@
 void PluginEditor::paint(Graphics& g) { g.fillAll(Colour(28, 28, 28)); }
 void PluginEditor::resized() { mainComponent.setBounds(getLocalBounds()); }
 void PluginEditor::timerCallback() { }
-PluginEditor::~PluginEditor() { processor.keyboardState = nullptr; }
 
-PluginEditor::PluginEditor(PluginProcessor& p): AudioProcessorEditor(&p), processor(p), mainComponent(&p.synth) {
+PluginEditor::PluginEditor(juce::MidiKeyboardState& keyboard_state, PluginProcessor& p): AudioProcessorEditor(&p), processor(p), mainComponent(keyboard_state, &p.synth) {
   setSize(1200, 770);
 
   setResizable(false, false);

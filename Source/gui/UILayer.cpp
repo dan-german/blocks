@@ -13,7 +13,8 @@
 #include "model/ModelConstants.h"
 #include "BinaryData.h"
 
-UILayer::UILayer(Slider::Listener* listener): keyboard(keyboardState, MidiKeyboardComponent::Orientation::horizontalKeyboard), ComponentMovementWatcher(this) {
+UILayer::UILayer(juce::MidiKeyboardState& keyboard_state, Slider::Listener* listener): 
+    keyboard(keyboard_state, MidiKeyboardComponent::Orientation::horizontalKeyboard), ComponentMovementWatcher(this) {
   addModulatorsButton();
   addAndMakeVisible(presetButton);
 

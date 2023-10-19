@@ -33,7 +33,6 @@ public:
   SideMenu matrix;
   ModulatorsSideMenu modulators;
   PresetButtonComponent presetButton;
-  MidiKeyboardState keyboardState;
   KeyboardComponent keyboard;
 
   std::unique_ptr<SVGButton> settingsButton;
@@ -46,7 +45,7 @@ public:
 
   ModulationsListBoxModel modulationsListBoxModel;
 
-  UILayer(Slider::Listener* listener);
+  UILayer(juce::MidiKeyboardState& keyboard_state, Slider::Listener* listener);
   ~UILayer() override;
 
   void resized() override;
@@ -66,6 +65,8 @@ private:
   void showModulatorsSideMenu();
   void resizeSettingsButton();
   void resizeSaveAndNewButtons();
+
+private:
   int edgeMargin = 16;
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(UILayer)
