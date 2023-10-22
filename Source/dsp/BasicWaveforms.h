@@ -10,28 +10,33 @@
 
 #pragma once
 
-template <int table_size>
-class LookUpTable {
-public:
-  int size = table_size;
-  float* array = new float[table_size];
+#include <vector>
+
+struct LookUpTable {
+    
+  explicit LookUpTable(std::size_t size) : array(size) {}
+  LookUpTable(const LookUpTable&) = delete;
+  LookUpTable(LookUpTable&&) noexcept = default;
+  LookUpTable& operator=(const LookUpTable&) = delete;
+  LookUpTable& operator=(LookUpTable&&) noexcept = default;
+
+  std::vector<float> array;
 };
 
 class BasicWaveforms {
 private:
-  static const int size = 100;
+  static constexpr size_t size = 100;
 
-  inline static LookUpTable<size> sine;
-  inline static LookUpTable<size> saw;
-  inline static LookUpTable<size> square;
-  inline static LookUpTable<size> triangle;
+  inline static LookUpTable sine{size};
+  inline static LookUpTable saw{size};
+  inline static LookUpTable square{size};
+  inline static LookUpTable triangle{size};
 
   static void setupSine();
   static void setupSaw();
   static void setupSquare();
 public:
   BasicWaveforms();
-  ~BasicWaveforms();
 
   static float getSine(float x);
   static float getSaw(float x);

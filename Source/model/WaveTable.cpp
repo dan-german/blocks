@@ -10,17 +10,22 @@
 
 #include "model/WaveTable.h"
 
-WaveTable::WaveTable() { }
-WaveTable::~WaveTable() { }
+#include <algorithm>
+
+
+WaveTable::WaveTable() noexcept
+{
+  waveforms.reserve(32);
+}
 
 void WaveTable::addWaveform(int length, float* waveform, float topFrequency) {
-  waveforms[size].data = new float[length + 1];
-  waveforms[size].length = length;
-  waveforms[size].topFrequency = topFrequency;
+  
+  Waveform new_waveform{.topFrequency = topFrequency, 
+                        .data = std::vector<float>(length + 1), 
+                        .length = length};
 
-  for (long i = 0; i < length; i++)
-    waveforms[size].data[i] = waveform[i];
+  std::copy_n(waveform, length, new_waveform.data.begin());
+  new_waveform.data[length] = new_waveform.data[0];
 
-  waveforms[size].data[length] = waveforms[size].data[0];
-  size++;
+  waveforms.push_back(std::move(new_waveform));
 }

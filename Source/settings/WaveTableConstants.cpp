@@ -76,14 +76,14 @@ void WaveTableConstants::loadBandlimitedWaveTables(int sampleRate) {
   int nearestPowerOfTwo = static_cast<int>(pow(2, ceil(log(harmonics) / log(2))));
   int tableLength = nearestPowerOfTwo * 4; // Double for the sample rate & oversampling
 
-  float* sawHarmonics = new float[tableLength];
-  float* sawWaveform = new float[tableLength];
+  std::vector<float> sawHarmonics(tableLength);
+  std::vector<float> sawWaveform(tableLength);
 
-  float* squareHarmonics = new float[tableLength];
-  float* squareWaveform = new float[tableLength];
+  std::vector<float> squareHarmonics(tableLength);
+  std::vector<float> squareWaveform(tableLength);
 
-  float* triangleHarmonics = new float[tableLength];
-  float* triangleWaveform = new float[tableLength];
+  std::vector<float> triangleHarmonics(tableLength);
+  std::vector<float> triangleWaveform(tableLength);
 
   float topFrequency = baseFrequency * 2.0f / sampleRate;
 
@@ -96,21 +96,21 @@ void WaveTableConstants::loadBandlimitedWaveTables(int sampleRate) {
       triangleWaveform[i] = 0;
     }
     // Make an array of various harmonics
-    fillSawtoothHarmonics(sawHarmonics, tableLength, harmonics);
-    fillSquareHarmonics(squareHarmonics, tableLength, harmonics);
-    fillTriangleHarmonics(triangleHarmonics, tableLength, harmonics);
+    fillSawtoothHarmonics(sawHarmonics.data(), tableLength, harmonics);
+    fillSquareHarmonics(squareHarmonics.data(), tableLength, harmonics);
+    fillTriangleHarmonics(triangleHarmonics.data(), tableLength, harmonics);
     // Generate waveforms out of the harmonics using iFFT
-    fft(tableLength, sawHarmonics, sawWaveform);
-    fft(tableLength, squareHarmonics, squareWaveform);
-    fft(tableLength, triangleHarmonics, triangleWaveform);
+    fft(tableLength, sawHarmonics.data(), sawWaveform.data());
+    fft(tableLength, squareHarmonics.data(), squareWaveform.data());
+    fft(tableLength, triangleHarmonics.data(), triangleWaveform.data());
     // Normalized waveforms to +-1 range
-    normalizeWaveform(sawWaveform, tableLength);
-    normalizeWaveform(squareWaveform, tableLength);
-    normalizeWaveform(triangleWaveform, tableLength);
+    normalizeWaveform(sawWaveform.data(), tableLength);
+    normalizeWaveform(squareWaveform.data(), tableLength);
+    normalizeWaveform(triangleWaveform.data(), tableLength);
     // Add waveforms to corresponding wave tables
-    bandlimitedSawtooth.addWaveform(tableLength, sawWaveform, topFrequency);
-    bandlimitedSquare.addWaveform(tableLength, squareWaveform, topFrequency);
-    bandlimitedTriangle.addWaveform(tableLength, triangleWaveform, topFrequency);
+    bandlimitedSawtooth.addWaveform(tableLength, sawWaveform.data(), topFrequency);
+    bandlimitedSquare.addWaveform(tableLength, squareWaveform.data(), topFrequency);
+    bandlimitedTriangle.addWaveform(tableLength, triangleWaveform.data(), topFrequency);
 
     topFrequency *= 2;
     harmonics /= 2;
@@ -197,55 +197,52 @@ void WaveTableConstants::fft(int length, float* realArray, float* imaginaryArray
 
 // Sine has 1 harmonic so he gets special treatment
 void WaveTableConstants::setupSineWaveTable(int tableLength) {
-  float* sineHarmonics = new float[tableLength];
-  float* sineWaveform = new float[tableLength];
+    std::vector<float> sineHarmonics(tableLength);
+    std::vector<float> sineWaveform(tableLength, 0.0);
 
-  for (int i = 0; i < tableLength; i++)
-    sineWaveform[i] = 0;
-
-  fillSineHarmonics(sineHarmonics, tableLength);
-  fft(tableLength, sineHarmonics, sineWaveform);
-  normalizeWaveform(sineWaveform, tableLength);
-  sine.addWaveform(tableLength, sineWaveform, 1);
+  fillSineHarmonics(sineHarmonics.data(), tableLength);
+  fft(tableLength, sineHarmonics.data(), sineWaveform.data());
+  normalizeWaveform(sineWaveform.data(), tableLength);
+  sine.addWaveform(tableLength, sineWaveform.data(), 1);
 }
 
 void WaveTableConstants::setupSquare() {
-  float* sqr = new float[lfoArrayLength];
+  std::vector<float> sqr(lfoArrayLength);
 
 
   for (int i = 0; i < lfoArrayLength; i++)
     sqr[i] = i < lfoArrayLength / 2.0f ? 1.0f : -1.0f;
 
-  square.addWaveform(lfoArrayLength, sqr, 1);
+  square.addWaveform(lfoArrayLength, sqr.data(), 1);
 }
 
 void WaveTableConstants::setupSawtooth() {
-  float* saw = new float[lfoArrayLength];
+  std::vector<float> saw(lfoArrayLength);
 
   for (int i = 0; i < lfoArrayLength; i++)
     saw[i] = i / ((float)lfoArrayLength - 1.0f) * 2.0f - 1.0f;
 
-  sawtooth.addWaveform(lfoArrayLength, saw, 1);
+  sawtooth.addWaveform(lfoArrayLength, saw.data(), 1);
 }
 
 void WaveTableConstants::setupTriangle() {
-  float* tri = new float[lfoArrayLength];
+  std::vector<float> tri(lfoArrayLength);
 
   for (int i = 0; i < lfoArrayLength; i++)
     tri[i] = 2 * abs(i / ((float)lfoArrayLength - 1.0f) * 2.0f - 1.0f) - 1.0f;
 
-  triangle.addWaveform(lfoArrayLength, tri, 1);
+  triangle.addWaveform(lfoArrayLength, tri.data(), 1);
 }
 
 void WaveTableConstants::setupTestWave() {
   int waveLength = 3;
-  float* test = new float[waveLength];
+  std::vector<float> test(waveLength);
 
   test[0] = 0.1f;
   test[1] = 0.2f;
   test[2] = 0.3f;
 
-  testWave.addWaveform(waveLength, test, 1);
+  testWave.addWaveform(waveLength, test.data(), 1);
 }
 
 WaveTable* WaveTableConstants::getWaveTable(WaveTableConstants::WaveTableType type) {

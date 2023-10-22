@@ -17,8 +17,6 @@ namespace Model {
     this->name = type + " " + String(number).toStdString();
   }
 
-  Module::~Module() { }
-
   void Module::reset() {
     for (auto parameter : parameters) {
       auto defaultValue = parameter->audioParameter->getDefaultValue();
