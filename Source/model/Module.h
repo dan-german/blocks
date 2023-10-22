@@ -60,7 +60,6 @@ namespace Model {
     int length = 1;
 
     Module(Type type, int number);
-    ~Module();
 
     inline bool isModulator() { return category == Category::modulator; }
     inline bool isEnvelope() { return id.type == Types::adsr; }

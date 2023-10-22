@@ -40,7 +40,6 @@ void BasicWaveforms::setupSine() {
     sine.array[i] = sinf(static_cast<float>(M_PI * 2.0f * i / size));
 }
 
-BasicWaveforms::~BasicWaveforms() {}
 float BasicWaveforms::getSine(float x) { return Utils::decimalSubscript(sine.array, x * size); }
 float BasicWaveforms::getSaw(float x) { return Utils::decimalSubscript(saw.array, x * size); }
 float BasicWaveforms::getSquare(float x) { return Utils::decimalSubscript(square.array, x); }

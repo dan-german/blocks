@@ -22,7 +22,7 @@ void Voice::notePressureChanged() {}
 void Voice::notePitchbendChanged() {}
 void Voice::noteTimbreChanged() {}
 void Voice::noteKeyStateChanged() {}
-void Voice::setLfoPhase(int64 seconds) { for (auto modulator : modulators) modulator->setPhase(seconds); }
+void Voice::setLfoPhase(int64 seconds) { for (auto& modulator : modulators) modulator->setPhase(seconds); }
 void Voice::repositionProcessor(Index oldIndex, Index newIndex) { graphManager.repositionProcessor(oldIndex, newIndex); }
 
 std::shared_ptr<Processor> Voice::getProcessor(String name) { return processorMap[name]; }
@@ -31,7 +31,7 @@ std::shared_ptr<Processor> Voice::getProcessor(Index index) { return graphManage
 std::shared_ptr<Processor> Voice::getModulator(String name) { return modulatorMap[name]; }
 
 inline void Voice::processModulators(int samples) {
-  for (auto modulator : modulators) {
+  for (auto& modulator : modulators) {
     modulator->process(samples);
   }
 }
@@ -71,7 +71,7 @@ void Voice::addChild(std::shared_ptr<Block> parent, Index index) {
 }
 
 void Voice::renderNextBlock(AudioBuffer<float>& outputBuffer, int startSample, int numSamples) {
-  for (auto processor : graphManager.processors) processor->bpm = bpm;
+  for (auto& processor : graphManager.processors) processor->bpm = bpm;
 
   processModulators(numSamples);
 
@@ -123,7 +123,7 @@ std::shared_ptr<ModulationInput> Voice::getModulationInput(std::shared_ptr<Modul
   auto targetProcessor = processorMap[modulationConnection->target->name];
   auto sourceProcessor = modulatorMap[modulationConnection->source->name];
 
-  for (auto modulationInput : targetProcessor->getParameter(modulationConnection->parameterIndex)->modulationInputs)
+  for (auto& modulationInput : targetProcessor->getParameter(modulationConnection->parameterIndex)->modulationInputs)
     if (modulationInput->source == sourceProcessor)
       return modulationInput;
 
@@ -131,7 +131,7 @@ std::shared_ptr<ModulationInput> Voice::getModulationInput(std::shared_ptr<Modul
 }
 
 std::shared_ptr<ModulationInput> Voice::getModulationInput(String source, String target, int parameterIndex) {
-  for (auto modulationInput : processorMap[target]->getParameter(parameterIndex)->modulationInputs)
+  for (auto& modulationInput : processorMap[target]->getParameter(parameterIndex)->modulationInputs)
     if (modulationInput->source == processorMap[source])
       return modulationInput;
 
@@ -160,7 +160,7 @@ void Voice::removeModulator(int index) {
 }
 
 void Voice::noteStopped(bool allowTailOff) {
-  for (auto listener : listeners)
+  for (auto* listener : listeners)
     listener->noteStopped(allowTailOff);
 
   note = {};
@@ -175,12 +175,12 @@ void Voice::startNote(bool notifyListeners) {
   float frequency = (float)currentlyPlayingNote.getFrequencyInHertz();
 
   if (!notifyListeners) return;
-  for (auto listener : listeners)
+  for (auto* listener : listeners)
     listener->noteStarted(this, frequency);
 }
 
 void Voice::correctToTime(int64 timeInSamples) {
-  for (auto modulator : modulators) {
+  for (auto& modulator : modulators) {
     modulator->setPhase(timeInSamples);
   }
 }
