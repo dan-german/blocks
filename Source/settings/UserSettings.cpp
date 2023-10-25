@@ -1,8 +1,12 @@
 #include "settings/UserSettings.h"
 
+namespace {
+  std::unique_ptr<PropertiesFile> get_file();
+}
+
 UserSettings* UserSettings::shared() {
-  if (instance == nullptr) instance = new UserSettings();
-  return instance;
+  static UserSettings instance;
+  return &instance;
 }
 
 void UserSettings::set(StringRef k, const var& v) {
@@ -19,10 +23,11 @@ String UserSettings::getString(StringRef keyName, String& defaultValue) {
 }
 
 UserSettings::UserSettings() {
-  file = getFile();
+  file = get_file();
 }
 
-std::unique_ptr<PropertiesFile> UserSettings::getFile() {
+namespace {
+std::unique_ptr<PropertiesFile> get_file() {
   PropertiesFile::Options options;
 
   options.applicationName = "blocks";
@@ -32,4 +37,5 @@ std::unique_ptr<PropertiesFile> UserSettings::getFile() {
   options.storageFormat = PropertiesFile::StorageFormat::storeAsXML;
 
   return std::make_unique<PropertiesFile>(options);
+}
 }

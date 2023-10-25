@@ -14,7 +14,7 @@ void ButtonGrid::present(std::function<void(Index)> callback) {
 
 void ButtonGrid::resized() {
   for (int i = 0; i < listBoxes.size(); i++) {
-    auto listBox = listBoxes[i];
+    auto* listBox = listBoxes[i].get();
     listBox->setRowHeight(itemHeight);
     auto localBounds = getLocalBounds();
     int width = getWidth() / listBoxes.size();
@@ -34,18 +34,22 @@ void ButtonGrid::setModel(Array<StringArray> models) {
 
   for (int i = 0; i < models.size(); i++) {
     auto model = models.getUnchecked(i);
-    auto listBoxModel = new ButtonGridModel(model, i);
+    auto listBoxModel = std::make_unique<ButtonGridModel>(model, i);
     listBoxModel->onClick = [this](Index index) { this->onClick(index); };
-    listBoxModels.add(listBoxModel);
 
-    auto listBox = new ListBox();
+    auto listBox = std::make_unique<ListBox>();
     listBox->getVerticalScrollBar().setColour(ScrollBar::ColourIds::thumbColourId, Colour(60, 60, 60));
-    listBox->setModel(listBoxModel);
-    addAndMakeVisible(listBox);
+    listBox->setModel(listBoxModel.get());
 
-    listBoxes.add(listBox);
+
+    addAndMakeVisible(listBox.get());
+
     listBox->setRowHeight(itemHeight);
     listBox->setColour(ListBox::ColourIds::backgroundColourId, ThemeManager::shared()->getCurrent().background);
+    
+    listBoxModels.push_back(std::move(listBoxModel));
+    listBoxes.push_back(std::move(listBox));
+
     numberOfRows = std::max(numberOfRows, model.size());
   }
 

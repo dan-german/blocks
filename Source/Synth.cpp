@@ -210,7 +210,7 @@ void Synth::initialize(double sampleRate, int bufferSize) {
 void Synth::removeBlock(Index index) {
   auto block = moduleManager.getBlock(index);
 
-  for (auto voice : blockVoices)
+  for (auto* voice : blockVoices)
     for (int i = 0; i < block->length; i++)
       voice->removeBlock(block->index.toTheRight(i));
 

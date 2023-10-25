@@ -13,8 +13,5 @@ public:
 
 private:
   UserSettings();
-  std::unique_ptr<PropertiesFile> getFile();
-
-  inline static UserSettings* instance = nullptr;
   std::unique_ptr<PropertiesFile> file;
 };
