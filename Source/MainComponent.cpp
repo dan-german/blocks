@@ -353,9 +353,12 @@ void MainComponent::removeTab(GridItemComponent* tab) {
     refreshInspector();
   }
 
-  tabGrid.detachModule(tab->index, true);
   removeChildComponent(tab);
-  delegate->editorRemovedTab(tab->index.column);
+
+  auto tab_column = tab->index.column;
+  tabGrid.detachModule(tab->index, true);
+  
+  delegate->editorRemovedTab(tab_column);
   gridDarkBackground.setVisible(false);
 }
 
@@ -367,11 +370,13 @@ void MainComponent::removeBlock(GridItemComponent* block) {
   } else if (inspector.isVisible()) {
     refreshInspector();
   }
-
-  blockGrid.detachModule(block->index);
-  blockGrid.ResetDotsVisibility();
   blocks.removeFirstMatchingValue(item);
-  delegate->editorRemovedBlock(item->index);
+
+  auto index = block->index;
+  blockGrid.detachModule(index);
+  blockGrid.ResetDotsVisibility();
+
+  delegate->editorRemovedBlock(index);
   uiLayer.setModulations(delegate->getModulations());
   ResetDownFlowingDots();
 }

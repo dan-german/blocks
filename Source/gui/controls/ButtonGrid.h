@@ -9,8 +9,8 @@ using namespace juce;
 class ButtonGrid: public juce::Component {
 public:
   int itemHeight;
-  OwnedArray<ListBox> listBoxes;
-  Array<ButtonGridModel*> listBoxModels;
+  std::vector<std::unique_ptr<ListBox>> listBoxes;
+  std::vector<std::unique_ptr<ButtonGridModel>> listBoxModels;
   std::function<void(Index)> onClick;
   Colour backgroundColour;
   int numberOfColumns = 0;
