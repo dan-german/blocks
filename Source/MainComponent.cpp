@@ -117,7 +117,7 @@ void MainComponent::setupBlockGrid() {
 }
 
 void MainComponent::setupUI() {
-  uiLayer.presetButton.setStrings(delegate->editorRequestsPresetNames());
+  // uiLayer.presetButton.setStrings(delegate->editorRequestsPresetNames());
   uiLayer.modulationsListBoxModel.delegate = this;
   uiLayer.modulators.addMouseListener(this, true);
   addAndMakeVisible(uiLayer, 2);
@@ -470,6 +470,7 @@ void MainComponent::spawnTabComponent(std::shared_ptr<Tab> tab) {
 }
 
 void MainComponent::graphicsTimerCallback(const float secondsSincelastUpdate) {
+  return;
   auto currentlyPlayingNotes = delegate->editorRequestsCurrentlyPlayingNotes();
   noteLogger.log(currentlyPlayingNotes);
 
@@ -758,7 +759,7 @@ void MainComponent::loadPreset(int index) {
 }
 
 void MainComponent::visibilityChanged() {
-  loadState(delegate->getStateRepresentation());
+  // loadState(delegate->getStateRepresentation());
 }
 
 void MainComponent::clickedOnGrid(GridComponent* grid, Index index) {

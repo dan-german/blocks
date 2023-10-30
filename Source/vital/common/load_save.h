@@ -172,17 +172,17 @@ class LoadSave {
     static File getUserSkinDirectory();
     static File getUserSampleDirectory();
     static File getUserLfoDirectory();
-    static void getAllFilesOfTypeInDirectories(Array<File>& files, const String& extensions,
+    static void getAllFilesOfTypeInDirectories(juce::Array<File>& files, const String& extensions,
                                                const std::vector<File>& directories);
-    static void getAllPresets(Array<File>& presets);
-    static void getAllWavetables(Array<File>& wavetables);
-    static void getAllSkins(Array<File>& skins);
-    static void getAllLfos(Array<File>& lfos);
-    static void getAllSamples(Array<File>& samples);
-    static void getAllUserPresets(Array<File>& presets);
-    static void getAllUserWavetables(Array<File>& wavetables);
-    static void getAllUserLfos(Array<File>& lfos);
-    static void getAllUserSamples(Array<File>& samples);
+    static void getAllPresets(juce::Array<File>& presets);
+    static void getAllWavetables(juce::Array<File>& wavetables);
+    static void getAllSkins(juce::Array<File>& skins);
+    static void getAllLfos(juce::Array<File>& lfos);
+    static void getAllSamples(juce::Array<File>& samples);
+    static void getAllUserPresets(juce::Array<File>& presets);
+    static void getAllUserWavetables(juce::Array<File>& wavetables);
+    static void getAllUserLfos(juce::Array<File>& lfos);
+    static void getAllUserSamples(juce::Array<File>& samples);
     static int compareFeatureVersionStrings(String a, String b);
     static int compareVersionStrings(String a, String b);
 
