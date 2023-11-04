@@ -51,28 +51,39 @@ namespace vital {
     enabled_modulation_processors_.ensureCapacity(kMaxModulationConnections);
   }
 
+  void BlocksVoiceHandler::something() {
+    auto controls = producers_->getControls();
+    auto controls2 = producers2_->getControls();
+
+    if (controls["osc_1_on"]->value() == 0.0f) {
+      controls["osc_1_on"]->set(1.0f);
+      controls2["osc_2_on"]->set(0.0f);
+      controls2["osc_2_pan"]->set(1.0f);
+      voice_sum_->unplug(producers2_);
+      voice_sum_->plug(producers_, 0);
+      DBG("plugging producers");
+    } else {
+      controls["osc_1_on"]->set(0.0f);
+      controls2["osc_2_on"]->set(1.0f);
+      voice_sum_->unplug(producers_);
+      voice_sum_->plug(producers2_, 0);
+      DBG("plugging producers2");
+    }
+  }
+
   void BlocksVoiceHandler::init() {
     createNoteArticulation();
     createProducers();
     createModulators();
-    // createFilters(note_from_reference_->output());
     createVoiceOutput();
 
-    // reverb_ = new FilterModule("filter_1");
-    // reverb_ = new ChorusModule(beats_per_second_);
-    // addSubmodule(reverb_);
-    // addProcessor(reverb_);
-    // reverb_->plug(producers_->output(OscillatorModule::kRaw), 0);
-
-    Add* voice_sum = new Add();
-
-    voice_sum->plug(producers_, 1); // what does voice_sum do??
-    output_->plug(voice_sum, 0);
+    voice_sum_ = new Add();
+    output_->plug(voice_sum_, 0);
     output_->plug(amplitude_, 1);
 
     direct_output_->plug(amplitude_, 1);
 
-    addProcessor(voice_sum);
+    addProcessor(voice_sum_);
     addProcessor(output_);
     addProcessor(direct_output_);
 
@@ -102,11 +113,8 @@ namespace vital {
     }
 
     VoiceHandler::init();
-    // auto controls = producers_->getControls();
-    // producers_->getControls()["osc_1_transpose"]->set(-18.0f);
-    // reverb_->enable(true);
-    // producers_->setFilter1On(filters_module_->getFilter1OnValue());
-    // producers_->setFilter2On(filters_module_->getFilter2OnValue());
+    producers2_->getControls()["osc_2_transpose"]->set(-12.0f);
+
     setupPolyModulationReadouts();
 
     for (int i = 0; i < kNumMacros; ++i) {
@@ -149,7 +157,6 @@ namespace vital {
   }
 
   void BlocksVoiceHandler::createProducers() {
-    // for (int i = 0; i < 8; i++) {
     producers_ = new OscillatorModule("osc_1");
     producers_->plug(reset(), OscillatorModule::kReset);
     producers_->plug(retrigger(), OscillatorModule::kRetrigger);
@@ -157,9 +164,8 @@ namespace vital {
     producers_->plug(active_mask(), OscillatorModule::kActiveVoices);
     addSubmodule(producers_);
     addProcessor(producers_);
-    producers_->enable(0);
 
-    producers2_ = new OscillatorModule("osc_1");
+    producers2_ = new OscillatorModule("osc_2");
     producers2_->plug(reset(), OscillatorModule::kReset);
     producers2_->plug(retrigger(), OscillatorModule::kRetrigger);
     producers2_->plug(bent_midi_, OscillatorModule::kMidi);
@@ -167,7 +173,8 @@ namespace vital {
     addSubmodule(producers2_);
     addProcessor(producers2_);
 
-    producers2_->enable(0);
+    oscs_.push_back(producers_);
+    oscs_.push_back(producers2_);
   }
 
   void BlocksVoiceHandler::createModulators() {

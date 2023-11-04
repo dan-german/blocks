@@ -768,3 +768,10 @@ void SynthBase::ValueChangedCallback::messageCallback() {
     }
   }
 }
+
+
+void SynthBase::something() { 
+  // sound_e
+  engine_->something();
+  // DBG("ya");
+}

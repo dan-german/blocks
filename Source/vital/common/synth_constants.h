@@ -23,7 +23,7 @@
 namespace vital {
 
   constexpr int kNumLfos = 8;
-  constexpr int kNumOscillators = 1;
+  constexpr int kNumOscillators = 2;
   constexpr int kNumOscillatorWaveFrames = 257;
   constexpr int kNumEnvelopes = 6;
   constexpr int kNumRandomLfos = 4;

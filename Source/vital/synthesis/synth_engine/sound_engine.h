@@ -96,11 +96,12 @@ namespace vital {
       force_inline int getOversamplingAmount() const { return last_oversampling_amount_; }
 
       void checkOversampling();
+      void something();
 
     private:
+      BlocksVoiceHandler* voice_handler_;
       void setOversamplingAmount(int oversampling_amount, int sample_rate);
     
-      BlocksVoiceHandler* voice_handler_;
       ReorderableEffectChain* effect_chain_;
       Add* output_total_;
 

@@ -395,4 +395,8 @@ namespace vital {
   void SoundEngine::sostenutoOffRange(int sample, int from_channel, int to_channel) {
     voice_handler_->sostenutoOffRange(sample, from_channel, to_channel);
   }
+
+  void SoundEngine::something() { 
+    voice_handler_->something();
+  }
 } // namespace vital

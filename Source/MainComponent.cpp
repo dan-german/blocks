@@ -149,7 +149,9 @@ void MainComponent::setupListeners() {
   };
 
   uiLayer.newPresetButton->onClick = [this]() {
+    DBG("changed preset");
     delegate->editorChangedPreset(-1);
+    return;
     clear();
   };
 

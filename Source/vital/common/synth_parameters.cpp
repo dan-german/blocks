@@ -467,13 +467,13 @@ namespace vital {
       ValueDetails::kIndexed, false, "", "Transpose Quantize", nullptr },
     { "tune", 0x000000, -1.0, 1.0, 0.0, 0.0, 100.0,
       ValueDetails::kLinear, false, "", "Tune", nullptr },
-    { "pan", 0x000000, -1.0, 1.0, 0.0, 0.0, 100.0,
+    { "pan", 0x000000, -1.0, 1.0, 1.0, 0.0, 100.0,
       ValueDetails::kLinear, false, "%", "Pan", nullptr },
     { "stack_style", 0x000000, 0.0, SynthOscillator::kNumUnisonStackTypes - 1, 0.0, 0.0, 1.0,
       ValueDetails::kIndexed, false, "", "Stack Style", strings::kUnisonStackNames },
     { "unison_detune", 0x000000, 0.0, 10.0, 4.472135955, 0.0, 1.0,
       ValueDetails::kQuadratic, false, "%", "Unison Detune", nullptr },
-    { "unison_voices", 0x000000, 1.0, 16.0, 1.0, 0.0, 1.0,
+    { "unison_voices", 0x000000, 1.0, 16.0, 2.0, 0.0, 1.0,
       ValueDetails::kIndexed, false, "v", "Unison Voices", nullptr },
     { "unison_blend", 0x000000, 0.0, 1.0, 0.8, 0.0, 100.0,
       ValueDetails::kLinear, false, "%", "Blend", nullptr },
@@ -584,11 +584,13 @@ namespace vital {
     }
 
     details_lookup_["osc_1_on"].default_value = 1.0f;
-    details_lookup_["osc_1_pan"].default_value = 1.0f;
+    // details_lookup_["osc_1_pan"].default_value = -1.0f;
+    // details_lookup_["osc_2_pan"].default_value = 1.0f;
+    // details_lookup_["osc_1_pan"].default_value = 1.0f;
     // details_lookup_["osc_1_transpose"].default_value = -24.0f;
 // _transpose
-    details_lookup_["osc_2_destination"].default_value = 1.0f;
-    details_lookup_["osc_3_destination"].default_value = 3.0f;
+    // details_lookup_["osc_2_destination"].default_value = 1.0f;
+    // details_lookup_["osc_3_destination"].default_value = 3.0f;
 
     details_lookup_["filter_1_osc1_input"].default_value = 1.0f;
     details_lookup_["filter_2_osc2_input"].default_value = 1.0f;
@@ -624,6 +626,3 @@ namespace vital {
   ValueDetailsLookup Parameters::lookup_;
 
 } // namespace vital
-
-    // auto controls = producers_->getControls();
-    // producers_->getControls()["osc_1_pan"]->set(1.0f);

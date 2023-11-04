@@ -14,13 +14,13 @@
  * along with pylon.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "PluginProcessor.h"
+#include "blocks_plugin_processor.h"
 #include "PluginEditor.h"
 
 #include "vital/synthesis/synth_engine/sound_engine.h"
 #include "vital/common/load_save.h"
 
-PluginProcessor::PluginProcessor(): juce::AudioProcessor(BusesProperties().withOutput("Output", AudioChannelSet::stereo(), true)) {
+PluginProcessor::PluginProcessor(): juce::AudioProcessor(BusesProperties().withOutput("Output", AudioChannelSet::stereo(), true)), SynthGuiInterface(this, false) {
   last_seconds_time_ = 0.0;
 
   int num_params = vital::Parameters::getNumParameters();
@@ -228,4 +228,212 @@ void PluginProcessor::setStateInformation(const void* data, int size_in_bytes) {
 
 juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter() {
   return new PluginProcessor();
+}
+
+// MainComponent::Delegate
+void PluginProcessor::editorAdjustedModulator(int parameter, int modulator, float value) {
+  // moduleManager.getModulator(modulator)->parameter(parameter)->setValue(value);
+}
+void PluginProcessor::editorAdjustedBlock(Index index, int parameter, float value) {
+  // moduleManager.getBlock(index)->parameter(parameter)->setValue(value);
+}
+void PluginProcessor::editorChangedModulationMagnitude(int index, float magnitude) {
+  // moduleManager.getConnection(index)->setMagnitude(magnitude);
+}
+void PluginProcessor::editorChangedModulationPolarity(int index, bool bipolar) {
+  // moduleManager.getConnection(index)->setPolarity(bipolar);
+}
+
+void PluginProcessor::editorAdjustedTab(int column, int parameter, float value) {
+  // moduleManager.getTab(column)->parameter(parameter)->setValue(value);
+}
+
+std::shared_ptr<Module> PluginProcessor::getModulator(int index) {
+  // return moduleManager.getModulator(index);
+}
+
+juce::Array<std::shared_ptr<Modulation>> PluginProcessor::getConnectionsOfSource(std::shared_ptr<Module> source) {
+  return juce::Array<std::shared_ptr<Modulation>>();
+  // return moduleManager.getConnectionsOfSource(source);
+}
+
+juce::Array<std::shared_ptr<Modulation>> PluginProcessor::getModulations() {
+  // return moduleManager.getConnections();
+}
+
+std::shared_ptr<Block> PluginProcessor::getBlock(Index index) {
+  // return (index.row == -1 || index.column == -1) ? nullptr : moduleManager.getBlock(index);
+}
+
+std::shared_ptr<Tab> PluginProcessor::getTab(int column) {
+  // return moduleManager.getTab(column);
+}
+
+juce::Array<MPENote> PluginProcessor::editorRequestsCurrentlyPlayingNotes() {
+  // return currentlyPlayingNotes;
+}
+
+juce::Array<int> PluginProcessor::editorRequestsActiveColumns() {
+  // return moduleManager.getActiveColumns();
+}
+
+void PluginProcessor::editorRepositionedBlock(Index oldIndex, Index newIndex) {
+  // Analytics::shared()->countAction("Block Repositioned");
+  // repositionProcessor(oldIndex, newIndex);
+}
+
+void PluginProcessor::editorConnectedModulation(int modulatorIndex, String targetName, int parameter) {
+  // Analytics::shared()->countAction("Modulation Connected");
+  // connect(modulatorIndex, targetName, parameter);
+}
+
+void PluginProcessor::editorDisconnectedModulation(int index) {
+  // Analytics::shared()->countAction("Modulation Disconnected");
+  // disconnect(index);
+}
+
+PresetInfo PluginProcessor::editorChangedPreset(int index) {
+  synth_->something();
+  return PresetInfo();
+  // soun
+  // sound
+  // return changePreset(index);
+}
+
+void PluginProcessor::editorRemovedTab(int column) {
+  // Analytics::shared()->countAction("Tab Removed");
+  // removeTab(column);
+}
+
+std::shared_ptr<Tab> PluginProcessor::editorAddedTab(int column) {
+  // auto type = Model::Types::noteTab;
+  // Analytics::shared()->countAction(type + " Tab Added");
+  // return moduleManager.addTab(type, column, -1);
+}
+
+void PluginProcessor::editorRemovedModulator(int index) {
+  // Analytics::shared()->countAction("Modulator Removed");
+  // removeModulator(index);
+}
+
+std::shared_ptr<Module> PluginProcessor::editorAddedModulator(Model::Type code) {
+  //   Analytics::shared()->countAction("Modulator Added");
+  //   return addModulator(code);
+}
+
+void PluginProcessor::editorRemovedBlock(Index index) {
+  // Analytics::shared()->countAction("Block Removed");
+  // removeBlock(index);
+}
+
+std::shared_ptr<Block> PluginProcessor::editorAddedBlock(Model::Type type, Index index) {
+  return nullptr;
+  // Analytics::shared()->countAction(type + " Block Added");
+  // return addBlock(type, index, -1);
+}
+
+void PluginProcessor::editorRepositionedTab(int oldColumn, int newColumn) {
+  // Analytics::shared()->countAction("Tab Repositioned");
+
+  // auto tab = moduleManager.getTab(oldColumn);
+  // auto columns = tab->getAllColumns();
+  // auto currentBlockVoice = blockVoices[getCurrentVoiceIndex()];
+  // currentBlockVoice->setColumnsState(columns, false);
+
+  // tab->column = newColumn;
+}
+
+void PluginProcessor::editorChangedTabLength(int column, int length) {
+  // Analytics::shared()->countAction("Tab Length Changed");
+  // auto tab = moduleManager.getTab(column);
+  // tab->length = length;
+}
+
+void PluginProcessor::editorChangedBlockLength(Index index, int length) {
+  // Analytics::shared()->countAction("Block Length Changed");
+  // auto parent = moduleManager.getBlock(index);
+  // auto difference = length - parent->length;
+  // bool expanded = difference > 0;
+
+  // if (expanded) {
+  //   expand(index, difference, true);
+  // } else {
+  //   reduce(index, abs(difference));
+  // }
+}
+
+juce::Array<std::shared_ptr<Module>> PluginProcessor::getModulators() {
+  return {};
+  // Array<std::shared_ptr<Module>> array;
+  // for (auto modulator : moduleManager.modulators) array.add(modulator);
+  // return array;
+}
+
+void PluginProcessor::editorSavedPreset(String name) {
+  // Analytics::shared()->countAction("Preset Saved");
+  // auto info = PresetInfo::create(name, moduleManager.getTabs(), moduleManager.getBlocks(), moduleManager.getModulators(), moduleManager.getConnections());
+  // presetManager.save(info);
+}
+
+std::pair<float, float> PluginProcessor::editorRequestsModulatorValue(Index moduleIndex, int parameterIndex, int modulatorIndex) {
+  // auto voice = blockVoices[getCurrentVoiceIndex()];
+  // auto processor = voice->getProcessor(moduleIndex);
+  // auto parameter = processor->getParameter(parameterIndex);
+  // auto modulationInput = parameter->modulationInputs[modulatorIndex];
+
+  // if (modulationInput)
+  //   return { modulationInput->source->getValue(0), modulationInput->connection->getMagnitude() };
+
+  // return { 0.0f, 0.0f };
+}
+
+std::pair<float, float> PluginProcessor::editorRequestsModulatorValue(int modulationConnectionIndex) {
+  // auto connection = moduleManager.getConnection(modulationConnectionIndex);
+  // auto currentVoice = blockVoices[getCurrentVoiceIndex()];
+
+  // if (auto modulationInput = currentVoice->getModulationInput(connection))
+  //   return { modulationInput->source->getValue(0), modulationInput->connection->getMagnitude() };
+
+  // return { 0.0f, 0.0f };
+}
+
+PresetInfo PluginProcessor::getStateRepresentation() {
+  // auto currentState = PresetInfo();
+
+  // for (auto block : moduleManager.getBlocks()) {
+  //   auto presetBlock = PresetInfo::Block();
+  //   presetBlock.index = { block->index.row, block->index.column }; ;
+  //   presetBlock.id = block->id;
+  //   presetBlock.length = block->length;
+  //   currentState.blocks.add(presetBlock);
+  // }
+
+  // for (auto tab : moduleManager.getTabs()) {
+  //   auto presetTab = PresetInfo::Tab();
+  //   presetTab.column = tab->column;
+  //   presetTab.id = tab->id;
+  //   currentState.tabs.add(presetTab);
+  // }
+
+  // return currentState;
+}
+
+juce::StringArray PluginProcessor::editorRequestsPresetNames() {
+  // StringArray result;
+
+  // for (auto preset : presetManager.presets)
+  //   result.add(preset.name);
+
+  return {};
+}
+
+// MainComponent::Delegate end 
+void PluginProcessor::editorParameterGestureChanged(String moduleName, int parameterIndex, bool started) {
+  if (JUCE_STANDALONE_APPLICATION) return;
+
+  // if (started) {
+  //   moduleManager.getModule(moduleName)->parameter(parameterIndex)->audioParameter->beginChangeGesture();
+  // } else {
+  //   moduleManager.getModule(moduleName)->parameter(parameterIndex)->audioParameter->endChangeGesture();
+  // }
 }

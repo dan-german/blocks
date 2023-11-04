@@ -21,10 +21,11 @@
 #include "vital/common/synth_base.h"
 #include "vital/value_bridge.h"
 #include "MainComponent.h"
+#include "vital/common/synth_gui_interface.h"
 
 class ValueBridge;
 
-class PluginProcessor: public SynthBase, public juce::AudioProcessor, public ValueBridge::Listener {
+class PluginProcessor: public SynthBase, public juce::AudioProcessor, public ValueBridge::Listener, public MainComponent::Delegate, public SynthGuiInterface {
 public:
   static constexpr int kSetProgramWaitMilliseconds = 500;
 
@@ -70,6 +71,43 @@ public:
 
   void parameterChanged(std::string name, vital::mono_float value) override;
 
+  // MainComponent::Delegate
+  std::shared_ptr<Tab> editorAddedTab(int column) override;
+  void editorRepositionedTab(int oldColumn, int newColumn) override;
+  void editorChangedTabLength(int column, int length) override;
+  juce::Array<int> editorRequestsActiveColumns() override;
+
+  void editorRemovedTab(int column) override;
+  void editorRemovedBlock(Index index) override;
+  void editorRepositionedBlock(Index oldIndex, Index newIndex) override;
+  void editorAdjustedBlock(Index index, int parameter, float value) override;
+  void editorAdjustedTab(int column, int parameter, float value) override;
+  void editorChangedModulationMagnitude(int connectionIndex, float magnitude) override;
+  void editorParameterGestureChanged(String moduleName, int parameterIndex, bool started) override;
+  void editorChangedModulationPolarity(int index, bool bipolar) override;
+  void editorDisconnectedModulation(int index) override;
+  void editorSavedPreset(String name) override;
+  void editorConnectedModulation(int modulatorIndex, String targetName, int parameter) override;
+  void editorChangedBlockLength(Index index, int length) override;
+  void editorAdjustedModulator(int parameter, int modulator, float value) override;
+  void editorRemovedModulator(int index) override;
+
+  std::shared_ptr<Block> getBlock(Index index) override;
+  std::shared_ptr<Tab> getTab(int column) override;
+  std::shared_ptr<Block> editorAddedBlock(Model::Type code, Index index) override;
+  std::shared_ptr<Module> getModulator(int index) override;
+  std::shared_ptr<Module> editorAddedModulator(Model::Type code) override;
+  PresetInfo editorChangedPreset(int index) override;
+  PresetInfo getStateRepresentation() override;
+  juce::Array<std::shared_ptr<Module>> getModulators() override;
+  juce::Array<std::shared_ptr<Modulation>> getConnectionsOfSource(std::shared_ptr<Module> source) override;
+  juce::Array<std::shared_ptr<Modulation>> getModulations() override;
+
+  std::pair<float, float> editorRequestsModulatorValue(Index moduleIndex, int parameterIndex, int modulatorIndex) override;
+  std::pair<float, float> editorRequestsModulatorValue(int modulationConnectionIndex) override;
+  juce::StringArray editorRequestsPresetNames() override;
+  juce::Array<juce::MPENote> editorRequestsCurrentlyPlayingNotes() override;
+  // *********************************************************
 private:
   bool editorReady = false;
 

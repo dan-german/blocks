@@ -73,6 +73,7 @@ class SynthBase : public MidiManager::Listener {
     void disconnectModulation(const std::string& source, const std::string& destination);
     void disconnectModulation(vital::ModulationConnection* connection);
     void clearModulations();
+    void something();
     void forceShowModulation(const std::string& source, bool force);
     bool isModSourceEnabled(const std::string& source);
     int getNumModulations(const std::string& destination);

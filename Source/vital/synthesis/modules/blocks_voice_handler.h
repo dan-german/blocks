@@ -59,7 +59,7 @@ namespace vital {
 
       output_map& getPolyModulations() override;
       ModulationConnectionBank& getModulationBank() { return modulation_bank_; }
-      Wavetable* getWavetable(int index) { return producers_->getWavetable(); }
+      Wavetable* getWavetable(int index) { return oscs_[index]->getWavetable(); }
       Sample* getSample() { return nullptr; } // removed
       LineGenerator* getLfoSource(int index) { return &lfo_sources_[index]; }
       Output* getDirectOutput() { return getAccumulatedOutput(direct_output_->output()); }
@@ -74,6 +74,7 @@ namespace vital {
         return enabled_modulation_processors_;
       }
 
+      void something();
     private:
       void createNoteArticulation();
       void createProducers();
@@ -87,6 +88,7 @@ namespace vital {
       CircularQueue<ModulationConnectionProcessor*> enabled_modulation_processors_;
       OscillatorModule* producers_;
       OscillatorModule* producers2_;
+      std::vector<OscillatorModule*> oscs_;
       Output* beats_per_second_;
 
       Processor* note_from_reference_;
@@ -96,6 +98,7 @@ namespace vital {
       EnvelopeModule* amplitude_envelope_;
       Processor* amplitude_;
       Processor* pitch_wheel_;
+      Processor* voice_sum_;
 
       FiltersModule* filters_module_;
 
