@@ -7,7 +7,7 @@
 
   ==============================================================================
 */
-#include "PluginProcessor.h"
+#include "blocks_plugin_processor.h"
 #include "PluginEditor.h"
 
 void PluginEditor::paint(Graphics& g) { g.fillAll(Colour(28, 28, 28)); }

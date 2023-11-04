@@ -52,6 +52,9 @@ namespace vital {
     std::string local_description;
   } typedef ValueDetails;
 
+      // { "pan", 0x000000, -1.0, 1.0, 0.0, 0.0, 100.0,
+      // ValueDetails::kLinear, false, "%", "Pan", nullptr },
+
   class ValueDetailsLookup {
     public:
       ValueDetailsLookup();

@@ -29,7 +29,7 @@ namespace vital {
   class Sample;
   class ReorderableEffectChain;
   class StereoMemory;
-  class SynthVoiceHandler;
+  class BlocksVoiceHandler;
   class SynthLfo;
   class Value;
   class ValueSwitch;
@@ -100,7 +100,7 @@ namespace vital {
     private:
       void setOversamplingAmount(int oversampling_amount, int sample_rate);
     
-      SynthVoiceHandler* voice_handler_;
+      BlocksVoiceHandler* voice_handler_;
       ReorderableEffectChain* effect_chain_;
       Add* output_total_;
 

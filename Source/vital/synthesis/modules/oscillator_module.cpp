@@ -28,6 +28,7 @@ namespace vital {
   }
 
   void OscillatorModule::init() {
+    DBG("OscillatorModule::init");
     oscillator_ = new SynthOscillator(wavetable_.get());
 
     createBaseControl(prefix_ + "_view_2d");

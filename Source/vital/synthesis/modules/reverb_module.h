@@ -36,8 +36,13 @@ namespace vital {
       void processWithInput(const poly_float* audio_in, int num_samples) override;
       Processor* clone() const override { return new ReverbModule(*this); }
 
-    protected:
+  void process(int num_samples) override {
+    processWithInput(input(0)->source->buffer, num_samples);
+  }
+
+    public:
       Reverb* reverb_;
+    protected:
 
       JUCE_LEAK_DETECTOR(ReverbModule)
   };

@@ -36,15 +36,15 @@ namespace vital {
     filter_1_->useInput(input(kKeytrack), FilterModule::kKeytrack);
     filter_1_->useInput(input(kMidi), FilterModule::kMidi);
 
-    filter_2_filter_input_ = createBaseControl("filter_2_filter_input");
-    filter_2_ = new FilterModule("filter_2");
-    addSubmodule(filter_2_);
-    addProcessor(filter_2_);
+    // filter_2_filter_input_ = createBaseControl("filter_2_filter_input");
+    // filter_2_ = new FilterModule("filter_2");
+    // addSubmodule(filter_2_);
+    // addProcessor(filter_2_);
 
-    filter_2_->plug(filter_2_input_.get(), FilterModule::kAudio);
-    filter_2_->useInput(input(kReset), FilterModule::kReset);
-    filter_2_->useInput(input(kKeytrack), FilterModule::kKeytrack);
-    filter_2_->useInput(input(kMidi), FilterModule::kMidi);
+    // filter_2_->plug(filter_2_input_.get(), FilterModule::kAudio);
+    // filter_2_->useInput(input(kReset), FilterModule::kReset);
+    // filter_2_->useInput(input(kKeytrack), FilterModule::kKeytrack);
+    // filter_2_->useInput(input(kMidi), FilterModule::kMidi);
 
     SynthModule::init();
   }
@@ -54,14 +54,14 @@ namespace vital {
     filter_2_input_->buffer = input(kFilter2Input)->source->buffer;
 
     getLocalProcessor(filter_1_)->process(num_samples);
-    getLocalProcessor(filter_2_)->process(num_samples);
+    // getLocalProcessor(filter_2_)->process(num_samples);
 
     poly_float* output_buffer = output()->buffer;
     const poly_float* filter_1_buffer = filter_1_->output()->buffer;
-    const poly_float* filter_2_buffer = filter_2_->output()->buffer;
+    // const poly_float* filter_2_buffer = filter_2_->output()->buffer;
 
     for (int i = 0; i < num_samples; ++i)
-      output_buffer[i] = filter_1_buffer[i] + filter_2_buffer[i];
+      output_buffer[i] = filter_1_buffer[i];// + filter_2_buffer[i];
   }
 
   void FiltersModule::processSerialForward(int num_samples) {
@@ -101,8 +101,8 @@ namespace vital {
   void FiltersModule::process(int num_samples) {
     if (filter_1_filter_input_->value() && filter_1_->getOnValue()->value())
       processSerialBackward(num_samples);
-    else if (filter_2_filter_input_->value() && filter_2_->getOnValue()->value())
-      processSerialForward(num_samples);
+    // else if (filter_2_filter_input_->value() && filter_2_->getOnValue()->value())
+    //   processSerialForward(num_samples);
     else
       processParallel(num_samples);
   }

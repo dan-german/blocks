@@ -23,7 +23,7 @@
 namespace vital {
 
   ChorusModule::ChorusModule(const Output* beats_per_second) :
-      SynthModule(0, 1), beats_per_second_(beats_per_second),
+      SynthModule(1, 1), beats_per_second_(beats_per_second),
       frequency_(nullptr), delay_time_1_(nullptr), delay_time_2_(nullptr),
       mod_depth_(nullptr), phase_(0.0f) {
     wet_ = 0.0f;
@@ -36,6 +36,7 @@ namespace vital {
       delays_[i] = new MultiDelay(max_samples);
       addIdleProcessor(delays_[i]);
     }
+
   }
 
   void ChorusModule::init() {

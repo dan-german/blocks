@@ -144,7 +144,7 @@ namespace vital {
       ValueDetails::kLinear, false, " semitones", "Reverb High Cutoff", nullptr },
     { "reverb_high_shelf_gain", 0x000000, -6.0, 0.0, -1.0, 0.0, 1.0,
       ValueDetails::kLinear, false, " dB", "Reverb High Gain", nullptr },
-    { "reverb_dry_wet", 0x000000, 0.0, 1.0, 0.25, 0.0, 100.0,
+    { "reverb_dry_wet", 0x000000, 0.0, 1.0, 1.00, 0.0, 100.0,
       ValueDetails::kLinear, false, "%", "Reverb Mix", nullptr },
     { "reverb_delay", 0x000609, 0.0, 0.3, 0.0, 0.0, 1.0,
       ValueDetails::kLinear, false, " secs", "Reverb Delay", nullptr },
@@ -156,7 +156,7 @@ namespace vital {
       ValueDetails::kQuadratic, false, "%", "Reverb Chorus Amount", nullptr },
     { "reverb_chorus_frequency", 0x000000, -8.0, 3.0, -2.0, 0.0, 1.0,
       ValueDetails::kExponential, false, " Hz", "Reverb Chorus Frequency", nullptr },
-    { "reverb_on", 0x000000, 0.0, 1.0, 0.0, 0.0, 1.0,
+    { "reverb_on", 0x000000, 0.0, 1.0, 1.0, 0.0, 1.0,
       ValueDetails::kIndexed, false, "", "Reverb Switch", strings::kOffOnNames },
     { "sub_on", 0x000000, 0.0, 1.0, 0.0, 0.0, 1.0,
       ValueDetails::kIndexed, false, "", "Sub Switch", strings::kOffOnNames },
@@ -200,7 +200,7 @@ namespace vital {
       ValueDetails::kLinear, false, "%", "Velocity Track", nullptr },
     { "volume", 0x000000, 0.0, 7399.4404, 5473.0404, -80, 1.0,
       ValueDetails::kSquareRoot, false, "dB", "Volume", nullptr },
-    { "phaser_on", 0x000000, 0.0, 1.0, 0.0, 0.0, 1.0,
+    { "phaser_on", 0x000000, 0.0, 1.0, 1.0, 0.0, 1.0,
       ValueDetails::kIndexed, false, "", "Phaser Switch", strings::kOffOnNames },
     { "phaser_dry_wet", 0x000000, 0.0, 1.0, 1.0, 0.0, 100.0,
       ValueDetails::kLinear, false, "%", "Phaser Mix", nullptr },
@@ -262,7 +262,7 @@ namespace vital {
       ValueDetails::kExponential, false, "ms", "Chorus Delay 1", nullptr },
     { "chorus_delay_2", 0x000000, -10.0, -5.64386, -7.0, 0.0, 1000.0,
       ValueDetails::kExponential, false, " ms", "Chorus Delay 2", nullptr },
-    { "compressor_on", 0x000000, 0.0, 1.0, 0.0, 0.0, 1.0,
+    { "compressor_on", 0x000000, 0.0, 1.0, 1.0, 0.0, 1.0,
       ValueDetails::kIndexed, false, "", "Compressor Switch", strings::kOffOnNames },
     { "compressor_low_upper_threshold", 0x000000, -80.0, 0.0, -28.0, 0.0, 1.0,
       ValueDetails::kLinear, false, " dB", "Low Upper Threshold", nullptr },
@@ -584,10 +584,15 @@ namespace vital {
     }
 
     details_lookup_["osc_1_on"].default_value = 1.0f;
+    details_lookup_["osc_1_pan"].default_value = 1.0f;
+    // details_lookup_["osc_1_transpose"].default_value = -24.0f;
+// _transpose
     details_lookup_["osc_2_destination"].default_value = 1.0f;
     details_lookup_["osc_3_destination"].default_value = 3.0f;
+
     details_lookup_["filter_1_osc1_input"].default_value = 1.0f;
     details_lookup_["filter_2_osc2_input"].default_value = 1.0f;
+    details_lookup_["filter_1_on"].default_value = 1.0f;
 
     std::sort(details_list_.begin(), details_list_.end(), compareValueDetails);
   }
@@ -619,3 +624,6 @@ namespace vital {
   ValueDetailsLookup Parameters::lookup_;
 
 } // namespace vital
+
+    // auto controls = producers_->getControls();
+    // producers_->getControls()["osc_1_pan"]->set(1.0f);

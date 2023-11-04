@@ -102,7 +102,7 @@ namespace vital {
       case constants::kPhaser:
         return new PhaserModule(beats_per_second_);
       case constants::kReverb:
-        return new ReverbModule();
+        return nullptr;
       default:
         return nullptr;
     }

@@ -23,12 +23,12 @@
 namespace vital {
 
   constexpr int kNumLfos = 8;
-  constexpr int kNumOscillators = 3;
+  constexpr int kNumOscillators = 1;
   constexpr int kNumOscillatorWaveFrames = 257;
   constexpr int kNumEnvelopes = 6;
   constexpr int kNumRandomLfos = 4;
   constexpr int kNumMacros = 4;
-  constexpr int kNumFilters = 2;
+  constexpr int kNumFilters = 1;
   constexpr int kNumFormants = 4;
   constexpr int kNumChannels = 2;
   constexpr int kMaxPolyphony = 33;

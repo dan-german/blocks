@@ -17,9 +17,9 @@
 #include "vital/synthesis/modules/producers_module.h"
 
 namespace vital {
-  ProducersModule::ProducersModule() :
-      SynthModule(kNumInputs, kNumOutputs), sample_destination_(nullptr),
-      filter1_on_(nullptr), filter2_on_(nullptr) {
+  ProducersModule::ProducersModule():
+    SynthModule(kNumInputs, kNumOutputs), sample_destination_(nullptr),
+    filter1_on_(nullptr), filter2_on_(nullptr) {
     for (int i = 0; i < kNumOscillators; ++i) {
       std::string number = std::to_string(i + 1);
       oscillators_[i] = new OscillatorModule("osc_" + number);
@@ -55,6 +55,7 @@ namespace vital {
     for (int i = 0; i < kNumOscillators; ++i) {
       int index1 = getFirstModulationIndex(i);
       int index2 = getSecondModulationIndex(i);
+      std::cout << "osc " << i << " " << index1 << " " << index2 << std::endl;
       oscillators_[i]->oscillator()->setFirstOscillatorOutput(oscillators_[index1]->output(OscillatorModule::kRaw));
       oscillators_[i]->oscillator()->setSecondOscillatorOutput(oscillators_[index2]->output(OscillatorModule::kRaw));
       oscillators_[i]->oscillator()->setSampleOutput(sampler_->output(SampleModule::kRaw));
@@ -72,7 +73,7 @@ namespace vital {
       distortion_types[i] = oscillators_[i]->getDistortionType();
       processed[i] = false;
     }
-   
+
     int num_processed = 0;
     int index = 0;
     for (int i = 0; i < kNumOscillators * kNumOscillators && num_processed < kNumOscillators; ++i) {
@@ -80,8 +81,8 @@ namespace vital {
       int first_source = getFirstModulationIndex(index);
       int second_source = getSecondModulationIndex(index);
       if ((!SynthOscillator::isFirstModulation(distortion_types[index]) || processed[first_source]) &&
-          (!SynthOscillator::isSecondModulation(distortion_types[index]) || processed[second_source]) &&
-          !processed[index]) {
+        (!SynthOscillator::isSecondModulation(distortion_types[index]) || processed[second_source]) &&
+        !processed[index]) {
         num_processed++;
         processed[index] = true;
         getLocalProcessor(module)->process(num_samples);
@@ -110,8 +111,8 @@ namespace vital {
       bool filter2 = destination == constants::kFilter2 || destination == constants::kDualFilters;
       bool direct_out = destination == constants::kDirectOut;
       if (raw || (!filter2 && filter1 && !filter1_on) ||
-                 (!filter1 && filter2 && !filter2_on) ||
-                 (filter1 && filter2 && !filter1_on && !filter2_on)) {
+        (!filter1 && filter2 && !filter2_on) ||
+        (filter1 && filter2 && !filter1_on && !filter2_on)) {
         utils::addBuffers(raw_output, raw_output, buffer, num_samples);
       }
       if (filter1)
@@ -130,8 +131,8 @@ namespace vital {
     bool filter2_sample = sample_destination == constants::kFilter2 || sample_destination == constants::kDualFilters;
     bool sample_direct_out = sample_destination == constants::kDirectOut;
     if (sample_raw || (!filter2_sample && filter1_sample && !filter1_on) ||
-                      (!filter1_sample && filter2_sample && !filter2_on) ||
-                      (filter1_sample && filter2_sample && !filter1_on && !filter2_on)) {
+      (!filter1_sample && filter2_sample && !filter2_on) ||
+      (filter1_sample && filter2_sample && !filter1_on && !filter2_on)) {
       utils::addBuffers(raw_output, raw_output, sample, num_samples);
     }
     if (filter1_sample)

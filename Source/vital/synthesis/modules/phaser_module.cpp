@@ -20,13 +20,15 @@
 namespace vital {
 
   PhaserModule::PhaserModule(const Output* beats_per_second) :
-      SynthModule(0, kNumOutputs), beats_per_second_(beats_per_second), phaser_(nullptr) { }
+      SynthModule(1, kNumOutputs), beats_per_second_(beats_per_second), phaser_(nullptr) { 
+        phaser_ = new Phaser();
+      }
 
   PhaserModule::~PhaserModule() {
   }
 
   void PhaserModule::init() {
-    phaser_ = new Phaser();
+    // phaser_ = new Phaser();
     phaser_->useOutput(output(kAudioOutput), Phaser::kAudioOutput);
     phaser_->useOutput(output(kCutoffOutput), Phaser::kCutoffOutput);
     addIdleProcessor(phaser_);
@@ -49,6 +51,8 @@ namespace vital {
     phaser_->plug(phaser_phase_offset, Phaser::kPhaseOffset);
     phaser_->plug(phaser_blend, Phaser::kBlend);
     phaser_->init();
+    enable(true);
+    // phaser->enable(true); 
 
     SynthModule::init();
   }

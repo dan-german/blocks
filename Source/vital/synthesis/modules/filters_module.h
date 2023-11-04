@@ -44,7 +44,7 @@ namespace vital {
       Processor* clone() const override { return new FiltersModule(*this); }
 
       const Value* getFilter1OnValue() const { return filter_1_->getOnValue(); }
-      const Value* getFilter2OnValue() const { return filter_2_->getOnValue(); }
+      const Value* getFilter2OnValue() const { return 0; }
 
       void setOversampleAmount(int oversample) override {
         SynthModule::setOversampleAmount(oversample);

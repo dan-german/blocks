@@ -22,7 +22,7 @@
 #include "vital/synthesis/filters/decimator.h"
 #include "vital/synthesis/modules/modulation_connection_processor.h"
 #include "vital/common/synth_constants.h"
-#include "vital/synthesis/modules/synth_voice_handler.h"
+#include "vital/synthesis/modules/blocks_voice_handler.h"
 #include "vital/synthesis/utilities/peak_meter.h"
 #include "vital/synthesis/framework/operators.h"
 #include "vital/synthesis/modules/reorderable_effect_chain.h"
@@ -61,7 +61,7 @@ namespace vital {
     Value* voice_priority = createBaseControl("voice_priority");
     Value* voice_override = createBaseControl("voice_override");
 
-    voice_handler_ = new SynthVoiceHandler(beats_per_second_clamped->output());
+    voice_handler_ = new BlocksVoiceHandler(beats_per_second_clamped->output());
     addSubmodule(voice_handler_);
     voice_handler_->setPolyphony(vital::kMaxPolyphony);
     voice_handler_->plug(polyphony, VoiceHandler::kPolyphony);
@@ -73,33 +73,33 @@ namespace vital {
     createBaseControl("pitch_wheel");
     createBaseControl("mod_wheel");
 
-    Value* effect_chain_order = createBaseControl("effect_chain_order");
-    effect_chain_ = new ReorderableEffectChain(beats_per_second, voice_handler_->midi_offset_output());
-    addSubmodule(effect_chain_);
-    addProcessor(effect_chain_);
-    effect_chain_->plug(voice_handler_, ReorderableEffectChain::kAudio);
-    effect_chain_->plug(effect_chain_order, ReorderableEffectChain::kOrder);
+    // Value* effect_chain_order = createBaseControl("effect_chain_order");
+    // effect_chain_ = new ReorderableEffectChain(beats_per_second, voice_handler_->midi_offset_output());
+    // addSubmodule(effect_chain_);
+    // addProcessor(effect_chain_);
+    // effect_chain_->plug(voice_handler_, ReorderableEffectChain::kAudio);
+    // effect_chain_->plug(effect_chain_order, ReorderableEffectChain::kOrder);
 
-    SynthModule* compressor = effect_chain_->getEffect(constants::kCompressor);
-    createStatusOutput("compressor_low_input", compressor->output(CompressorModule::kLowInputMeanSquared));
-    createStatusOutput("compressor_band_input", compressor->output(CompressorModule::kBandInputMeanSquared));
-    createStatusOutput("compressor_high_input", compressor->output(CompressorModule::kHighInputMeanSquared));
-    createStatusOutput("compressor_low_output", compressor->output(CompressorModule::kLowOutputMeanSquared));
-    createStatusOutput("compressor_band_output", compressor->output(CompressorModule::kBandOutputMeanSquared));
-    createStatusOutput("compressor_high_output", compressor->output(CompressorModule::kHighOutputMeanSquared));
+    // SynthModule* compressor = effect_chain_->getEffect(constants::kCompressor);
+    // createStatusOutput("compressor_low_input", compressor->output(CompressorModule::kLowInputMeanSquared));
+    // createStatusOutput("compressor_band_input", compressor->output(CompressorModule::kBandInputMeanSquared));
+    // createStatusOutput("compressor_high_input", compressor->output(CompressorModule::kHighInputMeanSquared));
+    // createStatusOutput("compressor_low_output", compressor->output(CompressorModule::kLowOutputMeanSquared));
+    // createStatusOutput("compressor_band_output", compressor->output(CompressorModule::kBandOutputMeanSquared));
+    // createStatusOutput("compressor_high_output", compressor->output(CompressorModule::kHighOutputMeanSquared));
 
-    SynthModule* chorus = effect_chain_->getEffect(constants::kChorus);
-    for (int i = 0; i < ChorusModule::kMaxDelayPairs; ++i)
-      createStatusOutput("chorus_delays" + std::to_string(i + 1), chorus->output(i + 1));
+    // SynthModule* chorus = effect_chain_->getEffect(constants::kChorus);
+    // for (int i = 0; i < ChorusModule::kMaxDelayPairs; ++i)
+    //   createStatusOutput("chorus_delays" + std::to_string(i + 1), chorus->output(i + 1));
     
-    SynthModule* phaser = effect_chain_->getEffect(constants::kPhaser);
-    createStatusOutput("phaser_cutoff", phaser->output(PhaserModule::kCutoffOutput));
+    // SynthModule* phaser = effect_chain_->getEffect(constants::kPhaser);
+    // createStatusOutput("phaser_cutoff", phaser->output(PhaserModule::kCutoffOutput));
 
-    SynthModule* flanger = effect_chain_->getEffect(constants::kFlanger);
-    createStatusOutput("flanger_delay_frequency", flanger->output(FlangerModule::kFrequencyOutput));
+    // SynthModule* flanger = effect_chain_->getEffect(constants::kFlanger);
+    // createStatusOutput("flanger_delay_frequency", flanger->output(FlangerModule::kFrequencyOutput));
 
     output_total_ = new Add();
-    output_total_->plug(effect_chain_, 0);
+    output_total_->plug(voice_handler_, 0);
     output_total_->plug(voice_handler_->getDirectOutput(), 1);
     addProcessor(output_total_);
 
@@ -234,7 +234,7 @@ namespace vital {
       oversample >>= 1;
     }
     voice_handler_->setOversampleAmount(oversample);
-    effect_chain_->setOversampleAmount(oversample);
+    // effect_chain_->setOversampleAmount(oversample);
     output_total_->setOversampleAmount(oversample);
     last_oversampling_amount_ = oversampling_amount;
     last_sample_rate_ = sample_rate;
@@ -261,12 +261,12 @@ namespace vital {
 
   void SoundEngine::correctToTime(double seconds) {
     voice_handler_->correctToTime(seconds);
-    effect_chain_->correctToTime(seconds);
+    // effect_chain_->correctToTime(seconds);
   }
 
   void SoundEngine::allSoundsOff() {
     voice_handler_->allSoundsOff();
-    effect_chain_->hardReset();
+    // effect_chain_->hardReset();
     decimator_->hardReset();
   }
 
@@ -323,7 +323,7 @@ namespace vital {
   }
 
   const StereoMemory* SoundEngine::getEqualizerMemory() {
-    return effect_chain_->getEqualizerMemory();
+    return nullptr;
   }
 
   void SoundEngine::setAftertouch(mono_float note, mono_float value, int sample, int channel) {

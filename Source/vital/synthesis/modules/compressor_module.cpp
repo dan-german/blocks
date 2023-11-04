@@ -20,13 +20,15 @@
 
 namespace vital {
 
-  CompressorModule::CompressorModule() : SynthModule(0, kNumOutputs), compressor_(nullptr) { }
+  CompressorModule::CompressorModule() : SynthModule(1, kNumOutputs), compressor_(nullptr) { 
+    compressor_ = new MultibandCompressor();
+  }
 
   CompressorModule::~CompressorModule() {
   }
 
   void CompressorModule::init() {
-    compressor_ = new MultibandCompressor();
+    // compressor_ = new MultibandCompressor();
     compressor_->useOutput(output(kAudio), MultibandCompressor::kAudio);
     compressor_->useOutput(output(kLowInputMeanSquared), MultibandCompressor::kLowInputMeanSquared);
     compressor_->useOutput(output(kBandInputMeanSquared), MultibandCompressor::kBandInputMeanSquared);

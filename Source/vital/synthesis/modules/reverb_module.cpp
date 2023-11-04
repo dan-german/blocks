@@ -20,28 +20,29 @@
 
 namespace vital {
 
-  ReverbModule::ReverbModule() : SynthModule(0, 1), reverb_(nullptr) { }
-
-  ReverbModule::~ReverbModule() {
+  ReverbModule::ReverbModule() : SynthModule(1, 1), reverb_(nullptr) { 
+    reverb_ = new Reverb();
   }
 
-  void ReverbModule::init() {
-    reverb_ = new Reverb();
-    reverb_->useOutput(output());
-    addIdleProcessor(reverb_);
+  ReverbModule::~ReverbModule() {}
 
-    Output* reverb_decay_time = createMonoModControl("reverb_decay_time");
-    Output* reverb_pre_low_cutoff = createMonoModControl("reverb_pre_low_cutoff");
-    Output* reverb_pre_high_cutoff = createMonoModControl("reverb_pre_high_cutoff");
-    Output* reverb_low_shelf_cutoff = createMonoModControl("reverb_low_shelf_cutoff");
-    Output* reverb_low_shelf_gain = createMonoModControl("reverb_low_shelf_gain");
-    Output* reverb_high_shelf_cutoff = createMonoModControl("reverb_high_shelf_cutoff");
-    Output* reverb_high_shelf_gain = createMonoModControl("reverb_high_shelf_gain");
-    Output* reverb_chorus_amount = createMonoModControl("reverb_chorus_amount");
-    Output* reverb_chorus_frequency = createMonoModControl("reverb_chorus_frequency");
-    Output* reverb_size = createMonoModControl("reverb_size");
-    Output* reverb_delay = createMonoModControl("reverb_delay");
-    Output* reverb_wet = createMonoModControl("reverb_dry_wet");
+  void ReverbModule::init() {
+    reverb_->useOutput(output());
+    // addProcessor(reverb_);
+    // add
+
+    Output* reverb_decay_time = createPolyModControl("reverb_decay_time");
+    Output* reverb_pre_low_cutoff = createPolyModControl("reverb_pre_low_cutoff");
+    Output* reverb_pre_high_cutoff = createPolyModControl("reverb_pre_high_cutoff");
+    Output* reverb_low_shelf_cutoff = createPolyModControl("reverb_low_shelf_cutoff");
+    Output* reverb_low_shelf_gain = createPolyModControl("reverb_low_shelf_gain");
+    Output* reverb_high_shelf_cutoff = createPolyModControl("reverb_high_shelf_cutoff");
+    Output* reverb_high_shelf_gain = createPolyModControl("reverb_high_shelf_gain");
+    Output* reverb_chorus_amount = createPolyModControl("reverb_chorus_amount");
+    Output* reverb_chorus_frequency = createPolyModControl("reverb_chorus_frequency");
+    Output* reverb_size = createPolyModControl("reverb_size");
+    Output* reverb_delay = createPolyModControl("reverb_delay");
+    Output* reverb_wet = createPolyModControl("reverb_dry_wet");
 
     reverb_->plug(reverb_decay_time, Reverb::kDecayTime);
     reverb_->plug(reverb_pre_low_cutoff, Reverb::kPreLowCutoff);
