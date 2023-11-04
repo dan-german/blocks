@@ -770,8 +770,8 @@ void SynthBase::ValueChangedCallback::messageCallback() {
 }
 
 
-void SynthBase::something() { 
+void SynthBase::something(std::string type, Index index) { 
   // sound_e
-  engine_->something();
+  engine_->something(type, index);
   // DBG("ya");
 }

@@ -293,7 +293,6 @@ void PluginProcessor::editorDisconnectedModulation(int index) {
 }
 
 PresetInfo PluginProcessor::editorChangedPreset(int index) {
-  synth_->something();
   return PresetInfo();
   // soun
   // sound
@@ -327,6 +326,7 @@ void PluginProcessor::editorRemovedBlock(Index index) {
 }
 
 std::shared_ptr<Block> PluginProcessor::editorAddedBlock(Model::Type type, Index index) {
+  synth_->something(type, index);
   return nullptr;
   // Analytics::shared()->countAction(type + " Block Added");
   // return addBlock(type, index, -1);

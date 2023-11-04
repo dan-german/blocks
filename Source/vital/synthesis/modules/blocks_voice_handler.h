@@ -27,6 +27,7 @@
 #include "vital/synthesis/modules/chorus_module.h"
 #include "vital/synthesis/modules/compressor_module.h"
 #include "vital/synthesis/modules/phaser_module.h"
+#include "model/Index.h"
 #include <vector>
 
 namespace vital {
@@ -59,7 +60,7 @@ namespace vital {
 
       output_map& getPolyModulations() override;
       ModulationConnectionBank& getModulationBank() { return modulation_bank_; }
-      Wavetable* getWavetable(int index) { return oscs_[index]->getWavetable(); }
+      Wavetable* getWavetable(int index) { return oscillators_[index]->getWavetable(); }
       Sample* getSample() { return nullptr; } // removed
       LineGenerator* getLfoSource(int index) { return &lfo_sources_[index]; }
       Output* getDirectOutput() { return getAccumulatedOutput(direct_output_->output()); }
@@ -74,10 +75,10 @@ namespace vital {
         return enabled_modulation_processors_;
       }
 
-      void something();
+      void something(std::string type, Index index);
     private:
       void createNoteArticulation();
-      void createProducers();
+      void createOscillators();
       void createModulators();
       void createVoiceOutput();
       void createFilters(Output* keytrack);
@@ -99,6 +100,10 @@ namespace vital {
       Processor* amplitude_;
       Processor* pitch_wheel_;
       Processor* voice_sum_;
+
+      std::vector<std::vector<Processor*>> processor_matrix_;
+      std::vector<OscillatorModule*> oscillators_;
+      std::vector<FilterModule*> filters_;
 
       FiltersModule* filters_module_;
 

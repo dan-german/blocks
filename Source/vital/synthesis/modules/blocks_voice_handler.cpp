@@ -51,29 +51,52 @@ namespace vital {
     enabled_modulation_processors_.ensureCapacity(kMaxModulationConnections);
   }
 
-  void BlocksVoiceHandler::something() {
-    auto controls = producers_->getControls();
-    auto controls2 = producers2_->getControls();
-
-    if (controls["osc_1_on"]->value() == 0.0f) {
-      controls["osc_1_on"]->set(1.0f);
-      controls2["osc_2_on"]->set(0.0f);
-      controls2["osc_2_pan"]->set(1.0f);
-      voice_sum_->unplug(producers2_);
-      voice_sum_->plug(producers_, 0);
-      DBG("plugging producers");
+  void BlocksVoiceHandler::something(std::string type, Index index) {
+    DBG("adding " + type);
+    if (type == "osc") {
+      OscillatorModule* osc = oscillators_.back();
+      auto name = "osc_" + std::to_string(oscillators_.size());
+      osc->getControls()[name + "_on"]->set(1.0f);
+      oscillators_.pop_back();
+      processor_matrix_[index.column][index.row] = osc;
     } else {
-      controls["osc_1_on"]->set(0.0f);
-      controls2["osc_2_on"]->set(1.0f);
-      voice_sum_->unplug(producers_);
-      voice_sum_->plug(producers2_, 0);
-      DBG("plugging producers2");
+      FilterModule* filter = filters_.back();
+      auto name = "filter_" + std::to_string(filters_.size());
+      filter->getControls()[name + "_on"]->set(1.0f);
+      filters_.pop_back();
+      processor_matrix_[index.column][index.row] = filter;
+    }
+
+    for (int column = 0; column < processor_matrix_.size(); column++) {
+      for (int row = 0; row < processor_matrix_[column].size(); row++) {
+        auto processor = processor_matrix_[column][row];
+        if (processor != nullptr) {
+          voice_sum_->unplug(processor_matrix_[column][row]);
+        }
+      }
+    }
+
+    Processor* current = nullptr;
+    Processor* target = nullptr;
+    for (int column = 0; column < processor_matrix_.size(); column++) {
+      for (int row = 0; row < processor_matrix_[column].size(); row++) {
+        auto processor = processor_matrix_[column][row];
+        if (processor != nullptr) { 
+          if (current) { 
+            processor->plug(current, 0);
+          }
+
+          current = processor;
+        }
+      }
+      voice_sum_->plug(current, 0);
     }
   }
 
   void BlocksVoiceHandler::init() {
     createNoteArticulation();
-    createProducers();
+    createOscillators();
+    createFilters(note_percentage_->output());
     createModulators();
     createVoiceOutput();
 
@@ -113,7 +136,12 @@ namespace vital {
     }
 
     VoiceHandler::init();
-    producers2_->getControls()["osc_2_transpose"]->set(-12.0f);
+
+    // set all oscillators to off 
+    for (int i = 0; i < oscillators_.size(); i++) {
+      auto name = "osc_" + std::to_string(i + 1);
+      oscillators_[i]->getControls()[name + "_on"]->set(0.0f);
+    }
 
     setupPolyModulationReadouts();
 
@@ -156,25 +184,30 @@ namespace vital {
     }
   }
 
-  void BlocksVoiceHandler::createProducers() {
-    producers_ = new OscillatorModule("osc_1");
-    producers_->plug(reset(), OscillatorModule::kReset);
-    producers_->plug(retrigger(), OscillatorModule::kRetrigger);
-    producers_->plug(bent_midi_, OscillatorModule::kMidi);
-    producers_->plug(active_mask(), OscillatorModule::kActiveVoices);
-    addSubmodule(producers_);
-    addProcessor(producers_);
+  void BlocksVoiceHandler::createOscillators() {
+    int rows = 7;
+    int columns = 5;
 
-    producers2_ = new OscillatorModule("osc_2");
-    producers2_->plug(reset(), OscillatorModule::kReset);
-    producers2_->plug(retrigger(), OscillatorModule::kRetrigger);
-    producers2_->plug(bent_midi_, OscillatorModule::kMidi);
-    producers2_->plug(active_mask(), OscillatorModule::kActiveVoices);
-    addSubmodule(producers2_);
-    addProcessor(producers2_);
+    processor_matrix_.resize(rows);
 
-    oscs_.push_back(producers_);
-    oscs_.push_back(producers2_);
+    for (int i = 0; i < columns; i++) {
+      processor_matrix_[i].resize(columns);
+    }
+
+    oscillators_.reserve(5);
+    for (int i = 0; i < 5; i++) {
+      auto name = "osc_" + std::to_string(i + 1);
+      auto osc = new OscillatorModule(name);
+      osc->plug(reset(), OscillatorModule::kReset);
+      osc->plug(retrigger(), OscillatorModule::kRetrigger);
+      osc->plug(bent_midi_, OscillatorModule::kMidi);
+      osc->plug(active_mask(), OscillatorModule::kActiveVoices);
+      addSubmodule(osc);
+      addProcessor(osc);
+      oscillators_.push_back(osc);
+
+      // osc->getControls(
+    }
   }
 
   void BlocksVoiceHandler::createModulators() {
@@ -245,15 +278,16 @@ namespace vital {
   }
 
   void BlocksVoiceHandler::createFilters(Output* keytrack) {
-    // filters_module_ = new FiltersModule();
-    // addSubmodule(filters_module_);
-    // addProcessor(filters_module_);
-
-    // filters_module_->plug(producers_->output(ProducersModule::kToFilter1), FiltersModule::kFilter1Input);
-    // filters_module_->plug(producers_->output(ProducersModule::kToFilter2), FiltersModule::kFilter2Input);
-    // filters_module_->plug(reset(), FiltersModule::kReset);
-    // filters_module_->plug(keytrack, FiltersModule::kKeytrack);
-    // filters_module_->plug(bent_midi_, FiltersModule::kMidi);
+    filters_.reserve(5);
+    for (int i = 0; i < 5; i++) { 
+      auto name = "filter_" + std::to_string(i + 1);
+      auto filter = new FilterModule(name);
+      filter->plug(reset(), FilterModule::kReset);
+      filter->plug(bent_midi_, FilterModule::kMidi);
+      addSubmodule(filter);
+      addProcessor(filter);
+      filters_.push_back(filter);
+    }
   }
 
   void BlocksVoiceHandler::createNoteArticulation() {

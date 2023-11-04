@@ -27,6 +27,7 @@
 #include "vital/common/midi_manager.h"
 #include "vital/common/tuning.h"
 #include "vital/common/wavetable/wavetable_creator.h"
+#include "model/Index.h"
 
 #include <set>
 #include <string>
@@ -73,7 +74,7 @@ class SynthBase : public MidiManager::Listener {
     void disconnectModulation(const std::string& source, const std::string& destination);
     void disconnectModulation(vital::ModulationConnection* connection);
     void clearModulations();
-    void something();
+    void something(std::string type, Index index);
     void forceShowModulation(const std::string& source, bool force);
     bool isModSourceEnabled(const std::string& source);
     int getNumModulations(const std::string& destination);
