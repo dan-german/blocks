@@ -100,6 +100,7 @@ namespace vital {
       Processor* amplitude_;
       Processor* pitch_wheel_;
       Processor* voice_sum_;
+      VariableAdd* last_node_;
 
       std::vector<std::vector<Processor*>> processor_matrix_;
       std::vector<OscillatorModule*> oscillators_;

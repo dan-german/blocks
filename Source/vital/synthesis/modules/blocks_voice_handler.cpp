@@ -81,15 +81,15 @@ namespace vital {
     for (int column = 0; column < processor_matrix_.size(); column++) {
       for (int row = 0; row < processor_matrix_[column].size(); row++) {
         auto processor = processor_matrix_[column][row];
-        if (processor != nullptr) { 
-          if (current) { 
+        if (processor != nullptr) {
+          if (current) {
             processor->plug(current, 0);
           }
 
           current = processor;
         }
       }
-      voice_sum_->plug(current, 0);
+      last_node_->plug(current, index.column);
     }
   }
 
@@ -100,8 +100,10 @@ namespace vital {
     createModulators();
     createVoiceOutput();
 
+    last_node_ = new VariableAdd(5);
+    addProcessor(last_node_);
     voice_sum_ = new Add();
-    output_->plug(voice_sum_, 0);
+    output_->plug(last_node_, 0);
     output_->plug(amplitude_, 1);
 
     direct_output_->plug(amplitude_, 1);
@@ -141,6 +143,7 @@ namespace vital {
     for (int i = 0; i < oscillators_.size(); i++) {
       auto name = "osc_" + std::to_string(i + 1);
       oscillators_[i]->getControls()[name + "_on"]->set(0.0f);
+      oscillators_[i]->getControls()[name + "_transpose"]->set(float(i));
     }
 
     setupPolyModulationReadouts();
@@ -279,7 +282,7 @@ namespace vital {
 
   void BlocksVoiceHandler::createFilters(Output* keytrack) {
     filters_.reserve(5);
-    for (int i = 0; i < 5; i++) { 
+    for (int i = 0; i < 5; i++) {
       auto name = "filter_" + std::to_string(i + 1);
       auto filter = new FilterModule(name);
       filter->plug(reset(), FilterModule::kReset);
