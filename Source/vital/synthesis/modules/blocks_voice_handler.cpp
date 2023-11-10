@@ -49,29 +49,29 @@ namespace vital {
     midi_offset_output_ = registerControlRateOutput(note_from_reference_->output(), true);
 
     enabled_modulation_processors_.ensureCapacity(kMaxModulationConnections);
+
+    int rows = 7;
+    int columns = 5;
+
+    processor_matrix_.resize(rows);
+
+    for (int i = 0; i < columns; i++) {
+      processor_matrix_[i].resize(columns);
+    }
   }
 
-  void BlocksVoiceHandler::something(std::string type, Index index) {
-    DBG("adding " + type);
-    if (type == "osc") {
-      OscillatorModule* osc = oscillators_.back();
-      auto name = "osc_" + std::to_string(oscillators_.size());
-      osc->getControls()[name + "_on"]->set(1.0f);
-      oscillators_.pop_back();
-      processor_matrix_[index.column][index.row] = osc;
-    } else {
-      FilterModule* filter = filters_.back();
-      auto name = "filter_" + std::to_string(filters_.size());
-      filter->getControls()[name + "_on"]->set(1.0f);
-      filters_.pop_back();
-      processor_matrix_[index.column][index.row] = filter;
-    }
+  void BlocksVoiceHandler::AddBlock(std::string type, Index index) {
+    auto module = modules_[type].back();
+    auto name = type + "_" + std::to_string(modules_[type].size());
+    module->getControls()[name + "_on"]->set(1.0f);
+    modules_[type].pop_back();
+    processor_matrix_[index.column][index.row] = module;
 
     for (int column = 0; column < processor_matrix_.size(); column++) {
       for (int row = 0; row < processor_matrix_[column].size(); row++) {
         auto processor = processor_matrix_[column][row];
         if (processor != nullptr) {
-          voice_sum_->unplug(processor_matrix_[column][row]);
+          voice_sum_->unplug(processor_matrix_[column][row].get());
         }
       }
     }
@@ -86,7 +86,7 @@ namespace vital {
             processor->plug(current, 0);
           }
 
-          current = processor;
+          current = processor.get();
         }
       }
       last_node_->plug(current, index.column);
@@ -187,29 +187,36 @@ namespace vital {
     }
   }
 
-  void BlocksVoiceHandler::createOscillators() {
-    int rows = 7;
-    int columns = 5;
-
-    processor_matrix_.resize(rows);
-
-    for (int i = 0; i < columns; i++) {
-      processor_matrix_[i].resize(columns);
-    }
-
-    oscillators_.reserve(5);
+  void BlocksVoiceHandler::createFilters(Output* keytrack) {
     for (int i = 0; i < 5; i++) {
-      auto name = "osc_" + std::to_string(i + 1);
-      auto osc = new OscillatorModule(name);
+      auto name = "filter_" + std::to_string(i + 1);
+      auto filter = std::make_shared<FilterModule>(name);
+
+      filter->plug(reset(), FilterModule::kReset);
+      filter->plug(bent_midi_, FilterModule::kMidi);
+
+      addSubmodule(filter.get());
+      addProcessor(filter.get());
+
+      modules_["filter"].push_back(filter);
+    }
+  }
+
+  void BlocksVoiceHandler::createOscillators() {
+    std::string type = "osc";
+    for (int i = 0; i < 5; i++) {
+      auto name = type + "_" + std::to_string(i + 1);
+      auto osc = std::make_shared<OscillatorModule>(name);
+
       osc->plug(reset(), OscillatorModule::kReset);
       osc->plug(retrigger(), OscillatorModule::kRetrigger);
       osc->plug(bent_midi_, OscillatorModule::kMidi);
       osc->plug(active_mask(), OscillatorModule::kActiveVoices);
-      addSubmodule(osc);
-      addProcessor(osc);
-      oscillators_.push_back(osc);
 
-      // osc->getControls(
+      addSubmodule(osc.get());
+      addProcessor(osc.get());
+      modules_[type].push_back(osc);
+      oscillators_.push_back(osc);
     }
   }
 
@@ -278,19 +285,6 @@ namespace vital {
     createStatusOutput("lift", lift());
     createStatusOutput("mod_wheel", mod_wheel());
     createStatusOutput("pitch_wheel", pitch_wheel_percent());
-  }
-
-  void BlocksVoiceHandler::createFilters(Output* keytrack) {
-    filters_.reserve(5);
-    for (int i = 0; i < 5; i++) {
-      auto name = "filter_" + std::to_string(i + 1);
-      auto filter = new FilterModule(name);
-      filter->plug(reset(), FilterModule::kReset);
-      filter->plug(bent_midi_, FilterModule::kMidi);
-      addSubmodule(filter);
-      addProcessor(filter);
-      filters_.push_back(filter);
-    }
   }
 
   void BlocksVoiceHandler::createNoteArticulation() {

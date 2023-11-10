@@ -75,7 +75,7 @@ namespace vital {
         return enabled_modulation_processors_;
       }
 
-      void something(std::string type, Index index);
+      void AddBlock(std::string type, Index index);
     private:
       void createNoteArticulation();
       void createOscillators();
@@ -102,8 +102,8 @@ namespace vital {
       Processor* voice_sum_;
       VariableAdd* last_node_;
 
-      std::vector<std::vector<Processor*>> processor_matrix_;
-      std::vector<OscillatorModule*> oscillators_;
+      std::vector<std::vector<std::shared_ptr<Processor>>> processor_matrix_;
+      std::vector<std::shared_ptr<OscillatorModule>> oscillators_;
       std::vector<FilterModule*> filters_;
 
       FiltersModule* filters_module_;
@@ -136,6 +136,7 @@ namespace vital {
 
       output_map poly_readouts_;
       poly_mask last_active_voice_mask_;
+      std::map<std::string, std::vector<std::shared_ptr<SynthModule>>> modules_;
 
       JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(BlocksVoiceHandler)
   };

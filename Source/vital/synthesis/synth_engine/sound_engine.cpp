@@ -397,6 +397,6 @@ namespace vital {
   }
 
   void SoundEngine::something(std::string type, Index index) { 
-    voice_handler_->something(type, index);
+    voice_handler_->AddBlock(type, index);
   }
 } // namespace vital
