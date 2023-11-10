@@ -23,6 +23,35 @@
 
 namespace vital {
 
+  Value* SynthModule::createBaseControl2(ValueDetails details) {
+    mono_float default_value = details.default_value;
+
+    Value* val = nullptr;
+    if (details.audio_rate) {
+      if (details.smooth_value) {
+        val = new SmoothValue(default_value);
+        addMonoProcessor(val, false);
+      }
+      else {
+        val = new Value(default_value);
+        addIdleMonoProcessor(val);
+      }
+    }
+    else {
+      if (details.smooth_value) {
+        val = new cr::SmoothValue(default_value);
+        addMonoProcessor(val, false);
+      }
+      else {
+        val = new cr::Value(default_value);
+        addIdleMonoProcessor(val);
+      }
+    }
+
+    // data_->controls[name] = val;
+    return val;
+  }
+
   Value* SynthModule::createBaseControl(std::string name, bool audio_rate, bool smooth_value) {
     mono_float default_value = Parameters::getDetails(name).default_value;
 
@@ -138,6 +167,103 @@ namespace vital {
       cr::Root* root = new cr::Root(details.post_offset);
       root->plug(control_rate_total);
       addMonoProcessor(root);
+      control_rate_total = root->output();
+    }
+
+    return control_rate_total;
+  }
+
+  Output* SynthModule::createPolyModControl2(ValueDetails details, Input* reset) {
+    Output* base_control = createBaseModControl(details.name, details.audio_rate, details.smooth_value, nullptr);
+
+    Processor* poly_total;
+    if (details.audio_rate) {
+      poly_total = new ModulationSum();
+      if (reset)
+        poly_total->useInput(reset, ModulationSum::kReset);
+    }
+    else
+      poly_total = new cr::VariableAdd();
+    addProcessor(poly_total);
+    data_->poly_mod_destinations[details.name] = poly_total;
+
+    Processor* modulation_total;
+    if (details.audio_rate)
+      modulation_total = new Add();
+    else
+      modulation_total = new cr::Add();
+
+    modulation_total->plug(base_control, 0);
+    modulation_total->plug(poly_total, 1);
+    addProcessor(modulation_total);
+
+    // data_->poly_modulation_readout[name] = poly_total->output(); // todo - fix
+
+    ValueSwitch* control_switch = new ValueSwitch(0.0f);
+    control_switch->plugNext(base_control);
+    control_switch->plugNext(modulation_total);
+
+    if (details.internal_modulation) { // todo - fix
+      // poly_total->plugNext(details.internal_modulation);
+      // control_switch->set(1);
+    }
+    else {
+      control_switch->addProcessor(poly_total);
+      control_switch->addProcessor(modulation_total);
+      control_switch->set(0);
+    }
+    addIdleProcessor(control_switch);
+    data_->poly_modulation_switches[details.name] = control_switch;
+
+    Output* control_rate_total = control_switch->output(ValueSwitch::kSwitch);
+    if (details.audio_rate)
+      return control_rate_total;
+
+    if (details.value_scale == ValueDetails::kQuadratic) {
+      Processor* scale = nullptr;
+      if (details.post_offset)
+        scale = new cr::Quadratic(details.post_offset);
+      else
+        scale = new cr::Square();
+
+      scale->plug(control_rate_total);
+      addProcessor(scale);
+      control_rate_total = scale->output();
+    }
+    else if (details.value_scale == ValueDetails::kCubic) {
+      Processor* scale = nullptr;
+      VITAL_ASSERT(details.post_offset == 0.0f);
+      if (details.post_offset)
+        scale = new cr::Cubic(details.post_offset);
+      else
+        scale = new cr::Cube();
+
+      scale->plug(control_rate_total);
+      addProcessor(scale);
+      control_rate_total = scale->output();
+    }
+    else if (details.value_scale == ValueDetails::kQuartic) {
+      Processor* scale = nullptr;
+      VITAL_ASSERT(details.post_offset == 0.0f);
+      if (details.post_offset)
+        scale = new cr::Quartic(details.post_offset);
+      else
+        scale = new cr::Quart();
+
+      scale->plug(control_rate_total);
+      addProcessor(scale);
+      control_rate_total = scale->output();
+    }
+    else if (details.value_scale == ValueDetails::kExponential) {      
+      Processor* exponential = new cr::ExponentialScale(details.min, details.max, 2.0f, details.post_offset);
+      exponential->plug(control_rate_total);
+      addProcessor(exponential);
+      control_rate_total = exponential->output();
+    }
+    else if (details.value_scale == ValueDetails::kSquareRoot) {      
+      cr::Root* root = new cr::Root(details.post_offset);
+      root->plug(control_rate_total);
+      addProcessor(root);
       control_rate_total = root->output();
     }
 

@@ -110,6 +110,7 @@ namespace vital {
     protected:
       // Creates a basic linear non-scaled control.
       Value* createBaseControl(std::string name, bool audio_rate = false, bool smooth_value = false);
+      Value* createBaseControl2(ValueDetails details);
 
       // Creates a basic non-scaled linear control that you can modulate monophonically
       Output* createBaseModControl(std::string name, bool audio_rate = false, bool smooth_value = false,
@@ -122,6 +123,8 @@ namespace vital {
       // Creates any control that you can modulate polyphonically and monophonically.
       Output* createPolyModControl(std::string name, bool audio_rate = false, bool smooth_value = false,
                                    Output* internal_modulation = nullptr, Input* reset = nullptr);
+
+      Output* createPolyModControl2(ValueDetails details, Input* reset = nullptr);
 
       // Creates a switch from free running frequencies to tempo synced frequencies.
       Output* createTempoSyncSwitch(std::string name, Processor* frequency,

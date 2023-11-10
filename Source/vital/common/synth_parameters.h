@@ -24,6 +24,14 @@
 namespace vital {
 
   struct ValueDetails {
+    enum Type {
+      kBase,
+      kMode,
+      kMonoMod,
+      kPolyMod,
+      kTempoSyncSwitch
+    };
+
     enum ValueScale {
       kIndexed,
       kLinear,
@@ -39,19 +47,27 @@ namespace vital {
     mono_float min = 0.0f;
     mono_float max = 1.0f;
     mono_float default_value = 0.0f;
-
     // post_offset used to offset quadratic and exponential scaling.
     mono_float post_offset = 0.0f;
-
     mono_float display_multiply = 1.0f;
     ValueScale value_scale = kLinear;
     bool display_invert = false;
-    std::string display_units;
+    std::string display_units = "";
     std::string display_name;
     const std::string* string_lookup = nullptr;
     std::string local_description;
+    Type type = kPolyMod;
+    bool audio_rate = false;
+    bool smooth_value = false;
+    bool internal_modulation = false;
+    bool reset = false;
+    int input_index ;
   } typedef ValueDetails;
 
+  // bool audio_rate = false
+  // bool smooth_value = false
+  // Output* internal_modulation = nullptr
+  // Input* reset = nullptr
 
   class ValueDetailsLookup {
     public:
