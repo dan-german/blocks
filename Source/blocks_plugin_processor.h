@@ -94,6 +94,7 @@ public:
   void editorRemovedModulator(int index) override;
 
   std::shared_ptr<Block> getBlock(Index index) override;
+  std::shared_ptr<model::Module> getBlock2(Index index) override;
   std::shared_ptr<Tab> getTab(int column) override;
   std::shared_ptr<Block> editorAddedBlock(Model::Type code, Index index) override;
   std::shared_ptr<model::Module> editorAddedBlock2(Model::Type code, Index index) override;

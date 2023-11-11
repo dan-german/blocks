@@ -12,6 +12,8 @@
 
 #include "model/Module.h"
 #include "InspectorSlider.h"
+#include "module_new.h"
+#include "vital/common/synth_parameters.h"
 
 using namespace Model;
 
@@ -29,14 +31,14 @@ public:
 
   void resized() override;
 
-  void setConfiguration(std::shared_ptr<Module> module);
+  void setConfiguration(std::shared_ptr<model::Module> module);
   void setModulationIndicatorValue(int parameterIndex, int modulatorIndex, float value, float magnitude);
   void setModulationIndicatorPolarity(int parameterIndex, int modulatorIndex, bool bipolar);
   OwnedArray<InspectorSlider>& getSliders();
 private:
   OwnedArray<InspectorSlider> parameterSliders;
 
-  void spawnSlider(std::shared_ptr<ModuleParameter> model);
+  void spawnSlider(vital::ValueDetails model);
   void sliderValueChanged(Slider* slider) override;
   void updateSize();
   void resetInspector();

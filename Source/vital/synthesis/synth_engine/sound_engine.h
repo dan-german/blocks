@@ -46,6 +46,9 @@ namespace vital {
       SoundEngine();
       virtual ~SoundEngine();
 
+      std::shared_ptr<model::Module> AddBlock(std::string type, Index index);
+      std::shared_ptr<model::Module> GetBlock(Index index);
+
       void init() override;
       void process(int num_samples) override;
       void correctToTime(double seconds) override;
@@ -98,7 +101,6 @@ namespace vital {
       force_inline int getOversamplingAmount() const { return last_oversampling_amount_; }
 
       void checkOversampling();
-      std::shared_ptr<model::Module> AddBlock(std::string type, Index index);
 
     private:
       BlocksVoiceHandler* voice_handler_;

@@ -78,6 +78,7 @@ public:
   }
 
   std::shared_ptr<model::Module> AddBlock(std::string type, Index index);
+  std::shared_ptr<model::Module> GetBlock(Index index);
 private:
   void createNoteArticulation();
   void createOscillators();

@@ -10,6 +10,7 @@
 
 #include "gui/InspectorComponent.h"
 #include "model/ModuleParameter.h"
+#include "module_new.h"
 
 InspectorComponent::InspectorComponent() {}
 InspectorComponent::~InspectorComponent() { }
@@ -18,46 +19,46 @@ int InspectorComponent::calculateWidth() { return sliderWidth * (parameterSlider
 void InspectorComponent::sliderDragStarted(Slider* slider) { delegate->inspectorGestureChanged(getIndexOfSlider(slider), true); }
 void InspectorComponent::sliderDragEnded(Slider* slider) { delegate->inspectorGestureChanged(getIndexOfSlider(slider), false); }
 
-void InspectorComponent::setConfiguration(std::shared_ptr<Module> module) {
+void InspectorComponent::setConfiguration(std::shared_ptr<model::Module> module) {
   resetInspector();
-  for (auto parameter : module->parameters) spawnSlider(parameter);
+  for (auto parameter : module->parameters_) spawnSlider(parameter);
   updateSize();
 }
 
-void InspectorComponent::spawnSlider(std::shared_ptr<ModuleParameter> parameter) {
+void InspectorComponent::spawnSlider(vital::ValueDetails parameter) {
   auto slider = new InspectorSlider();
-  auto audioParameter = parameter->audioParameter;
+  // auto audioParameter = parameter->audioParameter;
 
-  auto range = audioParameter->getNormalisableRange();
-  slider->slider.setRange(range.start, range.end, range.interval);
+  // auto range = audioParameter->getNormalisableRange();
+  slider->slider.setRange(parameter.min, parameter.max);
 
-  slider->slider.addListener(this);
-  slider->titleLabel.setText(parameter->id.toStdString(), dontSendNotification);
-  slider->slider.setSkewFactor(parameter->skew, false);
-  slider->slider.setTextValueSuffix(parameter->valueSuffix);
+  // slider->slider.addListener(this);
+  // slider->titleLabel.setText(parameter->id.toStdString(), dontSendNotification);
+  // slider->slider.setSkewFactor(parameter->skew, false);
+  // slider->slider.setTextValueSuffix(parameter->valueSuffix);
 
-  if (dynamic_cast<AudioParameterInt*>(audioParameter)) 
-    slider->slider.setNumDecimalPlacesToDisplay(0);
-  else if (dynamic_cast<AudioParameterFloat*>(audioParameter))
-    slider->slider.setNumDecimalPlacesToDisplay(2);
+  // if (dynamic_cast<AudioParameterInt*>(audioParameter)) 
+  //   slider->slider.setNumDecimalPlacesToDisplay(0);
+  // else if (dynamic_cast<AudioParameterFloat*>(audioParameter))
+  //   slider->slider.setNumDecimalPlacesToDisplay(2);
 
-  auto choices = audioParameter->getAllValueStrings();
+  // auto choices = audioParameter->getAllValueStrings();
 
-  if (parameter->textFromValueFunction)
-    slider->slider.textFromValueFunction = parameter->textFromValueFunction;
-  else if (choices.size() != 0) {
-    slider->setType(InspectorSlider::Type::thumb);
-    slider->slider.textFromValueFunction = [choices](double value) { return choices[value]; };
-  }
+  // if (parameter->textFromValueFunction)
+  //   slider->slider.textFromValueFunction = parameter->textFromValueFunction;
+  // else if (choices.size() != 0) {
+  //   slider->setType(InspectorSlider::Type::thumb);
+  //   slider->slider.textFromValueFunction = [choices](double value) { return choices[value]; };
+  // }
 
-  for (auto modulator : parameter->connections)
-    slider->addModulationIndicator(modulator->magnitudeParameter->getValue(), modulator->source->colour.colour, static_cast<bool>(modulator->bipolarParameter->getValue()), parameter->audioParameter->getValue());
+  // for (auto modulator : parameter->connections)
+  //   slider->addModulationIndicator(modulator->magnitudeParameter->getValue(), modulator->source->colour.colour, static_cast<bool>(modulator->bipolarParameter->getValue()), parameter->audioParameter->getValue());
 
   parameterSliders.add(slider);
   addAndMakeVisible(slider);
 
-  auto value = audioParameter->getNormalisableRange().convertFrom0to1(audioParameter->getValue());
-  slider->slider.setValue(value, dontSendNotification);
+  // auto value = audioParameter->getNormalisableRange().convertFrom0to1(audioParameter->getValue());
+  // slider->slider.setValue(value, dontSendNotification);
 }
 
 void InspectorComponent::resetInspector() {

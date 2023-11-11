@@ -260,9 +260,10 @@ juce::Array<std::shared_ptr<Modulation>> PluginProcessor::getConnectionsOfSource
 juce::Array<std::shared_ptr<Modulation>> PluginProcessor::getModulations() {
   // return moduleManager.getConnections();
 }
+std::shared_ptr<Block> PluginProcessor::getBlock(Index index) {}
 
-std::shared_ptr<Block> PluginProcessor::getBlock(Index index) {
-  // return (index.row == -1 || index.column == -1) ? nullptr : moduleManager.getBlock(index);
+std::shared_ptr<model::Module> PluginProcessor::getBlock2(Index index) {
+  return (index.row == -1 || index.column == -1) ? nullptr : synth_->GetBlock(index);
 }
 
 std::shared_ptr<Tab> PluginProcessor::getTab(int column) {

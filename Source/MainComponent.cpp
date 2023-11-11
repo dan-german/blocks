@@ -426,14 +426,14 @@ void MainComponent::updateModuleComponentVisuals(int sliderIndex, float value, s
 }
 
 void MainComponent::refreshInspector() {
-  std::shared_ptr<Module> focusedModule;
+  std::shared_ptr<model::Module> focusedModule;
 
-  auto isTab = tabGrid.containsItem(focusedGridItem);
-  if (isTab) {
-    focusedModule = delegate->getTab(focusedGridItem->index.column);
-  } else {
-    focusedModule = delegate->getBlock(focusedGridItem->index);
-  }
+  // auto isTab = tabGrid.containsItem(focusedGridItem);
+  // if (isTab) {
+  //   focusedModule = delegate->getTab(focusedGridItem->index.column);
+  // } else {
+    focusedModule = delegate->getBlock2(focusedGridItem->index);
+  // }
 
   inspector.setConfiguration(focusedModule);
   resizeInspector();
@@ -579,7 +579,7 @@ void MainComponent::connectionDeleted(ConnectionComponent* component) {
   delegate->editorDisconnectedModulation(component->row);
   uiLayer.setModulations(delegate->getModulations());
 
-  if (inspector.isVisible()) inspector.setConfiguration(delegate->getBlock(focusedGridItem->index));
+  // if (inspector.isVisible()) inspector.setConfiguration(delegate->getBlock(focusedGridItem->index));
   for (auto block : blocks) block->setConfig(delegate->getBlock(block->index));
 }
 
@@ -723,7 +723,7 @@ void MainComponent::modulatorRemoved(ModulatorComponent* component) {
   delegate->editorRemovedModulator(component->row);
   uiLayer.setModulations(delegate->getModulations());
 
-  if (inspector.isVisible()) inspector.setConfiguration(delegate->getBlock(focusedGridItem->index));
+  // if (inspector.isVisible()) inspector.setConfiguration(delegate->getBlock(focusedGridItem->index));
   for (auto block : blocks) block->setConfig(delegate->getBlock(block->index));
 }
 

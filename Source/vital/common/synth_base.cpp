@@ -26,7 +26,7 @@
 #include "vital/common/synth_parameters.h"
 #include "vital/synthesis/framework/utils.h"
 
-SynthBase::SynthBase() : expired_(false) {
+SynthBase::SynthBase(): expired_(false) {
   expired_ = LoadSave::isExpired();
   self_reference_ = std::make_shared<SynthBase*>();
   *self_reference_ = this;
@@ -152,8 +152,8 @@ vital::modulation_change SynthBase::createModulationChange(vital::ModulationConn
   vital::ModulationConnectionBank& modulation_bank = getModulationBank();
   for (int i = 0; i < vital::kMaxModulationConnections; ++i) {
     if (modulation_bank.atIndex(i)->source_name == connection->source_name &&
-        modulation_bank.atIndex(i)->destination_name != connection->destination_name &&
-        !modulation_bank.atIndex(i)->modulation_processor->isControlRate()) {
+      modulation_bank.atIndex(i)->destination_name != connection->destination_name &&
+      !modulation_bank.atIndex(i)->modulation_processor->isControlRate()) {
       num_audio_rate++;
     }
   }
@@ -170,8 +170,7 @@ void SynthBase::connectModulation(vital::ModulationConnection* connection) {
   if (isInvalidConnection(change)) {
     connection->destination_name = "";
     connection->source_name = "";
-  }
-  else if (mod_connections_.count(connection) == 0) {
+  } else if (mod_connections_.count(connection) == 0) {
     change.disconnecting = false;
     mod_connections_.push_back(connection);
     modulation_change_queue_.enqueue(change);
@@ -211,7 +210,7 @@ void SynthBase::disconnectModulation(const std::string& source, const std::strin
 
 void SynthBase::clearModulations() {
   clearModulationQueue();
-  
+
   while (mod_connections_.size()) {
     vital::ModulationConnection* connection = *mod_connections_.begin();
     mod_connections_.remove(connection);
@@ -344,8 +343,7 @@ bool SynthBase::loadFromJson(const json& data) {
     bool result = LoadSave::jsonToState(this, save_info_, data);
     pauseProcessing(false);
     return result;
-  }
-  catch (const json::exception& e) {
+  } catch (const json::exception& e) {
     pauseProcessing(false);
     throw e;
   }
@@ -354,7 +352,7 @@ bool SynthBase::loadFromJson(const json& data) {
 bool SynthBase::loadFromFile(File preset, std::string& error) {
   if (!preset.exists())
     return false;
-  
+
   try {
     json parsed_json_state = json::parse(preset.loadFileAsString().toStdString(), nullptr);
     if (!loadFromJson(parsed_json_state)) {
@@ -363,12 +361,11 @@ bool SynthBase::loadFromFile(File preset, std::string& error) {
     }
 
     active_file_ = preset;
-  }
-  catch (const json::exception& e) {
+  } catch (const json::exception& e) {
     error = "Preset file is corrupted.";
     return false;
   }
-  
+
   setPresetName(preset.getFileNameWithoutExtension());
 
   SynthGuiInterface* gui_interface = getGuiInterface();
@@ -452,7 +449,7 @@ void SynthBase::renderAudioToFile(File file, float seconds, float bpm, std::vect
 
     writer->writeFromFloatArrays(buffers, 2, kBufferSize);
 
-  #if JUCE_MODULE_AVAILABLE_juce_graphics
+#if JUCE_MODULE_AVAILABLE_juce_graphics
     int image_index = (samples * kVideoRate) / kSampleRate;
     if (image_index > current_image_index && render_images) {
       current_image_index = image_index;
@@ -495,7 +492,7 @@ void SynthBase::renderAudioToFile(File file, float seconds, float bpm, std::vect
 
       png.writeImageToStream(image, image_file_stream);
     }
-  #endif
+#endif
   }
 
   writer->flush();
@@ -586,7 +583,7 @@ void SynthBase::processAudio(AudioSampleBuffer* buffer, int channels, int sample
 }
 
 void SynthBase::processAudioWithInput(AudioSampleBuffer* buffer, const vital::poly_float* input_buffer,
-                                      int channels, int samples, int offset) {
+  int channels, int samples, int offset) {
   if (expired_)
     return;
 
@@ -644,7 +641,7 @@ void SynthBase::updateMemoryOutput(int samples, const vital::poly_float* audio) 
 
   if (last_played && (last_played_note_ != last_played || num_pressed > last_num_pressed_)) {
     last_played_note_ = last_played;
-    
+
     vital::mono_float frequency = vital::utils::midiNoteToFrequency(last_played_note_);
     vital::mono_float period = engine_->getSampleRate() / frequency;
     int window_length = output_inc * vital::kOscilloscopeMemoryResolution;
@@ -770,6 +767,10 @@ void SynthBase::ValueChangedCallback::messageCallback() {
 }
 
 
-std::shared_ptr<model::Module> SynthBase::AddBlock(std::string type, Index index) { 
+std::shared_ptr<model::Module> SynthBase::AddBlock(std::string type, Index index) {
   return engine_->AddBlock(type, index);
+}
+
+std::shared_ptr<model::Module> SynthBase::GetBlock(Index index) {
+  return engine_->GetBlock(index);  
 }

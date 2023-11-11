@@ -31,372 +31,376 @@
 
 namespace vital {
 
-  SoundEngine::SoundEngine() : SynthModule(0, 1), voice_handler_(nullptr), effect_chain_(nullptr),
-                               output_total_(nullptr), last_oversampling_amount_(-1), last_sample_rate_(-1),
-                               oversampling_(nullptr), legato_(nullptr), decimator_(nullptr), peak_meter_(nullptr) {
-    SoundEngine::init();
-    bps_ = data_->controls["beats_per_minute"];
-    modulation_processors_.reserve(kMaxModulationConnections);
+SoundEngine::SoundEngine(): SynthModule(0, 1), voice_handler_(nullptr), effect_chain_(nullptr),
+output_total_(nullptr), last_oversampling_amount_(-1), last_sample_rate_(-1),
+oversampling_(nullptr), legato_(nullptr), decimator_(nullptr), peak_meter_(nullptr) {
+  SoundEngine::init();
+  bps_ = data_->controls["beats_per_minute"];
+  modulation_processors_.reserve(kMaxModulationConnections);
+}
+
+SoundEngine::~SoundEngine() {
+  voice_handler_->prepareDestroy();
+}
+
+void SoundEngine::init() {
+  createBaseControl("bypass");
+  createBaseControl("mpe_enabled");
+  createBaseControl("view_spectrogram");
+  oversampling_ = createBaseControl("oversampling");
+  legato_ = createBaseControl("legato");
+
+  Output* stereo_routing = createMonoModControl("stereo_routing");
+  Value* stereo_mode = createBaseControl("stereo_mode");
+  Output* beats_per_second = createMonoModControl("beats_per_minute");
+  cr::LowerBound* beats_per_second_clamped = new cr::LowerBound(0.0f);
+  beats_per_second_clamped->plug(beats_per_second);
+  addProcessor(beats_per_second_clamped);
+
+  Output* polyphony = createMonoModControl("polyphony");
+  Value* voice_priority = createBaseControl("voice_priority");
+  Value* voice_override = createBaseControl("voice_override");
+
+  voice_handler_ = new BlocksVoiceHandler(beats_per_second_clamped->output());
+  addSubmodule(voice_handler_);
+  voice_handler_->setPolyphony(vital::kMaxPolyphony);
+  voice_handler_->plug(polyphony, VoiceHandler::kPolyphony);
+  voice_handler_->plug(voice_priority, VoiceHandler::kVoicePriority);
+  voice_handler_->plug(voice_override, VoiceHandler::kVoiceOverride);
+
+  addProcessor(voice_handler_);
+
+  createBaseControl("pitch_wheel");
+  createBaseControl("mod_wheel");
+
+  // Value* effect_chain_order = createBaseControl("effect_chain_order");
+  // effect_chain_ = new ReorderableEffectChain(beats_per_second, voice_handler_->midi_offset_output());
+  // addSubmodule(effect_chain_);
+  // addProcessor(effect_chain_);
+  // effect_chain_->plug(voice_handler_, ReorderableEffectChain::kAudio);
+  // effect_chain_->plug(effect_chain_order, ReorderableEffectChain::kOrder);
+
+  // SynthModule* compressor = effect_chain_->getEffect(constants::kCompressor);
+  // createStatusOutput("compressor_low_input", compressor->output(CompressorModule::kLowInputMeanSquared));
+  // createStatusOutput("compressor_band_input", compressor->output(CompressorModule::kBandInputMeanSquared));
+  // createStatusOutput("compressor_high_input", compressor->output(CompressorModule::kHighInputMeanSquared));
+  // createStatusOutput("compressor_low_output", compressor->output(CompressorModule::kLowOutputMeanSquared));
+  // createStatusOutput("compressor_band_output", compressor->output(CompressorModule::kBandOutputMeanSquared));
+  // createStatusOutput("compressor_high_output", compressor->output(CompressorModule::kHighOutputMeanSquared));
+
+  // SynthModule* chorus = effect_chain_->getEffect(constants::kChorus);
+  // for (int i = 0; i < ChorusModule::kMaxDelayPairs; ++i)
+  //   createStatusOutput("chorus_delays" + std::to_string(i + 1), chorus->output(i + 1));
+
+  // SynthModule* phaser = effect_chain_->getEffect(constants::kPhaser);
+  // createStatusOutput("phaser_cutoff", phaser->output(PhaserModule::kCutoffOutput));
+
+  // SynthModule* flanger = effect_chain_->getEffect(constants::kFlanger);
+  // createStatusOutput("flanger_delay_frequency", flanger->output(FlangerModule::kFrequencyOutput));
+
+  output_total_ = new Add();
+  output_total_->plug(voice_handler_, 0);
+  output_total_->plug(voice_handler_->getDirectOutput(), 1);
+  addProcessor(output_total_);
+
+  decimator_ = new Decimator(3);
+  decimator_->plug(output_total_);
+  addProcessor(decimator_);
+
+  StereoEncoder* decoder = new StereoEncoder(true);
+  decoder->plug(decimator_, StereoEncoder::kAudio);
+  decoder->plug(stereo_routing, StereoEncoder::kEncodingValue);
+  decoder->plug(stereo_mode, StereoEncoder::kMode);
+  addProcessor(decoder);
+
+  Output* volume = createMonoModControl("volume");
+  SmoothVolume* scaled_audio = new SmoothVolume();
+  scaled_audio->plug(decoder, SmoothVolume::kAudioRate);
+  scaled_audio->plug(volume, SmoothVolume::kDb);
+
+  peak_meter_ = new PeakMeter();
+  peak_meter_->plug(scaled_audio, 0);
+  createStatusOutput("peak_meter", peak_meter_->output(PeakMeter::kLevel));
+  createStatusOutput("peak_meter_memory", peak_meter_->output(PeakMeter::kMemoryPeak));
+
+  Clamp* clamp = new Clamp(-2.1f, 2.1f);
+  clamp->plug(scaled_audio);
+
+  addProcessor(peak_meter_);
+  addProcessor(scaled_audio);
+
+  addProcessor(clamp);
+  clamp->useOutput(output());
+
+  SynthModule::init();
+  disableUnnecessaryModSources();
+  setOversamplingAmount(kDefaultOversamplingAmount, kDefaultSampleRate);
+}
+
+void SoundEngine::connectModulation(const modulation_change& change) {
+  change.modulation_processor->plug(change.source, ModulationConnectionProcessor::kModulationInput);
+  change.modulation_processor->setDestinationScale(change.destination_scale);
+  VITAL_ASSERT(vital::utils::isFinite(change.destination_scale));
+
+  Processor* destination = change.mono_destination;
+  bool polyphonic = change.source->owner->isPolyphonic() && change.poly_destination;
+  change.modulation_processor->setPolyphonicModulation(polyphonic);
+  voice_handler_->enableModulationConnection(change.modulation_processor);
+  if (polyphonic) {
+    destination = change.poly_destination;
+    voice_handler_->setActiveNonaccumulatedOutput(change.poly_destination->output());
   }
 
-  SoundEngine::~SoundEngine() {
-    voice_handler_->prepareDestroy();
+  if (!destination->isControlRate() && !change.source->isControlRate()) {
+    change.source->owner->setControlRate(false);
+    change.modulation_processor->setControlRate(false);
   }
+  change.source->owner->enable(true);
+  change.modulation_processor->enable(true);
+  destination->plugNext(change.modulation_processor);
+  change.modulation_processor->process(1);
+  destination->process(1);
 
-  void SoundEngine::init() {
-    createBaseControl("bypass");
-    createBaseControl("mpe_enabled");
-    createBaseControl("view_spectrogram");
-    oversampling_ = createBaseControl("oversampling");
-    legato_ = createBaseControl("legato");
+  change.mono_modulation_switch->set(1);
+  if (change.poly_modulation_switch)
+    change.poly_modulation_switch->set(1);
 
-    Output* stereo_routing = createMonoModControl("stereo_routing");
-    Value* stereo_mode = createBaseControl("stereo_mode");
-    Output* beats_per_second = createMonoModControl("beats_per_minute");
-    cr::LowerBound* beats_per_second_clamped = new cr::LowerBound(0.0f);
-    beats_per_second_clamped->plug(beats_per_second);
-    addProcessor(beats_per_second_clamped);
+  modulation_processors_.push_back(change.modulation_processor);
+}
 
-    Output* polyphony = createMonoModControl("polyphony");
-    Value* voice_priority = createBaseControl("voice_priority");
-    Value* voice_override = createBaseControl("voice_override");
+int SoundEngine::getNumPressedNotes() {
+  return voice_handler_->getNumPressedNotes();
+}
 
-    voice_handler_ = new BlocksVoiceHandler(beats_per_second_clamped->output());
-    addSubmodule(voice_handler_);
-    voice_handler_->setPolyphony(vital::kMaxPolyphony);
-    voice_handler_->plug(polyphony, VoiceHandler::kPolyphony);
-    voice_handler_->plug(voice_priority, VoiceHandler::kVoicePriority);
-    voice_handler_->plug(voice_override, VoiceHandler::kVoiceOverride);
+void SoundEngine::disconnectModulation(const modulation_change& change) {
+  change.modulation_processor->setDestinationScale(0.0f);
 
-    addProcessor(voice_handler_);
+  Processor* destination = change.mono_destination;
+  if (change.source->owner->isPolyphonic() && change.poly_destination)
+    destination = change.poly_destination;
 
-    createBaseControl("pitch_wheel");
-    createBaseControl("mod_wheel");
+  destination->unplug(change.modulation_processor);
+  voice_handler_->disableModulationConnection(change.modulation_processor);
 
-    // Value* effect_chain_order = createBaseControl("effect_chain_order");
-    // effect_chain_ = new ReorderableEffectChain(beats_per_second, voice_handler_->midi_offset_output());
-    // addSubmodule(effect_chain_);
-    // addProcessor(effect_chain_);
-    // effect_chain_->plug(voice_handler_, ReorderableEffectChain::kAudio);
-    // effect_chain_->plug(effect_chain_order, ReorderableEffectChain::kOrder);
+  if (change.mono_destination->connectedInputs() == 1 &&
+    (change.poly_destination == nullptr || change.poly_destination->connectedInputs() == 0)) {
+    change.mono_modulation_switch->set(0);
 
-    // SynthModule* compressor = effect_chain_->getEffect(constants::kCompressor);
-    // createStatusOutput("compressor_low_input", compressor->output(CompressorModule::kLowInputMeanSquared));
-    // createStatusOutput("compressor_band_input", compressor->output(CompressorModule::kBandInputMeanSquared));
-    // createStatusOutput("compressor_high_input", compressor->output(CompressorModule::kHighInputMeanSquared));
-    // createStatusOutput("compressor_low_output", compressor->output(CompressorModule::kLowOutputMeanSquared));
-    // createStatusOutput("compressor_band_output", compressor->output(CompressorModule::kBandOutputMeanSquared));
-    // createStatusOutput("compressor_high_output", compressor->output(CompressorModule::kHighOutputMeanSquared));
-
-    // SynthModule* chorus = effect_chain_->getEffect(constants::kChorus);
-    // for (int i = 0; i < ChorusModule::kMaxDelayPairs; ++i)
-    //   createStatusOutput("chorus_delays" + std::to_string(i + 1), chorus->output(i + 1));
-    
-    // SynthModule* phaser = effect_chain_->getEffect(constants::kPhaser);
-    // createStatusOutput("phaser_cutoff", phaser->output(PhaserModule::kCutoffOutput));
-
-    // SynthModule* flanger = effect_chain_->getEffect(constants::kFlanger);
-    // createStatusOutput("flanger_delay_frequency", flanger->output(FlangerModule::kFrequencyOutput));
-
-    output_total_ = new Add();
-    output_total_->plug(voice_handler_, 0);
-    output_total_->plug(voice_handler_->getDirectOutput(), 1);
-    addProcessor(output_total_);
-
-    decimator_ = new Decimator(3);
-    decimator_->plug(output_total_);
-    addProcessor(decimator_);
-
-    StereoEncoder* decoder = new StereoEncoder(true);
-    decoder->plug(decimator_, StereoEncoder::kAudio);
-    decoder->plug(stereo_routing, StereoEncoder::kEncodingValue);
-    decoder->plug(stereo_mode, StereoEncoder::kMode);
-    addProcessor(decoder);
-
-    Output* volume = createMonoModControl("volume");
-    SmoothVolume* scaled_audio = new SmoothVolume();
-    scaled_audio->plug(decoder, SmoothVolume::kAudioRate);
-    scaled_audio->plug(volume, SmoothVolume::kDb);
-
-    peak_meter_ = new PeakMeter();
-    peak_meter_->plug(scaled_audio, 0);
-    createStatusOutput("peak_meter", peak_meter_->output(PeakMeter::kLevel));
-    createStatusOutput("peak_meter_memory", peak_meter_->output(PeakMeter::kMemoryPeak));
-
-    Clamp* clamp = new Clamp(-2.1f, 2.1f);
-    clamp->plug(scaled_audio);
-    
-    addProcessor(peak_meter_);
-    addProcessor(scaled_audio);
-
-    addProcessor(clamp);
-    clamp->useOutput(output());
-
-    SynthModule::init();
-    disableUnnecessaryModSources();
-    setOversamplingAmount(kDefaultOversamplingAmount, kDefaultSampleRate);
-  }
-
-  void SoundEngine::connectModulation(const modulation_change& change) {
-    change.modulation_processor->plug(change.source, ModulationConnectionProcessor::kModulationInput);
-    change.modulation_processor->setDestinationScale(change.destination_scale);
-    VITAL_ASSERT(vital::utils::isFinite(change.destination_scale));
-
-    Processor* destination = change.mono_destination;
-    bool polyphonic = change.source->owner->isPolyphonic() && change.poly_destination;
-    change.modulation_processor->setPolyphonicModulation(polyphonic);
-    voice_handler_->enableModulationConnection(change.modulation_processor);
-    if (polyphonic) {
-      destination = change.poly_destination;
-      voice_handler_->setActiveNonaccumulatedOutput(change.poly_destination->output());
+    if (change.poly_modulation_switch) {
+      change.poly_modulation_switch->set(0);
+      voice_handler_->setInactiveNonaccumulatedOutput(change.poly_destination->output());
     }
+  }
 
-    if (!destination->isControlRate() && !change.source->isControlRate()) {
-      change.source->owner->setControlRate(false);
-      change.modulation_processor->setControlRate(false);
+  change.modulation_processor->enable(false);
+  change.modulation_processor->setControlRate(true);
+  if (change.num_audio_rate == 0)
+    change.source->owner->setControlRate(true);
+
+  modulation_processors_.remove(change.modulation_processor);
+}
+
+int SoundEngine::getNumActiveVoices() {
+  return voice_handler_->getNumActiveVoices();
+}
+
+ModulationConnectionBank& SoundEngine::getModulationBank() {
+  return voice_handler_->getModulationBank();
+}
+
+mono_float SoundEngine::getLastActiveNote() const {
+  return voice_handler_->getLastActiveNote();
+}
+
+void SoundEngine::setTuning(const Tuning* tuning) {
+  voice_handler_->setTuning(tuning);
+}
+
+void SoundEngine::checkOversampling() {
+  int oversampling = oversampling_->value();
+  int oversampling_amount = 1 << oversampling;
+  int sample_rate = getSampleRate();
+  if (last_oversampling_amount_ != oversampling_amount || last_sample_rate_ != sample_rate)
+    setOversamplingAmount(oversampling_amount, sample_rate);
+}
+
+void SoundEngine::setOversamplingAmount(int oversampling_amount, int sample_rate) {
+  static constexpr int kBaseSampleRate = 44100;
+
+  int oversample = oversampling_amount;
+  int sample_rate_mult = sample_rate / kBaseSampleRate;
+  while (sample_rate_mult > 1 && oversample > 1) {
+    sample_rate_mult >>= 1;
+    oversample >>= 1;
+  }
+  voice_handler_->setOversampleAmount(oversample);
+  // effect_chain_->setOversampleAmount(oversample);
+  output_total_->setOversampleAmount(oversample);
+  last_oversampling_amount_ = oversampling_amount;
+  last_sample_rate_ = sample_rate;
+}
+
+void SoundEngine::process(int num_samples) {
+  VITAL_ASSERT(num_samples <= output()->buffer_size);
+
+  juce::FloatVectorOperations::disableDenormalisedNumberSupport();
+  voice_handler_->setLegato(legato_->value());
+  ProcessorRouter::process(num_samples);
+
+  if (getNumActiveVoices() == 0) {
+    CircularQueue<ModulationConnectionProcessor*>& connections = voice_handler_->enabledModulationConnection();
+    for (ModulationConnectionProcessor* modulation : connections) {
+      if (!modulation->isInputSourcePolyphonic())
+        modulation->process(num_samples);
     }
-    change.source->owner->enable(true);
-    change.modulation_processor->enable(true);
-    destination->plugNext(change.modulation_processor);
-    change.modulation_processor->process(1);
-    destination->process(1);
-
-    change.mono_modulation_switch->set(1);
-    if (change.poly_modulation_switch)
-      change.poly_modulation_switch->set(1);
-
-    modulation_processors_.push_back(change.modulation_processor);
   }
 
-  int SoundEngine::getNumPressedNotes() {
-    return voice_handler_->getNumPressedNotes();
-  }
+  for (auto& status_source : data_->status_outputs)
+    status_source.second->update();
+}
 
-  void SoundEngine::disconnectModulation(const modulation_change& change) {
-    change.modulation_processor->setDestinationScale(0.0f);
+void SoundEngine::correctToTime(double seconds) {
+  voice_handler_->correctToTime(seconds);
+  // effect_chain_->correctToTime(seconds);
+}
 
-    Processor* destination = change.mono_destination;
-    if (change.source->owner->isPolyphonic() && change.poly_destination)
-      destination = change.poly_destination;
+void SoundEngine::allSoundsOff() {
+  voice_handler_->allSoundsOff();
+  // effect_chain_->hardReset();
+  decimator_->hardReset();
+}
 
-    destination->unplug(change.modulation_processor);
-    voice_handler_->disableModulationConnection(change.modulation_processor);
+void SoundEngine::allNotesOff(int sample) {
+  voice_handler_->allNotesOff(sample);
+}
 
-    if (change.mono_destination->connectedInputs() == 1 &&
-        (change.poly_destination == nullptr || change.poly_destination->connectedInputs() == 0)) {
-      change.mono_modulation_switch->set(0);
+void SoundEngine::allNotesOff(int sample, int channel) {
+  voice_handler_->allNotesOff(channel);
+}
 
-      if (change.poly_modulation_switch) {
-        change.poly_modulation_switch->set(0);
-        voice_handler_->setInactiveNonaccumulatedOutput(change.poly_destination->output());
-      }
-    }
+void SoundEngine::allNotesOffRange(int sample, int from_channel, int to_channel) {
+  voice_handler_->allNotesOffRange(sample, from_channel, to_channel);
+}
 
-    change.modulation_processor->enable(false);
-    change.modulation_processor->setControlRate(true);
-    if (change.num_audio_rate == 0)
-      change.source->owner->setControlRate(true);
+void SoundEngine::noteOn(int note, mono_float velocity, int sample, int channel) {
+  voice_handler_->noteOn(note, velocity, sample, channel);
+}
 
-    modulation_processors_.remove(change.modulation_processor);
-  }
+void SoundEngine::noteOff(int note, mono_float lift, int sample, int channel) {
+  voice_handler_->noteOff(note, lift, sample, channel);
+}
 
-  int SoundEngine::getNumActiveVoices() {
-    return voice_handler_->getNumActiveVoices();
-  }
+void SoundEngine::setModWheel(mono_float value, int channel) {
+  voice_handler_->setModWheel(value, channel);
+}
 
-  ModulationConnectionBank& SoundEngine::getModulationBank() {
-    return voice_handler_->getModulationBank();
-  }
+void SoundEngine::setModWheelAllChannels(mono_float value) {
+  voice_handler_->setModWheelAllChannels(value);
+}
 
-  mono_float SoundEngine::getLastActiveNote() const {
-    return voice_handler_->getLastActiveNote();
-  }
+void SoundEngine::setPitchWheel(mono_float value, int channel) {
+  voice_handler_->setPitchWheel(value, channel);
+}
 
-  void SoundEngine::setTuning(const Tuning* tuning) {
-    voice_handler_->setTuning(tuning);
-  }
+void SoundEngine::setZonedPitchWheel(mono_float value, int from_channel, int to_channel) {
+  voice_handler_->setZonedPitchWheel(value, from_channel, to_channel);
+}
 
-  void SoundEngine::checkOversampling() {
-    int oversampling = oversampling_->value();
-    int oversampling_amount = 1 << oversampling;
-    int sample_rate = getSampleRate();
-    if (last_oversampling_amount_ != oversampling_amount || last_sample_rate_ != sample_rate)
-      setOversamplingAmount(oversampling_amount, sample_rate);
-  }
+void SoundEngine::disableUnnecessaryModSources() {
+  voice_handler_->disableUnnecessaryModSources();
+}
 
-  void SoundEngine::setOversamplingAmount(int oversampling_amount, int sample_rate) {
-    static constexpr int kBaseSampleRate = 44100;
-    
-    int oversample = oversampling_amount;
-    int sample_rate_mult = sample_rate / kBaseSampleRate;
-    while (sample_rate_mult > 1 && oversample > 1) {
-      sample_rate_mult >>= 1;
-      oversample >>= 1;
-    }
-    voice_handler_->setOversampleAmount(oversample);
-    // effect_chain_->setOversampleAmount(oversample);
-    output_total_->setOversampleAmount(oversample);
-    last_oversampling_amount_ = oversampling_amount;
-    last_sample_rate_ = sample_rate;
-  }
+void SoundEngine::enableModSource(const std::string& source) {
+  getModulationSource(source)->owner->enable(true);
+}
 
-  void SoundEngine::process(int num_samples) {
-    VITAL_ASSERT(num_samples <= output()->buffer_size);
+void SoundEngine::disableModSource(const std::string& source) {
+  voice_handler_->disableModSource(source);
+}
 
-    juce::FloatVectorOperations::disableDenormalisedNumberSupport();
-    voice_handler_->setLegato(legato_->value());
-    ProcessorRouter::process(num_samples);
+bool SoundEngine::isModSourceEnabled(const std::string& source) {
+  return getModulationSource(source)->owner->enabled();
+}
 
-    if (getNumActiveVoices() == 0) {
-      CircularQueue<ModulationConnectionProcessor*>& connections = voice_handler_->enabledModulationConnection();
-      for (ModulationConnectionProcessor* modulation : connections) {
-        if (!modulation->isInputSourcePolyphonic())
-          modulation->process(num_samples);
-      }
-    }
+const StereoMemory* SoundEngine::getEqualizerMemory() {
+  return nullptr;
+}
 
-    for (auto& status_source : data_->status_outputs)
-      status_source.second->update();
-  }
+void SoundEngine::setAftertouch(mono_float note, mono_float value, int sample, int channel) {
+  voice_handler_->setAftertouch(note, value, sample, channel);
+}
 
-  void SoundEngine::correctToTime(double seconds) {
-    voice_handler_->correctToTime(seconds);
-    // effect_chain_->correctToTime(seconds);
-  }
+void SoundEngine::setChannelAftertouch(int channel, mono_float value, int sample) {
+  voice_handler_->setChannelAftertouch(channel, value, sample);
+}
 
-  void SoundEngine::allSoundsOff() {
-    voice_handler_->allSoundsOff();
-    // effect_chain_->hardReset();
-    decimator_->hardReset();
-  }
+void SoundEngine::setChannelRangeAftertouch(int from_channel, int to_channel, mono_float value, int sample) {
+  voice_handler_->setChannelRangeAftertouch(from_channel, to_channel, value, sample);
+}
 
-  void SoundEngine::allNotesOff(int sample) {
-    voice_handler_->allNotesOff(sample);
-  }
+void SoundEngine::setChannelSlide(int channel, mono_float value, int sample) {
+  voice_handler_->setChannelSlide(channel, value, sample);
+}
 
-  void SoundEngine::allNotesOff(int sample, int channel) {
-    voice_handler_->allNotesOff(channel);
-  }
+void SoundEngine::setChannelRangeSlide(int from_channel, int to_channel, mono_float value, int sample) {
+  voice_handler_->setChannelRangeSlide(from_channel, to_channel, value, sample);
+}
 
-  void SoundEngine::allNotesOffRange(int sample, int from_channel, int to_channel) {
-    voice_handler_->allNotesOffRange(sample, from_channel, to_channel);
-  }
+void SoundEngine::setBpm(mono_float bpm) {
+  mono_float bps = bpm / 60.0f;
+  if (bps_->value() != bps)
+    bps_->set(bps);
+}
 
-  void SoundEngine::noteOn(int note, mono_float velocity, int sample, int channel) {
-    voice_handler_->noteOn(note, velocity, sample, channel);
-  }
+Wavetable* SoundEngine::getWavetable(int index) {
+  return voice_handler_->getWavetable(index);
+}
 
-  void SoundEngine::noteOff(int note, mono_float lift, int sample, int channel) {
-    voice_handler_->noteOff(note, lift, sample, channel);
-  }
+Sample* SoundEngine::getSample() {
+  return voice_handler_->getSample();
+}
 
-  void SoundEngine::setModWheel(mono_float value, int channel) {
-    voice_handler_->setModWheel(value, channel);
-  }
+LineGenerator* SoundEngine::getLfoSource(int index) {
+  return voice_handler_->getLfoSource(index);
+}
 
-  void SoundEngine::setModWheelAllChannels(mono_float value) {
-    voice_handler_->setModWheelAllChannels(value);
-  }
-  
-  void SoundEngine::setPitchWheel(mono_float value, int channel) {
-    voice_handler_->setPitchWheel(value, channel);
-  }
+void SoundEngine::sustainOn(int channel) {
+  voice_handler_->sustainOn(channel);
+}
 
-  void SoundEngine::setZonedPitchWheel(mono_float value, int from_channel, int to_channel) {
-    voice_handler_->setZonedPitchWheel(value, from_channel, to_channel);
-  }
+void SoundEngine::sustainOff(int sample, int channel) {
+  voice_handler_->sustainOff(sample, channel);
+}
 
-  void SoundEngine::disableUnnecessaryModSources() {
-    voice_handler_->disableUnnecessaryModSources();
-  }
+void SoundEngine::sostenutoOn(int channel) {
+  voice_handler_->sostenutoOn(channel);
+}
 
-  void SoundEngine::enableModSource(const std::string& source) {
-    getModulationSource(source)->owner->enable(true);
-  }
+void SoundEngine::sostenutoOff(int sample, int channel) {
+  voice_handler_->sostenutoOff(sample, channel);
+}
 
-  void SoundEngine::disableModSource(const std::string& source) {
-    voice_handler_->disableModSource(source);
-  }
+void SoundEngine::sustainOnRange(int from_channel, int to_channel) {
+  voice_handler_->sustainOnRange(from_channel, to_channel);
+}
 
-  bool SoundEngine::isModSourceEnabled(const std::string& source) {
-    return getModulationSource(source)->owner->enabled();
-  }
+void SoundEngine::sustainOffRange(int sample, int from_channel, int to_channel) {
+  voice_handler_->sustainOffRange(sample, from_channel, to_channel);
+}
 
-  const StereoMemory* SoundEngine::getEqualizerMemory() {
-    return nullptr;
-  }
+void SoundEngine::sostenutoOnRange(int from_channel, int to_channel) {
+  voice_handler_->sostenutoOnRange(from_channel, to_channel);
+}
 
-  void SoundEngine::setAftertouch(mono_float note, mono_float value, int sample, int channel) {
-    voice_handler_->setAftertouch(note, value, sample, channel);
-  }
+void SoundEngine::sostenutoOffRange(int sample, int from_channel, int to_channel) {
+  voice_handler_->sostenutoOffRange(sample, from_channel, to_channel);
+}
 
-  void SoundEngine::setChannelAftertouch(int channel, mono_float value, int sample) {
-    voice_handler_->setChannelAftertouch(channel, value, sample);
-  }
+std::shared_ptr<model::Module> SoundEngine::AddBlock(std::string type, Index index) {
+  return voice_handler_->AddBlock(type, index);
+}
 
-  void SoundEngine::setChannelRangeAftertouch(int from_channel, int to_channel, mono_float value, int sample) {
-    voice_handler_->setChannelRangeAftertouch(from_channel, to_channel, value, sample);
-  }
-
-  void SoundEngine::setChannelSlide(int channel, mono_float value, int sample) {
-    voice_handler_->setChannelSlide(channel, value, sample);
-  }
-
-  void SoundEngine::setChannelRangeSlide(int from_channel, int to_channel, mono_float value, int sample) {
-    voice_handler_->setChannelRangeSlide(from_channel, to_channel, value, sample);
-  }
-
-  void SoundEngine::setBpm(mono_float bpm) {
-    mono_float bps = bpm / 60.0f;
-    if (bps_->value() != bps)
-      bps_->set(bps);
-  }
-
-  Wavetable* SoundEngine::getWavetable(int index) {
-    return voice_handler_->getWavetable(index);
-  }
-
-  Sample* SoundEngine::getSample() {
-    return voice_handler_->getSample();
-  }
-
-  LineGenerator* SoundEngine::getLfoSource(int index) {
-    return voice_handler_->getLfoSource(index);
-  }
-
-  void SoundEngine::sustainOn(int channel) {
-    voice_handler_->sustainOn(channel);
-  }
-
-  void SoundEngine::sustainOff(int sample, int channel) {
-    voice_handler_->sustainOff(sample, channel);
-  }
-
-  void SoundEngine::sostenutoOn(int channel) {
-    voice_handler_->sostenutoOn(channel);
-  }
-
-  void SoundEngine::sostenutoOff(int sample, int channel) {
-    voice_handler_->sostenutoOff(sample, channel);
-  }
-
-  void SoundEngine::sustainOnRange(int from_channel, int to_channel) {
-    voice_handler_->sustainOnRange(from_channel, to_channel);
-  }
-
-  void SoundEngine::sustainOffRange(int sample, int from_channel, int to_channel) {
-    voice_handler_->sustainOffRange(sample, from_channel, to_channel);
-  }
-
-  void SoundEngine::sostenutoOnRange(int from_channel, int to_channel) {
-    voice_handler_->sostenutoOnRange(from_channel, to_channel);
-  }
-
-  void SoundEngine::sostenutoOffRange(int sample, int from_channel, int to_channel) {
-    voice_handler_->sostenutoOffRange(sample, from_channel, to_channel);
-  }
-
-  std::shared_ptr<model::Module> SoundEngine::AddBlock(std::string type, Index index) { 
-    return voice_handler_->AddBlock(type, index);
-  }
+std::shared_ptr<model::Module> SoundEngine::GetBlock(Index index) {
+  return voice_handler_->GetBlock(index);
+}
 } // namespace vital

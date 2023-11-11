@@ -65,6 +65,15 @@ BlocksVoiceHandler::BlocksVoiceHandler(Output* beats_per_second):
   modules_.spawn({ "osc" }, [](std::string type, int number) { return std::make_shared<model::OscillatorModule>(number); });
 }
 
+std::shared_ptr<model::Module> BlocksVoiceHandler::GetBlock(Index index) {
+  for (auto& module : modules_.all) {
+    if (module->index == index) {
+      return module;
+    }
+  }
+  return nullptr;
+}
+
 std::shared_ptr<model::Module> BlocksVoiceHandler::AddBlock(std::string type, Index index) {
   auto module = modules_.get({ type, -1 });
   module->index = index;

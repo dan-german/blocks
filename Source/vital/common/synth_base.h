@@ -61,6 +61,9 @@ class SynthBase : public MidiManager::Listener {
     SynthBase();
     virtual ~SynthBase();
 
+    std::shared_ptr<model::Module> AddBlock(std::string type, Index index);
+    std::shared_ptr<model::Module> GetBlock(Index index);
+
     void valueChanged(const std::string& name, vital::mono_float value);
     void valueChangedThroughMidi(const std::string& name, vital::mono_float value) override;
     void pitchWheelMidiChanged(vital::mono_float value) override;
@@ -75,7 +78,6 @@ class SynthBase : public MidiManager::Listener {
     void disconnectModulation(const std::string& source, const std::string& destination);
     void disconnectModulation(vital::ModulationConnection* connection);
     void clearModulations();
-    std::shared_ptr<model::Module> AddBlock(std::string type, Index index);
     void forceShowModulation(const std::string& source, bool force);
     bool isModSourceEnabled(const std::string& source);
     int getNumModulations(const std::string& destination);
