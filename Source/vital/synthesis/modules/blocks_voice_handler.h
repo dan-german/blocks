@@ -29,113 +29,115 @@
 #include "vital/synthesis/modules/phaser_module.h"
 #include "model/Index.h"
 #include <vector>
-#include "vital/synthesis/modules/oscillator_module_new.h"
+#include "vital/synthesis/modules/oscillator_processor.h"
+#include "ModuleContainer.h"
 
 namespace vital {
-  class AudioRateEnvelope;
-  class FiltersModule;
-  class LegatoFilter;
-  class LineMap;
-  class LfoModule;
-  class EnvelopeModule;
-  class RandomLfoModule;
-  class TriggerRandom;
+class AudioRateEnvelope;
+class FiltersModule;
+class LegatoFilter;
+class LineMap;
+class LfoModule;
+class EnvelopeModule;
+class RandomLfoModule;
+class TriggerRandom;
 
-  class BlocksVoiceHandler : public VoiceHandler {
-    public:
-      BlocksVoiceHandler(Output* beats_per_second);
-      virtual ~BlocksVoiceHandler() { }
+class BlocksVoiceHandler: public VoiceHandler {
+public:
+  BlocksVoiceHandler(Output* beats_per_second);
+  virtual ~BlocksVoiceHandler() { }
 
-      virtual Processor* clone() const override { VITAL_ASSERT(false); return nullptr; }
+  virtual Processor* clone() const override { VITAL_ASSERT(false); return nullptr; }
 
-      void init() override;
-      void prepareDestroy();
+  void init() override;
+  void prepareDestroy();
 
-      void process(int num_samples) override;
-      void noteOn(int note, mono_float velocity, int sample, int channel) override;
-      void noteOff(int note, mono_float lift, int sample, int channel) override;
-      bool shouldAccumulate(Output* output) override;
-      void correctToTime(double seconds) override;
-      void disableUnnecessaryModSources();
-      void disableModSource(const std::string& source);
+  void process(int num_samples) override;
+  void noteOn(int note, mono_float velocity, int sample, int channel) override;
+  void noteOff(int note, mono_float lift, int sample, int channel) override;
+  bool shouldAccumulate(Output* output) override;
+  void correctToTime(double seconds) override;
+  void disableUnnecessaryModSources();
+  void disableModSource(const std::string& source);
 
-      output_map& getPolyModulations() override;
-      ModulationConnectionBank& getModulationBank() { return modulation_bank_; }
-      Wavetable* getWavetable(int index) { return oscillators_[index]->getWavetable(); }
-      Sample* getSample() { return nullptr; } // removed
-      LineGenerator* getLfoSource(int index) { return &lfo_sources_[index]; }
-      Output* getDirectOutput() { return getAccumulatedOutput(direct_output_->output()); }
+  output_map& getPolyModulations() override;
+  ModulationConnectionBank& getModulationBank() { return modulation_bank_; }
+  Wavetable* getWavetable(int index) { return oscillators_[index]->getWavetable(); }
+  Sample* getSample() { return nullptr; } // removed
+  LineGenerator* getLfoSource(int index) { return &lfo_sources_[index]; }
+  Output* getDirectOutput() { return getAccumulatedOutput(direct_output_->output()); }
 
-      Output* note_retrigger() { return &note_retriggered_; }
+  Output* note_retrigger() { return &note_retriggered_; }
 
-      Output* midi_offset_output() { return midi_offset_output_; }
+  Output* midi_offset_output() { return midi_offset_output_; }
 
-      void enableModulationConnection(ModulationConnectionProcessor* processor);
-      void disableModulationConnection(ModulationConnectionProcessor* processor);
-      CircularQueue<ModulationConnectionProcessor*>& enabledModulationConnection() {
-        return enabled_modulation_processors_;
-      }
+  void enableModulationConnection(ModulationConnectionProcessor* processor);
+  void disableModulationConnection(ModulationConnectionProcessor* processor);
+  CircularQueue<ModulationConnectionProcessor*>& enabledModulationConnection() {
+    return enabled_modulation_processors_;
+  }
 
-      void AddBlock(std::string type, Index index);
-    private:
-      void createNoteArticulation();
-      void createOscillators();
-      void createModulators();
-      void createVoiceOutput();
-      void createFilters(Output* keytrack);
+  std::shared_ptr<model::Module> AddBlock(std::string type, Index index);
+private:
+  void createNoteArticulation();
+  void createOscillators();
+  void createModulators();
+  void createVoiceOutput();
+  void createFilters(Output* keytrack);
 
-      void setupPolyModulationReadouts();
+  void setupPolyModulationReadouts();
 
-      ModulationConnectionBank modulation_bank_;
-      CircularQueue<ModulationConnectionProcessor*> enabled_modulation_processors_;
-      Output* beats_per_second_;
+  ModulationConnectionBank modulation_bank_;
+  CircularQueue<ModulationConnectionProcessor*> enabled_modulation_processors_;
+  Output* beats_per_second_;
 
-      Processor* note_from_reference_;
-      Output* midi_offset_output_;
-      Processor* bent_midi_;
-      Processor* current_midi_note_;
-      EnvelopeModule* amplitude_envelope_;
-      Processor* amplitude_;
-      Processor* pitch_wheel_;
-      Processor* voice_sum_;
-      VariableAdd* last_node_;
+  Processor* note_from_reference_;
+  Output* midi_offset_output_;
+  Processor* bent_midi_;
+  Processor* current_midi_note_;
+  EnvelopeModule* amplitude_envelope_;
+  Processor* amplitude_;
+  Processor* pitch_wheel_;
+  Processor* voice_sum_;
+  VariableAdd* last_node_;
 
-      std::vector<std::vector<std::shared_ptr<Processor>>> processor_matrix_;
-      std::vector<std::shared_ptr<OscillatorModuleNew>> oscillators_;
-      std::vector<FilterModule*> filters_;
+  std::vector<std::vector<std::shared_ptr<Processor>>> processor_matrix_;
+  std::vector<std::shared_ptr<OscillatorProcessor>> oscillators_;
+  std::vector<FilterModule*> filters_;
 
-      FiltersModule* filters_module_;
+  FiltersModule* filters_module_;
 
-      LfoModule* lfos_[kNumLfos];
-      EnvelopeModule* envelopes_[kNumEnvelopes];
-      ChorusModule* reverb_;
+  LfoModule* lfos_[kNumLfos];
+  EnvelopeModule* envelopes_[kNumEnvelopes];
+  ChorusModule* reverb_;
 
-      Output note_retriggered_;
+  Output note_retriggered_;
 
-      LineGenerator lfo_sources_[kNumLfos];
+  LineGenerator lfo_sources_[kNumLfos];
 
-      TriggerRandom* random_;
-      RandomLfoModule* random_lfos_[kNumRandomLfos];
+  TriggerRandom* random_;
+  RandomLfoModule* random_lfos_[kNumRandomLfos];
 
-      LineMap* note_mapping_;
-      LineMap* velocity_mapping_;
-      LineMap* aftertouch_mapping_;
-      LineMap* slide_mapping_;
-      LineMap* lift_mapping_;
-      LineMap* mod_wheel_mapping_;
-      LineMap* pitch_wheel_mapping_;
+  LineMap* note_mapping_;
+  LineMap* velocity_mapping_;
+  LineMap* aftertouch_mapping_;
+  LineMap* slide_mapping_;
+  LineMap* lift_mapping_;
+  LineMap* mod_wheel_mapping_;
+  LineMap* pitch_wheel_mapping_;
+  ModuleContainer<model::Module> modules_;
 
-      cr::Value* stereo_;
-      cr::Multiply* note_percentage_;
+  cr::Value* stereo_;
+  cr::Multiply* note_percentage_;
 
-      Multiply* output_;
-      Multiply* direct_output_;
-      Output num_voices_;
+  Multiply* output_;
+  Multiply* direct_output_;
+  Output num_voices_;
 
-      output_map poly_readouts_;
-      poly_mask last_active_voice_mask_;
-      std::map<std::string, std::vector<std::shared_ptr<SynthModule>>> modules_;
+  output_map poly_readouts_;
+  poly_mask last_active_voice_mask_;
+  std::map<std::string, std::vector<std::shared_ptr<SynthModule>>> processors_;
 
-      JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(BlocksVoiceHandler)
-  };
+  JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(BlocksVoiceHandler)
+};
 } // namespace vital

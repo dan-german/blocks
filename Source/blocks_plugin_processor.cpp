@@ -326,10 +326,11 @@ void PluginProcessor::editorRemovedBlock(Index index) {
 }
 
 std::shared_ptr<Block> PluginProcessor::editorAddedBlock(Model::Type type, Index index) {
-  synth_->something(type, index);
   return nullptr;
-  // Analytics::shared()->countAction(type + " Block Added");
-  // return addBlock(type, index, -1);
+}
+
+std::shared_ptr<model::Module> PluginProcessor::editorAddedBlock2(Model::Type type, Index index) {
+  return synth_->AddBlock(type, index);
 }
 
 void PluginProcessor::editorRepositionedTab(int oldColumn, int newColumn) {

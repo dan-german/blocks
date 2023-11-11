@@ -14,21 +14,21 @@
  * along with vital.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "oscillator_module_new.h"
+#include "oscillator_processor.h"
 
 #include "vital/synthesis/producers/synth_oscillator.h"
 #include "vital/synthesis/lookups/wavetable.h"
 
 namespace vital {
 
-OscillatorModuleNew::OscillatorModuleNew(std::string prefix):
+OscillatorProcessor::OscillatorProcessor(std::string prefix):
   SynthModule(kNumInputs, kNumOutputs), prefix_(std::move(prefix)), on_(nullptr), distortion_type_(nullptr) {
   wavetable_ = std::make_shared<Wavetable>(kNumOscillatorWaveFrames);
   was_on_ = std::make_shared<bool>(true);
 }
 
-void OscillatorModuleNew::init() {
-  DBG("OscillatorModuleNew::init");
+void OscillatorProcessor::init() {
+  DBG("OscillatorProcessor::init");
   oscillator_ = new SynthOscillator(wavetable_.get());
 
   createBaseControl(prefix_ + "_view_2d");
@@ -49,12 +49,13 @@ void OscillatorModuleNew::init() {
   oscillator_->useInput(input(kMidi), SynthOscillator::kMidiNote);
   oscillator_->useOutput(output(kRaw), SynthOscillator::kRaw);
   oscillator_->useOutput(output(kLevelled), SynthOscillator::kLevelled);
+  oscillator_->plug(midi_track, SynthOscillator::kMidiTrack);
 
   addProcessor(oscillator_);
   SynthModule::init();
 }
 
-void OscillatorModuleNew::setModule(model::Module module) {
+void OscillatorProcessor::setModule(model::Module module) {
   for (int i = 0; i < module.parameters_.size(); i++) {
     auto parameter = module.parameters_[i];
     if (parameter.type == ValueDetails::Type::kBase) {
@@ -66,7 +67,7 @@ void OscillatorModuleNew::setModule(model::Module module) {
   }
 }
 
-void OscillatorModuleNew::process(int num_samples) {
+void OscillatorProcessor::process(int num_samples) {
   bool on = on_->value();
 
   if (on)

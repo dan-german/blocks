@@ -313,17 +313,19 @@ std::shared_ptr<Block> MainComponent::addBlock(int code, Index index) {
   case 2:
   case 3:
   case 4: {
-    block = delegate->editorAddedBlock(Model::Types::osc, index);
-    if (block == nullptr) return nullptr; // todo - grey out the button in the block selection popup if the block is not available
-    auto range = block->parameters[0]->audioParameter->getNormalisableRange();
-    block->parameters[0]->audioParameter->setValue(range.convertTo0to1(code));
+    auto hephep = delegate->editorAddedBlock2(Model::Types::osc, index);
+    DBG(hephep->parameters_.size());
+
+    // if (block == nullptr) return nullptr; // todo - grey out the button in the block selection popup if the block is not available
+    // auto range = block->parameters[0]->audioParameter->getNormalisableRange();
+    // block->parameters[0]->audioParameter->setValue(range.convertTo0to1(code));
     break;
   }
-  case 5: block = delegate->editorAddedBlock(Model::Types::filter, index); break;
-  case 6: block = delegate->editorAddedBlock(Model::Types::reverb, index); break;
-  case 7: block = delegate->editorAddedBlock(Model::Types::delay, index); break;
-  case 8: block = delegate->editorAddedBlock(Model::Types::drive, index); break;
-  case 9: block = delegate->editorAddedBlock(Model::Types::mixer, index); break;
+  // case 5: block = delegate->editorAddedBlock(Model::Types::filter, index); break;
+  // case 6: block = delegate->editorAddedBlock(Model::Types::reverb, index); break;
+  // case 7: block = delegate->editorAddedBlock(Model::Types::delay, index); break;
+  // case 8: block = delegate->editorAddedBlock(Model::Types::drive, index); break;
+  // case 9: block = delegate->editorAddedBlock(Model::Types::mixer, index); break;
   default: break;
   }
 

@@ -396,7 +396,7 @@ namespace vital {
     voice_handler_->sostenutoOffRange(sample, from_channel, to_channel);
   }
 
-  void SoundEngine::something(std::string type, Index index) { 
-    voice_handler_->AddBlock(type, index);
+  std::shared_ptr<model::Module> SoundEngine::AddBlock(std::string type, Index index) { 
+    return voice_handler_->AddBlock(type, index);
   }
 } // namespace vital

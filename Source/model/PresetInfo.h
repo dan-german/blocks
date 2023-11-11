@@ -15,7 +15,7 @@
 class PresetInfo {
 public:
   struct Module {
-    Model::ID id;
+    ID id;
     std::map<String, float> parameters;
   };
 

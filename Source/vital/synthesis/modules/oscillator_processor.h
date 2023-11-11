@@ -23,7 +23,7 @@
 namespace vital {
 class Wavetable;
 
-class OscillatorModuleNew: public SynthModule {
+class OscillatorProcessor: public SynthModule {
 public:
   enum {
     kReset,
@@ -39,12 +39,12 @@ public:
     kNumOutputs
   };
 
-  OscillatorModuleNew(std::string prefix = "");
-  virtual ~OscillatorModuleNew() { }
+  OscillatorProcessor(std::string prefix = "");
+  virtual ~OscillatorProcessor() { }
 
   void process(int num_samples) override;
   void init() override;
-  virtual Processor* clone() const override { return new OscillatorModuleNew(*this); }
+  virtual Processor* clone() const override { return new OscillatorProcessor(*this); }
 
   Wavetable* getWavetable() { return wavetable_.get(); }
   force_inline SynthOscillator* oscillator() { return oscillator_; }
@@ -64,7 +64,6 @@ protected:
   SynthOscillator* oscillator_;
   Value* distortion_type_;
 
-  JUCE_LEAK_DETECTOR(OscillatorModuleNew)
+  JUCE_LEAK_DETECTOR(OscillatorProcessor)
 };
 } // namespace vital
-

@@ -14,15 +14,12 @@
 #include "gui/ModuleColour.h"
 #include <vector>
 #include <juce_core/juce_core.h>
+#include "model/id.h"
+
 using namespace juce;
 
 namespace Model {
   using Type = std::string;
-
-  struct ID {
-    Type type;
-    int number;
-  };
 
   namespace Types {
     inline const Type lfo = "lfo";

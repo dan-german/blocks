@@ -770,8 +770,6 @@ void SynthBase::ValueChangedCallback::messageCallback() {
 }
 
 
-void SynthBase::something(std::string type, Index index) { 
-  // sound_e
-  engine_->something(type, index);
-  // DBG("ya");
+std::shared_ptr<model::Module> SynthBase::AddBlock(std::string type, Index index) { 
+  return engine_->AddBlock(type, index);
 }

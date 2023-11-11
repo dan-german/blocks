@@ -5,10 +5,10 @@ using namespace Model;
 
 template <class M>
 struct ModuleContainer {
-  std::map<Type, Array<std::shared_ptr<M>>> map;
+  std::map<std::string, Array<std::shared_ptr<M>>> map;
   Array<std::shared_ptr<M>> all;
 
-  void spawn(Array<Type> types, std::function<std::shared_ptr<M>(Type, int)> spawner) {
+  void spawn(Array<std::string> types, std::function<std::shared_ptr<M>(std::string, int)> spawner) {
     for (const auto& type : types) {
       Array<std::shared_ptr<M>> array;
 
@@ -25,12 +25,12 @@ struct ModuleContainer {
     module->reset();
     map[module->id.type].add(module);
 
-    struct Sorter
-    {
-      bool operator() (const std::shared_ptr<Module> a, const std::shared_ptr<Module> b) const noexcept { return a->id.number < b->id.number; }
-    };
+    // struct Sorter
+    // {
+    //   bool operator() (const std::shared_ptr<Module> a, const std::shared_ptr<Module> b) const noexcept { return a->id.number < b->id.number; }
+    // };
 
-    std::sort(map[module->id.type].begin(), map[module->id.type].end(), Sorter());
+    // std::sort(map[module->id.type].begin(), map[module->id.type].end(), Sorter());
   }
 
   std::shared_ptr<M> get(ID id) {

@@ -20,6 +20,7 @@
 #include "vital/synthesis/framework/synth_module.h"
 #include "vital/synthesis/framework/note_handler.h"
 #include "model/Index.h"
+#include "module_new.h"
 
 class LineGenerator;
 class Tuning;
@@ -97,7 +98,7 @@ namespace vital {
       force_inline int getOversamplingAmount() const { return last_oversampling_amount_; }
 
       void checkOversampling();
-      void something(std::string type, Index index);
+      std::shared_ptr<model::Module> AddBlock(std::string type, Index index);
 
     private:
       BlocksVoiceHandler* voice_handler_;

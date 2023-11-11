@@ -17,6 +17,7 @@
 #include "gui/BlockGridComponent.h"
 #include "gui/Tab.h"
 #include "model/NoteLogger.h"
+#include "module_new.h"
 
 using Modulation = Model::Modulation;
 using Block = Model::Block;
@@ -183,6 +184,7 @@ struct MainComponent::Delegate {
   virtual std::shared_ptr<Module> getModulator(int index) = 0;
   virtual std::shared_ptr<Module> editorAddedModulator(Model::Type code) = 0;
   virtual std::shared_ptr<Block> getBlock(Index index) = 0;
+  virtual std::shared_ptr<model::Module> editorAddedBlock2(Model::Type code, Index index) = 0;
   virtual std::shared_ptr<Block> editorAddedBlock(Model::Type code, Index index) = 0;
   virtual Array<int> editorRequestsActiveColumns() = 0;
   virtual Array<std::shared_ptr<Module>> getModulators() = 0;

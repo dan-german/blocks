@@ -22,6 +22,7 @@
 #include "vital/value_bridge.h"
 #include "MainComponent.h"
 #include "vital/common/synth_gui_interface.h"
+#include "module_new.h"
 
 class ValueBridge;
 
@@ -95,6 +96,7 @@ public:
   std::shared_ptr<Block> getBlock(Index index) override;
   std::shared_ptr<Tab> getTab(int column) override;
   std::shared_ptr<Block> editorAddedBlock(Model::Type code, Index index) override;
+  std::shared_ptr<model::Module> editorAddedBlock2(Model::Type code, Index index) override;
   std::shared_ptr<Module> getModulator(int index) override;
   std::shared_ptr<Module> editorAddedModulator(Model::Type code) override;
   PresetInfo editorChangedPreset(int index) override;
