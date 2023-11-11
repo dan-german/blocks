@@ -52,12 +52,12 @@ namespace vital {
         return static_cast<SynthOscillator::DistortionType>(val);
       }
 
+      Value* on_;
     protected:
       std::string prefix_;
       std::shared_ptr<Wavetable> wavetable_;
       std::shared_ptr<bool> was_on_;
 
-      Value* on_;
       SynthOscillator* oscillator_;
       Value* distortion_type_;
 

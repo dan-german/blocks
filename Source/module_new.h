@@ -1,3 +1,4 @@
+#pragma once
 #include "vital/common/synth_parameters.h"
 #include "vital/synthesis/producers/synth_oscillator.h"
 
@@ -21,7 +22,8 @@ public:
 
 
 class OscillatorModule: public Module {
-  OscillatorModule(): Module("osc") {
+public:
+  OscillatorModule(int number): Module("osc " + std::to_string(number)) {
     add({ .name = "on", .value_scale = ValueScale::kIndexed, .display_name = "Switch", .type = Type::kBase });
     add({ .name = "midi_track", .value_scale = ValueScale::kIndexed, .type = Type::kBase });
     add({ .name = "smooth_interpolation", .value_scale = ValueScale::kIndexed, .type = Type::kBase });

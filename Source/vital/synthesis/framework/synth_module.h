@@ -23,118 +23,110 @@
 #include <vector>
 
 namespace vital {
-  class ValueSwitch;
-  class SynthModule;
+class ValueSwitch;
+class SynthModule;
 
-  class StatusOutput {
-    public:
-      static constexpr float kClearValue = INT_MIN;
+class StatusOutput {
+public:
+  static constexpr float kClearValue = INT_MIN;
 
-      StatusOutput(Output* source) : source_(source), value_(0.0f) { }
+  StatusOutput(Output* source): source_(source), value_(0.0f) { }
 
-      force_inline poly_float value() const { return value_; }
+  force_inline poly_float value() const { return value_; }
 
-      force_inline void update(poly_mask voice_mask) {
-        poly_float masked_value = source_->buffer[0] & voice_mask;
-        value_ = masked_value + utils::swapVoices(masked_value);
-      }
+  force_inline void update(poly_mask voice_mask) {
+    poly_float masked_value = source_->buffer[0] & voice_mask;
+    value_ = masked_value + utils::swapVoices(masked_value);
+  }
 
-      force_inline void update() {
-        value_ = source_->buffer[0];
-      }
+  force_inline void update() {
+    value_ = source_->buffer[0];
+  }
 
-      force_inline void clear() { value_ = kClearValue; }
-      force_inline bool isClearValue(poly_float value) const { return poly_float::equal(value, kClearValue).anyMask(); }
-      force_inline bool isClearValue(float value) const { return value == kClearValue; }
+  force_inline void clear() { value_ = kClearValue; }
+  force_inline bool isClearValue(poly_float value) const { return poly_float::equal(value, kClearValue).anyMask(); }
+  force_inline bool isClearValue(float value) const { return value == kClearValue; }
 
-    private:
-      Output* source_;
-      poly_float value_;
+private:
+  Output* source_;
+  poly_float value_;
 
-      JUCE_LEAK_DETECTOR(StatusOutput)
-  };
+  JUCE_LEAK_DETECTOR(StatusOutput)
+};
 
-  struct ModuleData {
-    std::vector<Processor*> owned_mono_processors;
-    std::vector<SynthModule*> sub_modules;
+struct ModuleData {
+  std::vector<Processor*> owned_mono_processors;
+  std::vector<SynthModule*> sub_modules;
 
-    control_map controls;
-    output_map mod_sources;
-    std::map<std::string, std::unique_ptr<StatusOutput>> status_outputs;
-    input_map mono_mod_destinations;
-    input_map poly_mod_destinations;
-    output_map mono_modulation_readout;
-    output_map poly_modulation_readout;
-    std::map<std::string, ValueSwitch*> mono_modulation_switches;
-    std::map<std::string, ValueSwitch*> poly_modulation_switches;
+  control_map controls;
+  output_map mod_sources;
+  std::map<std::string, std::unique_ptr<StatusOutput>> status_outputs;
+  input_map mono_mod_destinations;
+  input_map poly_mod_destinations;
+  output_map mono_modulation_readout;
+  output_map poly_modulation_readout;
+  std::map<std::string, ValueSwitch*> mono_modulation_switches;
+  std::map<std::string, ValueSwitch*> poly_modulation_switches;
 
-    JUCE_LEAK_DETECTOR(ModuleData)
-  };
+  JUCE_LEAK_DETECTOR(ModuleData)
+};
 
-  class SynthModule : public ProcessorRouter {
-    public:
-      SynthModule(int num_inputs, int num_outputs, bool control_rate = false) :
-          ProcessorRouter(num_inputs, num_outputs, control_rate) {
-        data_ = std::make_shared<ModuleData>();
-      }
-      virtual ~SynthModule() { }
+class SynthModule: public ProcessorRouter {
+public:
+  SynthModule(int num_inputs, int num_outputs, bool control_rate = false):
+    ProcessorRouter(num_inputs, num_outputs, control_rate) {
+    data_ = std::make_shared<ModuleData>();
+  }
+  virtual ~SynthModule() { }
 
-      // Returns a map of all controls of this module and all submodules.
-      control_map getControls();
+  // Returns a map of all controls of this module and all submodules.
+  control_map getControls();
 
-      Output* getModulationSource(std::string name);
-      const StatusOutput* getStatusOutput(std::string name) const;
-      Processor* getModulationDestination(std::string name, bool poly);
-      Processor* getMonoModulationDestination(std::string name);
-      Processor* getPolyModulationDestination(std::string name);
+  Output* getModulationSource(std::string name);
+  const StatusOutput* getStatusOutput(std::string name) const;
+  Processor* getModulationDestination(std::string name, bool poly);
+  Processor* getMonoModulationDestination(std::string name);
+  Processor* getPolyModulationDestination(std::string name);
 
-      ValueSwitch* getModulationSwitch(std::string name, bool poly);
-      ValueSwitch* getMonoModulationSwitch(std::string name);
-      ValueSwitch* getPolyModulationSwitch(std::string name);
-      void updateAllModulationSwitches();
+  ValueSwitch* getModulationSwitch(std::string name, bool poly);
+  ValueSwitch* getMonoModulationSwitch(std::string name);
+  ValueSwitch* getPolyModulationSwitch(std::string name);
+  void updateAllModulationSwitches();
 
-      output_map& getModulationSources();
-      input_map& getMonoModulationDestinations();
-      input_map& getPolyModulationDestinations();
-      virtual output_map& getMonoModulations();
-      virtual output_map& getPolyModulations();
-      virtual void correctToTime(double seconds) { }
-      void enableOwnedProcessors(bool enable);
-      virtual void enable(bool enable) override;
-      void addMonoProcessor(Processor* processor, bool own = true);
-      void addIdleMonoProcessor(Processor* processor);
+  output_map& getModulationSources();
+  input_map& getMonoModulationDestinations();
+  input_map& getPolyModulationDestinations();
+  virtual output_map& getMonoModulations();
+  virtual output_map& getPolyModulations();
+  virtual void correctToTime(double seconds) { }
+  void enableOwnedProcessors(bool enable);
+  virtual void enable(bool enable) override;
+  void addMonoProcessor(Processor* processor, bool own = true);
+  void addIdleMonoProcessor(Processor* processor);
 
-      virtual Processor* clone() const override { return new SynthModule(*this); }
-      void addSubmodule(SynthModule* module) { data_->sub_modules.push_back(module); }
+  virtual Processor* clone() const override { return new SynthModule(*this); }
+  void addSubmodule(SynthModule* module) { data_->sub_modules.push_back(module); }
 
-    protected:
-      // Creates a basic linear non-scaled control.
-      Value* createBaseControl(std::string name, bool audio_rate = false, bool smooth_value = false);
-      Value* createBaseControl2(ValueDetails details);
+protected:
+  // Creates a basic linear non-scaled control.
+  Value* createBaseControl(std::string name, bool audio_rate = false, bool smooth_value = false);
+  Value* createBaseControl2(ValueDetails details);
+  // Creates a basic non-scaled linear control that you can modulate monophonically
+  Output* createBaseModControl(std::string name, bool audio_rate = false, bool smooth_value = false, Output* internal_modulation = nullptr);
+  Output* createBaseModControl2(ValueDetails details);
+  // Creates any control that you can modulate monophonically.
+  Output* createMonoModControl(std::string name, bool audio_rate = false, bool smooth_value = false, Output* internal_modulation = nullptr);
+  // Creates any control that you can modulate polyphonically and monophonically.
+  Output* createPolyModControl(std::string name, bool audio_rate = false, bool smooth_value = false, Output* internal_modulation = nullptr, Input* reset = nullptr);
+  Output* createPolyModControl2(ValueDetails details, Input* reset = nullptr);
+  // Creates a switch from free running frequencies to tempo synced frequencies.
+  Output* createTempoSyncSwitch(std::string name, Processor* frequency, const Output* beats_per_second, bool poly, Input* midi = nullptr);
 
-      // Creates a basic non-scaled linear control that you can modulate monophonically
-      Output* createBaseModControl(std::string name, bool audio_rate = false, bool smooth_value = false,
-                                   Output* internal_modulation = nullptr);
+  void createStatusOutput(std::string name, Output* source);
 
-      // Creates any control that you can modulate monophonically.
-      Output* createMonoModControl(std::string name, bool audio_rate = false, bool smooth_value = false,
-                                   Output* internal_modulation = nullptr);
+  std::shared_ptr<ModuleData> data_;
 
-      // Creates any control that you can modulate polyphonically and monophonically.
-      Output* createPolyModControl(std::string name, bool audio_rate = false, bool smooth_value = false,
-                                   Output* internal_modulation = nullptr, Input* reset = nullptr);
-
-      Output* createPolyModControl2(ValueDetails details, Input* reset = nullptr);
-
-      // Creates a switch from free running frequencies to tempo synced frequencies.
-      Output* createTempoSyncSwitch(std::string name, Processor* frequency,
-                                    const Output* beats_per_second, bool poly, Input* midi = nullptr);
-
-      void createStatusOutput(std::string name, Output* source);
-
-      std::shared_ptr<ModuleData> data_;
-
-      JUCE_LEAK_DETECTOR(SynthModule)
-  };
+  JUCE_LEAK_DETECTOR(SynthModule)
+};
 } // namespace vital
 

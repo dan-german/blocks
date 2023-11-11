@@ -55,12 +55,12 @@ public:
 
   void setModule(model::Module module);
 
+  Value* on_;
 protected:
   std::string prefix_;
   std::shared_ptr<Wavetable> wavetable_;
   std::shared_ptr<bool> was_on_;
 
-  Value* on_;
   SynthOscillator* oscillator_;
   Value* distortion_type_;
 

@@ -31,8 +31,7 @@ namespace vital {
       if (details.smooth_value) {
         val = new SmoothValue(default_value);
         addMonoProcessor(val, false);
-      }
-      else {
+      } else {
         val = new Value(default_value);
         addIdleMonoProcessor(val);
       }
@@ -48,7 +47,7 @@ namespace vital {
       }
     }
 
-    // data_->controls[name] = val;
+    data_->controls[details.name] = val;
     return val;
   }
 
@@ -115,6 +114,40 @@ namespace vital {
     return control_switch->output(ValueSwitch::kSwitch);
   }
 
+  Output* SynthModule::createBaseModControl2(ValueDetails details) {
+    Processor* base_val = createBaseControl2(details);
+
+    Processor* mono_total = nullptr;
+    if (details.audio_rate)
+      mono_total = new ModulationSum();
+    else
+      mono_total = new cr::VariableAdd();
+
+    mono_total->plugNext(base_val);
+    addMonoProcessor(mono_total, false);
+    data_->mono_mod_destinations[details.name] = mono_total;
+    data_->mono_modulation_readout[details.name] = mono_total->output();
+
+    ValueSwitch* control_switch = new ValueSwitch(0.0f);
+    control_switch->plugNext(base_val);
+    control_switch->plugNext(mono_total);
+
+    // if (internal_modulation)
+    //   mono_total->plugNext(internal_modulation);
+    // else
+    //   control_switch->addProcessor(mono_total);
+
+    addIdleMonoProcessor(control_switch);
+    // if (details.smooth_value || internal_modulation)
+    if (details.smooth_value)
+      control_switch->set(1);
+    else
+      control_switch->set(0);
+    data_->mono_modulation_switches[details.name] = control_switch;
+
+    return control_switch->output(ValueSwitch::kSwitch);
+  }
+
   Output* SynthModule::createMonoModControl(std::string name, bool audio_rate,
                                             bool smooth_value, Output* internal_modulation) {
     ValueDetails details = Parameters::getDetails(name);
@@ -174,7 +207,7 @@ namespace vital {
   }
 
   Output* SynthModule::createPolyModControl2(ValueDetails details, Input* reset) {
-    Output* base_control = createBaseModControl(details.name, details.audio_rate, details.smooth_value, nullptr);
+    Output* base_control = createBaseModControl2(details);
 
     Processor* poly_total;
     if (details.audio_rate) {
@@ -197,7 +230,7 @@ namespace vital {
     modulation_total->plug(poly_total, 1);
     addProcessor(modulation_total);
 
-    // data_->poly_modulation_readout[name] = poly_total->output(); // todo - fix
+    data_->poly_modulation_readout[details.name] = poly_total->output();
 
     ValueSwitch* control_switch = new ValueSwitch(0.0f);
     control_switch->plugNext(base_control);

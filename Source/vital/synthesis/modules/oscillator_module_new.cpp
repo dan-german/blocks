@@ -57,13 +57,12 @@ void OscillatorModuleNew::init() {
 void OscillatorModuleNew::setModule(model::Module module) {
   for (int i = 0; i < module.parameters_.size(); i++) {
     auto parameter = module.parameters_[i];
-    Output* output;
     if (parameter.type == ValueDetails::Type::kBase) {
       createBaseControl2(parameter);
     } else if (parameter.type == ValueDetails::Type::kPolyMod) {
-      output = createPolyModControl2(parameter, parameter.reset ? input(kReset) : nullptr);
+      Output* output = createPolyModControl2(parameter, parameter.reset ? input(kReset) : nullptr);
+      oscillator_->plug(output, parameter.input_index);
     }
-    oscillator_->plug(output, i);
   }
 }
 

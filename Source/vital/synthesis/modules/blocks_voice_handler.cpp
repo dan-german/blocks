@@ -28,11 +28,12 @@
 #include "vital/synthesis/modulators/trigger_random.h" 
 #include "vital/synthesis/modules/modulation_connection_processor.h"
 #include "vital/synthesis/effects/reverb.h"
+#include "module_new.h"
 
 namespace vital {
 
   BlocksVoiceHandler::BlocksVoiceHandler(Output* beats_per_second):
-    VoiceHandler(0, kMaxPolyphony), producers_(nullptr), beats_per_second_(beats_per_second),
+    VoiceHandler(0, kMaxPolyphony), beats_per_second_(beats_per_second),
     note_from_reference_(nullptr), midi_offset_output_(nullptr),
     bent_midi_(nullptr), current_midi_note_(nullptr), amplitude_envelope_(nullptr), amplitude_(nullptr),
     pitch_wheel_(nullptr), filters_module_(nullptr), lfos_(), envelopes_(), lfo_sources_(), random_(nullptr),
@@ -139,11 +140,17 @@ namespace vital {
 
     VoiceHandler::init();
 
-    // set all oscillators to off 
     for (int i = 0; i < oscillators_.size(); i++) {
       auto name = "osc_" + std::to_string(i + 1);
-      oscillators_[i]->getControls()[name + "_on"]->set(0.0f);
-      oscillators_[i]->getControls()[name + "_transpose"]->set(float(i));
+      auto module = model::OscillatorModule(i + 1);
+
+      auto controls = oscillators_[i]->getControls();
+      for (auto& control : controls) {
+        std::cout << control.first << std::endl << " value: " << control.second->value() << std::endl;
+      }
+      auto osc = oscillators_[i];
+      osc->on_->set(0.0f);
+      osc->setModule(module);
     }
 
     setupPolyModulationReadouts();
@@ -206,12 +213,12 @@ namespace vital {
     std::string type = "osc";
     for (int i = 0; i < 5; i++) {
       auto name = type + "_" + std::to_string(i + 1);
-      auto osc = std::make_shared<OscillatorModule>(name);
+      auto osc = std::make_shared<OscillatorModuleNew>(name);
 
-      osc->plug(reset(), OscillatorModule::kReset);
-      osc->plug(retrigger(), OscillatorModule::kRetrigger);
-      osc->plug(bent_midi_, OscillatorModule::kMidi);
-      osc->plug(active_mask(), OscillatorModule::kActiveVoices);
+      osc->plug(reset(), OscillatorModuleNew::kReset);
+      osc->plug(retrigger(), OscillatorModuleNew::kRetrigger);
+      osc->plug(bent_midi_, OscillatorModuleNew::kMidi);
+      osc->plug(active_mask(), OscillatorModuleNew::kActiveVoices);
 
       addSubmodule(osc.get());
       addProcessor(osc.get());
