@@ -161,27 +161,27 @@ void BlockComponent::setEnvelopePath(Colour colour) {
   envelopePath->colour = colour;
 }
 
-BlockComponent* BlockComponent::create(std::shared_ptr<Block> block) {
+BlockComponent* BlockComponent::create(std::shared_ptr<model::Module> block) {
   auto component = new BlockComponent(block->index);
 
   component->setTitle(block->name);
-  component->isStretchable = block->category == Model::Module::Category::effect;
+  component->isStretchable = block->category == model::Module::Category::effect;
   component->length = block->length;
   component->colour = block->colour.colour;
 
   if (block->id.type == Model::Types::osc) {
-    float waveformFloat = block->parameters[0]->audioParameter->getValue();
-    int waveformInt = static_cast<int>(block->parameters[0]->audioParameter->convertFrom0to1(waveformFloat));
-    auto painter = new OscillatorPainter();
-    painter->setWaveformType(static_cast<OscillatorPainter::WaveformType>(waveformInt));
-    painter->thickness = 2.0f;
-    component->setPainter(painter);
+    // float waveformFloat = block->parameters[0]->audioParameter->getValue();
+    // int waveformInt = static_cast<int>(block->parameters[0]->audioParameter->convertFrom0to1(waveformFloat));
+    // auto painter = new OscillatorPainter();
+    // painter->setWaveformType(static_cast<OscillatorPainter::WaveformType>(waveformInt));
+    // painter->thickness = 2.0f;
+    // component->setPainter(painter);
   } else if (block->id.type == Model::Types::adsr) {
     component->setEnvelopePath(component->colour);
-    component->getEnvelopePath()->setAttack(block->parameters[0]->audioParameter->getValue());
-    component->getEnvelopePath()->setDecay(block->parameters[1]->audioParameter->getValue());
-    component->getEnvelopePath()->setSustain(block->parameters[2]->audioParameter->getValue());
-    component->getEnvelopePath()->setRelease(block->parameters[3]->audioParameter->getValue());
+    // component->getEnvelopePath()->setAttack(block->parameters[0]->audioParameter->getValue());
+    // component->getEnvelopePath()->setDecay(block->parameters[1]->audioParameter->getValue());
+    // component->getEnvelopePath()->setSustain(block->parameters[2]->audioParameter->getValue());
+    // component->getEnvelopePath()->setRelease(block->parameters[3]->audioParameter->getValue());
   }
 
   component->themeChanged(ThemeManager::shared()->getCurrent());

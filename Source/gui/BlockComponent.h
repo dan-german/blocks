@@ -19,6 +19,7 @@
 #include "gui/ThemeListener.h"
 #include "gui/CircleIndicatorList.h"
 #include "gui/CircleIndicators.h"
+#include "module_new.h"
 
 class BlockComponent;
 using Block = Model::Block;
@@ -50,7 +51,7 @@ public:
   void setTitleColour(Colour newColour) { this->titleLabel.setColour(Label::ColourIds::textColourId, newColour); }
   EnvelopePath* getEnvelopePath() { return this->envelopePath.get(); }
 
-  static BlockComponent* create(std::shared_ptr<Block> block);
+  static BlockComponent* create(std::shared_ptr<model::Module> block);
   void setConfig(std::shared_ptr<Module> m);
   void animate();
 protected:

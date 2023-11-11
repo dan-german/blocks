@@ -67,6 +67,7 @@ BlocksVoiceHandler::BlocksVoiceHandler(Output* beats_per_second):
 
 std::shared_ptr<model::Module> BlocksVoiceHandler::AddBlock(std::string type, Index index) {
   auto module = modules_.get({ type, -1 });
+  module->index = index;
   auto processor = processors_[type].back();
   auto name = type + "_" + std::to_string(processors_[type].size());
   processor->getControls()[name + "_on"]->set(1.0f);

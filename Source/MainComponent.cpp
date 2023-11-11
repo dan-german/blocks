@@ -4,6 +4,7 @@
 #include "settings/GridConfigs.h"
 #include "gui/ThemeManager.h"
 #include "settings/UserSettings.h"
+#include "module_new.h"
 
 MainComponent::MainComponent(juce::MidiKeyboardState& keyboard_state, Delegate* delegate): delegate(delegate), uiLayer(keyboard_state, this), tabGrid(GridConfigs::tab), blockGrid(GridConfigs::blocks) {
   setWantsKeyboardFocus(false);
@@ -304,8 +305,8 @@ void MainComponent::showPopupAt(ButtonGridPopup& popup, std::function<void(Index
   popup.present(callbackWrapper);
 }
 
-std::shared_ptr<Block> MainComponent::addBlock(int code, Index index) {
-  std::shared_ptr<Block> block = nullptr;
+std::shared_ptr<model::Module> MainComponent::addBlock(int code, Index index) {
+  std::shared_ptr<model::Module> block = nullptr;
 
   switch (code) { // the first row's 5 codes are reserved for different wave types in the block selection menu popup
   case 0:
@@ -313,8 +314,8 @@ std::shared_ptr<Block> MainComponent::addBlock(int code, Index index) {
   case 2:
   case 3:
   case 4: {
-    auto hephep = delegate->editorAddedBlock2(Model::Types::osc, index);
-    DBG(hephep->parameters_.size());
+    block = delegate->editorAddedBlock2(Model::Types::osc, index);
+    DBG(block->parameters_.size());
 
     // if (block == nullptr) return nullptr; // todo - grey out the button in the block selection popup if the block is not available
     // auto range = block->parameters[0]->audioParameter->getNormalisableRange();
@@ -449,7 +450,7 @@ PopupMenu MainComponent::spawnModulationMenu(Module& victim) {
   return modulateMenu;
 }
 
-void MainComponent::spawnBlockComponent(std::shared_ptr<Block> block) {
+void MainComponent::spawnBlockComponent(std::shared_ptr<model::Module> block) {
   auto blockComponent = BlockComponent::create(block);
 
   blocks.add(blockComponent);
@@ -458,8 +459,8 @@ void MainComponent::spawnBlockComponent(std::shared_ptr<Block> block) {
   addAndMakeVisible(blockComponent, 1000);
   cursor.setAlwaysOnTop(true);
   if (block->length > 1) blockGrid.setItemLength(blockComponent, block->length);
-  blockComponent->setConfig(block);
-  ResetDownFlowingDots();
+  // blockComponent->setConfig(block);
+  // ResetDownFlowingDots();
 }
 
 void MainComponent::spawnTabComponent(std::shared_ptr<Tab> tab) {
@@ -597,7 +598,7 @@ void MainComponent::sliderValueChanged(Slider* slider) {
 void MainComponent::loadState(PresetInfo preset) {
   for (auto presetBlock : preset.blocks) {
     auto block = delegate->getBlock(Index { presetBlock.index.first, presetBlock.index.second });
-    spawnBlockComponent(block);
+    // spawnBlockComponent(block);
   }
 
   for (auto presetTab : preset.tabs) {
