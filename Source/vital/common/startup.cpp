@@ -33,6 +33,6 @@ bool Startup::isComputerCompatible() {
   #if defined(__ARM_NEON__)
   return true;
   #else
-  return SystemStats::hasSSE2() || SystemStats::hasAVX2();
+  return juce::SystemStats::hasSSE2() || juce::SystemStats::hasAVX2();
   #endif
 }

@@ -249,6 +249,7 @@ void PluginProcessor::editorAdjustedTab(int column, int parameter, float value) 
 }
 
 std::shared_ptr<Module> PluginProcessor::getModulator(int index) {
+  return nullptr;
   // return moduleManager.getModulator(index);
 }
 
@@ -258,22 +259,27 @@ juce::Array<std::shared_ptr<Modulation>> PluginProcessor::getConnectionsOfSource
 }
 
 juce::Array<std::shared_ptr<Modulation>> PluginProcessor::getModulations() {
+  return {};
   // return moduleManager.getConnections();
 }
 
 std::shared_ptr<Block> PluginProcessor::getBlock(Index index) {
+    return nullptr;
   // return (index.row == -1 || index.column == -1) ? nullptr : moduleManager.getBlock(index);
 }
 
 std::shared_ptr<Tab> PluginProcessor::getTab(int column) {
+    return nullptr;
   // return moduleManager.getTab(column);
 }
 
 juce::Array<MPENote> PluginProcessor::editorRequestsCurrentlyPlayingNotes() {
+  return {};
   // return currentlyPlayingNotes;
 }
 
 juce::Array<int> PluginProcessor::editorRequestsActiveColumns() {
+  return {};
   // return moduleManager.getActiveColumns();
 }
 
@@ -308,6 +314,7 @@ std::shared_ptr<Tab> PluginProcessor::editorAddedTab(int column) {
   // auto type = Model::Types::noteTab;
   // Analytics::shared()->countAction(type + " Tab Added");
   // return moduleManager.addTab(type, column, -1);
+  return nullptr;
 }
 
 void PluginProcessor::editorRemovedModulator(int index) {
@@ -318,6 +325,7 @@ void PluginProcessor::editorRemovedModulator(int index) {
 std::shared_ptr<Module> PluginProcessor::editorAddedModulator(Model::Type code) {
   //   Analytics::shared()->countAction("Modulator Added");
   //   return addModulator(code);
+  return nullptr;
 }
 
 void PluginProcessor::editorRemovedBlock(Index index) {
@@ -384,7 +392,7 @@ std::pair<float, float> PluginProcessor::editorRequestsModulatorValue(Index modu
   // if (modulationInput)
   //   return { modulationInput->source->getValue(0), modulationInput->connection->getMagnitude() };
 
-  // return { 0.0f, 0.0f };
+   return { 0.0f, 0.0f };
 }
 
 std::pair<float, float> PluginProcessor::editorRequestsModulatorValue(int modulationConnectionIndex) {
@@ -394,11 +402,11 @@ std::pair<float, float> PluginProcessor::editorRequestsModulatorValue(int modula
   // if (auto modulationInput = currentVoice->getModulationInput(connection))
   //   return { modulationInput->source->getValue(0), modulationInput->connection->getMagnitude() };
 
-  // return { 0.0f, 0.0f };
+  return { 0.0f, 0.0f };
 }
 
 PresetInfo PluginProcessor::getStateRepresentation() {
-  // auto currentState = PresetInfo();
+  return PresetInfo();
 
   // for (auto block : moduleManager.getBlocks()) {
   //   auto presetBlock = PresetInfo::Block();
