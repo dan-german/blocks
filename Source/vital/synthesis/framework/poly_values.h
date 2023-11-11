@@ -23,7 +23,7 @@
 #if VITAL_AVX2
   #define VITAL_AVX2 1
   static_assert(false, "AVX2 is not supported yet.");
-#elif __SSE2__
+#elif __SSE2__ || (defined(_M_AMD64) || defined(_M_X64))
   #define VITAL_SSE2 1
 #elif defined(__ARM_NEON__) || defined(__ARM_NEON)
   #define VITAL_NEON 1
