@@ -48,16 +48,16 @@ void MainComponent::paint(juce::Graphics& g) {
 }
 
 void MainComponent::inspectorGestureChanged(int index, bool started) {
-  std::shared_ptr<Module> focusedModule;
+  // std::shared_ptr<Module> focusedModule;
 
-  auto isTab = tabGrid.containsItem(focusedGridItem);
-  if (isTab) {
-    focusedModule = delegate->getTab(focusedGridItem->index.column);
-  } else {
-    focusedModule = delegate->getBlock(focusedGridItem->index);
-  }
+  // auto isTab = tabGrid.containsItem(focusedGridItem);
+  // if (isTab) {
+  //   focusedModule = delegate->getTab(focusedGridItem->index.column);
+  // } else {
+  //   focusedModule = delegate->getBlock(focusedGridItem->index);
+  // }
 
-  delegate->editorParameterGestureChanged(focusedModule->name, index, started);
+  // delegate->editorParameterGestureChanged(focusedModule->name, index, started);
 }
 
 void MainComponent::changeModulePainter(int value) {
@@ -322,11 +322,12 @@ std::shared_ptr<model::Module> MainComponent::addBlock(int code, Index index) {
     // block->parameters[0]->audioParameter->setValue(range.convertTo0to1(code));
     break;
   }
-  // case 5: block = delegate->editorAddedBlock(Model::Types::filter, index); break;
-  // case 6: block = delegate->editorAddedBlock(Model::Types::reverb, index); break;
-  // case 7: block = delegate->editorAddedBlock(Model::Types::delay, index); break;
-  // case 8: block = delegate->editorAddedBlock(Model::Types::drive, index); break;
-  // case 9: block = delegate->editorAddedBlock(Model::Types::mixer, index); break;
+  case 5: block = delegate->editorAddedBlock2(Model::Types::filter, index); break;
+    // case 5: block = delegate->editorAddedBlock(Model::Types::filter, index); break;
+    // case 6: block = delegate->editorAddedBlock(Model::Types::reverb, index); break;
+    // case 7: block = delegate->editorAddedBlock(Model::Types::delay, index); break;
+    // case 8: block = delegate->editorAddedBlock(Model::Types::drive, index); break;
+    // case 9: block = delegate->editorAddedBlock(Model::Types::mixer, index); break;
   default: break;
   }
 
@@ -362,7 +363,7 @@ void MainComponent::removeTab(GridItemComponent* tab) {
 
   auto tab_column = tab->index.column;
   tabGrid.detachModule(tab->index, true);
-  
+
   delegate->editorRemovedTab(tab_column);
   gridDarkBackground.setVisible(false);
 }
@@ -401,9 +402,9 @@ void MainComponent::inspectorChangedParameter(int sliderIndex, float value) {
   if (isTab) {
     delegate->editorAdjustedTab(moduleIndex.column, sliderIndex, value);
   } else {
-    auto module = delegate->getBlock(moduleIndex);
+    // auto module = delegate->getBlock(moduleIndex);
     delegate->editorAdjustedBlock(moduleIndex, sliderIndex, value);
-    updateModuleComponentVisuals(sliderIndex, value, static_cast<std::shared_ptr<Block>>(module));
+    // updateModuleComponentVisuals(sliderIndex, value, static_cast<std::shared_ptr<Block>>(module));
   }
 }
 
@@ -432,7 +433,7 @@ void MainComponent::refreshInspector() {
   // if (isTab) {
   //   focusedModule = delegate->getTab(focusedGridItem->index.column);
   // } else {
-    focusedModule = delegate->getBlock2(focusedGridItem->index);
+  focusedModule = delegate->getBlock2(focusedGridItem->index);
   // }
 
   inspector.setConfiguration(focusedModule);
@@ -855,16 +856,16 @@ void MainComponent::notesEnded(Array<int> notes) { }
 
 void MainComponent::ResetDownFlowingDots() {
   std::set<int> columns_with_blocks;
-  for (auto block_component : blocks) { 
+  for (auto block_component : blocks) {
     auto block_model = delegate->getBlock(block_component->index);
     if (block_model->id.type != Model::Types::osc) continue;
     columns_with_blocks.insert(block_component->index.column);
   }
 
-  for (int column = 0; column < GridConfigs::blocks.columns; column++) { 
+  for (int column = 0; column < GridConfigs::blocks.columns; column++) {
     blockGrid.SetDownFlowingHighlight(column, false);
   }
-  
+
   for (auto column : columns_with_blocks) {
     blockGrid.SetDownFlowingHighlight(column, true);
   }

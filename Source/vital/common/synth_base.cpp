@@ -766,7 +766,6 @@ void SynthBase::ValueChangedCallback::messageCallback() {
   }
 }
 
-
 std::shared_ptr<model::Module> SynthBase::AddBlock(std::string type, Index index) {
   return engine_->AddBlock(type, index);
 }

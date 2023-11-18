@@ -68,8 +68,10 @@ namespace vital {
     Output* drive = createModControl(prefix_ + "_drive");
     Output* blend = createModControl(prefix_ + "_blend");
     Output* blend_transpose = createModControl(prefix_ + "_blend_transpose");
+
     if (create_on_value_)
       on_ = createBaseControl(prefix_ + "_on");
+
     Value* filter_style = createBaseControl(prefix_ + "_style");
     filter_model_ = createBaseControl(prefix_ + "_model");
 

@@ -71,7 +71,8 @@ namespace vital {
   }
 
   void Add::process(int num_samples) {
-    VITAL_ASSERT(inputMatchesBufferSize(0));
+    auto value = inputMatchesBufferSize(0);
+    VITAL_ASSERT(value);
     VITAL_ASSERT(inputMatchesBufferSize(1));
 
     poly_float* dest = output()->buffer;

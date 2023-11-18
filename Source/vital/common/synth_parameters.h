@@ -17,6 +17,7 @@
 #pragma once
 
 #include "vital/synthesis/framework/common.h"
+#include "vital/synthesis/framework/value.h"
 
 #include <map>
 #include <string>
@@ -61,8 +62,8 @@ namespace vital {
     bool smooth_value = false;
     bool internal_modulation = false;
     bool reset = false;
-    int input_index ;
-  } typedef ValueDetails;
+    Value* val;
+  };
 
   // bool audio_rate = false
   // bool smooth_value = false

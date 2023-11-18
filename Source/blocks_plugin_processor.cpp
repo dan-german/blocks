@@ -21,6 +21,13 @@
 #include "vital/common/load_save.h"
 
 PluginProcessor::PluginProcessor(): juce::AudioProcessor(BusesProperties().withOutput("Output", AudioChannelSet::stereo(), true)), SynthGuiInterface(this, false) {
+  // for (auto module : synth.moduleManager.pool.allModules) {
+  //   for (auto parameter : module->parameters) {
+  //     addParameter(parameter->audioParameter);
+  //     parameter->audioParameter->addListener(this);
+  //   }
+  // }
+
   last_seconds_time_ = 0.0;
 
   int num_params = vital::Parameters::getNumParameters();
@@ -235,7 +242,11 @@ void PluginProcessor::editorAdjustedModulator(int parameter, int modulator, floa
   // moduleManager.getModulator(modulator)->parameter(parameter)->setValue(value);
 }
 void PluginProcessor::editorAdjustedBlock(Index index, int parameter, float value) {
-  // moduleManager.getBlock(index)->parameter(parameter)->setValue(value);
+  DBG("value: " << value);
+  auto block = synth_->GetBlock(index);
+  auto param = block->parameters_[parameter]->val;
+  param->set(value);
+  // synth_->GetBlock(index)->parameters_[parameter].val->set(value);
 }
 void PluginProcessor::editorChangedModulationMagnitude(int index, float magnitude) {
   // moduleManager.getConnection(index)->setMagnitude(magnitude);
@@ -260,6 +271,7 @@ juce::Array<std::shared_ptr<Modulation>> PluginProcessor::getConnectionsOfSource
 juce::Array<std::shared_ptr<Modulation>> PluginProcessor::getModulations() {
   // return moduleManager.getConnections();
 }
+
 std::shared_ptr<Block> PluginProcessor::getBlock(Index index) {}
 
 std::shared_ptr<model::Module> PluginProcessor::getBlock2(Index index) {
@@ -433,9 +445,10 @@ juce::StringArray PluginProcessor::editorRequestsPresetNames() {
 void PluginProcessor::editorParameterGestureChanged(String moduleName, int parameterIndex, bool started) {
   if (JUCE_STANDALONE_APPLICATION) return;
 
-  // if (started) {
-  //   moduleManager.getModule(moduleName)->parameter(parameterIndex)->audioParameter->beginChangeGesture();
-  // } else {
-  //   moduleManager.getModule(moduleName)->parameter(parameterIndex)->audioParameter->endChangeGesture();
-  // }
+  if (started) {
+      // synth_->BeginParameterChangeGesture(moduleName, parameterIndex);
+    // moduleManager.getModule(moduleName)->parameter(parameterIndex)->audioParameter->beginChangeGesture();
+  } else {
+    // moduleManager.getModule(moduleName)->parameter(parameterIndex)->audioParameter->endChangeGesture();
+  }
 }

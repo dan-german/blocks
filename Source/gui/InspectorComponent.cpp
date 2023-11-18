@@ -21,7 +21,7 @@ void InspectorComponent::sliderDragEnded(Slider* slider) { delegate->inspectorGe
 
 void InspectorComponent::setConfiguration(std::shared_ptr<model::Module> module) {
   resetInspector();
-  for (auto parameter : module->parameters_) spawnSlider(parameter);
+  for (auto parameter : module->parameters_) spawnSlider(*parameter);
   updateSize();
 }
 
@@ -32,7 +32,7 @@ void InspectorComponent::spawnSlider(vital::ValueDetails parameter) {
   // auto range = audioParameter->getNormalisableRange();
   slider->slider.setRange(parameter.min, parameter.max);
 
-  // slider->slider.addListener(this);
+  slider->slider.addListener(this);
   // slider->titleLabel.setText(parameter->id.toStdString(), dontSendNotification);
   // slider->slider.setSkewFactor(parameter->skew, false);
   // slider->slider.setTextValueSuffix(parameter->valueSuffix);

@@ -29,8 +29,9 @@
 #include "vital/synthesis/modules/phaser_module.h"
 #include "model/Index.h"
 #include <vector>
-#include "vital/synthesis/modules/oscillator_processor.h"
 #include "ModuleContainer.h"
+// #include "osc.h"
+#include "vital/synthesis/modules/oscillator_module.h"
 
 namespace vital {
 class AudioRateEnvelope;
@@ -85,7 +86,7 @@ private:
   void createModulators();
   void createVoiceOutput();
   void createFilters(Output* keytrack);
-
+  std::shared_ptr<SynthModule> createProcessor(std::shared_ptr<model::Module> module);
   void setupPolyModulationReadouts();
 
   ModulationConnectionBank modulation_bank_;
@@ -103,7 +104,7 @@ private:
   VariableAdd* last_node_;
 
   std::vector<std::vector<std::shared_ptr<Processor>>> processor_matrix_;
-  std::vector<std::shared_ptr<OscillatorProcessor>> oscillators_;
+  std::vector<std::shared_ptr<OscillatorModule>> oscillators_;
   std::vector<FilterModule*> filters_;
 
   FiltersModule* filters_module_;

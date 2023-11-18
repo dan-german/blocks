@@ -30,6 +30,7 @@
 #include "vital/synthesis/effects/reverb.h"
 #include "module_new.h"
 #include "oscillator_module_new.h"
+#include "filter_module_new.h"
 
 namespace vital {
 
@@ -63,6 +64,7 @@ BlocksVoiceHandler::BlocksVoiceHandler(Output* beats_per_second):
 
   int module_count = 5;
   modules_.spawn({ "osc" }, [](std::string type, int number) { return std::make_shared<model::OscillatorModule>(number); });
+  modules_.spawn({ "filter" }, [](std::string type, int number) { return std::make_shared<model::FilterModule>(number); });
 }
 
 std::shared_ptr<model::Module> BlocksVoiceHandler::GetBlock(Index index) {
@@ -77,11 +79,7 @@ std::shared_ptr<model::Module> BlocksVoiceHandler::GetBlock(Index index) {
 std::shared_ptr<model::Module> BlocksVoiceHandler::AddBlock(std::string type, Index index) {
   auto module = modules_.get({ type, -1 });
   module->index = index;
-  auto processor = processors_[type].back();
-  auto name = type + "_" + std::to_string(processors_[type].size());
-  processor->getControls()[name + "_on"]->set(1.0f);
-  processors_[type].pop_back();
-  processor_matrix_[index.column][index.row] = processor;
+  createProcessor(module);
 
   for (int column = 0; column < processor_matrix_.size(); column++) {
     for (int row = 0; row < processor_matrix_[column].size(); row++) {
@@ -114,7 +112,6 @@ std::shared_ptr<model::Module> BlocksVoiceHandler::AddBlock(std::string type, In
 void BlocksVoiceHandler::init() {
   createNoteArticulation();
   createOscillators();
-  createFilters(note_percentage_->output());
   createModulators();
   createVoiceOutput();
 
@@ -156,19 +153,6 @@ void BlocksVoiceHandler::init() {
   }
 
   VoiceHandler::init();
-
-  for (int i = 0; i < oscillators_.size(); i++) {
-    auto name = "osc_" + std::to_string(i + 1);
-    auto module = model::OscillatorModule(i + 1);
-
-    auto controls = oscillators_[i]->getControls();
-    for (auto& control : controls) {
-      std::cout << control.first << std::endl << " value: " << control.second->value() << std::endl;
-    }
-    auto osc = oscillators_[i];
-    osc->on_->set(0.0f);
-    // osc->setModule(module);
-  }
 
   setupPolyModulationReadouts();
 
@@ -226,19 +210,54 @@ void BlocksVoiceHandler::createFilters(Output* keytrack) {
   }
 }
 
+std::shared_ptr<SynthModule> BlocksVoiceHandler::createProcessor(std::shared_ptr<model::Module> module) {
+  auto index = module->index;
+  std::shared_ptr<SynthModule> processor;
+  auto name = module->name;
+
+  if (module->id.type == "osc") {
+    auto osc = oscillators_[0];
+    processor = osc;
+    module->parameters_[0]->val = osc->control_map_["transpose"];
+    module->parameters_[1]->val = osc->control_map_["tune"];
+    module->parameters_[2]->val = osc->control_map_["unison_voices"];
+    module->parameters_[3]->val = osc->control_map_["unison_detune"];
+    module->parameters_[4]->val = osc->control_map_["level"];
+    module->parameters_[5]->val = osc->control_map_["pan"];
+    oscillators_.erase(oscillators_.begin());
+  } else if (module->id.type == "filter") {
+    auto filter = std::make_shared<FilterModule>(name);
+    addProcessor(filter.get());
+    addSubmodule(filter.get());
+    filter->init();
+    module->parameters_[0]->val = filter->control_map_["style"];
+    module->parameters_[1]->val = filter->control_map_["cutoff"];
+    processor = filter;
+    filter->plug(reset(), FilterModule::kReset);
+    filter->plug(bent_midi_, FilterModule::kMidi);
+    filter->plug(note_from_reference_->output(), FilterModule::kKeytrack);
+    processors_["filter"].push_back(filter);
+    filter->control_map_["on"]->set(1.0f);
+  }
+
+  processor_matrix_[index.column][index.row] = processor;
+  processors_[module->id.type].push_back(processor);
+  return processor;
+}
+
 void BlocksVoiceHandler::createOscillators() {
   std::string type = "osc";
   for (int i = 0; i < 5; i++) {
     auto name = type + "_" + std::to_string(i + 1);
-    auto osc = std::make_shared<OscillatorProcessor>(name);
+    auto osc = std::make_shared<OscillatorModule>(name);
 
-    osc->plug(reset(), OscillatorProcessor::kReset);
-    osc->plug(retrigger(), OscillatorProcessor::kRetrigger);
-    osc->plug(bent_midi_, OscillatorProcessor::kMidi);
-    osc->plug(active_mask(), OscillatorProcessor::kActiveVoices);
-
+    osc->plug(reset(), OscillatorModule::kReset);
+    osc->plug(retrigger(), OscillatorModule::kRetrigger);
+    osc->plug(bent_midi_, OscillatorModule::kMidi);
+    osc->plug(active_mask(), OscillatorModule::kActiveVoices);
     addSubmodule(osc.get());
     addProcessor(osc.get());
+
     processors_[type].push_back(osc);
     oscillators_.push_back(osc);
   }

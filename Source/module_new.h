@@ -1,13 +1,12 @@
 #pragma once
 #include "vital/common/synth_parameters.h"
 #include "model/id.h"
-#include "vital/synthesis/producers/synth_oscillator.h"
 #include "gui/ModuleColour.h"
 #include "model/Index.h"
+#include "vital/synthesis/framework/value.h"
 
 using ValueScale = vital::ValueDetails::ValueScale;
 using Type = vital::ValueDetails::Type;
-using Osc = vital::SynthOscillator;
 
 namespace model {
 class Module {
@@ -15,7 +14,8 @@ public:
   ID id;
   std::string name;
   Index index = { -1, -1 };
-  std::vector<vital::ValueDetails> parameters_;
+  std::vector<std::shared_ptr<vital::ValueDetails>> parameters_;
+  // std::vector<vital::Value*> values_;
 
   enum Category { source, effect, modulator, tab };
   Category category;
@@ -29,11 +29,14 @@ public:
   inline bool isEnvelope() { return id.type == "adsr"; }
   inline bool isOscillator() { return id.type == "osc"; }
 
-  Module(std::string prefix): name(prefix) { }
+  Module(std::string prefix, int number): name(prefix + "_" + std::to_string(number)) { 
+    id = { prefix, number };
+  }
 
   void add(vital::ValueDetails parameter) {
     parameter.name = name + "_" + parameter.name;
-    parameters_.push_back(parameter);
+    auto shared_ptr = std::make_shared<vital::ValueDetails>(parameter);
+    parameters_.push_back(shared_ptr);
   }
 };
 }

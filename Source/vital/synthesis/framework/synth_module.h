@@ -18,6 +18,7 @@
 
 #include "vital/common/synth_types.h"
 #include "vital/synthesis/framework/processor_router.h"
+#include "module_new.h"
 
 #include <climits>
 #include <vector>
@@ -106,19 +107,18 @@ public:
 
   virtual Processor* clone() const override { return new SynthModule(*this); }
   void addSubmodule(SynthModule* module) { data_->sub_modules.push_back(module); }
+  virtual void setModule(model::Module module) {};
+  std::map<std::string, Value*> control_map_;
 
 protected:
   // Creates a basic linear non-scaled control.
   Value* createBaseControl(std::string name, bool audio_rate = false, bool smooth_value = false);
-  Value* createBaseControl2(ValueDetails details);
   // Creates a basic non-scaled linear control that you can modulate monophonically
   Output* createBaseModControl(std::string name, bool audio_rate = false, bool smooth_value = false, Output* internal_modulation = nullptr);
-  Output* createBaseModControl2(ValueDetails details);
   // Creates any control that you can modulate monophonically.
   Output* createMonoModControl(std::string name, bool audio_rate = false, bool smooth_value = false, Output* internal_modulation = nullptr);
   // Creates any control that you can modulate polyphonically and monophonically.
   Output* createPolyModControl(std::string name, bool audio_rate = false, bool smooth_value = false, Output* internal_modulation = nullptr, Input* reset = nullptr);
-  Output* createPolyModControl2(ValueDetails details, Input* reset = nullptr);
   // Creates a switch from free running frequencies to tempo synced frequencies.
   Output* createTempoSyncSwitch(std::string name, Processor* frequency, const Output* beats_per_second, bool poly, Input* midi = nullptr);
 
