@@ -18,6 +18,7 @@
 #include "gui/Tab.h"
 #include "model/NoteLogger.h"
 #include "module_new.h"
+#include "modulation_new.h"
 
 using Modulation = Model::Modulation;
 using Block = Model::Block;
@@ -122,7 +123,6 @@ private:
   void updateInspectorModulationIndicators();
   void handleModuleLandedOnInspector(BlockComponent* moduleComponent, const Point<int>& inspectorRelativePosition);
   void refreshInspector();
-  void connectModulation(BlockComponent* moduleComponent, Index& victimIndex, int parameterIndex);
   void setupUI();
   void sliderValueChanged(Slider* slider) override;
   void setupBlockGrid();
@@ -190,6 +190,7 @@ struct MainComponent::Delegate {
   virtual Array<int> editorRequestsActiveColumns() = 0;
   virtual Array<std::shared_ptr<Module>> getModulators() = 0;
   virtual Array<std::shared_ptr<Modulation>> getModulations() = 0;
+  virtual std::vector<std::shared_ptr<model::Modulation>> getModulations2() = 0;
   virtual Array<std::shared_ptr<Modulation>> getConnectionsOfSource(std::shared_ptr<Module> source) = 0;
 
   virtual ~Delegate() = default;

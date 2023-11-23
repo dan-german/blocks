@@ -391,10 +391,6 @@ void MainComponent::handleModuleLandedOnInspector(BlockComponent* moduleComponen
   blockGrid.resnapBlock(moduleComponent);
 }
 
-void MainComponent::connectModulation(BlockComponent* moduleComponent, Index& victimIndex, int parameterIndex) {
-  uiLayer.setModulations(delegate->getModulations());
-}
-
 void MainComponent::inspectorChangedParameter(int sliderIndex, float value) {
   Index moduleIndex(focusedGridItem->index);
   auto isTab = tabGrid.containsItem(focusedGridItem);

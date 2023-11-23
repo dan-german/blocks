@@ -269,7 +269,24 @@ juce::Array<std::shared_ptr<Modulation>> PluginProcessor::getConnectionsOfSource
 }
 
 juce::Array<std::shared_ptr<Modulation>> PluginProcessor::getModulations() {
-  // return moduleManager.getConnections();
+
+}
+
+std::vector<std::shared_ptr<model::Modulation>> PluginProcessor::getModulations2() {
+  std::vector<std::shared_ptr<model::Modulation>> modulations;
+
+  auto& bank = synth_->getModulationBank();
+  for (int i = 0; i < vital::kMaxModulationConnections; i++) {
+    auto mod = bank.atIndex(i);
+
+    bool is_connection_active = mod->destination_name != "" && mod->source_name != "";
+    if (!is_connection_active) continue;
+
+    auto modulation = std::make_shared<model::Modulation>(nullptr, nullptr, 0, 1.0f, i, false);
+    modulations.push_back(modulation);
+  }
+
+  return modulations;
 }
 
 std::shared_ptr<Block> PluginProcessor::getBlock(Index index) {}
@@ -343,6 +360,7 @@ std::shared_ptr<Block> PluginProcessor::editorAddedBlock(Model::Type type, Index
 }
 
 std::shared_ptr<model::Module> PluginProcessor::editorAddedBlock2(Model::Type type, Index index) {
+
   return synth_->AddBlock(type, index);
 }
 
@@ -446,8 +464,8 @@ void PluginProcessor::editorParameterGestureChanged(String moduleName, int param
   if (JUCE_STANDALONE_APPLICATION) return;
 
   if (started) {
-      // synth_->BeginParameterChangeGesture(moduleName, parameterIndex);
-    // moduleManager.getModule(moduleName)->parameter(parameterIndex)->audioParameter->beginChangeGesture();
+    // synth_->BeginParameterChangeGesture(moduleName, parameterIndex);
+  // moduleManager.getModule(moduleName)->parameter(parameterIndex)->audioParameter->beginChangeGesture();
   } else {
     // moduleManager.getModule(moduleName)->parameter(parameterIndex)->audioParameter->endChangeGesture();
   }

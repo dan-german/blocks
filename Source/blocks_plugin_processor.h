@@ -23,6 +23,7 @@
 #include "MainComponent.h"
 #include "vital/common/synth_gui_interface.h"
 #include "module_new.h"
+#include "modulation_new.h"
 
 class ValueBridge;
 
@@ -105,6 +106,7 @@ public:
   juce::Array<std::shared_ptr<Module>> getModulators() override;
   juce::Array<std::shared_ptr<Modulation>> getConnectionsOfSource(std::shared_ptr<Module> source) override;
   juce::Array<std::shared_ptr<Modulation>> getModulations() override;
+  std::vector<std::shared_ptr<model::Modulation>> getModulations2() override;
 
   std::pair<float, float> editorRequestsModulatorValue(Index moduleIndex, int parameterIndex, int modulatorIndex) override;
   std::pair<float, float> editorRequestsModulatorValue(int modulationConnectionIndex) override;

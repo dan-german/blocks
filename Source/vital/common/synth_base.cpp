@@ -166,6 +166,8 @@ bool SynthBase::isInvalidConnection(const vital::modulation_change& change) {
 }
 
 void SynthBase::connectModulation(vital::ModulationConnection* connection) {
+  DBG("source" << connection->source_name);
+  DBG("target" << connection->destination_name);
   vital::modulation_change change = createModulationChange(connection);
   if (isInvalidConnection(change)) {
     connection->destination_name = "";
@@ -186,7 +188,24 @@ bool SynthBase::connectModulation(const std::string& source, const std::string& 
   if (connection)
     connectModulation(connection);
 
+
+  connection->modulation_processor->lineMapGenerator()->initLinear();
+  // initModulationValues(source, destination);
+
   return create;
+}
+
+void SynthBase::initModulationValues(const std::string& source, const std::string& destination) {
+  int connection_index = getConnectionIndex(source, destination);
+  if (connection_index < 0)
+    return;
+
+  vital::ModulationConnection* connection = getModulationBank().atIndex(connection_index);
+  LineGenerator* map_generator = connection->modulation_processor->lineMapGenerator();
+  map_generator->initLinear();
+
+  std::string power_name = "modulation_" + std::to_string(connection_index + 1) + "_power";
+  valueChanged(power_name, 0.0f);
 }
 
 void SynthBase::disconnectModulation(vital::ModulationConnection* connection) {
@@ -767,9 +786,14 @@ void SynthBase::ValueChangedCallback::messageCallback() {
 }
 
 std::shared_ptr<model::Module> SynthBase::AddBlock(std::string type, Index index) {
-  return engine_->AddBlock(type, index);
+  auto block = engine_->AddBlock(type, index);
+  connectModulation("lfo_1", "osc_1_tune");
+  auto controls = getControls();
+
+  getControls()["modulation_1_amount"]->set(1.0f);
+  return block;
 }
 
 std::shared_ptr<model::Module> SynthBase::GetBlock(Index index) {
-  return engine_->GetBlock(index);  
+  return engine_->GetBlock(index);
 }

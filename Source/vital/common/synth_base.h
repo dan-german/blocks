@@ -177,6 +177,7 @@ class SynthBase : public MidiManager::Listener {
     void processKeyboardEvents(MidiBuffer& buffer, int num_samples);
     void processModulationChanges();
     void updateMemoryOutput(int samples, const vital::poly_float* audio);
+    void initModulationValues(const std::string& source, const std::string& destination);
 
     std::unique_ptr<vital::SoundEngine> engine_;
     std::unique_ptr<MidiManager> midi_manager_;
