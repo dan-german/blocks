@@ -31,6 +31,7 @@
 #include "module_new.h"
 #include "oscillator_module_new.h"
 #include "filter_module_new.h"
+#include "lfo_module_new.h"
 
 namespace vital {
 
@@ -52,6 +53,7 @@ BlocksVoiceHandler::BlocksVoiceHandler(Output* beats_per_second):
   midi_offset_output_ = registerControlRateOutput(note_from_reference_->output(), true);
 
   enabled_modulation_processors_.ensureCapacity(kMaxModulationConnections);
+  lfos_.reserve(kNumLfos);
 
   int rows = 7;
   int columns = 5;
@@ -65,6 +67,7 @@ BlocksVoiceHandler::BlocksVoiceHandler(Output* beats_per_second):
   int module_count = 5;
   modules_.spawn({ "osc" }, [](std::string type, int number) { return std::make_shared<model::OscillatorModule>(number); });
   modules_.spawn({ "filter" }, [](std::string type, int number) { return std::make_shared<model::FilterModule>(number); });
+  modules_.spawn({ "lfo" }, [](std::string type, int number) { return std::make_shared<model::LFOModule>(number); });
 }
 
 std::shared_ptr<model::Module> BlocksVoiceHandler::GetBlock(Index index) {
@@ -74,6 +77,17 @@ std::shared_ptr<model::Module> BlocksVoiceHandler::GetBlock(Index index) {
     }
   }
   return nullptr;
+}
+
+std::shared_ptr<model::Module> BlocksVoiceHandler::AddModulator(std::string type) {
+  std::cout << "adding modulators of type: " << type << std::endl;
+  auto module = modules_.get({ type, -1 });
+  active_modulators_.push_back(module);
+  if (type == "lfo") {
+    auto lfo = lfos_[0];
+    module->parameters_[0]->val = lfo->control_map_["frequency"];
+  }
+  return module;
 }
 
 std::shared_ptr<model::Module> BlocksVoiceHandler::AddBlock(std::string type, Index index) {
@@ -268,10 +282,10 @@ void BlocksVoiceHandler::createModulators() {
     lfo_sources_[i].setLoop(false);
     lfo_sources_[i].initTriangle();
     std::string prefix = std::string("lfo_") + std::to_string(i + 1);
-    LfoModule* lfo = new LfoModule(prefix, &lfo_sources_[i], beats_per_second_);
-    addSubmodule(lfo);
-    addProcessor(lfo);
-    lfos_[i] = lfo;
+    auto lfo = std::make_shared<LfoModule>(prefix, &lfo_sources_[i], beats_per_second_);
+    addSubmodule(lfo.get());
+    addProcessor(lfo.get());
+    lfos_.push_back(lfo);
     lfo->plug(retrigger(), LfoModule::kNoteTrigger);
     lfo->plug(note_count(), LfoModule::kNoteCount);
     lfo->plug(bent_midi_, LfoModule::kMidi);

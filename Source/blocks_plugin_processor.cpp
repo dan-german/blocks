@@ -19,6 +19,7 @@
 
 #include "vital/synthesis/synth_engine/sound_engine.h"
 #include "vital/common/load_save.h"
+#include "vital/synthesis/modules/blocks_voice_handler.h"
 
 PluginProcessor::PluginProcessor(): juce::AudioProcessor(BusesProperties().withOutput("Output", AudioChannelSet::stereo(), true)), SynthGuiInterface(this, false) {
   // for (auto module : synth.moduleManager.pool.allModules) {
@@ -346,8 +347,11 @@ void PluginProcessor::editorRemovedModulator(int index) {
 }
 
 std::shared_ptr<Module> PluginProcessor::editorAddedModulator(Model::Type code) {
-  //   Analytics::shared()->countAction("Modulator Added");
-  //   return addModulator(code);
+
+}
+
+std::shared_ptr<model::Module> PluginProcessor::editorAddedModulator2(Model::Type code) {
+  return synth_->AddModulator(code);
 }
 
 void PluginProcessor::editorRemovedBlock(Index index) {
@@ -469,4 +473,8 @@ void PluginProcessor::editorParameterGestureChanged(String moduleName, int param
   } else {
     // moduleManager.getModule(moduleName)->parameter(parameterIndex)->audioParameter->endChangeGesture();
   }
+}
+
+std::vector<std::shared_ptr<model::Module>> PluginProcessor::getModulators2() { 
+ return synth_->getEngine()->voice_handler_->active_modulators_;
 }

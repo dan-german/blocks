@@ -183,12 +183,14 @@ struct MainComponent::Delegate {
   virtual std::shared_ptr<Tab> getTab(int column) = 0;
   virtual std::shared_ptr<Module> getModulator(int index) = 0;
   virtual std::shared_ptr<Module> editorAddedModulator(Model::Type code) = 0;
+  virtual std::shared_ptr<model::Module> editorAddedModulator2(Model::Type code) = 0;
   virtual std::shared_ptr<Block> getBlock(Index index) = 0;
   virtual std::shared_ptr<model::Module> getBlock2(Index index) = 0;
   virtual std::shared_ptr<model::Module> editorAddedBlock2(Model::Type code, Index index) = 0;
   virtual std::shared_ptr<Block> editorAddedBlock(Model::Type code, Index index) = 0;
   virtual Array<int> editorRequestsActiveColumns() = 0;
   virtual Array<std::shared_ptr<Module>> getModulators() = 0;
+  virtual std::vector<std::shared_ptr<model::Module>> getModulators2() = 0;
   virtual Array<std::shared_ptr<Modulation>> getModulations() = 0;
   virtual std::vector<std::shared_ptr<model::Modulation>> getModulations2() = 0;
   virtual Array<std::shared_ptr<Modulation>> getConnectionsOfSource(std::shared_ptr<Module> source) = 0;

@@ -400,6 +400,10 @@ std::shared_ptr<model::Module> SoundEngine::AddBlock(std::string type, Index ind
   return voice_handler_->AddBlock(type, index);
 }
 
+std::shared_ptr<model::Module> SoundEngine::AddModulator(std::string type) {
+  return voice_handler_->AddModulator(type);
+}
+
 std::shared_ptr<model::Module> SoundEngine::GetBlock(Index index) {
   return voice_handler_->GetBlock(index);
 }

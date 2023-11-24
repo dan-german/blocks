@@ -50,7 +50,7 @@ public:
 
   void resized() override;
   void setModulations(Array<std::shared_ptr<Modulation>> modulationConnections);
-  void setModulators(Array<std::shared_ptr<Module>> modulators);
+  void setModulators(std::vector<std::shared_ptr<model::Module>> modulators);
   void componentMovedOrResized(bool wasMoved, bool wasResized) override {};
   void componentPeerChanged() override {};
   void componentVisibilityChanged() override {};

@@ -176,9 +176,9 @@ void MainComponent::setupListeners() {
 }
 
 void MainComponent::addModulator(Model::Type code) {
-  auto module = delegate->editorAddedModulator(code);
+  auto module = delegate->editorAddedModulator2(code);
   if (module == nullptr) return;
-  uiLayer.setModulators(delegate->getModulators());
+  uiLayer.setModulators(delegate->getModulators2());
 }
 
 void MainComponent::resized() {
@@ -538,7 +538,7 @@ void MainComponent::clear() {
 
   uiLayer.presetButton.label.setText("empty", dontSendNotification);
   uiLayer.setModulations(delegate->getModulations());
-  uiLayer.setModulators(delegate->getModulators());
+  uiLayer.setModulators(delegate->getModulators2());
   ResetDownFlowingDots();
 }
 
@@ -604,7 +604,7 @@ void MainComponent::loadState(PresetInfo preset) {
   }
 
   uiLayer.setModulations(delegate->getModulations());
-  uiLayer.setModulators(delegate->getModulators());
+  // uiLayer.setModulators(delegate->getModulators());
   uiLayer.presetButton.content.label.setText(preset.name, dontSendNotification);
 
   for (auto block : blocks) block->animate();

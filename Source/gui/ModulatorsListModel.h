@@ -11,13 +11,14 @@
 #pragma once
 #include "model/Module.h"
 #include "gui/ModulatorComponent.h"
+#include "module_new.h"
 
 using Module = Model::Module;
 
 class ModulatorsListModel: public ListBoxModel {
 private:
-  Array<std::shared_ptr<Module>> modulators;
-  void setupModulatorComponent(Module& model, ModulatorComponent& component) const;
+  std::vector<std::shared_ptr<model::Module>> modulators;
+  void setupModulatorComponent(model::Module& model, ModulatorComponent& component) const;
 public:
   ~ModulatorsListModel() override = default;
   Component* refreshComponentForRow(int rowNumber, bool isRowSelected, Component* existingComponentToUpdate) override;
@@ -25,9 +26,8 @@ public:
   ModulatorComponent::Listener* modulatorListener;
 
   int getNumRows() override;
-  void add(std::shared_ptr<Module> modulator);
   void remove(int index);
-  void setModulators(Array<std::shared_ptr<Module>> modulators);
+  void setModulators(std::vector<std::shared_ptr<model::Module>> modulators);
 protected:
   void paintListBoxItem(int rowNumber, Graphics& g, int width, int height, bool rowIsSelected) override {}
   void listBoxItemDoubleClicked(int row, const MouseEvent& event) override;

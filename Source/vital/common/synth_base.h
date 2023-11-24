@@ -62,6 +62,7 @@ class SynthBase : public MidiManager::Listener {
     virtual ~SynthBase();
 
     std::shared_ptr<model::Module> AddBlock(std::string type, Index index);
+    std::shared_ptr<model::Module> AddModulator(std::string type);
     std::shared_ptr<model::Module> GetBlock(Index index);
 
     void valueChanged(const std::string& name, vital::mono_float value);

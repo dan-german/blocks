@@ -5,12 +5,12 @@ using namespace Model;
 
 template <class M>
 struct ModuleContainer {
-  std::map<std::string, Array<std::shared_ptr<M>>> map;
-  Array<std::shared_ptr<M>> all;
+  std::map<std::string, juce::Array<std::shared_ptr<M>>> map;
+  juce::Array<std::shared_ptr<M>> all;
 
-  void spawn(Array<std::string> types, std::function<std::shared_ptr<M>(std::string, int)> spawner) {
+  void spawn(juce::Array<std::string> types, std::function<std::shared_ptr<M>(std::string, int)> spawner) {
     for (const auto& type : types) {
-      Array<std::shared_ptr<M>> array;
+      juce::Array<std::shared_ptr<M>> array;
 
       for (int i = 1; i <= MAX_MODULES_PER_TYPE; i++) {
         array.add(std::shared_ptr<M>(spawner(type, i)));

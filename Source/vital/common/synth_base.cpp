@@ -787,11 +787,14 @@ void SynthBase::ValueChangedCallback::messageCallback() {
 
 std::shared_ptr<model::Module> SynthBase::AddBlock(std::string type, Index index) {
   auto block = engine_->AddBlock(type, index);
-  connectModulation("lfo_1", "osc_1_tune");
-  auto controls = getControls();
-
-  getControls()["modulation_1_amount"]->set(1.0f);
+  // connectModulation("lfo_1", "osc_1_tune");
+  // auto controls = getControls();
+  // getControls()["modulation_1_amount"]->set(1.0f);
   return block;
+}
+
+std::shared_ptr<model::Module> SynthBase::AddModulator(std::string type) {
+  return engine_->AddModulator(type);
 }
 
 std::shared_ptr<model::Module> SynthBase::GetBlock(Index index) {

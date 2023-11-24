@@ -79,7 +79,9 @@ public:
   }
 
   std::shared_ptr<model::Module> AddBlock(std::string type, Index index);
+  std::shared_ptr<model::Module> AddModulator(std::string type);
   std::shared_ptr<model::Module> GetBlock(Index index);
+  std::vector<std::shared_ptr<model::Module>> active_modulators_;
 private:
   void createNoteArticulation();
   void createOscillators();
@@ -105,11 +107,12 @@ private:
 
   std::vector<std::vector<std::shared_ptr<Processor>>> processor_matrix_;
   std::vector<std::shared_ptr<OscillatorModule>> oscillators_;
+  std::vector<std::shared_ptr<LfoModule>> lfos_;
   std::vector<FilterModule*> filters_;
 
   FiltersModule* filters_module_;
 
-  LfoModule* lfos_[kNumLfos];
+  // LfoModule* lfos_[kNumLfos];
   EnvelopeModule* envelopes_[kNumEnvelopes];
   ChorusModule* reverb_;
 

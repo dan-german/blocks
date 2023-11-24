@@ -12,6 +12,7 @@
 #include <juce_audio_plugin_client/Standalone/juce_StandaloneFilterWindow.h>
 #include "model/ModelConstants.h"
 #include "BinaryData.h"
+#include "module_new.h"
 
 UILayer::UILayer(juce::MidiKeyboardState& keyboard_state, Slider::Listener* listener): 
     keyboard(keyboard_state, MidiKeyboardComponent::Orientation::horizontalKeyboard), ComponentMovementWatcher(this) {
@@ -139,7 +140,7 @@ void UILayer::setModulations(Array<std::shared_ptr<Modulation>> modulationConnec
   if (matrix.listBox.isVisible()) matrix.listBox.updateContent();
 }
 
-void UILayer::setModulators(Array<std::shared_ptr<Module>> newModulators) {
+void UILayer::setModulators(std::vector<std::shared_ptr<model::Module>> newModulators) {
   modulators.modulatorsListModel.setModulators(newModulators);
   if (modulators.listBox.isVisible()) modulators.listBox.updateContent();
 }

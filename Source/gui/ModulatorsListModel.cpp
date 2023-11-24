@@ -11,12 +11,14 @@
 #include "gui/ModulatorsListModel.h"
 #include "model/ModuleParameter.h"
 #include "model/LFOModule.h"
+#include "module_new.h"
 
-void ModulatorsListModel::add(std::shared_ptr<Module> modulator) { this->modulators.add(modulator); }
 int ModulatorsListModel::getNumRows() { return modulators.size(); }
 void ModulatorsListModel::listBoxItemDoubleClicked(int row, const MouseEvent& event) { ListBoxModel::listBoxItemDoubleClicked(row, event); }
 var ModulatorsListModel::getDragSourceDescription(const SparseSet<int>& rowsToDescribe) { return ListBoxModel::getDragSourceDescription(rowsToDescribe); }
-void ModulatorsListModel::remove(int index) { modulators.remove(index); }
+void ModulatorsListModel::remove(int index) { 
+  modulators.erase(modulators.begin() + index);
+}
 
 Component* ModulatorsListModel::refreshComponentForRow(int rowNumber, bool isRowSelected, Component* existingComponentToUpdate) {
   ModulatorComponent* component;
@@ -26,7 +28,7 @@ Component* ModulatorsListModel::refreshComponentForRow(int rowNumber, bool isRow
   else
     component = new ModulatorComponent();
 
-  if (modulators.isEmpty()) return component;
+  if (modulators.size() == 0) return component;
   if (rowNumber >= modulators.size()) return component;
 
   setupModulatorComponent(*modulators[rowNumber], *component);
@@ -35,44 +37,44 @@ Component* ModulatorsListModel::refreshComponentForRow(int rowNumber, bool isRow
   return component;
 }
 
-void ModulatorsListModel::setupModulatorComponent(Module& model, ModulatorComponent& component) const {
+void ModulatorsListModel::setupModulatorComponent(model::Module& model, ModulatorComponent& component) const {
   component.title.setText(model.name, dontSendNotification);
 
-  for (int i = 0; i < model.parameters.size(); i++) {
-    auto parameter = model.parameters[i];
+  for (int i = 0; i < model.parameters_.size(); i++) {
+    auto parameter = model.parameters_[i];
     auto slider = component.sliders[i];
-    auto audioParameter = parameter->audioParameter;
+    // auto audioParameter = parameter->audioParameter;
 
-    slider->boxSlider.slider.setRange(audioParameter->getNormalisableRange().start,
-      audioParameter->getNormalisableRange().end,
-      audioParameter->getNormalisableRange().interval);
+    // slider->boxSlider.slider.setRange(audioParameter->getNormalisableRange().start,
+    //   audioParameter->getNormalisableRange().end,
+    //   audioParameter->getNormalisableRange().interval);
 
-    auto value = audioParameter->getNormalisableRange().convertFrom0to1(audioParameter->getValue());
-    slider->boxSlider.slider.setTextValueSuffix(parameter->valueSuffix);
-    slider->boxSlider.choices = parameter->audioParameter->getAllValueStrings();
-    slider->boxSlider.slider.setSkewFactor(parameter->skew, false);
+    // auto value = audioParameter->getNormalisableRange().convertFrom0to1(audioParameter->getValue());
+    // slider->boxSlider.slider.setTextValueSuffix(parameter->valueSuffix);
+    // slider->boxSlider.choices = parameter->audioParameter->getAllValueStrings();
+    // slider->boxSlider.slider.setSkewFactor(parameter->skew, false);
 
-    slider->label.setText(parameter->id, dontSendNotification);
+    // slider->label.setText(parameter->id, dontSendNotification);
 
-    if (dynamic_cast<AudioParameterFloat*>(audioParameter))
-      slider->boxSlider.slider.setNumDecimalPlacesToDisplay(2);
-    else
-      slider->boxSlider.slider.setNumDecimalPlacesToDisplay(0);
+    // if (dynamic_cast<AudioParameterFloat*>(audioParameter))
+    //   slider->boxSlider.slider.setNumDecimalPlacesToDisplay(2);
+    // else
+    //   slider->boxSlider.slider.setNumDecimalPlacesToDisplay(0);
 
-    auto choices = audioParameter->getAllValueStrings();
+    // auto choices = audioParameter->getAllValueStrings();
 
-    if (parameter->textFromValueFunction) {
-      slider->boxSlider.slider.textFromValueFunction = parameter->textFromValueFunction;
-      slider->boxSlider.slider.setNumDecimalPlacesToDisplay(0);
-    } else if (choices.size() != 0)
-      slider->boxSlider.slider.textFromValueFunction = [choices](double value) { return choices[value]; };
-    else {
-      slider->boxSlider.slider.textFromValueFunction = {};
-    }
+    // if (parameter->textFromValueFunction) {
+    //   slider->boxSlider.slider.textFromValueFunction = parameter->textFromValueFunction;
+    //   slider->boxSlider.slider.setNumDecimalPlacesToDisplay(0);
+    // } else if (choices.size() != 0)
+    //   slider->boxSlider.slider.textFromValueFunction = [choices](double value) { return choices[value]; };
+    // else {
+    //   slider->boxSlider.slider.textFromValueFunction = {};
+    // }
 
-    slider->boxSlider.slider.setValue(value, dontSendNotification);
-    slider->boxSlider.slider.getTextFromValue(value);
-    slider->boxSlider.valueLabel.setText(slider->boxSlider.slider.getTextFromValue(value), dontSendNotification);
+    // slider->boxSlider.slider.setValue(value, dontSendNotification);
+    // slider->boxSlider.slider.getTextFromValue(value);
+    // slider->boxSlider.valueLabel.setText(slider->boxSlider.slider.getTextFromValue(value), dontSendNotification);
   }
 
   component.delegate = modulatorListener;
@@ -80,10 +82,10 @@ void ModulatorsListModel::setupModulatorComponent(Module& model, ModulatorCompon
 
   if (model.id.type == Model::Types::lfo) {
     component.oscillatorPainter.setVisible(true);
-    auto parameter = model.parameter(Model::LFOModule::Parameters::pWaveform);
-    auto value = parameter->audioParameter->getNormalisableRange().convertFrom0to1(parameter->audioParameter->getValue());
-    component.oscillatorPainter.setWaveformType(static_cast<OscillatorPainter::WaveformType>((int)value));
-    component.envelopePath.setVisible(false);
+    // auto parameter = model.parameter(Model::LFOModule::Parameters::pWaveform);
+    // auto value = parameter->audioParameter->getNormalisableRange().convertFrom0to1(parameter->audioParameter->getValue());
+    // component.oscillatorPainter.setWaveformType(static_cast<OscillatorPainter::WaveformType>((int)value));
+    // component.envelopePath.setVisible(false);
   } else {
     component.oscillatorPainter.setVisible(false);
     component.envelopePath.setVisible(true);
@@ -104,19 +106,19 @@ void ModulatorsListModel::setupModulatorComponent(Module& model, ModulatorCompon
     };
   } else if (model.id.type == Model::Types::adsr) {
     component.onSliderValueChange = [&component, &model](int index, float value) {
-      auto normalizedValue = model.parameters[index]->audioParameter->convertTo0to1(value);
-      switch (index) {
-      case 0: component.envelopePath.setAttack(normalizedValue); break;
-      case 1: component.envelopePath.setDecay(normalizedValue); break;
-      case 2: component.envelopePath.setSustain(normalizedValue); break;
-      case 3: component.envelopePath.setRelease(normalizedValue); break;
-      default: break;
-      }
+      // auto normalizedValue = model.parameters[index]->audioParameter->convertTo0to1(value);
+      // switch (index) {
+      // case 0: component.envelopePath.setAttack(normalizedValue); break;
+      // case 1: component.envelopePath.setDecay(normalizedValue); break;
+      // case 2: component.envelopePath.setSustain(normalizedValue); break;
+      // case 3: component.envelopePath.setRelease(normalizedValue); break;
+      // default: break;
+      // }
     };
   }
 }
 
-void ModulatorsListModel::setModulators(Array<std::shared_ptr<Module>> modulators) {
+void ModulatorsListModel::setModulators(std::vector<std::shared_ptr<model::Module>> modulators) {
   this->modulators.clear();
   this->modulators = modulators;
 }

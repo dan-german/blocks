@@ -26,100 +26,99 @@ class LineGenerator;
 class Tuning;
 
 namespace vital {
-  class Decimator;
-  class PeakMeter;
-  class Sample;
-  class ReorderableEffectChain;
-  class StereoMemory;
-  class BlocksVoiceHandler;
-  class SynthLfo;
-  class Value;
-  class ValueSwitch;
-  class WaveFrame;
-  class Wavetable;
+class Decimator;
+class PeakMeter;
+class Sample;
+class ReorderableEffectChain;
+class StereoMemory;
+class BlocksVoiceHandler;
+class SynthLfo;
+class Value;
+class ValueSwitch;
+class WaveFrame;
+class Wavetable;
 
-  class SoundEngine : public SynthModule, public NoteHandler {
-    public:
-      static constexpr int kDefaultOversamplingAmount = 2;
-      static constexpr int kDefaultSampleRate = 44100;
+class SoundEngine: public SynthModule, public NoteHandler {
+public:
+  static constexpr int kDefaultOversamplingAmount = 2;
+  static constexpr int kDefaultSampleRate = 44100;
 
-      SoundEngine();
-      virtual ~SoundEngine();
+  SoundEngine();
+  virtual ~SoundEngine();
 
-      std::shared_ptr<model::Module> AddBlock(std::string type, Index index);
-      std::shared_ptr<model::Module> GetBlock(Index index);
+  std::shared_ptr<model::Module> AddModulator(std::string type);
+  std::shared_ptr<model::Module> AddBlock(std::string type, Index index);
+  std::shared_ptr<model::Module> GetBlock(Index index);
 
-      void init() override;
-      void process(int num_samples) override;
-      void correctToTime(double seconds) override;
+  void init() override;
+  void process(int num_samples) override;
+  void correctToTime(double seconds) override;
 
-      int getNumPressedNotes();
-      void connectModulation(const modulation_change& change);
-      void disconnectModulation(const modulation_change& change);
-      int getNumActiveVoices();
-      ModulationConnectionBank& getModulationBank();
-      mono_float getLastActiveNote() const;
+  int getNumPressedNotes();
+  void connectModulation(const modulation_change& change);
+  void disconnectModulation(const modulation_change& change);
+  int getNumActiveVoices();
+  ModulationConnectionBank& getModulationBank();
+  mono_float getLastActiveNote() const;
 
-      void setTuning(const Tuning* tuning);
+  void setTuning(const Tuning* tuning);
 
-      void allSoundsOff() override;
-      void allNotesOff(int sample) override;
-      void allNotesOff(int sample, int channel) override;
-      void allNotesOffRange(int sample, int from_channel, int to_channel);
+  void allSoundsOff() override;
+  void allNotesOff(int sample) override;
+  void allNotesOff(int sample, int channel) override;
+  void allNotesOffRange(int sample, int from_channel, int to_channel);
 
-      void noteOn(int note, mono_float velocity, int sample, int channel) override;
-      void noteOff(int note, mono_float lift, int sample, int channel) override;
-      void setModWheel(mono_float value, int channel);
-      void setModWheelAllChannels(mono_float value);
-      void setPitchWheel(mono_float value, int channel);
-      void setZonedPitchWheel(mono_float value, int from_channel, int to_channel);
-      void disableUnnecessaryModSources();
-      void enableModSource(const std::string& source);
-      void disableModSource(const std::string& source);
-      bool isModSourceEnabled(const std::string& source);
-      const StereoMemory* getEqualizerMemory();
+  void noteOn(int note, mono_float velocity, int sample, int channel) override;
+  void noteOff(int note, mono_float lift, int sample, int channel) override;
+  void setModWheel(mono_float value, int channel);
+  void setModWheelAllChannels(mono_float value);
+  void setPitchWheel(mono_float value, int channel);
+  void setZonedPitchWheel(mono_float value, int from_channel, int to_channel);
+  void disableUnnecessaryModSources();
+  void enableModSource(const std::string& source);
+  void disableModSource(const std::string& source);
+  bool isModSourceEnabled(const std::string& source);
+  const StereoMemory* getEqualizerMemory();
 
-      void setBpm(mono_float bpm);
-      void setAftertouch(mono_float note, mono_float value, int sample, int channel);
-      void setChannelAftertouch(int channel, mono_float value, int sample);
-      void setChannelRangeAftertouch(int from_channel, int to_channel, mono_float value, int sample);
-      void setChannelSlide(int channel, mono_float value, int sample);
-      void setChannelRangeSlide(int from_channel, int to_channel, mono_float value, int sample);
-      Wavetable* getWavetable(int index);
-      Sample* getSample();
-      LineGenerator* getLfoSource(int index);
+  void setBpm(mono_float bpm);
+  void setAftertouch(mono_float note, mono_float value, int sample, int channel);
+  void setChannelAftertouch(int channel, mono_float value, int sample);
+  void setChannelRangeAftertouch(int from_channel, int to_channel, mono_float value, int sample);
+  void setChannelSlide(int channel, mono_float value, int sample);
+  void setChannelRangeSlide(int from_channel, int to_channel, mono_float value, int sample);
+  Wavetable* getWavetable(int index);
+  Sample* getSample();
+  LineGenerator* getLfoSource(int index);
 
-      void sustainOn(int channel);
-      void sustainOff(int sample, int channel);
-      void sostenutoOn(int channel);
-      void sostenutoOff(int sample, int channel);
+  void sustainOn(int channel);
+  void sustainOff(int sample, int channel);
+  void sostenutoOn(int channel);
+  void sostenutoOff(int sample, int channel);
 
-      void sustainOnRange(int from_channel, int to_channel);
-      void sustainOffRange(int sample, int from_channel, int to_channel);
-      void sostenutoOnRange(int from_channel, int to_channel);
-      void sostenutoOffRange(int sample, int from_channel, int to_channel);
-      force_inline int getOversamplingAmount() const { return last_oversampling_amount_; }
+  void sustainOnRange(int from_channel, int to_channel);
+  void sustainOffRange(int sample, int from_channel, int to_channel);
+  void sostenutoOnRange(int from_channel, int to_channel);
+  void sostenutoOffRange(int sample, int from_channel, int to_channel);
+  force_inline int getOversamplingAmount() const { return last_oversampling_amount_; }
 
-      void checkOversampling();
+  void checkOversampling();
+  BlocksVoiceHandler* voice_handler_;
+private:
+  void setOversamplingAmount(int oversampling_amount, int sample_rate);
+  ReorderableEffectChain* effect_chain_;
+  Add* output_total_;
 
-    private:
-      BlocksVoiceHandler* voice_handler_;
-      void setOversamplingAmount(int oversampling_amount, int sample_rate);
-    
-      ReorderableEffectChain* effect_chain_;
-      Add* output_total_;
+  int last_oversampling_amount_;
+  int last_sample_rate_;
+  Value* oversampling_;
+  Value* bps_;
+  Value* legato_;
+  Decimator* decimator_;
+  PeakMeter* peak_meter_;
 
-      int last_oversampling_amount_;
-      int last_sample_rate_;
-      Value* oversampling_;
-      Value* bps_;
-      Value* legato_;
-      Decimator* decimator_;
-      PeakMeter* peak_meter_;
+  CircularQueue<Processor*> modulation_processors_;
 
-      CircularQueue<Processor*> modulation_processors_;
-
-      JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SoundEngine)
-  };
+  JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SoundEngine)
+};
 } // namespace vital
 
