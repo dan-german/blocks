@@ -51,7 +51,7 @@ public:
   void setTitleColour(Colour newColour) { this->titleLabel.setColour(Label::ColourIds::textColourId, newColour); }
   EnvelopePath* getEnvelopePath() { return this->envelopePath.get(); }
 
-  static BlockComponent* create(std::shared_ptr<model::Module> block);
+  static BlockComponent* create(std::shared_ptr<model::Block> block);
   void setConfig(std::shared_ptr<Module> m);
   void animate();
 protected:

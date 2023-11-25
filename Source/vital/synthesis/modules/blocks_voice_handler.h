@@ -32,6 +32,7 @@
 #include "ModuleContainer.h"
 // #include "osc.h"
 #include "vital/synthesis/modules/oscillator_module.h"
+#include "model/module_manager.h"
 
 namespace vital {
 class AudioRateEnvelope;
@@ -78,7 +79,7 @@ public:
     return enabled_modulation_processors_;
   }
 
-  std::shared_ptr<model::Module> AddBlock(std::string type, Index index);
+  std::shared_ptr<model::Block> AddBlock(std::string type, Index index);
   std::shared_ptr<model::Module> GetBlock(Index index);
   std::shared_ptr<model::Module> AddModulator(std::string type);
   std::shared_ptr<model::Module> GetModulator(int index);
@@ -89,7 +90,7 @@ private:
   void createModulators();
   void createVoiceOutput();
   void createFilters(Output* keytrack);
-  std::shared_ptr<SynthModule> createProcessor(std::shared_ptr<model::Module> module);
+  std::shared_ptr<SynthModule> createProcessor(std::shared_ptr<model::Block> module);
   void setupPolyModulationReadouts();
 
   ModulationConnectionBank modulation_bank_;
@@ -132,6 +133,7 @@ private:
   LineMap* mod_wheel_mapping_;
   LineMap* pitch_wheel_mapping_;
   ModuleContainer<model::Module> modules_;
+  model::ModuleManager module_manager_;
 
   cr::Value* stereo_;
   cr::Multiply* note_percentage_;

@@ -786,21 +786,11 @@ void SynthBase::ValueChangedCallback::messageCallback() {
   }
 }
 
-std::shared_ptr<model::Module> SynthBase::AddBlock(std::string type, Index index) {
-  auto block = engine_->AddBlock(type, index);
-  return block;
-}
-
-std::shared_ptr<model::Module> SynthBase::AddModulator(std::string type) {
-  return engine_->AddModulator(type);
-}
-
-std::shared_ptr<model::Module> SynthBase::GetBlock(Index index) {
-  return engine_->GetBlock(index);
-}
-
 void SynthBase::ConnectModulation(int modulatorIndex, std::string targetName, int parameter) { 
   std::string modulator_name = getEngine()->voice_handler_->active_modulators_[0]->name;
+
+  // auto target_module = engine_->GetBlock(parameter);
+
   std::string parameter_name = "osc_1_tune";
   std::cout << "connecting: " << modulator_name << " to " << parameter_name << std::endl;
 

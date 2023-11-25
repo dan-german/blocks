@@ -410,7 +410,6 @@ namespace vital {
       current_phase = utils::maskLoad(current_phase, audio_rate_state_.phase, getResetMask(kNoteTrigger));
 
     poly_float frequency = input(kFrequency)->at(0);
-    std::cout << "frequency: " << frequency[0] << std::endl;
     float tick_time = 1.0f / getSampleRate();
     poly_float delta_offset = frequency * tick_time;
 

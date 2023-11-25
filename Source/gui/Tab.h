@@ -24,7 +24,7 @@ namespace Model {
     int currentColumn = 0;
     bool state;
     UniqueRandom uniqueRandom;
-    Array<int> activeColumns;
+    juce::Array<int> activeColumns;
 
     Tab(Type type, int number);
 
@@ -34,8 +34,8 @@ namespace Model {
     void setLength(int _length) { this->length = _length; }
     void setColumn(int column) { this->column = column; }
 
-    Array<int> getNextColumns(int columnCount);
-    Array<int> getAllColumns();
+    juce::Array<int> getNextColumns(int columnCount);
+    juce::Array<int> getAllColumns();
 
   private:
     int stepColumn(Selection selection);

@@ -89,7 +89,7 @@ private:
 
   void toggleGridItemSelection(GridComponent* grid, GridItemComponent* item, bool selected);
   void showBlocksPopup(Index index);
-  std::shared_ptr<model::Module> addBlock(int code, Index index);
+  std::shared_ptr<model::Block> addBlock(int code, Index index);
   void removeBlock(GridItemComponent* block);
   void removeTab(GridItemComponent* tab);
   std::shared_ptr<model::Module> getFocusedModule();
@@ -114,7 +114,7 @@ private:
   void inspectorGestureChanged(int index, bool started) override;
 
   void dismissPopup(ButtonGridPopup& popup);
-  void spawnBlockComponent(std::shared_ptr<model::Module> block);
+  void spawnBlockComponent(std::shared_ptr<model::Block> block);
   void spawnTabComponent(std::shared_ptr<Tab> tab);
   void graphicsTimerCallback(const float secondsSinceLastUpdate);
   void changeModulePainter(int value);
@@ -186,7 +186,7 @@ struct MainComponent::Delegate {
   virtual std::shared_ptr<model::Module> editorAddedModulator2(Model::Type code) = 0;
   virtual std::shared_ptr<Block> getBlock(Index index) = 0;
   virtual std::shared_ptr<model::Module> getBlock2(Index index) = 0;
-  virtual std::shared_ptr<model::Module> editorAddedBlock2(Model::Type code, Index index) = 0;
+  virtual std::shared_ptr<model::Block> editorAddedBlock2(Model::Type code, Index index) = 0;
   virtual std::shared_ptr<Block> editorAddedBlock(Model::Type code, Index index) = 0;
   virtual Array<int> editorRequestsActiveColumns() = 0;
   virtual Array<std::shared_ptr<Module>> getModulators() = 0;

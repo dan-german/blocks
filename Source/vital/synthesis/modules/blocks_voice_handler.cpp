@@ -65,48 +65,44 @@ BlocksVoiceHandler::BlocksVoiceHandler(Output* beats_per_second):
   }
 
   int module_count = 5;
-  modules_.spawn({ "osc" }, [](std::string type, int number) { return std::make_shared<model::OscillatorModule>(number); });
-  modules_.spawn({ "filter" }, [](std::string type, int number) { return std::make_shared<model::FilterModule>(number); });
-  modules_.spawn({ "lfo" }, [](std::string type, int number) { return std::make_shared<model::LFOModule>(number); });
+  // modules_.spawn({ "osc" }, [](std::string type, int number) { return std::make_shared<model::OscillatorModule>(number); });
+  // modules_.spawn({ "filter" }, [](std::string type, int number) { return std::make_shared<model::FilterModule>(number); });
+  // modules_.spawn({ "lfo" }, [](std::string type, int number) { return std::make_shared<model::LFOModule>(number); });
 }
 
 std::shared_ptr<model::Module> BlocksVoiceHandler::GetBlock(Index index) {
-  for (auto& module : modules_.all) {
-    if (module->index == index) {
-      return module;
-    }
-  }
-  return nullptr;
+  return module_manager_.GetBlock(index);
 }
 
 std::shared_ptr<model::Module> BlocksVoiceHandler::AddModulator(std::string type) {
   std::cout << "adding modulators of type: " << type << std::endl;
-  auto module = modules_.get({ type, -1 });
-  active_modulators_.push_back(module);
+  // auto module = modules_.get({ type, -1 });
+  auto modulator = module_manager_.AddModulator(type, -1, 1);
+  active_modulators_.push_back(modulator);
   if (type == "lfo") {
     auto lfo = lfos_[0];
 
     lfo->control_map_["sync"]->set(0.0f);
     auto cm = lfo->control_map_;
 
-    // module->parameters_[0]->val = lfo->control_map_["tempo"];
-    module->parameters_[0]->val = lfo->control_map_["tempo"];
-    module->parameters_[1]->val = lfo->control_map_["frequency"];
-    module->parameters_[2]->val = lfo->control_map_["sync"]; // sync
-    module->parameters_[3]->val = lfo->control_map_["sync_type"]; // mode
+    modulator->parameters_[0]->val = lfo->control_map_["tempo"];
+    modulator->parameters_[1]->val = lfo->control_map_["frequency"];
+    modulator->parameters_[2]->val = lfo->control_map_["sync"]; // sync
+    modulator->parameters_[3]->val = lfo->control_map_["sync_type"]; // mode
   }
 
-  return module;
+  return modulator;
 }
 
 std::shared_ptr<model::Module> BlocksVoiceHandler::GetModulator(int index) {
   return active_modulators_[index];
 }
 
-std::shared_ptr<model::Module> BlocksVoiceHandler::AddBlock(std::string type, Index index) {
-  auto module = modules_.get({ type, -1 });
-  module->index = index;
-  createProcessor(module);
+std::shared_ptr<model::Block> BlocksVoiceHandler::AddBlock(std::string type, Index index) {
+  // auto module = module_manager_.get({ type, -1 });
+  auto block = module_manager_.AddBlock(type, index);
+  block->index = index;
+  createProcessor(block);
 
   for (int column = 0; column < processor_matrix_.size(); column++) {
     for (int row = 0; row < processor_matrix_[column].size(); row++) {
@@ -133,7 +129,7 @@ std::shared_ptr<model::Module> BlocksVoiceHandler::AddBlock(std::string type, In
     last_node_->plug(current, index.column);
   }
 
-  return module;
+  return block;
 }
 
 void BlocksVoiceHandler::init() {
@@ -238,10 +234,10 @@ void BlocksVoiceHandler::createFilters(Output* keytrack) {
   }
 }
 
-std::shared_ptr<SynthModule> BlocksVoiceHandler::createProcessor(std::shared_ptr<model::Module> module) {
+std::shared_ptr<SynthModule> BlocksVoiceHandler::createProcessor(std::shared_ptr<model::Block> module) {
   auto index = module->index;
-  std::shared_ptr<SynthModule> processor;
   auto name = module->name;
+  std::shared_ptr<SynthModule> processor;
 
   if (module->id.type == "osc") {
     auto osc = oscillators_[0];

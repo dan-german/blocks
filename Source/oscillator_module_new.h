@@ -4,9 +4,9 @@
 using Osc = vital::SynthOscillator;
 
 namespace model {
-class OscillatorModule: public Module {
+class OscillatorModule: public Block {
 public:
-  OscillatorModule(int number): Module("osc", number) {
+  OscillatorModule(int number): Block("osc", number) {
     add({ .name = "transpose", .min = -48.0, .max = 48.0, .audio_rate = true, .reset = true });
     add({ .name = "tune", .min = -1.0, .display_multiply = 100.0, .value_scale = ValueScale::kLinear, .audio_rate = true, .reset = true });
     add({ .name = "unison_voices", .min = 1.0, .max = 16.0, .default_value = 1.0, .value_scale = ValueScale::kIndexed });

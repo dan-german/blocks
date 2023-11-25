@@ -161,7 +161,7 @@ void BlockComponent::setEnvelopePath(Colour colour) {
   envelopePath->colour = colour;
 }
 
-BlockComponent* BlockComponent::create(std::shared_ptr<model::Module> block) {
+BlockComponent* BlockComponent::create(std::shared_ptr<model::Block> block) {
   auto component = new BlockComponent(block->index);
 
   component->setTitle(block->name);

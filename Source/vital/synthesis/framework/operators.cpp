@@ -341,7 +341,6 @@ namespace vital {
     poly_float midi = input(kKeytrackTranspose)->at(0) + input(kKeytrackTune)->at(0) + input(kMidi)->at(0);
     poly_float keytrack_frequency = utils::midiNoteToFrequency(midi);
     poly_float result = utils::maskLoad(tempo_adjusted, input(kFrequency)->at(0), frequency_mask);
-    std::cout << "result: " << result[0]<< std::endl;
     output()->buffer[0] = utils::maskLoad(result, keytrack_frequency, keytrack_mask);
   }
 } // namespace vital

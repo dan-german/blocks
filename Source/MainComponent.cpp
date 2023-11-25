@@ -311,8 +311,8 @@ void MainComponent::showPopupAt(ButtonGridPopup& popup, std::function<void(Index
   popup.present(callbackWrapper);
 }
 
-std::shared_ptr<model::Module> MainComponent::addBlock(int code, Index index) {
-  std::shared_ptr<model::Module> block = nullptr;
+std::shared_ptr<model::Block> MainComponent::addBlock(int code, Index index) {
+  std::shared_ptr<model::Block> block = nullptr;
 
   switch (code) { // the first row's 5 codes are reserved for different wave types in the block selection menu popup
   case 0:
@@ -453,7 +453,7 @@ PopupMenu MainComponent::spawnModulationMenu(Module& victim) {
   return modulateMenu;
 }
 
-void MainComponent::spawnBlockComponent(std::shared_ptr<model::Module> block) {
+void MainComponent::spawnBlockComponent(std::shared_ptr<model::Block> block) {
   auto blockComponent = BlockComponent::create(block);
 
   blocks.add(blockComponent);

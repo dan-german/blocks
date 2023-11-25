@@ -5,9 +5,9 @@
 //   ValueDetails::kLinear, false, " semitones", "Cutoff", nullptr },
 
 namespace model {
-class FilterModule: public Module {
+class FilterModule: public Block {
 public:
-  FilterModule(int number): Module("filter", number) {
+  FilterModule(int number): Block("filter", number) {
     add({ .name = "style", .max = 9.0 });
     add({ .name = "cutoff", .min = 8.0, .max = 136.0, .default_value = 60.0 });
     // add({ .name = "tune", .min = -1.0, .display_multiply = 100.0, .value_scale = ValueScale::kLinear, .audio_rate = true, .reset = true, .input_index = Osc::kTune });

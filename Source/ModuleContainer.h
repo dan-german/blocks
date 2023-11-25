@@ -1,3 +1,4 @@
+#pragma once
 #include <map>
 #include "model/ModelConstants.h"
 
@@ -22,7 +23,7 @@ struct ModuleContainer {
   }
 
   void retire(std::shared_ptr<M> module) {
-    module->reset();
+    // module->reset();
     map[module->id.type].add(module);
 
     // struct Sorter

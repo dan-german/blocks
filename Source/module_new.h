@@ -13,7 +13,7 @@ class Module {
 public:
   ID id;
   std::string name;
-  Index index = { -1, -1 };
+  // Index index = { -1, -1 };
   std::vector<std::shared_ptr<vital::ValueDetails>> parameters_;
   // std::vector<vital::Value*> values_;
 
@@ -29,7 +29,7 @@ public:
   inline bool isEnvelope() { return id.type == "adsr"; }
   inline bool isOscillator() { return id.type == "osc"; }
 
-  Module(std::string prefix, int number): name(prefix + "_" + std::to_string(number)) { 
+  Module(std::string prefix, int number): name(prefix + "_" + std::to_string(number)) {
     id = { prefix, number };
   }
 
@@ -39,4 +39,16 @@ public:
     parameters_.push_back(shared_ptr);
   }
 };
-}
+
+class Block: public Module {
+public:
+  Index index = { -1, -1 };
+  Block(std::string prefix, int number): Module(prefix, number) {
+    // category = Category::source;
+  };
+  // void reset() {
+  //   Module::reset();
+  //   index = { -1, -1 };
+  // };
+};
+} // namespace model

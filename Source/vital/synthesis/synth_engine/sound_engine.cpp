@@ -396,7 +396,7 @@ void SoundEngine::sostenutoOffRange(int sample, int from_channel, int to_channel
   voice_handler_->sostenutoOffRange(sample, from_channel, to_channel);
 }
 
-std::shared_ptr<model::Module> SoundEngine::AddBlock(std::string type, Index index) {
+std::shared_ptr<model::Block> SoundEngine::AddBlock(std::string type, Index index) {
   return voice_handler_->AddBlock(type, index);
 }
 

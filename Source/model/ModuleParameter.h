@@ -30,7 +30,7 @@ namespace Model {
     bool isModulatable;
     float skew = 1.0f;
     String valueSuffix = "";
-    Array<std::shared_ptr<Modulation>> connections;
+    juce::Array<std::shared_ptr<Modulation>> connections;
     std::function<String(double)> textFromValueFunction;
     std::function<double(const String&)> valueFromTextFunction;
     ModuleParameter(RangedAudioParameter* audioParameter,

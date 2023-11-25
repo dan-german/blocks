@@ -247,7 +247,7 @@ void PluginProcessor::editorAdjustedModulator(int parameter, int index, float va
 
 void PluginProcessor::editorAdjustedBlock(Index index, int parameter, float value) {
   DBG("value: " << value);
-  auto block = synth_->GetBlock(index);
+  auto block = synth_->getEngine()->voice_handler_->GetBlock(index);
   auto param = block->parameters_[parameter]->val;
   param->set(value);
   // synth_->GetBlock(index)->parameters_[parameter].val->set(value);
@@ -298,7 +298,7 @@ std::shared_ptr<Block> PluginProcessor::getBlock(Index index) {
 }
 
 std::shared_ptr<model::Module> PluginProcessor::getBlock2(Index index) {
-  return (index.row == -1 || index.column == -1) ? nullptr : synth_->GetBlock(index);
+  return (index.row == -1 || index.column == -1) ? nullptr : synth_->getEngine()->voice_handler_->GetBlock(index);
 }
 
 std::shared_ptr<Tab> PluginProcessor::getTab(int column) {
@@ -357,7 +357,7 @@ std::shared_ptr<Module> PluginProcessor::editorAddedModulator(Model::Type code) 
 }
 
 std::shared_ptr<model::Module> PluginProcessor::editorAddedModulator2(Model::Type code) {
-  return synth_->AddModulator(code);
+  return synth_->getEngine()->voice_handler_->AddModulator(code);
 }
 
 void PluginProcessor::editorRemovedBlock(Index index) {
@@ -369,8 +369,8 @@ std::shared_ptr<Block> PluginProcessor::editorAddedBlock(Model::Type type, Index
   return nullptr;
 }
 
-std::shared_ptr<model::Module> PluginProcessor::editorAddedBlock2(Model::Type type, Index index) {
-  return synth_->AddBlock(type, index);
+std::shared_ptr<model::Block> PluginProcessor::editorAddedBlock2(Model::Type type, Index index) {
+  return synth_->getEngine()->voice_handler_->AddBlock(type, index);
 }
 
 void PluginProcessor::editorRepositionedTab(int oldColumn, int newColumn) {
