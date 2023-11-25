@@ -239,9 +239,12 @@ juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter() {
 }
 
 // MainComponent::Delegate
-void PluginProcessor::editorAdjustedModulator(int parameter, int modulator, float value) {
-  // moduleManager.getModulator(modulator)->parameter(parameter)->setValue(value);
+void PluginProcessor::editorAdjustedModulator(int parameter, int index, float value) {
+  std::cout << "adjusting modulator index; " << index << " param: " << parameter << " val: " << value << std::endl;
+  auto modulator = synth_->getEngine()->voice_handler_->GetModulator(index);
+  modulator->parameters_[parameter]->val->set(value);
 }
+
 void PluginProcessor::editorAdjustedBlock(Index index, int parameter, float value) {
   DBG("value: " << value);
   auto block = synth_->GetBlock(index);
@@ -290,7 +293,9 @@ std::vector<std::shared_ptr<model::Modulation>> PluginProcessor::getModulations2
   return modulations;
 }
 
-std::shared_ptr<Block> PluginProcessor::getBlock(Index index) {}
+std::shared_ptr<Block> PluginProcessor::getBlock(Index index) {
+
+}
 
 std::shared_ptr<model::Module> PluginProcessor::getBlock2(Index index) {
   return (index.row == -1 || index.column == -1) ? nullptr : synth_->GetBlock(index);
@@ -314,6 +319,7 @@ void PluginProcessor::editorRepositionedBlock(Index oldIndex, Index newIndex) {
 }
 
 void PluginProcessor::editorConnectedModulation(int modulatorIndex, String targetName, int parameter) {
+  synth_->ConnectModulation(modulatorIndex, targetName.toStdString(), parameter);
   // Analytics::shared()->countAction("Modulation Connected");
   // connect(modulatorIndex, targetName, parameter);
 }
@@ -364,7 +370,6 @@ std::shared_ptr<Block> PluginProcessor::editorAddedBlock(Model::Type type, Index
 }
 
 std::shared_ptr<model::Module> PluginProcessor::editorAddedBlock2(Model::Type type, Index index) {
-
   return synth_->AddBlock(type, index);
 }
 

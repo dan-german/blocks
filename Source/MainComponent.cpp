@@ -25,6 +25,12 @@ MainComponent::MainComponent(juce::MidiKeyboardState& keyboard_state, Delegate* 
 
   noteLogger.listener = this;
   ThemeManager::shared()->set(UserSettings::shared()->getInt("theme", 0));
+  //
+  auto block = addBlock(0, { 0, 0 });
+  spawnBlockComponent(block);
+
+  addModulator(Model::Types::lfo);
+  delegate->editorConnectedModulation(0, "osc", 0);
 }
 
 void MainComponent::updateDotPosition(const Point<int> position) {
@@ -32,11 +38,11 @@ void MainComponent::updateDotPosition(const Point<int> position) {
 }
 
 void MainComponent::modulatorStartedAdjusting(ModulatorComponent* modulatorComponent, int index) {
-  delegate->editorParameterGestureChanged(delegate->getModulator(modulatorComponent->row)->name, index, true);
+  // delegate->editorParameterGestureChanged(delegate->getModulator(modulatorComponent->row)->name, index, true);
 }
 
 void MainComponent::modulatorEndedAdjusting(ModulatorComponent* modulatorComponent, int index) {
-  delegate->editorParameterGestureChanged(delegate->getModulator(modulatorComponent->row)->name, index, false);
+  // delegate->editorParameterGestureChanged(delegate->getModulator(modulatorComponent->row)->name, index, false);
 }
 
 void MainComponent::modulatorIsAdjusting(ModulatorComponent* component, int parameter, float value) {
@@ -629,23 +635,23 @@ void MainComponent::modulatorIsDragging(ModulatorComponent* modulatorComponent, 
 
     auto victim = getFocusedModule();
 
-    if (victim->parameters[sliderIndexUnderMouse]->isModulatable) {
+    // if (victim->parameters[sliderIndexUnderMouse]->isModulatable) {
       auto slider = inspector.getSliders()[sliderIndexUnderMouse];
       slider->setHighlighted(true, modulatorComponent->getColour());
-    }
-  } else {
-    if (previousSliderUnderMouse.has_value()) {
-      inspector.getSliders()[*previousSliderUnderMouse]->setHighlighted(false);
-      previousSliderUnderMouse = {};
-    }
+    // }
+  // } else {
+    // if (previousSliderUnderMouse.has_value()) {
+    //   inspector.getSliders()[*previousSliderUnderMouse]->setHighlighted(false);
+    //   previousSliderUnderMouse = {};
+    // }
   }
 }
 
-std::shared_ptr<Module> MainComponent::getFocusedModule() {
-  if (focusedGridItem->grid == &blockGrid)
-    return delegate->getBlock(focusedGridItem->index);
-  else
-    return delegate->getTab(focusedGridItem->index.column);
+std::shared_ptr<model::Module> MainComponent::getFocusedModule() {
+  // if (focusedGridItem->grid == &blockGrid)
+    return delegate->getBlock2(focusedGridItem->index);
+  // else
+  //   return delegate->getTab(focusedGridItem->index.column);
 }
 
 void MainComponent::modulatorEndedDrag(ModulatorComponent* modulatorComponent, const MouseEvent& event) {
@@ -669,17 +675,17 @@ void MainComponent::modulatorEndedDrag(ModulatorComponent* modulatorComponent, c
     auto focusedModule = getFocusedModule();
     if (focusedModule == nullptr) return;
 
-    auto isModulatable = focusedModule->parameters[parameterIndex]->isModulatable;
-    if (!isModulatable) return;
+    // auto isModulatable = focusedModule->parameters[parameterIndex]->isModulatable;
+    // if (!isModulatable) return;
 
     delegate->editorConnectedModulation(modulatorComponent->row, focusedModule->name, parameterIndex);
-    uiLayer.setModulations(delegate->getModulations());
+    // uiLayer.setModulations(delegate->getModulations());
     refreshInspector();
 
-    auto modulator = delegate->getModulator(modulatorIndex);
+    // auto modulator = delegate->getModulator(modulatorIndex);
     auto focusedBlock = blockMatrix[focusedGridItem->index.row][focusedGridItem->index.column];
 
-    focusedBlock->setConfig(focusedModule);
+    // focusedBlock->setConfig(focusedModule);
   }
 }
 

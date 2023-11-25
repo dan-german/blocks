@@ -3,7 +3,7 @@
 #include "model/id.h"
 #include "gui/ModuleColour.h"
 #include "model/Index.h"
-#include "vital/synthesis/framework/value.h"
+// #include "vital/synthesis/framework/value.h"
 
 using ValueScale = vital::ValueDetails::ValueScale;
 using Type = vital::ValueDetails::Type;

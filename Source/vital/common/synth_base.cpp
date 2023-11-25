@@ -25,6 +25,7 @@
 #include "vital/common/synth_gui_interface.h"
 #include "vital/common/synth_parameters.h"
 #include "vital/synthesis/framework/utils.h"
+#include "vital/synthesis/modules/blocks_voice_handler.h"
 
 SynthBase::SynthBase(): expired_(false) {
   expired_ = LoadSave::isExpired();
@@ -185,9 +186,9 @@ bool SynthBase::connectModulation(const std::string& source, const std::string& 
   if (create)
     connection = getModulationBank().createConnection(source, destination);
 
-  if (connection)
+  if (connection) {
     connectModulation(connection);
-
+  }
 
   connection->modulation_processor->lineMapGenerator()->initLinear();
   // initModulationValues(source, destination);
@@ -787,9 +788,6 @@ void SynthBase::ValueChangedCallback::messageCallback() {
 
 std::shared_ptr<model::Module> SynthBase::AddBlock(std::string type, Index index) {
   auto block = engine_->AddBlock(type, index);
-  // connectModulation("lfo_1", "osc_1_tune");
-  // auto controls = getControls();
-  // getControls()["modulation_1_amount"]->set(1.0f);
   return block;
 }
 
@@ -799,4 +797,15 @@ std::shared_ptr<model::Module> SynthBase::AddModulator(std::string type) {
 
 std::shared_ptr<model::Module> SynthBase::GetBlock(Index index) {
   return engine_->GetBlock(index);
+}
+
+void SynthBase::ConnectModulation(int modulatorIndex, std::string targetName, int parameter) { 
+  std::string modulator_name = getEngine()->voice_handler_->active_modulators_[0]->name;
+  std::string parameter_name = "osc_1_tune";
+  std::cout << "connecting: " << modulator_name << " to " << parameter_name << std::endl;
+
+  auto num_mods = engine_->voice_handler_->active_modulators_.size();
+  auto connection_name = "modulation_" + std::to_string(num_mods) + "_amount";
+  getControls()[connection_name]->set(1.0f);
+  connectModulation(modulator_name, parameter_name);
 }

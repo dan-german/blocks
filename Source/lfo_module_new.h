@@ -8,7 +8,12 @@ namespace model {
 class LFOModule: public Module {
 public:
   LFOModule(int number): Module("lfo", number) {
+    // enum Parameters { pWaveform, pSynced, pRate, pMode };
+    // add({ .name = "wave", .min = -7.0, .max = 9.0 });
+    add({ .name = "tempo", .min = -7.0, .max = 12.0 });
     add({ .name = "frequency", .min = -7.0, .max = 9.0 });
+    add({ .name = "sync", .min = 0.0, .max = 4.0 });
+    add({ .name = "mode", .min = 0.0, .max = 5.0 });
   }
 };
 }

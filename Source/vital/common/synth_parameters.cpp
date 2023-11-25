@@ -376,7 +376,7 @@ namespace vital {
       ValueDetails::kIndexed, false, "", "Sync Type", strings::kSyncNames },
     { "frequency", 0x000000, -7.0, 9.0, 1.0, 0.0, 1.0,
       ValueDetails::kExponential, true, " secs", "Frequency", nullptr },
-    { "sync", 0x000000, 0.0, SynthLfo::kNumSyncOptions - 1, 1.0, 0.0, 1.0,
+    { "sync", 0x000000, 0.0, SynthLfo::kNumSyncOptions - 1, 0.0, 0.0, 0.0,
       ValueDetails::kIndexed, false, "", "Sync", strings::kFrequencySyncNames },
     { "tempo", 0x000000, 0.0, 12.0, 7.0, 0.0, 1.0,
       ValueDetails::kIndexed, false, "", "Tempo", strings::kSyncedFrequencyNames },

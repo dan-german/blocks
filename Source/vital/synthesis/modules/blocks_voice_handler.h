@@ -79,8 +79,9 @@ public:
   }
 
   std::shared_ptr<model::Module> AddBlock(std::string type, Index index);
-  std::shared_ptr<model::Module> AddModulator(std::string type);
   std::shared_ptr<model::Module> GetBlock(Index index);
+  std::shared_ptr<model::Module> AddModulator(std::string type);
+  std::shared_ptr<model::Module> GetModulator(int index);
   std::vector<std::shared_ptr<model::Module>> active_modulators_;
 private:
   void createNoteArticulation();

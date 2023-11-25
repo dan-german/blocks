@@ -13,16 +13,14 @@
 #include <memory>
 #include "module_new.h"
 #include <juce_audio_processors/juce_audio_processors.h>
-// #include <juce_audio_processors/juce_audio_processors.h>
-
-// using namespace juce;
+#include "vital/common/synth_parameters.h"
 
 namespace model {
-  // class Module;
   struct Modulation {
     Modulation(Module* target, Module* modulator, int parameterIndex, float magnitude, int number, bool bipolar = false);
     Modulation(int number);
     ~Modulation();
+    std::shared_ptr<vital::ValueDetails> magnitude_parameter_;
 
     // std::shared_ptr<RangedAudioParameter> magnitudeParameter;
     // std::shared_ptr<RangedAudioParameter> bipolarParameter;

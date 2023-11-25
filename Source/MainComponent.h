@@ -92,7 +92,7 @@ private:
   std::shared_ptr<model::Module> addBlock(int code, Index index);
   void removeBlock(GridItemComponent* block);
   void removeTab(GridItemComponent* tab);
-  std::shared_ptr<Module> getFocusedModule();
+  std::shared_ptr<model::Module> getFocusedModule();
 
   // Grid Listener
   void clickedOnGrid(GridComponent* grid, Index index) override;

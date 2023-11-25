@@ -34,11 +34,11 @@ namespace Model {
 
     inline const Type noteTab = "note";
 
-    inline const Array<Type> all = { osc, lfo, adsr, filter, reverb, delay, drive, mixer };
+    inline const juce::Array<Type> all = { osc, lfo, adsr, filter, reverb, delay, drive, mixer };
 
-    inline const Array<Type> modulators = { lfo, adsr };
-    inline const Array<Type> blocks = { osc, filter, reverb, delay, drive, mixer };
-    inline const Array<Type> tabs = { noteTab };
+    inline const juce::Array<Type> modulators = { lfo, adsr };
+    inline const juce::Array<Type> blocks = { osc, filter, reverb, delay, drive, mixer };
+    inline const juce::Array<Type> tabs = { noteTab };
   }
 
   class ModuleParameter;
@@ -50,7 +50,7 @@ namespace Model {
     ID id;
     String name;
     std::map<String, std::shared_ptr<ModuleParameter>> parameterMap; // relevant only for automation? 
-    Array<std::shared_ptr<ModuleParameter>> parameters;
+    juce::Array<std::shared_ptr<ModuleParameter>> parameters;
     ModuleColour colour = { Colour(237, 237, 237), -1 };
     bool isActive = false;
     bool isChild = false;

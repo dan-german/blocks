@@ -253,6 +253,7 @@ Output* SynthModule::createTempoSyncSwitch(std::string name, Processor* frequenc
 
   cr::Value* sync = new cr::Value(1.0f);
   data_->controls[name + "_sync"] = sync;
+  control_map_["sync"] = sync;
   addIdleProcessor(sync);
 
   TempoChooser* tempo_chooser = new TempoChooser();

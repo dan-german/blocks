@@ -85,9 +85,22 @@ std::shared_ptr<model::Module> BlocksVoiceHandler::AddModulator(std::string type
   active_modulators_.push_back(module);
   if (type == "lfo") {
     auto lfo = lfos_[0];
-    module->parameters_[0]->val = lfo->control_map_["frequency"];
+
+    lfo->control_map_["sync"]->set(0.0f);
+    auto cm = lfo->control_map_;
+
+    // module->parameters_[0]->val = lfo->control_map_["tempo"];
+    module->parameters_[0]->val = lfo->control_map_["tempo"];
+    module->parameters_[1]->val = lfo->control_map_["frequency"];
+    module->parameters_[2]->val = lfo->control_map_["sync"]; // sync
+    module->parameters_[3]->val = lfo->control_map_["sync_type"]; // mode
   }
+
   return module;
+}
+
+std::shared_ptr<model::Module> BlocksVoiceHandler::GetModulator(int index) {
+  return active_modulators_[index];
 }
 
 std::shared_ptr<model::Module> BlocksVoiceHandler::AddBlock(std::string type, Index index) {
@@ -156,6 +169,7 @@ void BlocksVoiceHandler::init() {
     std::string amount_name = "modulation_" + number + "_amount";
     Output* modulation_amount = createPolyModControl(amount_name);
     processor->plug(modulation_amount, ModulationConnectionProcessor::kModulationAmount);
+
     processor->initializeBaseValue(data_->controls[amount_name]);
 
     Output* modulation_power = createPolyModControl("modulation_" + number + "_power");
@@ -167,7 +181,7 @@ void BlocksVoiceHandler::init() {
   }
 
   VoiceHandler::init();
-
+  // control_map_["amount"]->set(1.0f);
   setupPolyModulationReadouts();
 
   for (int i = 0; i < kNumMacros; ++i) {

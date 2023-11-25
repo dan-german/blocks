@@ -45,16 +45,17 @@ void ModulatorsListModel::setupModulatorComponent(model::Module& model, Modulato
     auto slider = component.sliders[i];
     // auto audioParameter = parameter->audioParameter;
 
+    slider->boxSlider.slider.setRange(parameter->min, parameter->max);
     // slider->boxSlider.slider.setRange(audioParameter->getNormalisableRange().start,
     //   audioParameter->getNormalisableRange().end,
-    //   audioParameter->getNormalisableRange().interval);
+      // audioParameter->getNormalisableRange().interval);
 
-    // auto value = audioParameter->getNormalisableRange().convertFrom0to1(audioParameter->getValue());
+    auto value = parameter->val->value();
     // slider->boxSlider.slider.setTextValueSuffix(parameter->valueSuffix);
     // slider->boxSlider.choices = parameter->audioParameter->getAllValueStrings();
     // slider->boxSlider.slider.setSkewFactor(parameter->skew, false);
 
-    // slider->label.setText(parameter->id, dontSendNotification);
+    slider->label.setText(parameter->name, dontSendNotification);
 
     // if (dynamic_cast<AudioParameterFloat*>(audioParameter))
     //   slider->boxSlider.slider.setNumDecimalPlacesToDisplay(2);
@@ -72,7 +73,7 @@ void ModulatorsListModel::setupModulatorComponent(model::Module& model, Modulato
     //   slider->boxSlider.slider.textFromValueFunction = {};
     // }
 
-    // slider->boxSlider.slider.setValue(value, dontSendNotification);
+    slider->boxSlider.slider.setValue(value, dontSendNotification);
     // slider->boxSlider.slider.getTextFromValue(value);
     // slider->boxSlider.valueLabel.setText(slider->boxSlider.slider.getTextFromValue(value), dontSendNotification);
   }
