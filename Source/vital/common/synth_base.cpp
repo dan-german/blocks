@@ -167,8 +167,6 @@ bool SynthBase::isInvalidConnection(const vital::modulation_change& change) {
 }
 
 void SynthBase::connectModulation(vital::ModulationConnection* connection) {
-  DBG("source" << connection->source_name);
-  DBG("target" << connection->destination_name);
   vital::modulation_change change = createModulationChange(connection);
   if (isInvalidConnection(change)) {
     connection->destination_name = "";
@@ -183,8 +181,7 @@ void SynthBase::connectModulation(vital::ModulationConnection* connection) {
 bool SynthBase::connectModulation(const std::string& source, const std::string& destination) {
   vital::ModulationConnection* connection = getConnection(source, destination);
   bool create = connection == nullptr;
-  if (create)
-    connection = getModulationBank().createConnection(source, destination);
+  if (create) connection = getModulationBank().createConnection(source, destination);
 
   if (connection) {
     connectModulation(connection);
@@ -786,16 +783,32 @@ void SynthBase::ValueChangedCallback::messageCallback() {
   }
 }
 
-void SynthBase::ConnectModulation(int modulatorIndex, std::string targetName, int parameter) { 
-  std::string modulator_name = getEngine()->voice_handler_->active_modulators_[0]->name;
-
-  // auto target_module = engine_->GetBlock(parameter);
-
-  std::string parameter_name = "osc_1_tune";
-  std::cout << "connecting: " << modulator_name << " to " << parameter_name << std::endl;
-
-  auto num_mods = engine_->voice_handler_->active_modulators_.size();
-  auto connection_name = "modulation_" + std::to_string(num_mods) + "_amount";
+void SynthBase::connectModulation(int modulator_index, std::string target_name, std::string parameter_name) {
+  std::cout << "mod index: " << modulator_index << " param name: " << parameter_name << std::endl;
+  auto target = module_manager_.getModule(target_name);
+  auto source = module_manager_.getModulator(modulator_index);
+  auto connection = module_manager_.addConnection(source, target, parameter_name); 
+  std::cout << "connection: " << connection->id << std::endl;
+  auto connection_name = "modulation_" + std::to_string(connection->number) + "_amount";
   getControls()[connection_name]->set(1.0f);
-  connectModulation(modulator_name, parameter_name);
+
+  std::string composed_parameter_name = target->name + "_" + parameter_name; // maybe make this a Module method 
+  std::string modulator_name = getModuleManager().getModulator(modulator_index)->name;
+  connectModulation(modulator_name, composed_parameter_name);
 }
+
+vital::BlocksVoiceHandler* SynthBase::getVoiceHandler() {
+  return getEngine()->voice_handler_;
+}
+
+std::shared_ptr<model::Block> SynthBase::addBlock(std::string type, Index index) { 
+  auto block = module_manager_.addBlock(type, index);
+  getVoiceHandler()->addBlock(block);
+  return block;
+}
+
+std::shared_ptr<model::Module> SynthBase::addModulator(Model::Type type, int number, int colour_id) {
+  auto modulator = module_manager_.addModulator(type, number, colour_id);
+  getVoiceHandler()->addModulator(modulator); 
+  return modulator;
+} 

@@ -25,7 +25,7 @@ public:
 
   MouseListener* mouseListener = nullptr;
   Colour colour;
-  PlusComponent addButton;
+  PlusComponent add_button_;
   std::optional<Index> previousPlaceholderIndex;
   Path path;
   int currentPlaceholderLength = 1;

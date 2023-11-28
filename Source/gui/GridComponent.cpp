@@ -23,7 +23,7 @@ GridComponent::GridComponent(Config config) {
       itemMatrix[row].push_back(nullptr);
   }
 
-  addAndMakeVisible(addButton);
+  addAndMakeVisible(add_button_);
 
   setInterceptsMouseClicks(true, true);
 }
@@ -88,12 +88,12 @@ void GridComponent::showAddButton(Index index) {
   int size = 10;
   int x = point.getX() + moduleBounds.getWidth() / 2 - size / 2;
   int y = point.getY() + moduleBounds.getHeight() / 2 - size / 2;
-  addButton.setBounds(x, y, size, size);
-  addButton.setAlpha(1);
+  add_button_.setBounds(x, y, size, size);
+  add_button_.setAlpha(1);
 }
 
 void GridComponent::mouseExit(const MouseEvent& event) {
-  addButton.setAlpha(0);
+  add_button_.setAlpha(0);
   previousIndexUnderMouse = { -1, -1 };
 }
 

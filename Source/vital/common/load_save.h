@@ -32,8 +32,8 @@ using MemoryOutputStream = juce::MemoryOutputStream;
 using ScopedLock = juce::ScopedLock;
 using Time = juce::Time;
 
-template<typename T>
-using Array = juce::Array<T>;
+// template<typename T>
+// using Array = juce::Array<T>;
 
 
 namespace vital {

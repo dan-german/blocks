@@ -46,10 +46,6 @@ public:
   SoundEngine();
   virtual ~SoundEngine();
 
-  std::shared_ptr<model::Module> AddModulator(std::string type);
-  std::shared_ptr<model::Block> AddBlock(std::string type, Index index);
-  std::shared_ptr<model::Module> GetBlock(Index index);
-
   void init() override;
   void process(int num_samples) override;
   void correctToTime(double seconds) override;

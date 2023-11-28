@@ -15,6 +15,7 @@ public:
   std::string name;
   // Index index = { -1, -1 };
   std::vector<std::shared_ptr<vital::ValueDetails>> parameters_;
+  std::map<std::string, std::shared_ptr<vital::ValueDetails>> parameter_map_;
   // std::vector<vital::Value*> values_;
 
   enum Category { source, effect, modulator, tab };
@@ -37,6 +38,7 @@ public:
     parameter.name = name + "_" + parameter.name;
     auto shared_ptr = std::make_shared<vital::ValueDetails>(parameter);
     parameters_.push_back(shared_ptr);
+    parameter_map_[parameter.name] = shared_ptr;
   }
 };
 

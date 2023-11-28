@@ -30,8 +30,7 @@ namespace model {
     std::string name;
     std::shared_ptr<Module> source;
     std::shared_ptr<Module> target;
-    std::string parameterID;
-    int parameterIndex;
+    std::string parameter_name_;
 
     // float getMagnitude() { return magnitudeParameter->getNormalisableRange().convertFrom0to1(magnitudeParameter->getValue()); }
     // float getBipolar() { return bipolarParameter->getNormalisableRange().convertFrom0to1(bipolarParameter->getValue()); }

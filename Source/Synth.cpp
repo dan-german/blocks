@@ -21,9 +21,10 @@ void Synth::editorRepositionedBlock(Index oldIndex, Index newIndex) {
   repositionProcessor(oldIndex, newIndex);
 }
 
-void Synth::editorConnectedModulation(int modulatorIndex, String targetName, int parameter) {
+void Synth::editorConnectedModulation(int modulatorIndex, std::string targetName, std::string parameter) {
+
   Analytics::shared()->countAction("Modulation Connected");
-  connect(modulatorIndex, targetName, parameter);
+  // connect(modulatorIndex, targetName, parameter);
 }
 
 void Synth::editorDisconnectedModulation(int index) {

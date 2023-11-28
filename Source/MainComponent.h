@@ -52,8 +52,8 @@ protected:
 private:
   DarkBackground darkBackground;
   DarkBackground gridDarkBackground;
-  BlockGridComponent blockGrid;
-  TabContainerComponent tabGrid;
+  BlockGridComponent block_grid_;
+  TabContainerComponent tab_grid_;
   InspectorComponent inspector;
   int presetIndex = 0;
   StringArray presetNames;
@@ -61,16 +61,16 @@ private:
   GraphicsTimer timer;
 
   Array<BlockComponent*> blocks;
-  GridItemComponent* focusedGridItem = nullptr;
+  GridItemComponent* focused_grid_item_ = nullptr;
   Point<int> currentMousePosition;
 
-  BlockComponent* blockMatrix[Constants::rows][Constants::columns];
+  BlockComponent* block_matrix_[Constants::rows][Constants::columns];
   Cursor cursor;
   std::optional<int> previousSliderUnderMouse = {};
   BlockPlaceholder blockPlaceholder;
   bool isBlocksMenuVisible = false;
   bool modulatorDragMode = false;
-  ButtonGridPopup blocksPopup;
+  ButtonGridPopup blocks_popup_;
   ButtonGridPopup modulatorsPopup;
   ButtonGridPopup presetsPopup;
   NoteLogger noteLogger;
@@ -79,7 +79,7 @@ private:
   void clear();
   void resizeGrid();
   void resizeTabContainer();
-  void resizeInspector();
+  void ResizeInspector();
   void clickOnModulatorsPopup(Index index);
   void loadPreset(int index);
   void setupPopupMenus();
@@ -88,7 +88,7 @@ private:
   void ResetDownFlowingDots();
 
   void toggleGridItemSelection(GridComponent* grid, GridItemComponent* item, bool selected);
-  void showBlocksPopup(Index index);
+  void ShowBlocksPopup(Index index);
   std::shared_ptr<model::Block> addBlock(int code, Index index);
   void removeBlock(GridItemComponent* block);
   void removeTab(GridItemComponent* tab);
@@ -113,7 +113,7 @@ private:
   void inspectorChangedParameter(int sliderIndex, float value) override;
   void inspectorGestureChanged(int index, bool started) override;
 
-  void dismissPopup(ButtonGridPopup& popup);
+  void DismissPopup(ButtonGridPopup& popup);
   void spawnBlockComponent(std::shared_ptr<model::Block> block);
   void spawnTabComponent(std::shared_ptr<Tab> tab);
   void graphicsTimerCallback(const float secondsSinceLastUpdate);
@@ -163,7 +163,7 @@ struct MainComponent::Delegate {
   virtual void editorAdjustedBlock(Index moduleIndex, int parameterIndex, float value) = 0;
   virtual void editorAdjustedTab(int column, int parameterIndex, float value) = 0;
   virtual void editorAdjustedModulator(int modulatorIndex, int parameterIndex, float value) = 0;
-  virtual void editorConnectedModulation(int modulatorIndex, String targetName, int parameterIndex) = 0;
+  virtual void editorConnectedModulation(int modulator_index, std::string target_name, std::string parameter) = 0;
 
   virtual void editorChangedModulationMagnitude(int modulationConnectionIndex, float magnitude) = 0;
   virtual void editorChangedModulationPolarity(int index, bool bipolar) = 0;

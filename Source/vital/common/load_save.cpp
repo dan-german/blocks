@@ -1767,7 +1767,7 @@ std::vector<File> LoadSave::getDirectories(const String& folder_name) {
   if (!data_dir.exists() || !data_dir.isDirectory())
     return directories;
 
-  Array<File> sub_folders;
+  juce::Array<File> sub_folders;
   sub_folders.add(data_dir);
   data_dir.findChildFiles(sub_folders, File::findDirectories, false);
   for (const File& sub_folder : sub_folders) {
@@ -1841,7 +1841,7 @@ File LoadSave::getUserLfoDirectory() {
   return directory;
 }
 
-void LoadSave::getAllFilesOfTypeInDirectories(Array<File>& files, const String& extensions,
+void LoadSave::getAllFilesOfTypeInDirectories(juce::Array<File>& files, const String& extensions,
                                               const std::vector<File>& directories) {
   files.clear();
   for (const File& directory : directories) {
@@ -1850,27 +1850,27 @@ void LoadSave::getAllFilesOfTypeInDirectories(Array<File>& files, const String& 
   }
 }
 
-void LoadSave::getAllPresets(Array<File>& presets) {
+void LoadSave::getAllPresets(juce::Array<File>& presets) {
   getAllFilesOfTypeInDirectories(presets, String("*.") + vital::kPresetExtension, getPresetDirectories());
 }
 
-void LoadSave::getAllWavetables(Array<File>& wavetables) {
+void LoadSave::getAllWavetables(juce::Array<File>& wavetables) {
   getAllFilesOfTypeInDirectories(wavetables, vital::kWavetableExtensionsList, getWavetableDirectories());
 }
 
-void LoadSave::getAllSkins(Array<File>& skins) {
+void LoadSave::getAllSkins(juce::Array<File>& skins) {
   getAllFilesOfTypeInDirectories(skins, String("*.") + vital::kSkinExtension, getSkinDirectories());
 }
 
-void LoadSave::getAllLfos(Array<File>& lfos) {
+void LoadSave::getAllLfos(juce::Array<File>& lfos) {
   getAllFilesOfTypeInDirectories(lfos, String("*.") + vital::kLfoExtension, getLfoDirectories());
 }
 
-void LoadSave::getAllSamples(Array<File>& samples) {
+void LoadSave::getAllSamples(juce::Array<File>& samples) {
   getAllFilesOfTypeInDirectories(samples, "*.wav", getSampleDirectories());
 }
 
-void LoadSave::getAllUserPresets(Array<File>& presets) {
+void LoadSave::getAllUserPresets(juce::Array<File>& presets) {
   std::vector<File> directories = {
     getDataDirectory().getChildFile(kPresetFolderName),
     getUserPresetDirectory()
@@ -1878,7 +1878,7 @@ void LoadSave::getAllUserPresets(Array<File>& presets) {
   getAllFilesOfTypeInDirectories(presets, String("*.") + vital::kPresetExtension, directories);
 }
 
-void LoadSave::getAllUserWavetables(Array<File>& wavetables) {
+void LoadSave::getAllUserWavetables(juce::Array<File>& wavetables) {
   std::vector<File> directories = {
     getDataDirectory().getChildFile(kWavetableFolderName),
     getUserWavetableDirectory()
@@ -1886,7 +1886,7 @@ void LoadSave::getAllUserWavetables(Array<File>& wavetables) {
   getAllFilesOfTypeInDirectories(wavetables, vital::kWavetableExtensionsList, directories);
 }
 
-void LoadSave::getAllUserLfos(Array<File>& lfos) {
+void LoadSave::getAllUserLfos(juce::Array<File>& lfos) {
   std::vector<File> directories = {
     getDataDirectory().getChildFile(kLfoFolderName),
     getUserLfoDirectory()
@@ -1894,7 +1894,7 @@ void LoadSave::getAllUserLfos(Array<File>& lfos) {
   getAllFilesOfTypeInDirectories(lfos, String("*.") + vital::kLfoExtension, directories);
 }
 
-void LoadSave::getAllUserSamples(Array<File>& samples) {
+void LoadSave::getAllUserSamples(juce::Array<File>& samples) {
   std::vector<File> directories = {
     getDataDirectory().getChildFile(kSampleFolderName),
     getUserSampleDirectory()
@@ -1945,7 +1945,7 @@ File LoadSave::getShiftedFile(const String directory_name, const String& extensi
   for (const std::string& path : additional)
     directories.push_back(File(path));
 
-  Array<File> all_files;
+  juce::Array<File> all_files;
   getAllFilesOfTypeInDirectories(all_files, extensions, directories);
   if (all_files.isEmpty())
     return File();

@@ -30,7 +30,7 @@
 #include "model/Index.h"
 #include <vector>
 #include "ModuleContainer.h"
-// #include "osc.h"
+ // #include "osc.h"
 #include "vital/synthesis/modules/oscillator_module.h"
 #include "model/module_manager.h"
 
@@ -79,10 +79,9 @@ public:
     return enabled_modulation_processors_;
   }
 
-  std::shared_ptr<model::Block> AddBlock(std::string type, Index index);
-  std::shared_ptr<model::Module> GetBlock(Index index);
-  std::shared_ptr<model::Module> AddModulator(std::string type);
-  std::shared_ptr<model::Module> GetModulator(int index);
+  void addBlock(std::shared_ptr<model::Block> block);
+  void addModulator(std::shared_ptr<model::Module> module);
+
   std::vector<std::shared_ptr<model::Module>> active_modulators_;
 private:
   void createNoteArticulation();
@@ -110,12 +109,11 @@ private:
   std::vector<std::vector<std::shared_ptr<Processor>>> processor_matrix_;
   std::vector<std::shared_ptr<OscillatorModule>> oscillators_;
   std::vector<std::shared_ptr<LfoModule>> lfos_;
+  std::vector<std::shared_ptr<EnvelopeModule>> envelopes_;
   std::vector<FilterModule*> filters_;
 
   FiltersModule* filters_module_;
 
-  // LfoModule* lfos_[kNumLfos];
-  EnvelopeModule* envelopes_[kNumEnvelopes];
   ChorusModule* reverb_;
 
   Output note_retriggered_;
@@ -133,7 +131,6 @@ private:
   LineMap* mod_wheel_mapping_;
   LineMap* pitch_wheel_mapping_;
   ModuleContainer<model::Module> modules_;
-  model::ModuleManager module_manager_;
 
   cr::Value* stereo_;
   cr::Multiply* note_percentage_;

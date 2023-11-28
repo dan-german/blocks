@@ -29,6 +29,8 @@
 #include "vital/common/wavetable/wavetable_creator.h"
 #include "model/Index.h"
 #include "module_new.h"
+#include "vital/synthesis/modules/blocks_voice_handler.h"
+#include "model/module_manager.h"
 
 #include <set>
 #include <string>
@@ -61,7 +63,7 @@ public:
   SynthBase();
   virtual ~SynthBase();
 
-  void ConnectModulation(int modulatorIndex, std::string targetName, int parameter);
+  void connectModulation(int modulatorIndex, std::string targetName, std::string parameter);
 
   void valueChanged(const std::string& name, vital::mono_float value);
   void valueChangedThroughMidi(const std::string& name, vital::mono_float value) override;
@@ -85,6 +87,9 @@ public:
   std::vector<vital::ModulationConnection*> getSourceConnections(const std::string& source);
   bool isSourceConnected(const std::string& source);
   std::vector<vital::ModulationConnection*> getDestinationConnections(const std::string& destination);
+
+  std::shared_ptr<model::Block> addBlock(std::string type, Index index);
+  std::shared_ptr<model::Module> addModulator(Model::Type tpye, int number = -1, int colour_id = -1);
 
   const vital::StatusOutput* getStatusOutput(const std::string& name);
 
@@ -126,8 +131,11 @@ public:
   String getPresetName();
   String getMacroName(int index);
 
+  model::ModuleManager getModuleManager() { return module_manager_; }
+
   vital::control_map& getControls() { return controls_; }
   vital::SoundEngine* getEngine() { return engine_.get(); }
+  vital::BlocksVoiceHandler* getVoiceHandler();
   MidiKeyboardState* getKeyboardState() { return keyboard_state_.get(); }
   const vital::poly_float* getOscilloscopeMemory() { return oscilloscope_memory_; }
   const vital::StereoMemory* getAudioMemory() { return audio_memory_.get(); }
@@ -195,6 +203,8 @@ protected:
   vital::mono_float memory_input_offset_;
   int memory_index_;
   bool expired_;
+
+  model::ModuleManager module_manager_;
 
   std::map<std::string, String> save_info_;
   vital::control_map controls_;

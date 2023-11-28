@@ -44,6 +44,12 @@ PluginProcessor::PluginProcessor(): juce::AudioProcessor(BusesProperties().withO
   }
 
   bypass_parameter_ = bridge_lookup_["bypass"];
+
+  // synth_->addBlock("osc", { 0, 0 });
+  // synth_->addBlock("filter", { 1, 0 });
+  // synth_->addModulator("lfo");
+  // synth_->connectModulation(0, "osc_1", "tune");
+  // synth_->connectModulation(0, "filter_1", "cutoff");
 }
 
 PluginProcessor::~PluginProcessor() {
@@ -241,20 +247,22 @@ juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter() {
 // MainComponent::Delegate
 void PluginProcessor::editorAdjustedModulator(int parameter, int index, float value) {
   std::cout << "adjusting modulator index; " << index << " param: " << parameter << " val: " << value << std::endl;
-  auto modulator = synth_->getEngine()->voice_handler_->GetModulator(index);
+  auto modulator = synth_->getModuleManager().getModulator(index);
   modulator->parameters_[parameter]->val->set(value);
 }
 
 void PluginProcessor::editorAdjustedBlock(Index index, int parameter, float value) {
   DBG("value: " << value);
-  auto block = synth_->getEngine()->voice_handler_->GetBlock(index);
+  auto block = synth_->getModuleManager().getBlock(index);
   auto param = block->parameters_[parameter]->val;
   param->set(value);
   // synth_->GetBlock(index)->parameters_[parameter].val->set(value);
 }
+
 void PluginProcessor::editorChangedModulationMagnitude(int index, float magnitude) {
   // moduleManager.getConnection(index)->setMagnitude(magnitude);
 }
+
 void PluginProcessor::editorChangedModulationPolarity(int index, bool bipolar) {
   // moduleManager.getConnection(index)->setPolarity(bipolar);
 }
@@ -298,7 +306,7 @@ std::shared_ptr<Block> PluginProcessor::getBlock(Index index) {
 }
 
 std::shared_ptr<model::Module> PluginProcessor::getBlock2(Index index) {
-  return (index.row == -1 || index.column == -1) ? nullptr : synth_->getEngine()->voice_handler_->GetBlock(index);
+  return (index.row == -1 || index.column == -1) ? nullptr : synth_->getModuleManager().getBlock(index);
 }
 
 std::shared_ptr<Tab> PluginProcessor::getTab(int column) {
@@ -318,8 +326,8 @@ void PluginProcessor::editorRepositionedBlock(Index oldIndex, Index newIndex) {
   // repositionProcessor(oldIndex, newIndex);
 }
 
-void PluginProcessor::editorConnectedModulation(int modulatorIndex, String targetName, int parameter) {
-  synth_->ConnectModulation(modulatorIndex, targetName.toStdString(), parameter);
+void PluginProcessor::editorConnectedModulation(int modulatorIndex, std::string target_name, std::string parameter) {
+  synth_->connectModulation(modulatorIndex, target_name, parameter);
   // Analytics::shared()->countAction("Modulation Connected");
   // connect(modulatorIndex, targetName, parameter);
 }
@@ -357,7 +365,7 @@ std::shared_ptr<Module> PluginProcessor::editorAddedModulator(Model::Type code) 
 }
 
 std::shared_ptr<model::Module> PluginProcessor::editorAddedModulator2(Model::Type code) {
-  return synth_->getEngine()->voice_handler_->AddModulator(code);
+  return synth_->addModulator(code);
 }
 
 void PluginProcessor::editorRemovedBlock(Index index) {
@@ -370,7 +378,8 @@ std::shared_ptr<Block> PluginProcessor::editorAddedBlock(Model::Type type, Index
 }
 
 std::shared_ptr<model::Block> PluginProcessor::editorAddedBlock2(Model::Type type, Index index) {
-  return synth_->getEngine()->voice_handler_->AddBlock(type, index);
+  return synth_->addBlock(type, index);
+  // return synth_->getEngine()->voice_handler_->AddBlock(type, index);
 }
 
 void PluginProcessor::editorRepositionedTab(int oldColumn, int newColumn) {

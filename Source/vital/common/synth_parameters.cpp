@@ -418,7 +418,7 @@ namespace vital {
   const ValueDetails ValueDetailsLookup::filter_parameter_list[] = {
     { "mix", 0x000000, 0.0f, 1.0f, 1.0f, 0.0, 100.0,
       ValueDetails::kLinear, false, "%", "Mix", nullptr },
-    { "cutoff", 0x000000, 8.0, 136.0, 60.0, -60.0, 1.0,
+    { "cutoff", 0x000000, 8.0, 136.0, 30.0, -60.0, 1.0,
       ValueDetails::kLinear, false, " semitones", "Cutoff", nullptr },
     { "resonance", 0x000000, 0.0, 1.0, 0.5, 0.0, 100.0,
       ValueDetails::kLinear, false, "%", "Resonance", nullptr },

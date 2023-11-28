@@ -89,7 +89,7 @@ public:
   void editorChangedModulationPolarity(int index, bool bipolar) override;
   void editorDisconnectedModulation(int index) override;
   void editorSavedPreset(String name) override;
-  void editorConnectedModulation(int modulatorIndex, String targetName, int parameter) override;
+  void editorConnectedModulation(int modulatorIndex, std::string target_name, std::string parameter) override;
   void editorChangedBlockLength(Index index, int length) override;
   void editorAdjustedModulator(int parameter, int modulator, float value) override;
   void editorRemovedModulator(int index) override;

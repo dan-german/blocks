@@ -54,6 +54,7 @@ BlocksVoiceHandler::BlocksVoiceHandler(Output* beats_per_second):
 
   enabled_modulation_processors_.ensureCapacity(kMaxModulationConnections);
   lfos_.reserve(kNumLfos);
+  envelopes_.reserve(kNumEnvelopes);
 
   int rows = 7;
   int columns = 5;
@@ -65,20 +66,11 @@ BlocksVoiceHandler::BlocksVoiceHandler(Output* beats_per_second):
   }
 
   int module_count = 5;
-  // modules_.spawn({ "osc" }, [](std::string type, int number) { return std::make_shared<model::OscillatorModule>(number); });
-  // modules_.spawn({ "filter" }, [](std::string type, int number) { return std::make_shared<model::FilterModule>(number); });
-  // modules_.spawn({ "lfo" }, [](std::string type, int number) { return std::make_shared<model::LFOModule>(number); });
 }
 
-std::shared_ptr<model::Module> BlocksVoiceHandler::GetBlock(Index index) {
-  return module_manager_.GetBlock(index);
-}
-
-std::shared_ptr<model::Module> BlocksVoiceHandler::AddModulator(std::string type) {
+void BlocksVoiceHandler::addModulator(std::shared_ptr<model::Module> modulator) {
+  auto type = modulator->id.type;
   std::cout << "adding modulators of type: " << type << std::endl;
-  // auto module = modules_.get({ type, -1 });
-  auto modulator = module_manager_.AddModulator(type, -1, 1);
-  active_modulators_.push_back(modulator);
   if (type == "lfo") {
     auto lfo = lfos_[0];
 
@@ -89,19 +81,16 @@ std::shared_ptr<model::Module> BlocksVoiceHandler::AddModulator(std::string type
     modulator->parameters_[1]->val = lfo->control_map_["frequency"];
     modulator->parameters_[2]->val = lfo->control_map_["sync"]; // sync
     modulator->parameters_[3]->val = lfo->control_map_["sync_type"]; // mode
+  } else if (type == "adsr") { 
+    auto adsr = envelopes_[0];
+    modulator->parameters_[0]->val = adsr->control_map_["attack"];
+    modulator->parameters_[1]->val = adsr->control_map_["decay"];
+    modulator->parameters_[2]->val = adsr->control_map_["release"];
+    modulator->parameters_[3]->val = adsr->control_map_["sustain"];
   }
-
-  return modulator;
 }
 
-std::shared_ptr<model::Module> BlocksVoiceHandler::GetModulator(int index) {
-  return active_modulators_[index];
-}
-
-std::shared_ptr<model::Block> BlocksVoiceHandler::AddBlock(std::string type, Index index) {
-  // auto module = module_manager_.get({ type, -1 });
-  auto block = module_manager_.AddBlock(type, index);
-  block->index = index;
+void BlocksVoiceHandler::addBlock(std::shared_ptr<model::Block> block) {
   createProcessor(block);
 
   for (int column = 0; column < processor_matrix_.size(); column++) {
@@ -126,10 +115,8 @@ std::shared_ptr<model::Block> BlocksVoiceHandler::AddBlock(std::string type, Ind
         current = processor.get();
       }
     }
-    last_node_->plug(current, index.column);
+    last_node_->plug(current, block->index.column);
   }
-
-  return block;
 }
 
 void BlocksVoiceHandler::init() {
@@ -308,11 +295,12 @@ void BlocksVoiceHandler::createModulators() {
 
   for (int i = 0; i < kNumEnvelopes; ++i) {
     std::string prefix = std::string("env_") + std::to_string(i + 1);
-    EnvelopeModule* envelope = new EnvelopeModule(prefix, i == 0);
+    auto envelope = std::make_shared<EnvelopeModule>(prefix, i == 0);
     envelope->plug(retrigger(), EnvelopeModule::kTrigger);
-    addSubmodule(envelope);
-    addProcessor(envelope);
-    envelopes_[i] = envelope;
+    addSubmodule(envelope.get());
+    addProcessor(envelope.get());
+    envelopes_.push_back(envelope);
+    // envelopes_[i] = envelope;
 
     data_->mod_sources[prefix] = envelope->output();
     createStatusOutput(prefix, envelope->output(EnvelopeModule::kValue));
@@ -414,7 +402,7 @@ void BlocksVoiceHandler::createVoiceOutput() {
   amplitude->plug(voice_amplitude, 1);
   addProcessor(amplitude);
 
-  amplitude_envelope_ = envelopes_[0];
+  amplitude_envelope_ = envelopes_[0].get();
   amplitude_envelope_->setControlRate(false);
 
   Processor* control_amplitude = new SmoothMultiply();

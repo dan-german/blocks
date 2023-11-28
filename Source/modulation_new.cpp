@@ -24,7 +24,6 @@ Modulation::Modulation(Module* target,
   int number,
   bool bipolar): source(modulator),
   target(target),
-  parameterIndex(parameterIndex),
   number(number) {
   name = "modulation " + std::to_string(number);
   // magnitudeParameter = std::shared_ptr<AudioParameterFloat>(new AudioParameterFloat(name + " magnitude", name + " magnitude", NormalisableRange(-1.0f, 1.0f, 0.001f), magnitude));
@@ -40,7 +39,7 @@ Modulation::Modulation(int number): number(number) {
 Modulation::~Modulation() { }
 
 bool Modulation::operator==(const Modulation& rhs) const {
-  return this->target == rhs.target && this->source == rhs.source && this->parameterIndex == rhs.parameterIndex;
+  return this->target == rhs.target && this->source == rhs.source && this->parameter_name_ == rhs.parameter_name_;
 }
 
 void Modulation::reset() {

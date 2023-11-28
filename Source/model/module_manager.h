@@ -1,3 +1,4 @@
+#pragma once
 #include <memory>
 
 #include "module_pool.h"
@@ -16,7 +17,7 @@ namespace model {
 class ModuleManager {
 private:
   std::shared_ptr<model::Block> blockMatrix[Constants::rows][Constants::columns];
-  std::map<String, std::shared_ptr<model::Module>> nameToModuleMap;
+  std::map<std::string, std::shared_ptr<model::Module>> nameToModuleMap;
   std::vector<std::shared_ptr<model::Modulation>> connections;
   std::vector<std::shared_ptr<model::Block>> blocks;
   ColourPool colourPool;
@@ -34,26 +35,26 @@ public:
   // void triggerNoteInTabs(Voice* voice);
   // Array<int> getActiveColumns();
 
-  std::shared_ptr<model::Block> AddBlock(std::string type, Index index, int number = -1);
-  std::shared_ptr<model::Block> GetBlock(Index index) { return blockMatrix[index.row][index.column]; }
-  std::vector<std::shared_ptr<model::Block>> GetBlocks() { return blocks; }
-  void RemoveBlock(std::shared_ptr<model::Block> block);
-  void RepositionBlock(Index oldIndex, Index newIndex);
+  std::shared_ptr<model::Block> addBlock(std::string type, Index index, int number = -1);
+  std::shared_ptr<model::Block> getBlock(Index index) { return blockMatrix[index.row][index.column]; }
+  std::vector<std::shared_ptr<model::Block>> getBlocks() { return blocks; }
+  void removeBlock(std::shared_ptr<model::Block> block);
+  void repositionBlock(Index oldIndex, Index newIndex);
 
-  std::shared_ptr<model::Module> AddModulator(std::string type, int number, int colourId);
-  std::shared_ptr<model::Module> GetModulator(int index) { return modulators[index]; }
-  std::vector<std::shared_ptr<model::Module>> GetModulators();
+  std::shared_ptr<model::Module> addModulator(std::string type, int number, int colourId);
+  std::shared_ptr<model::Module> getModulator(int index) { return modulators[index]; }
+  std::vector<std::shared_ptr<model::Module>> getModulators();
   void RemoveModulator(int index);
 
-  std::shared_ptr<model::Modulation> AddConnection(std::shared_ptr<Module> source, std::shared_ptr<Module> target, int parameterIndex, int number = -1);
-  std::shared_ptr<model::Modulation> GetConnection(int index) { return connections[index]; }
-  std::vector<std::shared_ptr<model::Modulation>> GetConnectionsOfSource(std::shared_ptr<Module> source);
-  std::vector<std::shared_ptr<model::Modulation>> GetConnectionsOfTarget(std::shared_ptr<Module> target);
-  std::vector<std::shared_ptr<model::Modulation>> GetConnections();
-  void RemoveConnection(int index);
-  void RemoveConnection(std::shared_ptr<model::Modulation> connection);
-  bool ConnectionExists(int parameterIndex, std::shared_ptr<model::Module> source, std::shared_ptr<model::Module> target);
-  std::shared_ptr<model::Module> GetModule(String name) { return nameToModuleMap[name]; }
-  void Clear();
+  std::shared_ptr<model::Modulation> addConnection(std::shared_ptr<Module> source, std::shared_ptr<Module> target, std::string parameter_name, int number = -1);
+  std::shared_ptr<model::Modulation> getConnection(int index) { return connections[index]; }
+  std::vector<std::shared_ptr<model::Modulation>> getConnectionsOfSource(std::shared_ptr<Module> source);
+  std::vector<std::shared_ptr<model::Modulation>> getConnectionsOfTarget(std::shared_ptr<Module> target);
+  std::vector<std::shared_ptr<model::Modulation>> getConnections();
+  void removeConnection(int index);
+  void removeConnection(std::shared_ptr<model::Modulation> connection);
+  bool connectionExists(std::string parameter_name, std::shared_ptr<model::Module> source, std::shared_ptr<model::Module> target);
+  std::shared_ptr<model::Module> getModule(std::string name) { return nameToModuleMap[name]; }
+  void clear();
 };
 } // namespace model
