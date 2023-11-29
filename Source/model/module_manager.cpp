@@ -33,8 +33,8 @@ std::shared_ptr<Module> ModuleManager::addModulator(std::string code, int number
   return modulator;
 }
 
-std::vector<std::shared_ptr<Modulation>> ModuleManager::getConnectionsOfSource(std::shared_ptr<Module> source) {
-  std::vector<std::shared_ptr<Modulation>> sourceConnections;
+std::vector<std::shared_ptr<Connection>> ModuleManager::getConnectionsOfSource(std::shared_ptr<Module> source) {
+  std::vector<std::shared_ptr<Connection>> sourceConnections;
 
   for (auto connection : connections)
     if (connection->source == source)
@@ -43,8 +43,8 @@ std::vector<std::shared_ptr<Modulation>> ModuleManager::getConnectionsOfSource(s
   return sourceConnections;
 }
 
-std::vector<std::shared_ptr<Modulation>> ModuleManager::getConnectionsOfTarget(std::shared_ptr<Module> target) {
-  std::vector<std::shared_ptr<Modulation>> targetConnections;
+std::vector<std::shared_ptr<Connection>> ModuleManager::getConnectionsOfTarget(std::shared_ptr<Module> target) {
+  std::vector<std::shared_ptr<Connection>> targetConnections;
 
   for (auto connection : connections)
     if (connection->target == target)
@@ -73,7 +73,7 @@ void ModuleManager::repositionBlock(Index oldIndex, Index newIndex) {
   blockMatrix[oldIndex.row][oldIndex.column] = {};
 }
 
-std::shared_ptr<Modulation> ModuleManager::addConnection(std::shared_ptr<Module> source, std::shared_ptr<Module> target, std::string parameter_name, int number) {
+std::shared_ptr<Connection> ModuleManager::addConnection(std::shared_ptr<Module> source, std::shared_ptr<Module> target, std::string parameter_name, int number) {
   if (connectionExists(parameter_name, source, target)) return nullptr;
 
   auto connection = pool.getModulation(number);
@@ -103,13 +103,13 @@ void ModuleManager::removeConnection(int index) {
   pool.Retire(connection);
 }
 
-void ModuleManager::removeConnection(std::shared_ptr<Modulation> connection) {
+void ModuleManager::removeConnection(std::shared_ptr<Connection> connection) {
   // connection->target->removeConnection(connection);
   // pool.retire(connections.removeAndReturn(connections.indexOf(connection)));
 }
 
-std::vector<std::shared_ptr<Modulation>> ModuleManager::getConnections() {
-  std::vector<std::shared_ptr<Modulation>> array;
+std::vector<std::shared_ptr<Connection>> ModuleManager::getConnections() {
+  std::vector<std::shared_ptr<Connection>> array;
   array.insert(array.end(), connections.begin(), connections.end());
   return array;
 }

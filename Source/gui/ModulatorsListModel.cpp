@@ -78,7 +78,7 @@ void ModulatorsListModel::setupModulatorComponent(model::Module& model, Modulato
     // slider->boxSlider.valueLabel.setText(slider->boxSlider.slider.getTextFromValue(value), dontSendNotification);
   }
 
-  component.delegate = modulatorListener;
+  component.delegate = modulator_listener;
   component.setColour(model.colour.colour);
 
   if (model.id.type == Model::Types::lfo) {

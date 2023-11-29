@@ -38,8 +38,8 @@ public:
   ~MainComponent() override;
   void mouseMove(const MouseEvent& event) override;
 
-  BlocksLookAndFeel blocksLookAndFeel;
-  UILayer uiLayer;
+  BlocksLookAndFeel blocks_laf_;
+  UILayer ui_layer_;
   void loadState(PresetInfo preset);
   void visibilityChanged() override;
 protected:
@@ -50,30 +50,28 @@ protected:
   void mouseDown(const MouseEvent& event) override;
   void mouseUp(const MouseEvent& event) override;
 private:
-  DarkBackground darkBackground;
-  DarkBackground gridDarkBackground;
+  DarkBackground dark_background_;
+  DarkBackground grid_dark_background_;
   BlockGridComponent block_grid_;
   TabContainerComponent tab_grid_;
-  InspectorComponent inspector;
-  int presetIndex = 0;
-  StringArray presetNames;
-  SavePopup savePopup;
-  GraphicsTimer timer;
+  InspectorComponent inspector_;
+  SavePopup save_popup_;
+  GraphicsTimer timer_;
 
   Array<BlockComponent*> blocks;
   GridItemComponent* focused_grid_item_ = nullptr;
-  Point<int> currentMousePosition;
+  Point<int> current_mouse_position_;
 
   BlockComponent* block_matrix_[Constants::rows][Constants::columns];
   Cursor cursor;
-  std::optional<int> previousSliderUnderMouse = {};
-  BlockPlaceholder blockPlaceholder;
-  bool isBlocksMenuVisible = false;
-  bool modulatorDragMode = false;
+  std::optional<int> previous_slider_under_mouse_ = {};
+  BlockPlaceholder block_placeholder_;
+  bool is_blocks_popup_visible_ = false;
+  bool modulator_drag_mode_ = false;
   ButtonGridPopup blocks_popup_;
-  ButtonGridPopup modulatorsPopup;
-  ButtonGridPopup presetsPopup;
-  NoteLogger noteLogger;
+  ButtonGridPopup modualtors_popup_;
+  ButtonGridPopup presets_popup_;
+  NoteLogger note_logger_;
 
   void setupInspector();
   void clear();
@@ -191,8 +189,7 @@ struct MainComponent::Delegate {
   virtual Array<int> editorRequestsActiveColumns() = 0;
   virtual Array<std::shared_ptr<Module>> getModulators() = 0;
   virtual std::vector<std::shared_ptr<model::Module>> getModulators2() = 0;
-  virtual Array<std::shared_ptr<Modulation>> getModulations() = 0;
-  virtual std::vector<std::shared_ptr<model::Modulation>> getModulations2() = 0;
+  virtual std::vector<std::shared_ptr<model::Connection>> getModulations() = 0;
   virtual Array<std::shared_ptr<Modulation>> getConnectionsOfSource(std::shared_ptr<Module> source) = 0;
 
   virtual ~Delegate() = default;

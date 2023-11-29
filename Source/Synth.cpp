@@ -10,7 +10,7 @@ void Synth::editorAdjustedTab(int column, int parameter, float value) { moduleMa
 std::shared_ptr<Module> Synth::getModulator(int index) { return moduleManager.getModulator(index); }
 
 Array<std::shared_ptr<Modulation>> Synth::getConnectionsOfSource(std::shared_ptr<Module> source) { return moduleManager.getConnectionsOfSource(source); }
-Array<std::shared_ptr<Modulation>> Synth::getModulations() { return moduleManager.getConnections(); }
+std::vector<std::shared_ptr<model::Connection>> Synth::getModulations() { return {}; }
 std::shared_ptr<Block> Synth::getBlock(Index index) { return (index.row == -1 || index.column == -1) ? nullptr : moduleManager.getBlock(index); }
 std::shared_ptr<Tab> Synth::getTab(int column) { return moduleManager.getTab(column); }
 Array<MPENote> Synth::editorRequestsCurrentlyPlayingNotes() { return currentlyPlayingNotes; }

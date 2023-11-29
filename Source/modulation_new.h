@@ -16,10 +16,10 @@
 #include "vital/common/synth_parameters.h"
 
 namespace model {
-  struct Modulation {
-    Modulation(Module* target, Module* modulator, int parameterIndex, float magnitude, int number, bool bipolar = false);
-    Modulation(int number);
-    ~Modulation();
+  struct Connection {
+    Connection(Module* target, Module* modulator, int parameterIndex, float magnitude, int number, bool bipolar = false);
+    Connection(int number);
+    ~Connection();
     std::shared_ptr<vital::ValueDetails> magnitude_parameter_;
 
     // std::shared_ptr<RangedAudioParameter> magnitudeParameter;
@@ -39,6 +39,6 @@ namespace model {
     void reset();
     void setMagnitude(float magnitude);
     void setPolarity(bool bipolar);
-    bool operator==(Modulation const& rhs) const;
+    bool operator==(Connection const& rhs) const;
   };
 }

@@ -112,7 +112,7 @@ public:
   PresetInfo getStateRepresentation() override;
   Array<std::shared_ptr<Module>> getModulators() override;
   Array<std::shared_ptr<Modulation>> getConnectionsOfSource(std::shared_ptr<Module> source) override;
-  Array<std::shared_ptr<Modulation>> getModulations() override;
+  std::vector<std::shared_ptr<model::Connection>> getModulations() override;
 
   std::pair<float, float> editorRequestsModulatorValue(Index moduleIndex, int parameterIndex, int modulatorIndex) override;
   std::pair<float, float> editorRequestsModulatorValue(int modulationConnectionIndex) override;

@@ -792,9 +792,8 @@ void SynthBase::connectModulation(int modulator_index, std::string target_name, 
   auto connection_name = "modulation_" + std::to_string(connection->number) + "_amount";
   getControls()[connection_name]->set(1.0f);
 
-  std::string composed_parameter_name = target->name + "_" + parameter_name; // maybe make this a Module method 
   std::string modulator_name = getModuleManager().getModulator(modulator_index)->name;
-  connectModulation(modulator_name, composed_parameter_name);
+  connectModulation(modulator_name, parameter_name);
 }
 
 vital::BlocksVoiceHandler* SynthBase::getVoiceHandler() {

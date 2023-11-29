@@ -280,26 +280,26 @@ juce::Array<std::shared_ptr<Modulation>> PluginProcessor::getConnectionsOfSource
   // return moduleManager.getConnectionsOfSource(source);
 }
 
-juce::Array<std::shared_ptr<Modulation>> PluginProcessor::getModulations() {
-
+std::vector<std::shared_ptr<model::Connection>> PluginProcessor::getModulations() {
+  return synth_->getModuleManager().getConnections();
 }
 
-std::vector<std::shared_ptr<model::Modulation>> PluginProcessor::getModulations2() {
-  std::vector<std::shared_ptr<model::Modulation>> modulations;
+// std::vector<std::shared_ptr<model::Modulation>> PluginProcessor::getModulations2() {
+//   std::vector<std::shared_ptr<model::Modulation>> modulations;
 
-  auto& bank = synth_->getModulationBank();
-  for (int i = 0; i < vital::kMaxModulationConnections; i++) {
-    auto mod = bank.atIndex(i);
+//   auto& bank = synth_->getModulationBank();
+//   for (int i = 0; i < vital::kMaxModulationConnections; i++) {
+//     auto mod = bank.atIndex(i);
 
-    bool is_connection_active = mod->destination_name != "" && mod->source_name != "";
-    if (!is_connection_active) continue;
+//     bool is_connection_active = mod->destination_name != "" && mod->source_name != "";
+//     if (!is_connection_active) continue;
 
-    auto modulation = std::make_shared<model::Modulation>(nullptr, nullptr, 0, 1.0f, i, false);
-    modulations.push_back(modulation);
-  }
+//     auto modulation = std::make_shared<model::Modulation>(nullptr, nullptr, 0, 1.0f, i, false);
+//     modulations.push_back(modulation);
+//   }
 
-  return modulations;
-}
+//   return modulations;
+// }
 
 std::shared_ptr<Block> PluginProcessor::getBlock(Index index) {
 
@@ -490,5 +490,5 @@ void PluginProcessor::editorParameterGestureChanged(String moduleName, int param
 }
 
 std::vector<std::shared_ptr<model::Module>> PluginProcessor::getModulators2() { 
- return synth_->getEngine()->voice_handler_->active_modulators_;
+  return synth_->getModuleManager().getModulators();
 }

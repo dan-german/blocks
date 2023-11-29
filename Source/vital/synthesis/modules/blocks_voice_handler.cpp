@@ -64,8 +64,6 @@ BlocksVoiceHandler::BlocksVoiceHandler(Output* beats_per_second):
   for (int i = 0; i < columns; i++) {
     processor_matrix_[i].resize(columns);
   }
-
-  int module_count = 5;
 }
 
 void BlocksVoiceHandler::addModulator(std::shared_ptr<model::Module> modulator) {
@@ -210,13 +208,10 @@ void BlocksVoiceHandler::createFilters(Output* keytrack) {
   for (int i = 0; i < 5; i++) {
     auto name = "filter_" + std::to_string(i + 1);
     auto filter = std::make_shared<FilterModule>(name);
-
     filter->plug(reset(), FilterModule::kReset);
     filter->plug(bent_midi_, FilterModule::kMidi);
-
     addSubmodule(filter.get());
     addProcessor(filter.get());
-
     processors_["filter"].push_back(filter);
   }
 }
@@ -251,7 +246,7 @@ std::shared_ptr<SynthModule> BlocksVoiceHandler::createProcessor(std::shared_ptr
     filter->control_map_["on"]->set(1.0f);
   }
 
-  processor_matrix_[index.column][index.row] = processor;
+  processor_matrix_[index.row][index.column] = processor;
   processors_[module->id.type].push_back(processor);
   return processor;
 }

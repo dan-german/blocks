@@ -24,22 +24,23 @@
 #include <juce_gui_basics/juce_gui_basics.h>
 #include "gui/controls/SVGButton.h"
 #include "gui/controls/SavePopup.h"
+#include "modulation_new.h"
 
 using Modulation = Model::Modulation;
 using Module = Model::Module;
 
 class UILayer: public juce::Component, ComponentMovementWatcher {
 public:
-  SideMenu matrix;
-  ModulatorsSideMenu modulators;
-  PresetButtonComponent presetButton;
+  SideMenu connections;
+  ModulatorsSideMenu modulators_;
+  PresetButtonComponent preset_button_;
   KeyboardComponent keyboard;
 
   std::unique_ptr<SVGButton> settingsButton;
   std::unique_ptr<SVGButton> matrixButton;
   std::unique_ptr<SVGButton> saveButton;
   std::unique_ptr<SVGButton> newPresetButton;
-  std::unique_ptr<SVGButton> themeButton;
+  std::unique_ptr<SVGButton> theme_button_;
 
   std::unique_ptr<ModulatorsButton> modulatorsButton;
 
@@ -49,7 +50,7 @@ public:
   ~UILayer() override;
 
   void resized() override;
-  void setModulations(Array<std::shared_ptr<Modulation>> modulationConnections);
+  void setConnections(std::vector<std::shared_ptr<model::Connection>> connections);
   void setModulators(std::vector<std::shared_ptr<model::Module>> modulators);
   void componentMovedOrResized(bool wasMoved, bool wasResized) override {};
   void componentPeerChanged() override {};

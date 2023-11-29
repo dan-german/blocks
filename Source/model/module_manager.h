@@ -18,7 +18,7 @@ class ModuleManager {
 private:
   std::shared_ptr<model::Block> blockMatrix[Constants::rows][Constants::columns];
   std::map<std::string, std::shared_ptr<model::Module>> nameToModuleMap;
-  std::vector<std::shared_ptr<model::Modulation>> connections;
+  std::vector<std::shared_ptr<model::Connection>> connections;
   std::vector<std::shared_ptr<model::Block>> blocks;
   ColourPool colourPool;
 public:
@@ -46,13 +46,13 @@ public:
   std::vector<std::shared_ptr<model::Module>> getModulators();
   void RemoveModulator(int index);
 
-  std::shared_ptr<model::Modulation> addConnection(std::shared_ptr<Module> source, std::shared_ptr<Module> target, std::string parameter_name, int number = -1);
-  std::shared_ptr<model::Modulation> getConnection(int index) { return connections[index]; }
-  std::vector<std::shared_ptr<model::Modulation>> getConnectionsOfSource(std::shared_ptr<Module> source);
-  std::vector<std::shared_ptr<model::Modulation>> getConnectionsOfTarget(std::shared_ptr<Module> target);
-  std::vector<std::shared_ptr<model::Modulation>> getConnections();
+  std::shared_ptr<model::Connection> addConnection(std::shared_ptr<Module> source, std::shared_ptr<Module> target, std::string parameter_name, int number = -1);
+  std::shared_ptr<model::Connection> getConnection(int index) { return connections[index]; }
+  std::vector<std::shared_ptr<model::Connection>> getConnectionsOfSource(std::shared_ptr<Module> source);
+  std::vector<std::shared_ptr<model::Connection>> getConnectionsOfTarget(std::shared_ptr<Module> target);
+  std::vector<std::shared_ptr<model::Connection>> getConnections();
   void removeConnection(int index);
-  void removeConnection(std::shared_ptr<model::Modulation> connection);
+  void removeConnection(std::shared_ptr<model::Connection> connection);
   bool connectionExists(std::string parameter_name, std::shared_ptr<model::Module> source, std::shared_ptr<model::Module> target);
   std::shared_ptr<model::Module> getModule(std::string name) { return nameToModuleMap[name]; }
   void clear();

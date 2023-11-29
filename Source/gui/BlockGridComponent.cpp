@@ -54,7 +54,7 @@ void BlockGridComponent::reset() {
   highlight = false;
 }
 
-void BlockGridComponent::SetDownFlowingHighlight(int column, bool active) {
+void BlockGridComponent::setDownFlowingHighlight(int column, bool active) {
   for (auto row : dot_matrix_) {
     for (auto dot : *row) {
       dot->setColour(ThemeManager::shared()->getCurrent().two);

@@ -15,7 +15,7 @@ void SVGButton::setSVG(const void* svgData, const size_t svgDataNumBytes) {
 
   setButtonColour(colour);
 
-  drawableButton->onClick = [this]() { if (onClick) onClick(); };
+  drawableButton->onClick = [this]() { if (on_click_) on_click_(); };
 }
 
 void SVGButton::setButtonColour(Colour colour) {

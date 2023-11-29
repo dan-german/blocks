@@ -16,7 +16,7 @@ public:
   void animateDragMode(GridItemComponent* item, bool enabled = true);
   OwnedArray<OwnedArray<DotComponent>> dot_matrix_;
   void clear() override;
-  void SetDownFlowingHighlight(int column, bool active);
+  void setDownFlowingHighlight(int column, bool active);
 protected:
   void itemHovered(GridItemComponent* item, bool valid, bool inside, int proposedLength, Index index) override;
   virtual void gridItemEndedDrag(GridItemComponent* item, const MouseEvent& mouseEvent) override;

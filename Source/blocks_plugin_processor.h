@@ -107,8 +107,8 @@ public:
   juce::Array<std::shared_ptr<Module>> getModulators() override;
   std::vector<std::shared_ptr<model::Module>> getModulators2() override;
   juce::Array<std::shared_ptr<Modulation>> getConnectionsOfSource(std::shared_ptr<Module> source) override;
-  juce::Array<std::shared_ptr<Modulation>> getModulations() override;
-  std::vector<std::shared_ptr<model::Modulation>> getModulations2() override;
+  // juce::Array<std::shared_ptr<model::Modulation>> getModulations() override;
+  std::vector<std::shared_ptr<model::Connection>> getModulations() override;
 
   std::pair<float, float> editorRequestsModulatorValue(Index moduleIndex, int parameterIndex, int modulatorIndex) override;
   std::pair<float, float> editorRequestsModulatorValue(int modulationConnectionIndex) override;

@@ -27,35 +27,35 @@ Component* ModulationsListBoxModel::refreshComponentForRow(int rowNumber, bool i
   if (rowNumber >= connections.size()) return component;
   auto connection = connections[rowNumber];
 
-  auto range = connection->magnitudeParameter->getNormalisableRange();
-  component->slider.setRange(range.start, range.end, range.interval);
-  auto value = range.convertFrom0to1(connection->magnitudeParameter->getValue());
+  // auto range = connection->magnitudeParameter->getNormalisableRange();
+  // component->slider.setRange(range.start, range.end, range.interval);
+  // auto value = range.convertFrom0to1(connection->magnitudeParameter->getValue());
 
-  component->slider.setValue(value, dontSendNotification);
-  component->source.setText(connection->source->name, dontSendNotification);
+  // component->slider.setValue(value, dontSendNotification);
+  // component->source.setText(connection->source->name, dontSendNotification);
 
-  String targetTitle = connection->target->name + " " + connection->target->parameters[connection->parameterIndex]->id;
+  // String targetTitle = connection->target->name + " " + connection->target->parameters[connection->parameterIndex]->id;
 
-  component->target.setText(targetTitle, dontSendNotification);
-  component->slider.setNumDecimalPlacesToDisplay(3);
-  component->slider.addListener(this->sliderListener);
-  component->delegate = delegate;
-  component->indicator.setColour(connection->source->colour.colour);
+  // component->target.setText(targetTitle, dontSendNotification);
+  // component->slider.setNumDecimalPlacesToDisplay(3);
+  // component->slider.addListener(this->sliderListener);
+  // component->delegate = delegate;
+  // component->indicator.setColour(connection->source->colour.colour);
 
-  bool bipolar = static_cast<bool>(connection->bipolarParameter->getValue());
-  component->indicator.setBipolar(bipolar);
-  component->bipolarButton.setState(bipolar);
+  // bool bipolar = static_cast<bool>(connection->bipolarParameter->getValue());
+  // component->indicator.setBipolar(bipolar);
+  // component->bipolarButton.setState(bipolar);
 
-  using Parameters = Model::OscillatorModule::Parameters;
-  bool envelopeToOscGain = connection->source->isEnvelope() && connection->target->isOscillator() && Parameters(connection->parameterIndex) == Parameters::pGain;
-  if (envelopeToOscGain) component->handleOscGainEnvelope();
+  // using Parameters = Model::OscillatorModule::Parameters;
+  // bool envelopeToOscGain = connection->source->isEnvelope() && connection->target->isOscillator() && Parameters(connection->parameterIndex) == Parameters::pGain;
+  // if (envelopeToOscGain) component->handleOscGainEnvelope();
 
-  component->row = rowNumber;
+  // component->row = rowNumber;
 
   return component;
 }
 
-void ModulationsListBoxModel::setConnections(Array<std::shared_ptr<Modulation>> modulationConnections) {
+void ModulationsListBoxModel::setConnections(std::vector<std::shared_ptr<model::Connection>> modulationConnections) {
   this->connections.clear();
   this->connections = modulationConnections;
 }

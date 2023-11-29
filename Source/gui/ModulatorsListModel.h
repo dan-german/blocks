@@ -23,7 +23,7 @@ public:
   ~ModulatorsListModel() override = default;
   Component* refreshComponentForRow(int rowNumber, bool isRowSelected, Component* existingComponentToUpdate) override;
   Slider::Listener* sliderListener;
-  ModulatorComponent::Listener* modulatorListener;
+  ModulatorComponent::Listener* modulator_listener;
 
   int getNumRows() override;
   void remove(int index);

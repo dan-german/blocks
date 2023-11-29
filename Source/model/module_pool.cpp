@@ -33,14 +33,14 @@ ModulePool::ModulePool() {
   modulators.spawn({ "lfo" }, [](std::string type, int number) { return std::make_shared<model::LFOModule>(number); });
   modulators.spawn({ "adsr" }, [](std::string type, int number) { return std::make_shared<model::ADSRModule>(number); });
 
-  for (int i = 1; i <= 40; i++) connections.push_back(std::make_shared<Modulation>(i));
+  for (int i = 1; i <= 40; i++) connections.push_back(std::make_shared<Connection>(i));
 
   allModules.insert(allModules.end(), blocks.all.begin(), blocks.all.end());
   allModules.insert(allModules.end(), modulators.all.begin(), modulators.all.end());
   // allModules.insert(allModules.end(), tabs.all.begin(), tabs.all.end());
 }
 
-void ModulePool::Retire(std::shared_ptr<model::Modulation> modulationConnection) {
+void ModulePool::Retire(std::shared_ptr<model::Connection> modulationConnection) {
   modulationConnection->reset();
   connections.push_back(modulationConnection);
 }
@@ -51,7 +51,7 @@ std::shared_ptr<model::Module> ModulePool::getModulator(std::string code, int nu
   return modulator;
 }
 
-std::shared_ptr<Modulation> ModulePool::getModulation(int number) {
+std::shared_ptr<Connection> ModulePool::getModulation(int number) {
   int index = 0;
   for (int i = 0; i < connections.size(); i++) {
     if (connections[i]->number == number) {
