@@ -264,6 +264,7 @@ void PluginProcessor::editorChangedModulationMagnitude(int index, float magnitud
 }
 
 void PluginProcessor::editorChangedModulationPolarity(int index, bool bipolar) {
+  synth_->getModuleManager().getConnection(index)->bipolar_parameter_->val->set(bipolar);
   // moduleManager.getConnection(index)->setPolarity(bipolar);
 }
 

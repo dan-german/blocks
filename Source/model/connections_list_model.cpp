@@ -38,7 +38,7 @@ Component* ModulationsListBoxModel::refreshComponentForRow(int rowNumber, bool i
   // component->target.setText(targetTitle, dontSendNotification);
   // component->slider.setNumDecimalPlacesToDisplay(3);
   component->slider.addListener(this->slider_listener_);
-  // component->delegate = delegate;
+  component->delegate = delegate_;
   // component->indicator.setColour(connection->source->colour.colour);
 
   // bool bipolar = static_cast<bool>(connection->bipolarParameter->getValue());

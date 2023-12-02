@@ -21,6 +21,7 @@ namespace model {
     Connection(int number);
     ~Connection();
     std::shared_ptr<vital::ValueDetails> magnitude_parameter_;
+    std::shared_ptr<vital::ValueDetails> bipolar_parameter_;
 
     // std::shared_ptr<RangedAudioParameter> magnitudeParameter;
     // std::shared_ptr<RangedAudioParameter> bipolarParameter;

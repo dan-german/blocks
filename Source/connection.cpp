@@ -11,10 +11,7 @@
 #include "connection.h"
 #include <juce_core/juce_core.h>
 #include <juce_audio_processors/juce_audio_processors.h>
-// #include "OscillatorModule.h"
 
-// using namespace Model;
-// using namespace juce;
 namespace model {
 
 Connection::Connection(Module* target,
@@ -28,12 +25,14 @@ Connection::Connection(Module* target,
   name = "modulation " + std::to_string(number);
   magnitude_parameter_ = std::make_shared<vital::ValueDetails>();
   magnitude_parameter_->min = -1.0f;
+  bipolar_parameter_ = std::make_shared<vital::ValueDetails>();
 }
 
 Connection::Connection(int number): number(number) {
   name = "modulation " + std::to_string(number);
   magnitude_parameter_ = std::make_shared<vital::ValueDetails>();
   magnitude_parameter_->min = -1.0f;
+  bipolar_parameter_ = std::make_shared<vital::ValueDetails>();
 };
 
 Connection::~Connection() { }

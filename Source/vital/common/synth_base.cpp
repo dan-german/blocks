@@ -793,20 +793,17 @@ void SynthBase::connectModulation(int modulator_index, std::string target_name, 
   getControls()[connection_name]->set(1.0f);
 
   std::string modulator_name = getModuleManager().getModulator(modulator_index)->name;
-  // connectModulation(modulator_name, parameter_name);
 
   vital::ModulationConnection* connection = getConnection(modulator_name, parameter_name);
-  // connection->modulation_processor->control_map_["amount"]->set(1.0f);
 
   bool create = connection == nullptr;
   if (create) connection = getModulationBank().createConnection(modulator_name, parameter_name);
 
   if (connection) {
     connection_module->magnitude_parameter_->val = connection->modulation_processor->control_map_["amount"];
+    connection_module->bipolar_parameter_->val = connection->modulation_processor->control_map_["bipolar"];
     connectModulation(connection);
   }
-
-  // connection->modulation_processor->lineMapGenerator()->initLinear();
 }
 
 vital::BlocksVoiceHandler* SynthBase::getVoiceHandler() {
