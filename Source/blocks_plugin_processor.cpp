@@ -260,7 +260,7 @@ void PluginProcessor::editorAdjustedBlock(Index index, int parameter, float valu
 }
 
 void PluginProcessor::editorChangedModulationMagnitude(int index, float magnitude) {
-  // moduleManager.getConnection(index)->setMagnitude(magnitude);
+  synth_->getModuleManager().getConnection(index)->magnitude_parameter_->val->set(magnitude);
 }
 
 void PluginProcessor::editorChangedModulationPolarity(int index, bool bipolar) {

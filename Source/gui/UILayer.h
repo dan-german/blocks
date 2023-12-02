@@ -24,7 +24,7 @@
 #include <juce_gui_basics/juce_gui_basics.h>
 #include "gui/controls/SVGButton.h"
 #include "gui/controls/SavePopup.h"
-#include "modulation_new.h"
+#include "connection.h"
 
 using Modulation = Model::Modulation;
 using Module = Model::Module;
@@ -44,7 +44,7 @@ public:
 
   std::unique_ptr<ModulatorsButton> modulatorsButton;
 
-  ModulationsListBoxModel modulationsListBoxModel;
+  ModulationsListBoxModel connections_list_box_model_;
 
   UILayer(juce::MidiKeyboardState& keyboard_state, Slider::Listener* listener);
   ~UILayer() override;

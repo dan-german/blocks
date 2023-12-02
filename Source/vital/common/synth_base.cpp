@@ -787,20 +787,33 @@ void SynthBase::connectModulation(int modulator_index, std::string target_name, 
   std::cout << "mod index: " << modulator_index << " param name: " << parameter_name << std::endl;
   auto target = module_manager_.getModule(target_name);
   auto source = module_manager_.getModulator(modulator_index);
-  auto connection = module_manager_.addConnection(source, target, parameter_name); 
-  std::cout << "connection: " << connection->id << std::endl;
-  auto connection_name = "modulation_" + std::to_string(connection->number) + "_amount";
+  auto connection_module = module_manager_.addConnection(source, target, parameter_name);
+  std::cout << "connection: " << connection_module->id << std::endl;
+  auto connection_name = "modulation_" + std::to_string(connection_module->number) + "_amount";
   getControls()[connection_name]->set(1.0f);
 
   std::string modulator_name = getModuleManager().getModulator(modulator_index)->name;
-  connectModulation(modulator_name, parameter_name);
+  // connectModulation(modulator_name, parameter_name);
+
+  vital::ModulationConnection* connection = getConnection(modulator_name, parameter_name);
+  // connection->modulation_processor->control_map_["amount"]->set(1.0f);
+
+  bool create = connection == nullptr;
+  if (create) connection = getModulationBank().createConnection(modulator_name, parameter_name);
+
+  if (connection) {
+    connection_module->magnitude_parameter_->val = connection->modulation_processor->control_map_["amount"];
+    connectModulation(connection);
+  }
+
+  // connection->modulation_processor->lineMapGenerator()->initLinear();
 }
 
 vital::BlocksVoiceHandler* SynthBase::getVoiceHandler() {
   return getEngine()->voice_handler_;
 }
 
-std::shared_ptr<model::Block> SynthBase::addBlock(std::string type, Index index) { 
+std::shared_ptr<model::Block> SynthBase::addBlock(std::string type, Index index) {
   auto block = module_manager_.addBlock(type, index);
   getVoiceHandler()->addBlock(block);
   return block;
@@ -808,6 +821,6 @@ std::shared_ptr<model::Block> SynthBase::addBlock(std::string type, Index index)
 
 std::shared_ptr<model::Module> SynthBase::addModulator(Model::Type type, int number, int colour_id) {
   auto modulator = module_manager_.addModulator(type, number, colour_id);
-  getVoiceHandler()->addModulator(modulator); 
+  getVoiceHandler()->addModulator(modulator);
   return modulator;
-} 
+}

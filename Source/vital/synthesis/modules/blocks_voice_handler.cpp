@@ -147,11 +147,11 @@ void BlocksVoiceHandler::init() {
     processor->plug(reset(), ModulationConnectionProcessor::kReset);
 
     std::string number = std::to_string(i + 1);
-    std::string amount_name = "modulation_" + number + "_amount";
-    Output* modulation_amount = createPolyModControl(amount_name);
-    processor->plug(modulation_amount, ModulationConnectionProcessor::kModulationAmount);
+    // std::string amount_name = "modulation_" + number + "_amount";
+    // Output* modulation_amount = createPolyModControl(amount_name);
+    // processor->plug(modulation_amount, ModulationConnectionProcessor::kModulationAmount);
 
-    processor->initializeBaseValue(data_->controls[amount_name]);
+    // processor->initializeBaseValue(data_->controls[amount_name]);
 
     Output* modulation_power = createPolyModControl("modulation_" + number + "_power");
     processor->plug(modulation_power, ModulationConnectionProcessor::kModulationPower);

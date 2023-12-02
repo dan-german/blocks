@@ -8,7 +8,7 @@
   ==============================================================================
 */
 
-#include "modulation_new.h"
+#include "connection.h"
 #include <juce_core/juce_core.h>
 #include <juce_audio_processors/juce_audio_processors.h>
 // #include "OscillatorModule.h"
@@ -26,14 +26,14 @@ Connection::Connection(Module* target,
   target(target),
   number(number) {
   name = "modulation " + std::to_string(number);
-  // magnitudeParameter = std::shared_ptr<AudioParameterFloat>(new AudioParameterFloat(name + " magnitude", name + " magnitude", NormalisableRange(-1.0f, 1.0f, 0.001f), magnitude));
-  // bipolarParameter = std::shared_ptr<AudioParameterBool>(new AudioParameterBool(name + " bipolar", name + " bipolar", bipolar));
+  magnitude_parameter_ = std::make_shared<vital::ValueDetails>();
+  magnitude_parameter_->min = -1.0f;
 }
 
 Connection::Connection(int number): number(number) {
   name = "modulation " + std::to_string(number);
-  // magnitudeParameter = std::shared_ptr<AudioParameterFloat>(new AudioParameterFloat(name + " magnitude", name + " magnitude", NormalisableRange(-1.0f, 1.0f, 0.001f), 1.0f));
-  // bipolarParameter = std::shared_ptr<AudioParameterBool>(new AudioParameterBool(name + " bipolar", name + " bipolar", false));
+  magnitude_parameter_ = std::make_shared<vital::ValueDetails>();
+  magnitude_parameter_->min = -1.0f;
 };
 
 Connection::~Connection() { }

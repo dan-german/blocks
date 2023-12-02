@@ -8,12 +8,12 @@
   ==============================================================================
 */
 
-#include "model/MatrixListModel.h"
+#include "model/connections_list_model.h"
 #include "model/ModuleParameter.h"
 #include "model/Module.h"
 #include "OscillatorModule.h"
 
-int ModulationsListBoxModel::getNumRows() { return connections.size(); }
+int ModulationsListBoxModel::getNumRows() { return connections_.size(); }
 
 Component* ModulationsListBoxModel::refreshComponentForRow(int rowNumber, bool isRowSelected, Component* existingComponentToUpdate) {
   ConnectionComponent* component;
@@ -24,21 +24,20 @@ Component* ModulationsListBoxModel::refreshComponentForRow(int rowNumber, bool i
     component = new ConnectionComponent();
 
   component->reset();
-  if (rowNumber >= connections.size()) return component;
-  auto connection = connections[rowNumber];
+  if (rowNumber >= connections_.size()) return component;
+  auto connection = connections_[rowNumber];
 
-  // auto range = connection->magnitudeParameter->getNormalisableRange();
-  // component->slider.setRange(range.start, range.end, range.interval);
-  // auto value = range.convertFrom0to1(connection->magnitudeParameter->getValue());
+  auto magnitude_parameter = connection->magnitude_parameter_;
+  component->slider.setRange(magnitude_parameter->min, magnitude_parameter->max);
 
-  // component->slider.setValue(value, dontSendNotification);
+  component->slider.setValue(magnitude_parameter->val->value(), dontSendNotification);
   // component->source.setText(connection->source->name, dontSendNotification);
 
   // String targetTitle = connection->target->name + " " + connection->target->parameters[connection->parameterIndex]->id;
 
   // component->target.setText(targetTitle, dontSendNotification);
   // component->slider.setNumDecimalPlacesToDisplay(3);
-  // component->slider.addListener(this->sliderListener);
+  component->slider.addListener(this->slider_listener_);
   // component->delegate = delegate;
   // component->indicator.setColour(connection->source->colour.colour);
 
@@ -56,8 +55,8 @@ Component* ModulationsListBoxModel::refreshComponentForRow(int rowNumber, bool i
 }
 
 void ModulationsListBoxModel::setConnections(std::vector<std::shared_ptr<model::Connection>> modulationConnections) {
-  this->connections.clear();
-  this->connections = modulationConnections;
+  this->connections_.clear();
+  this->connections_ = modulationConnections;
 }
 
 void ModulationsListBoxModel::paintListBoxItem(int rowNumber, Graphics& g, int width, int height, bool rowIsSelected) { }

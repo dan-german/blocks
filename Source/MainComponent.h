@@ -18,7 +18,7 @@
 #include "gui/Tab.h"
 #include "model/NoteLogger.h"
 #include "module_new.h"
-#include "modulation_new.h"
+#include "connection.h"
 
 using Modulation = Model::Modulation;
 using Block = Model::Block;

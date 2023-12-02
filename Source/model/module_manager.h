@@ -6,7 +6,7 @@
 #include "gui/ColourPool.h"
 #include "settings/Constants.h"
 #include "module_new.h"
-#include "modulation_new.h"
+#include "connection.h"
 // #include "model/PresetManager.h"
 
 // using Module = Model::Module;

@@ -58,7 +58,7 @@ void InspectorComponent::spawnSlider(vital::ValueDetails parameter) {
   addAndMakeVisible(slider);
 
   // auto value = audioParameter->getNormalisableRange().convertFrom0to1(audioParameter->getValue());
-  // slider->slider.setValue(value, dontSendNotification);
+  slider->slider.setValue(parameter.val->value(), dontSendNotification);
 }
 
 void InspectorComponent::resetInspector() {

@@ -6,7 +6,7 @@
 
 namespace model {
 class FilterModule: public Block {
-public:
+public: 
   FilterModule(int number): Block("filter", number) {
     add({ .name = "style", .max = 9.0 });
     add({ .name = "cutoff", .min = 8.0, .max = 136.0, .default_value = 60.0 });

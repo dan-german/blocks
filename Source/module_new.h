@@ -3,7 +3,6 @@
 #include "model/id.h"
 #include "gui/ModuleColour.h"
 #include "model/Index.h"
-// #include "vital/synthesis/framework/value.h"
 
 using ValueScale = vital::ValueDetails::ValueScale;
 using Type = vital::ValueDetails::Type;
@@ -13,10 +12,8 @@ class Module {
 public:
   ID id;
   std::string name;
-  // Index index = { -1, -1 };
   std::vector<std::shared_ptr<vital::ValueDetails>> parameters_;
   std::map<std::string, std::shared_ptr<vital::ValueDetails>> parameter_map_;
-  // std::vector<vital::Value*> values_;
 
   enum Category { source, effect, modulator, tab };
   Category category;

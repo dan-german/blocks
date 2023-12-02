@@ -104,9 +104,9 @@ void MainComponent::setupTabGrid() {
   tab_grid_.listener = this;
   addAndMakeVisible(tab_grid_, 2);
 
-  for (auto glowIndicator : tab_grid_.glowIndicators) {
-    addChildComponent(glowIndicator);
-    glowIndicator->toFront(false);
+  for (auto glow_indicator_ : tab_grid_.glowIndicators) {
+    addChildComponent(glow_indicator_);
+    glow_indicator_->toFront(false);
   }
 }
 
@@ -124,7 +124,7 @@ void MainComponent::setupBlockGrid() {
 
 void MainComponent::setupUI() {
   // uiLayer.presetButton.setStrings(delegate->editorRequestsPresetNames());
-  ui_layer_.modulationsListBoxModel.delegate = this;
+  ui_layer_.connections_list_box_model_.delegate_ = this;
   ui_layer_.modulators_.addMouseListener(this, true);
   addAndMakeVisible(ui_layer_, 2);
 }
@@ -416,8 +416,8 @@ void MainComponent::updateModuleComponentVisuals(int sliderIndex, float value, s
       changeModulePainter((int)value);
       break;
     case OscillatorModule::pUnison: {
-      auto moduleComponent = block_matrix_[block->index.row][block->index.column];
-      if (auto painter = moduleComponent->getPainter())
+      auto module_component = block_matrix_[block->index.row][block->index.column];
+      if (auto painter = module_component->getPainter())
         painter->setUnison(static_cast<int>(value));
       break;
     }
@@ -428,16 +428,16 @@ void MainComponent::updateModuleComponentVisuals(int sliderIndex, float value, s
 }
 
 void MainComponent::refreshInspector() {
-  std::shared_ptr<model::Module> focusedModule;
+  std::shared_ptr<model::Module> focused_module;
 
   // auto isTab = tabGrid.containsItem(focusedGridItem);
   // if (isTab) {
   //   focusedModule = delegate->getTab(focusedGridItem->index.column);
   // } else {
-  focusedModule = delegate->getBlock2(focused_grid_item_->index);
+  focused_module = delegate->getBlock2(focused_grid_item_->index);
   // }
 
-  inspector_.setConfiguration(focusedModule);
+  inspector_.setConfiguration(focused_module);
   ResizeInspector();
 }
 
@@ -478,8 +478,8 @@ void MainComponent::spawnTabComponent(std::shared_ptr<Tab> tab) {
 
 void MainComponent::graphicsTimerCallback(const float secondsSincelastUpdate) {
   return;
-  auto currentlyPlayingNotes = delegate->editorRequestsCurrentlyPlayingNotes();
-  note_logger_.log(currentlyPlayingNotes);
+  auto currently_playing_notes = delegate->editorRequestsCurrentlyPlayingNotes();
+  note_logger_.log(currently_playing_notes);
 
   if (ui_layer_.connections.isVisible()) {
     auto modulationConnections = delegate->getModulations();
@@ -581,7 +581,7 @@ void MainComponent::connectionDeleted(ConnectionComponent* component) {
   delegate->editorDisconnectedModulation(component->row);
   ui_layer_.setConnections(delegate->getModulations());
 
-  // if (inspector.isVisible()) inspector.setConfiguration(delegate->getBlock(focusedGridItem->index));
+  if (inspector_.isVisible()) inspector_.setConfiguration(delegate->getBlock2(focused_grid_item_->index));
   for (auto block : blocks) block->setConfig(delegate->getBlock(block->index));
 }
 

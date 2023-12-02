@@ -31,7 +31,7 @@ UILayer::UILayer(juce::MidiKeyboardState& keyboard_state, Slider::Listener* list
   matrixButton->on_click_ = [this]() { connections.setVisible(true); };
 
   setupKeyboard();
-  modulationsListBoxModel.sliderListener = listener;
+  connections_list_box_model_.slider_listener_ = listener;
   setInterceptsMouseClicks(false, true);
   setOpaque(false);
 }
@@ -126,7 +126,7 @@ void UILayer::resizePresetButton() {
 
 void UILayer::setupSideMenus() {
   addChildComponent(connections);
-  connections.listBox.setModel(&modulationsListBoxModel);
+  connections.listBox.setModel(&connections_list_box_model_);
   modulators_.isOnLeft = false;
 }
 
@@ -136,7 +136,7 @@ void UILayer::showModulatorsSideMenu() {
 }
 
 void UILayer::setConnections(std::vector<std::shared_ptr<model::Connection>> modulationConnections) {
-  modulationsListBoxModel.setConnections(modulationConnections);
+  connections_list_box_model_.setConnections(modulationConnections);
   if (connections.listBox.isVisible()) connections.listBox.updateContent();
 }
 

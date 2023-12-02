@@ -23,7 +23,7 @@
 #include "MainComponent.h"
 #include "vital/common/synth_gui_interface.h"
 #include "module_new.h"
-#include "modulation_new.h"
+#include "connection.h"
 
 class ValueBridge;
 

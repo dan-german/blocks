@@ -150,7 +150,6 @@ namespace vital {
       }
 
       force_inline void markDead() {
-        DBG("deading");
         setKeyState(kDead);
       }
 

@@ -12,7 +12,7 @@
 
 #include "model/Modulation.h"
 #include "gui/ConnectionComponent.h"
-#include "modulation_new.h"
+#include "connection.h"
 
 using Modulation = Model::Modulation;
 
@@ -22,10 +22,10 @@ public:
   ~ModulationsListBoxModel() override = default;
   Component* refreshComponentForRow(int rowNumber, bool isRowSelected, Component* existingComponentToUpdate) override;
   void setConnections(std::vector<std::shared_ptr<model::Connection>> modulationConnections);
-  Slider::Listener* sliderListener;
-  ConnectionComponent::Listener* delegate;
+  Slider::Listener* slider_listener_;
+  ConnectionComponent::Listener* delegate_;
 private:
-  std::vector<std::shared_ptr<model::Connection>> connections;
+  std::vector<std::shared_ptr<model::Connection>> connections_;
 
   void paintListBoxItem(int rowNumber, Graphics& g, int width, int height, bool rowIsSelected) override;
   void listBoxItemClicked(int row, const MouseEvent& event) override;

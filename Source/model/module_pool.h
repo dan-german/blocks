@@ -15,7 +15,7 @@
 #include "gui/Tab.h"
 #include "ModuleContainer.h"
 #include "module_new.h"
-#include "modulation_new.h"
+#include "connection.h"
 
 // using namespace Model;
 namespace model { 

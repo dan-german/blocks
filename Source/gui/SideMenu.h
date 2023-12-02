@@ -11,7 +11,7 @@
 #pragma once
 
 #include "gui/controls/ExitButton.h"
-#include "model/MatrixListModel.h"
+#include "model/connections_list_model.h"
 #include "model/Modulation.h"
 
 class SideMenu: public Component {
