@@ -63,12 +63,10 @@ namespace vital {
     bool internal_modulation = false;
     bool reset = false;
     Value* val;
+    int decimal_places = 2;
+    bool hidden = false;
+    std::vector<std::string> choices; // equals to string_lookup basically... not the best design choice
   };
-
-  // bool audio_rate = false
-  // bool smooth_value = false
-  // Output* internal_modulation = nullptr
-  // Input* reset = nullptr
 
   class ValueDetailsLookup {
     public:

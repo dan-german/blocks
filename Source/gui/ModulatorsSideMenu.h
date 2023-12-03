@@ -12,7 +12,7 @@
 
 #include "gui/SideMenu.h"
 #include "gui/PlusComponent.h"
-#include "gui/ModulatorsListModel.h"
+#include "gui/modulators_list_model.h"
 #include "model/Module.h"
 #include "gui/controls/ButtonGridPopup.h"
 

@@ -11,7 +11,7 @@
 #include "gui/ModulatorComponent.h"
 
 void ModulatorComponent::sliderDragEnded(Slider* slider) {
-  delegate->modulatorEndedAdjusting(this, currentSliderIndex);
+  delegate_->modulatorEndedAdjusting(this, currentSliderIndex);
   ThemeManager::shared()->addListener(this);
 }
 
@@ -40,7 +40,7 @@ ModulatorComponent::ModulatorComponent() {
 
 void ModulatorComponent::setupRemoveButton() {
   addAndMakeVisible(exitButton);
-  exitButton.onClick = [this]() { delegate->modulatorRemoved(this); };
+  exitButton.onClick = [this]() { delegate_->modulatorRemoved(this); };
 }
 
 void ModulatorComponent::setupSliders() {
@@ -49,7 +49,7 @@ void ModulatorComponent::setupSliders() {
     sliders.add(slider);
     addAndMakeVisible(slidersContainer);
     slidersContainer.addAndMakeVisible(slider);
-    slider->boxSlider.slider.addListener(this);
+    slider->box_slider_.slider.addListener(this);
   }
 }
 
@@ -175,7 +175,7 @@ int ModulatorComponent::calculateHeight() {
 void ModulatorComponent::mouseDown(const MouseEvent& event) {
   if (event.eventComponent->getName() == ModulatorComponent::dragComponentIdentifier) {
     modulatorDragComponent.setMouseCursor(MouseCursor::NoCursor);
-    delegate->modulatorStartedDrag(this, event);
+    delegate_->modulatorStartedDrag(this, event);
   }
 }
 
@@ -183,7 +183,7 @@ void ModulatorComponent::mouseUp(const MouseEvent& event) {
   modulatorDragComponent.setMouseCursor(MouseCursor::NormalCursor);
 
   if (event.eventComponent->getName() == ModulatorComponent::dragComponentIdentifier)
-    delegate->modulatorEndedDrag(this, event);
+    delegate_->modulatorEndedDrag(this, event);
 }
 
 void ModulatorComponent::mouseEnter(const MouseEvent& event) {
@@ -198,7 +198,7 @@ void ModulatorComponent::mouseExit(const MouseEvent& event) {
 
 void ModulatorComponent::mouseDrag(const MouseEvent& event) {
   if (event.eventComponent->getName() == ModulatorComponent::dragComponentIdentifier)
-    delegate->modulatorIsDragging(this, event);
+    delegate_->modulatorIsDragging(this, event);
 }
 
 void ModulatorComponent::setColour(Colour colour) {
@@ -210,23 +210,23 @@ void ModulatorComponent::setColour(Colour colour) {
   envelopePath.colour = colour;
 
   for (auto slider : sliders)
-    slider->boxSlider.slider.setColour(Slider::ColourIds::trackColourId, colour.darker(0.9f));
+    slider->box_slider_.slider.setColour(Slider::ColourIds::trackColourId, colour.darker(0.9f));
 }
 
 void ModulatorComponent::sliderDragStarted(Slider* slider) {
   for (int i = 0; i < sliders.size(); i++)
-    if (&sliders[i]->boxSlider.slider == slider) {
+    if (&sliders[i]->box_slider_.slider == slider) {
       currentSliderIndex = i;
       break;
     }
 
-  delegate->modulatorStartedAdjusting(this, currentSliderIndex);
+  delegate_->modulatorStartedAdjusting(this, currentSliderIndex);
 }
 
 void ModulatorComponent::sliderValueChanged(Slider* slider) {
   float value = static_cast<float>(slider->getValue());
   if (onSliderValueChange) onSliderValueChange(currentSliderIndex, value);
-  delegate->modulatorIsAdjusting(this, currentSliderIndex, value);
+  delegate_->modulatorIsAdjusting(this, currentSliderIndex, value);
 }
 
 void ModulatorComponent::themeChanged(Theme theme) {

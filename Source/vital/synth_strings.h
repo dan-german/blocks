@@ -110,11 +110,11 @@ namespace strings {
   };
 
   const std::string kFrequencySyncNames[] = {
-    "Seconds",
-    "Tempo",
-    "Tempo Dotted",
-    "Tempo Triplets",
-    "Keytrack"
+    "seconds",
+    "tempo",
+    "dotted",
+    "triplets",
+    "keytrack"
   };
 
   const std::string kDistortionTypeShortNames[] = {
@@ -174,7 +174,7 @@ namespace strings {
   };
 
   const std::string kSyncedFrequencyNames[] = {
-    "Freeze",
+    "freeze",
     "32/1",
     "16/1",
     "8/1",
@@ -209,12 +209,12 @@ namespace strings {
   };
 
   const std::string kSyncNames[] = {
-    "Trigger",
-    "Sync",
-    "Envelope",
-    "Sustain Envelope",
-    "Loop Point",
-    "Loop Hold",
+    "trigger",
+    "sync",
+    "envelope",
+    "release",
+    "loop point",
+    "loop hold",
   };
 
   const std::string kRandomShortNames[] = {

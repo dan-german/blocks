@@ -41,7 +41,7 @@ private:
   int currentSliderIndex = -1;
 public:
   struct Listener;
-  Listener* delegate;
+  Listener* delegate_;
   OwnedArray<LabeledSlider> sliders;
   Label title;
   EnvelopePath envelopePath;

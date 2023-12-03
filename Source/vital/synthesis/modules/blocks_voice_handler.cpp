@@ -75,10 +75,11 @@ void BlocksVoiceHandler::addModulator(std::shared_ptr<model::Module> modulator) 
     lfo->control_map_["sync"]->set(0.0f);
     auto cm = lfo->control_map_;
 
-    modulator->parameters_[0]->val = lfo->control_map_["tempo"];
-    modulator->parameters_[1]->val = lfo->control_map_["frequency"];
-    modulator->parameters_[2]->val = lfo->control_map_["sync"]; // sync
-    modulator->parameters_[3]->val = lfo->control_map_["sync_type"]; // mode
+    modulator->parameter_map_["wave"]->val = lfo->control_map_["tempo"];
+    modulator->parameter_map_["tempo"]->val = lfo->control_map_["tempo"];
+    modulator->parameter_map_["frequency"]->val = lfo->control_map_["frequency"];
+    modulator->parameter_map_["sync"]->val = lfo->control_map_["sync"];
+    modulator->parameter_map_["mode"]->val = lfo->control_map_["sync_type"]; // mode
   } else if (type == "adsr") { 
     auto adsr = envelopes_[0];
     modulator->parameters_[0]->val = adsr->control_map_["attack"];

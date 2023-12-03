@@ -25,11 +25,15 @@ MainComponent::MainComponent(juce::MidiKeyboardState& keyboard_state, Delegate* 
 
   note_logger_.listener = this;
   ThemeManager::shared()->set(UserSettings::shared()->getInt("theme", 0));
-  //
-  // auto block = addBlock(0, { 0, 0 });
-  // spawnBlockComponent(block);
 
+  auto block = addBlock(0, { 0, 0 });
+  spawnBlockComponent(block);
   // addModulator(Model::Types::lfo);
+
+  // auto parameter_name = block->parameters_[0]->name;
+  // delegate->editorConnectedModulation(0, block->name, parameter_name);
+  // ui_layer_.setConnections(delegate->getModulations());
+  // refreshInspector();
 }
 
 void MainComponent::updateDotPosition(const Point<int> position) {
@@ -635,8 +639,8 @@ void MainComponent::modulatorIsDragging(ModulatorComponent* modulatorComponent, 
     auto victim = getFocusedModule();
 
     // if (victim->parameters[sliderIndexUnderMouse]->isModulatable) {
-      auto slider = inspector_.getSliders()[sliderIndexUnderMouse];
-      slider->setHighlighted(true, modulatorComponent->getColour());
+    auto slider = inspector_.getSliders()[sliderIndexUnderMouse];
+    slider->setHighlighted(true, modulatorComponent->getColour());
     // }
   // } else {
     // if (previousSliderUnderMouse.has_value()) {
@@ -648,7 +652,7 @@ void MainComponent::modulatorIsDragging(ModulatorComponent* modulatorComponent, 
 
 std::shared_ptr<model::Module> MainComponent::getFocusedModule() {
   // if (focusedGridItem->grid == &blockGrid)
-    return delegate->getBlock2(focused_grid_item_->index);
+  return delegate->getBlock2(focused_grid_item_->index);
   // else
   //   return delegate->getTab(focusedGridItem->index.column);
 }

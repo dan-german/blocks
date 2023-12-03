@@ -23,8 +23,6 @@ namespace model {
     std::shared_ptr<vital::ValueDetails> magnitude_parameter_;
     std::shared_ptr<vital::ValueDetails> bipolar_parameter_;
 
-    // std::shared_ptr<RangedAudioParameter> magnitudeParameter;
-    // std::shared_ptr<RangedAudioParameter> bipolarParameter;
 
     int id = 0;
     int number;
@@ -33,8 +31,6 @@ namespace model {
     std::shared_ptr<Module> target;
     std::string parameter_name_;
 
-    // float getMagnitude() { return magnitudeParameter->getNormalisableRange().convertFrom0to1(magnitudeParameter->getValue()); }
-    // float getBipolar() { return bipolarParameter->getNormalisableRange().convertFrom0to1(bipolarParameter->getValue()); }
     bool isOscGainEnvelope();
 
     void reset();

@@ -131,7 +131,7 @@ public:
   String getPresetName();
   String getMacroName(int index);
 
-  model::ModuleManager getModuleManager() { return module_manager_; }
+  model::ModuleManager& getModuleManager() { return module_manager_; }
 
   vital::control_map& getControls() { return controls_; }
   vital::SoundEngine* getEngine() { return engine_.get(); }

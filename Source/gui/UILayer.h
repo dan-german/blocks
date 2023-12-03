@@ -18,7 +18,7 @@
 #include "gui/KeyboardComponent.h"
 #include "gui/ValueAnimator.h"
 #include "model/Module.h"
-#include "gui/ModulatorsListModel.h"
+#include "gui/modulators_list_model.h"
 #include "gui/ModulatorsSideMenu.h"
 #include "gui/controls/ButtonGridPopup.h"
 #include <juce_gui_basics/juce_gui_basics.h>

@@ -12,6 +12,7 @@ class Module {
 public:
   ID id;
   std::string name;
+  std::string display_name;
   std::vector<std::shared_ptr<vital::ValueDetails>> parameters_;
   std::map<std::string, std::shared_ptr<vital::ValueDetails>> parameter_map_;
 
@@ -29,13 +30,16 @@ public:
 
   Module(std::string prefix, int number): name(prefix + "_" + std::to_string(number)) {
     id = { prefix, number };
-  }
+    display_name = prefix + " " + std::to_string(number);
+  } 
 
   void add(vital::ValueDetails parameter) {
+    parameter.display_name = parameter.display_name != "" ? parameter.display_name : parameter.name;
+    std::string short_name = parameter.name;
     parameter.name = name + "_" + parameter.name;
     auto shared_ptr = std::make_shared<vital::ValueDetails>(parameter);
     parameters_.push_back(shared_ptr);
-    parameter_map_[parameter.name] = shared_ptr;
+    parameter_map_[short_name] = shared_ptr;
   }
 };
 

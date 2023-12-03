@@ -42,8 +42,6 @@ bool Connection::operator==(const Connection& rhs) const {
 }
 
 void Connection::reset() {
-  // magnitudeParameter->setValue(1.0f);
-  // bipolarParameter->setValue(true);
   source = nullptr;
   target = nullptr;
 }

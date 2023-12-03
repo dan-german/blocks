@@ -30,10 +30,16 @@ void InspectorComponent::spawnSlider(vital::ValueDetails parameter) {
   // auto audioParameter = parameter->audioParameter;
 
   // auto range = audioParameter->getNormalisableRange();
-  slider->slider.setRange(parameter.min, parameter.max);
+  double interval = 0.0;
+  if (parameter.value_scale == ValueScale::kIndexed) {
+    interval = 1.0;
+  }
+
+  slider->slider.setRange(parameter.min, parameter.max, interval);
 
   slider->slider.addListener(this);
-  // slider->titleLabel.setText(parameter->id.toStdString(), dontSendNotification);
+  slider->titleLabel.setText(parameter.display_name, dontSendNotification);
+  slider->slider.setNumDecimalPlacesToDisplay(parameter.decimal_places);
   // slider->slider.setSkewFactor(parameter->skew, false);
   // slider->slider.setTextValueSuffix(parameter->valueSuffix);
 
@@ -45,7 +51,7 @@ void InspectorComponent::spawnSlider(vital::ValueDetails parameter) {
   // auto choices = audioParameter->getAllValueStrings();
 
   // if (parameter->textFromValueFunction)
-  //   slider->slider.textFromValueFunction = parameter->textFromValueFunction;
+  // slider->slider.textFromValueFunction = [parameter](double value) { return std::to_string(value * parameter.display_multiply); };
   // else if (choices.size() != 0) {
   //   slider->setType(InspectorSlider::Type::thumb);
   //   slider->slider.textFromValueFunction = [choices](double value) { return choices[value]; };
@@ -57,7 +63,6 @@ void InspectorComponent::spawnSlider(vital::ValueDetails parameter) {
   parameterSliders.add(slider);
   addAndMakeVisible(slider);
 
-  // auto value = audioParameter->getNormalisableRange().convertFrom0to1(audioParameter->getValue());
   slider->slider.setValue(parameter.val->value(), dontSendNotification);
 }
 

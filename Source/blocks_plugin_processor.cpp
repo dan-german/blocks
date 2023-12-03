@@ -246,8 +246,19 @@ juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter() {
 
 // MainComponent::Delegate
 void PluginProcessor::editorAdjustedModulator(int parameter, int index, float value) {
-  std::cout << "adjusting modulator index; " << index << " param: " << parameter << " val: " << value << std::endl;
   auto modulator = synth_->getModuleManager().getModulator(index);
+
+  if (modulator->id.type == "lfo") {
+    if (parameter == 1) {
+      bool is_changing_seconds = modulator->parameter_map_["sync"]->val->value() == 0.0f;
+      if (is_changing_seconds) {
+        modulator->parameter_map_["frequency"]->val->set(value);
+      } else {
+        modulator->parameter_map_["tempo"]->val->set(value);
+      }
+    }
+  }
+
   modulator->parameters_[parameter]->val->set(value);
 }
 
@@ -490,6 +501,6 @@ void PluginProcessor::editorParameterGestureChanged(String moduleName, int param
   }
 }
 
-std::vector<std::shared_ptr<model::Module>> PluginProcessor::getModulators2() { 
+std::vector<std::shared_ptr<model::Module>> PluginProcessor::getModulators2() {
   return synth_->getModuleManager().getModulators();
 }

@@ -20,7 +20,7 @@ public:
 
   void resized() override;
   Label label;
-  BoxSlider boxSlider;
+  BoxSlider box_slider_;
   void themeChanged(Theme theme) override;
 private:
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(LabeledSlider)

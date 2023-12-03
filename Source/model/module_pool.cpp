@@ -51,7 +51,7 @@ std::shared_ptr<model::Module> ModulePool::getModulator(std::string code, int nu
   return modulator;
 }
 
-std::shared_ptr<Connection> ModulePool::getModulation(int number) {
+std::shared_ptr<Connection> ModulePool::getConnection(int number) {
   int index = 0;
   for (int i = 0; i < connections.size(); i++) {
     if (connections[i]->number == number) {

@@ -76,8 +76,8 @@ void ModuleManager::repositionBlock(Index oldIndex, Index newIndex) {
 std::shared_ptr<Connection> ModuleManager::addConnection(std::shared_ptr<Module> source, std::shared_ptr<Module> target, std::string parameter_name, int number) {
   if (connectionExists(parameter_name, source, target)) return nullptr;
 
-  auto connection = pool.getModulation(number);
-  // connection->parameterIndex = parameterIndex;
+  auto connection = pool.getConnection(number);
+  connection->parameter_name_ = parameter_name;
   connection->source = source;
   connection->target = target;
   connections.push_back(connection);
@@ -109,15 +109,11 @@ void ModuleManager::removeConnection(std::shared_ptr<Connection> connection) {
 }
 
 std::vector<std::shared_ptr<Connection>> ModuleManager::getConnections() {
-  std::vector<std::shared_ptr<Connection>> array;
-  array.insert(array.end(), connections.begin(), connections.end());
-  return array;
+  return connections;
 }
 
 std::vector<std::shared_ptr<Module>> ModuleManager::getModulators() {
-  std::vector<std::shared_ptr<Module>> array;
-  array.insert(array.end(), modulators.begin(), modulators.end());
-  return array;
+  return modulators;
 }
 
 void ModuleManager::clear() {

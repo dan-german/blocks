@@ -164,7 +164,7 @@ void BlockComponent::setEnvelopePath(Colour colour) {
 BlockComponent* BlockComponent::create(std::shared_ptr<model::Block> block) {
   auto component = new BlockComponent(block->index);
 
-  component->setTitle(block->name);
+  component->setTitle(block->display_name);
   component->isStretchable = block->category == model::Module::Category::effect;
   component->length = block->length;
   component->colour = block->colour.colour;
