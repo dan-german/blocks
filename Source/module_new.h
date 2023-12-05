@@ -5,7 +5,6 @@
 #include "model/Index.h"
 
 using ValueScale = vital::ValueDetails::ValueScale;
-using Type = vital::ValueDetails::Type;
 
 namespace model {
 class Module {

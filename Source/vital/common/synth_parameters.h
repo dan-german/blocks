@@ -23,16 +23,7 @@
 #include <string>
 
 namespace vital {
-
   struct ValueDetails {
-    enum Type {
-      kBase,
-      kMode,
-      kMonoMod,
-      kPolyMod,
-      kTempoSyncSwitch
-    };
-
     enum ValueScale {
       kIndexed,
       kLinear,
@@ -57,7 +48,6 @@ namespace vital {
     std::string display_name;
     const std::string* string_lookup = nullptr;
     std::string local_description;
-    Type type = kPolyMod;
     bool audio_rate = false;
     bool smooth_value = false;
     bool internal_modulation = false;
