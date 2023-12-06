@@ -27,8 +27,8 @@ MainComponent::MainComponent(juce::MidiKeyboardState& keyboard_state, Delegate* 
   note_logger_.listener = this;
   ThemeManager::shared()->set(UserSettings::shared()->getInt("theme", 0));
 
-  auto block = addBlock(0, { 0, 0 });
-  spawnBlockComponent(block);
+  // auto block = addBlock(0, { 0, 0 });
+  // spawnBlockComponent(block);
   // addModulator(Model::Types::lfo);
 
   // auto parameter_name = block->parameters_[0]->name;
@@ -793,7 +793,7 @@ void MainComponent::gridItemRepositioned(GridComponent* grid, GridItemComponent*
     block_matrix_[oldIndex.row][oldIndex.column] = nullptr;
     block_matrix_[item->index.row][item->index.column] = static_cast<BlockComponent*>(item);
     delegate->editorRepositionedBlock(oldIndex, item->index);
-    ResetDownFlowingDots();
+    // ResetDownFlowingDots();
   } else if (grid == &tab_grid_) {
     delegate->editorRepositionedTab(oldIndex.column, item->index.column);
   }

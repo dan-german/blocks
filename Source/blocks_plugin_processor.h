@@ -81,7 +81,7 @@ public:
 
   void editorRemovedTab(int column) override;
   void editorRemovedBlock(Index index) override;
-  void editorRepositionedBlock(Index oldIndex, Index newIndex) override;
+  void editorRepositionedBlock(Index from, Index to) override;
   void editorAdjustedBlock(Index index, int parameter, float value) override;
   void editorAdjustedTab(int column, int parameter, float value) override;
   void editorChangedModulationMagnitude(int connectionIndex, float magnitude) override;

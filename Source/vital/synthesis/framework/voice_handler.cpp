@@ -650,8 +650,6 @@ namespace vital {
     VITAL_ASSERT(channel >= 0 && channel < kNumMidiChannels);
 
     Voice* voice = grabVoice();
-    // print voice's memory address
-    std::cout << voice << std::endl;
     if (voice == nullptr)
       return;
 

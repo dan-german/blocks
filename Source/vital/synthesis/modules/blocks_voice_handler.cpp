@@ -32,6 +32,7 @@
 #include "oscillator_module_new.h"
 #include "filter_module_new.h"
 #include "lfo_module_new.h"
+#include "blocks_voice_handler.h"
 
 namespace vital {
 
@@ -59,10 +60,10 @@ BlocksVoiceHandler::BlocksVoiceHandler(Output* beats_per_second):
   int rows = 7;
   int columns = 5;
 
-  processor_matrix_.resize(rows);
+  processor_matrix_.resize(columns);
 
   for (int i = 0; i < columns; i++) {
-    processor_matrix_[i].resize(columns);
+    processor_matrix_[i].resize(rows);
   }
 }
 
@@ -80,7 +81,7 @@ void BlocksVoiceHandler::addModulator(std::shared_ptr<model::Module> modulator) 
     modulator->parameter_map_["frequency"]->val = lfo->control_map_["frequency"];
     modulator->parameter_map_["sync"]->val = lfo->control_map_["sync"];
     modulator->parameter_map_["mode"]->val = lfo->control_map_["sync_type"]; // mode
-  } else if (type == "adsr") { 
+  } else if (type == "adsr") {
     auto adsr = envelopes_[0];
     modulator->parameters_[0]->val = adsr->control_map_["attack"];
     modulator->parameters_[1]->val = adsr->control_map_["decay"];
@@ -89,18 +90,21 @@ void BlocksVoiceHandler::addModulator(std::shared_ptr<model::Module> modulator) 
   }
 }
 
+void BlocksVoiceHandler::repositionBlock(Index from, Index to) {
+  std::cout << "from: " << from.column << ", " << from.row << " | to: " << to.column << ", " << to.row << std::endl;
+  processor_matrix_[to.column][to.row] = processor_matrix_[from.column][from.row];
+  processor_matrix_[from.column][from.row] = nullptr;
+  unplugAll();
+  connectAll();
+}
+
 void BlocksVoiceHandler::addBlock(std::shared_ptr<model::Block> block) {
   createProcessor(block);
+  unplugAll();
+  connectAll();
+}
 
-  for (int column = 0; column < processor_matrix_.size(); column++) {
-    for (int row = 0; row < processor_matrix_[column].size(); row++) {
-      auto processor = processor_matrix_[column][row];
-      if (processor != nullptr) {
-        voice_sum_->unplug(processor_matrix_[column][row].get());
-      }
-    }
-  }
-
+void BlocksVoiceHandler::connectAll() {
   Processor* current = nullptr;
   Processor* target = nullptr;
   for (int column = 0; column < processor_matrix_.size(); column++) {
@@ -114,7 +118,21 @@ void BlocksVoiceHandler::addBlock(std::shared_ptr<model::Block> block) {
         current = processor.get();
       }
     }
-    last_node_->plug(current, block->index.column);
+
+    if (current) {
+      last_node_->plug(current, column);
+    }
+  }
+}
+
+void BlocksVoiceHandler::unplugAll() {
+  for (int column = 0; column < processor_matrix_.size(); column++) {
+    for (int row = 0; row < processor_matrix_[column].size(); row++) {
+      auto processor = processor_matrix_[column][row];
+      if (processor != nullptr) {
+        voice_sum_->unplug(processor_matrix_[column][row].get());
+      }
+    }
   }
 }
 
@@ -248,7 +266,7 @@ std::shared_ptr<SynthModule> BlocksVoiceHandler::createProcessor(std::shared_ptr
     filter->control_map_["on"]->set(1.0f);
   }
 
-  processor_matrix_[index.row][index.column] = processor;
+  processor_matrix_[index.column][index.row] = processor;
   processors_[module->id.type].push_back(processor);
   return processor;
 }
