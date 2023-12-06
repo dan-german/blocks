@@ -283,6 +283,7 @@ void PluginProcessor::editorAdjustedTab(int column, int parameter, float value) 
   // moduleManager.getTab(column)->parameter(parameter)->setValue(value);
 }
 
+#pragma warning(default:4716)
 std::shared_ptr<Module> PluginProcessor::getModulator(int index) {
   // return moduleManager.getModulator(index);
 }
@@ -313,6 +314,7 @@ std::vector<std::shared_ptr<model::Connection>> PluginProcessor::getModulations(
 //   return modulations;
 // }
 
+#pragma warning(default:4716)
 std::shared_ptr<Block> PluginProcessor::getBlock(Index index) {
 
 }
@@ -321,14 +323,17 @@ std::shared_ptr<model::Module> PluginProcessor::getBlock2(Index index) {
   return (index.row == -1 || index.column == -1) ? nullptr : synth_->getModuleManager().getBlock(index);
 }
 
+#pragma warning(default:4716)
 std::shared_ptr<Tab> PluginProcessor::getTab(int column) {
   // return moduleManager.getTab(column);
 }
 
+#pragma warning(default:4716)
 juce::Array<MPENote> PluginProcessor::editorRequestsCurrentlyPlayingNotes() {
   // return currentlyPlayingNotes;
 }
 
+#pragma warning(default:4716)
 juce::Array<int> PluginProcessor::editorRequestsActiveColumns() {
   // return moduleManager.getActiveColumns();
 }
@@ -361,6 +366,7 @@ void PluginProcessor::editorRemovedTab(int column) {
   // removeTab(column);
 }
 
+#pragma warning(default:4716)
 std::shared_ptr<Tab> PluginProcessor::editorAddedTab(int column) {
   // auto type = Model::Types::noteTab;
   // Analytics::shared()->countAction(type + " Tab Added");
@@ -372,6 +378,7 @@ void PluginProcessor::editorRemovedModulator(int index) {
   // removeModulator(index);
 }
 
+#pragma warning(default:4716)
 std::shared_ptr<Module> PluginProcessor::editorAddedModulator(Model::Type code) {
 
 }
@@ -437,6 +444,7 @@ void PluginProcessor::editorSavedPreset(String name) {
   // presetManager.save(info);
 }
 
+#pragma warning(default:4716)
 std::pair<float, float> PluginProcessor::editorRequestsModulatorValue(Index moduleIndex, int parameterIndex, int modulatorIndex) {
   // auto voice = blockVoices[getCurrentVoiceIndex()];
   // auto processor = voice->getProcessor(moduleIndex);
@@ -449,6 +457,7 @@ std::pair<float, float> PluginProcessor::editorRequestsModulatorValue(Index modu
   // return { 0.0f, 0.0f };
 }
 
+#pragma warning(default:4716)
 std::pair<float, float> PluginProcessor::editorRequestsModulatorValue(int modulationConnectionIndex) {
   // auto connection = moduleManager.getConnection(modulationConnectionIndex);
   // auto currentVoice = blockVoices[getCurrentVoiceIndex()];
@@ -459,6 +468,7 @@ std::pair<float, float> PluginProcessor::editorRequestsModulatorValue(int modula
   // return { 0.0f, 0.0f };
 }
 
+#pragma warning(default:4716)
 PresetInfo PluginProcessor::getStateRepresentation() {
   // auto currentState = PresetInfo();
 
