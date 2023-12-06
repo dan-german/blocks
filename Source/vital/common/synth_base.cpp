@@ -821,3 +821,19 @@ std::shared_ptr<model::Module> SynthBase::addModulator(Model::Type type, int num
   getVoiceHandler()->addModulator(modulator);
   return modulator;
 }
+
+void SynthBase::repositionBlock(Index from, Index to) { 
+  auto block = getModuleManager().getBlock(from);
+
+  if (block->length > 1) {
+    // repositionGroup(from, to);
+  } else {
+    getVoiceHandler()->repositionBlock(from, to);
+    // getVoiceHandler()->repo
+    // for (auto voice : blockVoices) {
+      // voice->repositionProcessor(from, to);
+    // }
+  }
+
+  module_manager_.repositionBlock(from, to);
+}

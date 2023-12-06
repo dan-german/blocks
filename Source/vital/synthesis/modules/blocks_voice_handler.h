@@ -80,7 +80,10 @@ public:
   }
 
   void addBlock(std::shared_ptr<model::Block> block);
+  void connectAll();
+  void unplugAll();
   void addModulator(std::shared_ptr<model::Module> module);
+  void repositionBlock(Index from, Index to);
 
   std::vector<std::shared_ptr<model::Module>> active_modulators_;
 private:
@@ -89,8 +92,9 @@ private:
   void createModulators();
   void createVoiceOutput();
   void createFilters(Output* keytrack);
-  std::shared_ptr<SynthModule> createProcessor(std::shared_ptr<model::Block> module);
   void setupPolyModulationReadouts();
+
+  std::shared_ptr<SynthModule> createProcessor(std::shared_ptr<model::Block> module);
 
   ModulationConnectionBank modulation_bank_;
   CircularQueue<ModulationConnectionProcessor*> enabled_modulation_processors_;

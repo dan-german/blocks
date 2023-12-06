@@ -333,9 +333,10 @@ juce::Array<int> PluginProcessor::editorRequestsActiveColumns() {
   // return moduleManager.getActiveColumns();
 }
 
-void PluginProcessor::editorRepositionedBlock(Index oldIndex, Index newIndex) {
+void PluginProcessor::editorRepositionedBlock(Index from, Index to) {
   // Analytics::shared()->countAction("Block Repositioned");
   // repositionProcessor(oldIndex, newIndex);
+  synth_->repositionBlock(from, to);
 }
 
 void PluginProcessor::editorConnectedModulation(int modulatorIndex, std::string target_name, std::string parameter) {

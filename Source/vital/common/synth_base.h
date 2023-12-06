@@ -90,6 +90,7 @@ public:
 
   std::shared_ptr<model::Block> addBlock(std::string type, Index index);
   std::shared_ptr<model::Module> addModulator(Model::Type tpye, int number = -1, int colour_id = -1);
+  void repositionBlock(Index from, Index to);
 
   const vital::StatusOutput* getStatusOutput(const std::string& name);
 
