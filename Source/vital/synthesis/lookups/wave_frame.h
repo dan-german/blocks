@@ -62,12 +62,12 @@ namespace vital {
   class PredefinedWaveFrames {
     public:
       enum Shape {
-        kSin,
-        kSaturatedSin,
-        kTriangle,
-        kSquare,
-        kPulse,
         kSaw,
+        kSin,
+        kSquare,
+        kTriangle,
+        // kSaturatedSin,
+        // kPulse,
         kNumShapes
       };
 
@@ -81,12 +81,12 @@ namespace vital {
         return &wave_frames;
       }
 
-      void createSin(WaveFrame& wave_frame);
-      void createSaturatedSin(WaveFrame& wave_frame);
-      void createTriangle(WaveFrame& wave_frame);
-      void createSquare(WaveFrame& wave_frame);
-      void createPulse(WaveFrame& wave_frame);
       void createSaw(WaveFrame& wave_frame);
+      void createSin(WaveFrame& wave_frame);
+      void createSquare(WaveFrame& wave_frame);
+      void createTriangle(WaveFrame& wave_frame);
+      void createSaturatedSin(WaveFrame& wave_frame);
+      void createPulse(WaveFrame& wave_frame);
 
       WaveFrame wave_frames_[kNumShapes];
   };

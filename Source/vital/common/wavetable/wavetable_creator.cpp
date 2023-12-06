@@ -150,9 +150,11 @@ void WavetableCreator::renderToBuffer(float* buffer, int num_frames, int frame_s
 }
 
 void WavetableCreator::init() {
-  clear();
-  loadDefaultCreator();
-  render();
+  // clear();
+  // loadDefaultCreator();
+  // render();
+  wavetable_->setName("Default shapes");
+  initPredefinedWaves();
 }
 
 void WavetableCreator::clear() {
