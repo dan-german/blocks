@@ -99,12 +99,12 @@ namespace vital {
   }
 
   PredefinedWaveFrames::PredefinedWaveFrames() {
-    createSin(wave_frames_[kSin]);
-    createSaturatedSin(wave_frames_[kSaturatedSin]);
-    createTriangle(wave_frames_[kTriangle]);
-    createSquare(wave_frames_[kSquare]);
     createSaw(wave_frames_[kSaw]);
-    createPulse(wave_frames_[kPulse]);
+    createSin(wave_frames_[kSin]);
+    createSquare(wave_frames_[kSquare]);
+    createTriangle(wave_frames_[kTriangle]);
+    // createSaturatedSin(wave_frames_[kSaturatedSin]);
+    // createPulse(wave_frames_[kPulse]);
   }
 
   void PredefinedWaveFrames::createSin(WaveFrame& wave_frame) {

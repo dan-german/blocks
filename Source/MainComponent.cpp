@@ -5,6 +5,7 @@
 #include "gui/ThemeManager.h"
 #include "settings/UserSettings.h"
 #include "module_new.h"
+#include "vital/common/synth_constants.h"
 
 MainComponent::MainComponent(juce::MidiKeyboardState& keyboard_state, Delegate* delegate): delegate(delegate), ui_layer_(keyboard_state, this), tab_grid_(GridConfigs::tab), block_grid_(GridConfigs::blocks) {
   setWantsKeyboardFocus(false);
@@ -324,6 +325,10 @@ std::shared_ptr<model::Block> MainComponent::addBlock(int code, Index index) {
   case 3: { // tri
     block = delegate->editorAddedBlock2(Model::Types::osc, index);
     DBG(block->parameters_.size());
+
+    const float code_wavetable_frame = 
+      code / 4.0 * (vital::kNumOscillatorWaveFrames - 1);
+    block->parameters_[0]->val->set(code_wavetable_frame);
 
     // if (block == nullptr) return nullptr; // todo - grey out the button in the block selection popup if the block is not available
     // auto range = block->parameters[0]->audioParameter->getNormalisableRange();
