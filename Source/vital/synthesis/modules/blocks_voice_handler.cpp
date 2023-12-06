@@ -112,6 +112,7 @@ void BlocksVoiceHandler::connectAll() {
       auto processor = processor_matrix_[column][row];
       if (processor != nullptr) {
         if (current) {
+          std::cout << "plugging " << current << " into " << processor << std::endl;
           processor->plug(current, 0);
         }
 
@@ -120,8 +121,10 @@ void BlocksVoiceHandler::connectAll() {
     }
 
     if (current) {
+      std::cout << "plugging " << current << " into last node " << last_node_ << " at column: " << column << std::endl;
       last_node_->plug(current, column);
     }
+    current = nullptr;
   }
 }
 
@@ -131,6 +134,7 @@ void BlocksVoiceHandler::unplugAll() {
       auto processor = processor_matrix_[column][row];
       if (processor != nullptr) {
         voice_sum_->unplug(processor_matrix_[column][row].get());
+        last_node_->unplug(processor_matrix_[column][row].get());
       }
     }
   }
