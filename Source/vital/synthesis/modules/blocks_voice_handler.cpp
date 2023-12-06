@@ -225,12 +225,13 @@ std::shared_ptr<SynthModule> BlocksVoiceHandler::createProcessor(std::shared_ptr
   if (module->id.type == "osc") {
     auto osc = oscillators_[0];
     processor = osc;
-    module->parameters_[0]->val = osc->control_map_["transpose"];
-    module->parameters_[1]->val = osc->control_map_["tune"];
-    module->parameters_[2]->val = osc->control_map_["unison_voices"];
-    module->parameters_[3]->val = osc->control_map_["unison_detune"];
-    module->parameters_[4]->val = osc->control_map_["level"];
-    module->parameters_[5]->val = osc->control_map_["pan"];
+    module->parameters_[0]->val = osc->control_map_["wave_frame"];
+    module->parameters_[1]->val = osc->control_map_["transpose"];
+    module->parameters_[2]->val = osc->control_map_["tune"];
+    module->parameters_[3]->val = osc->control_map_["unison_voices"];
+    module->parameters_[4]->val = osc->control_map_["unison_detune"];
+    module->parameters_[5]->val = osc->control_map_["level"];
+    module->parameters_[6]->val = osc->control_map_["pan"];
     oscillators_.erase(oscillators_.begin());
   } else if (module->id.type == "filter") {
     auto filter = std::make_shared<FilterModule>(name);

@@ -318,11 +318,10 @@ std::shared_ptr<model::Block> MainComponent::addBlock(int code, Index index) {
   std::shared_ptr<model::Block> block = nullptr;
 
   switch (code) { // the first row's 5 codes are reserved for different wave types in the block selection menu popup
-  case 0:
-  case 1:
-  case 2:
-  case 3:
-  case 4: {
+  case 0:   // saw
+  case 1:   // sine
+  case 2:   // sqr
+  case 3: { // tri
     block = delegate->editorAddedBlock2(Model::Types::osc, index);
     DBG(block->parameters_.size());
 
@@ -331,6 +330,7 @@ std::shared_ptr<model::Block> MainComponent::addBlock(int code, Index index) {
     // block->parameters[0]->audioParameter->setValue(range.convertTo0to1(code));
     break;
   }
+  // case 4: // noise 
   case 5: block = delegate->editorAddedBlock2(Model::Types::filter, index); break;
     // case 5: block = delegate->editorAddedBlock(Model::Types::filter, index); break;
     // case 6: block = delegate->editorAddedBlock(Model::Types::reverb, index); break;
