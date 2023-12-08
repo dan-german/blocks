@@ -27,14 +27,10 @@ MainComponent::MainComponent(juce::MidiKeyboardState& keyboard_state, Delegate* 
   note_logger_.listener = this;
   ThemeManager::shared()->set(UserSettings::shared()->getInt("theme", 0));
 
-  // auto block = addBlock(0, { 0, 0 });
-  // spawnBlockComponent(block);
-  // addModulator(Model::Types::lfo);
-
-  // auto parameter_name = block->parameters_[0]->name;
-  // delegate->editorConnectedModulation(0, block->name, parameter_name);
-  // ui_layer_.setConnections(delegate->getModulations());
-  // refreshInspector();
+  auto osc_block = addBlock(0, { 0, 0 });
+  spawnBlockComponent(osc_block);
+  auto reverb_block = addBlock(6, { 1, 0 });
+  spawnBlockComponent(reverb_block);
 }
 
 void MainComponent::updateDotPosition(const Point<int> position) {
@@ -338,7 +334,7 @@ std::shared_ptr<model::Block> MainComponent::addBlock(int code, Index index) {
   // case 4: // noise 
   case 5: block = delegate->editorAddedBlock2(Model::Types::filter, index); break;
     // case 5: block = delegate->editorAddedBlock(Model::Types::filter, index); break;
-    // case 6: block = delegate->editorAddedBlock(Model::Types::reverb, index); break;
+    case 6: block = delegate->editorAddedBlock2(Model::Types::reverb, index); break;
     // case 7: block = delegate->editorAddedBlock(Model::Types::delay, index); break;
     // case 8: block = delegate->editorAddedBlock(Model::Types::drive, index); break;
     // case 9: block = delegate->editorAddedBlock(Model::Types::mixer, index); break;

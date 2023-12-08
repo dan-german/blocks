@@ -33,6 +33,7 @@
 #include "filter_module_new.h"
 #include "lfo_module_new.h"
 #include "blocks_voice_handler.h"
+#include "vital/synthesis/modules/reverb_module.h"
 
 namespace vital {
 
@@ -91,10 +92,10 @@ void BlocksVoiceHandler::addModulator(std::shared_ptr<model::Module> modulator) 
 }
 
 void BlocksVoiceHandler::repositionBlock(Index from, Index to) {
+  unplugAll();
   std::cout << "from: " << from.column << ", " << from.row << " | to: " << to.column << ", " << to.row << std::endl;
   processor_matrix_[to.column][to.row] = processor_matrix_[from.column][from.row];
   processor_matrix_[from.column][from.row] = nullptr;
-  unplugAll();
   connectAll();
 }
 
@@ -128,6 +129,18 @@ void BlocksVoiceHandler::connectAll() {
   }
 }
 
+std::shared_ptr<vital::Processor> BlocksVoiceHandler::findProcessorAbove(Index index) { 
+  std::cout << "finding processor above: " << index.column << ", " << index.row << std::endl;
+  for (int i = index.row - 1; i >= 0; i--) {
+    auto processor = processor_matrix_[index.column][i];
+    if (processor != nullptr) {
+      std::cout << "found processor above: " << index.column << ", " << i << std::endl;
+      return processor;
+    }
+  }
+  return nullptr;
+}
+
 void BlocksVoiceHandler::unplugAll() {
   for (int column = 0; column < processor_matrix_.size(); column++) {
     for (int row = 0; row < processor_matrix_[column].size(); row++) {
@@ -135,6 +148,11 @@ void BlocksVoiceHandler::unplugAll() {
       if (processor != nullptr) {
         voice_sum_->unplug(processor_matrix_[column][row].get());
         last_node_->unplug(processor_matrix_[column][row].get());
+        
+        if (auto processor_above = findProcessorAbove({column, row})) {
+          std::cout << "wow unplugging " << std::endl;
+          processor->unplug(processor_above.get());
+        }
       }
     }
   }
@@ -239,6 +257,18 @@ void BlocksVoiceHandler::createFilters(Output* keytrack) {
   }
 }
 
+// void BlocksVoiceHandler::createReverbs() {
+//   for (int i = 0; i < 5; i++) {
+//     auto name = "reverb_" + std::to_string(i + 1);
+//     auto reverb = std::make_shared<ReverbModule>(name);
+//     reverb->plug(reset(), ReverbModule::kReset);
+//     reverb->plug(bent_midi_, ReverbModule::kMidi);
+//     addSubmodule(reverb.get());
+//     addProcessor(reverb.get());
+//     processors_["reverb"].push_back(reverb);
+//   }
+// }
+
 std::shared_ptr<SynthModule> BlocksVoiceHandler::createProcessor(std::shared_ptr<model::Block> module) {
   auto index = module->index;
   auto name = module->name;
@@ -268,8 +298,20 @@ std::shared_ptr<SynthModule> BlocksVoiceHandler::createProcessor(std::shared_ptr
     filter->plug(note_from_reference_->output(), FilterModule::kKeytrack);
     processors_["filter"].push_back(filter);
     filter->control_map_["on"]->set(1.0f);
+  } else if (module->id.type == "reverb") {
+    auto reverb = std::make_shared<ReverbModule>();
+    addProcessor(reverb.get());
+    addSubmodule(reverb.get());
+    reverb->init();
+    // module->parameters_[0]->val = filter->control_map_["style"];
+    // module->parameters_[1]->val = filter->control_map_["cutoff"];
+    processor = reverb;
+    // filter->plug(reset(), FilterModule::kReset);
+    // filter->plug(bent_midi_, FilterModule::kMidi);
+    // filter->plug(note_from_reference_->output(), FilterModule::kKeytrack);
+    processors_["reverb"].push_back(reverb);
+    // filter->control_map_["on"]->set(1.0f);
   }
-
   processor_matrix_[index.column][index.row] = processor;
   processors_[module->id.type].push_back(processor);
   return processor;

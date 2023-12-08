@@ -22,7 +22,6 @@
 #include "vital/synthesis/lookups/wavetable.h"
 #include "vital/common/synth_types.h"
 #include "vital/common/line_generator.h"
-#include "vital/synthesis/modules/reverb_module.h"
 #include "vital/synthesis/modules/filters_module.h"
 #include "vital/synthesis/modules/chorus_module.h"
 #include "vital/synthesis/modules/compressor_module.h"
@@ -84,6 +83,7 @@ public:
   void unplugAll();
   void addModulator(std::shared_ptr<model::Module> module);
   void repositionBlock(Index from, Index to);
+  std::shared_ptr<vital::Processor> findProcessorAbove(Index index);
 
   std::vector<std::shared_ptr<model::Module>> active_modulators_;
 private:
@@ -92,6 +92,7 @@ private:
   void createModulators();
   void createVoiceOutput();
   void createFilters(Output* keytrack);
+  // void createReverbs();
   void setupPolyModulationReadouts();
 
   std::shared_ptr<SynthModule> createProcessor(std::shared_ptr<model::Block> module);

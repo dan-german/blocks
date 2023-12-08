@@ -232,7 +232,7 @@ namespace vital {
       void plugNext(const Output* source);
       void plugNext(const Processor* source);
 
-      // Use an existing input as our input.
+      // Use an existing input as our input
       void useInput(Input* input);
       void useInput(Input* input, int index);
 

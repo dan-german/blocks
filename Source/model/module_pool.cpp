@@ -13,6 +13,7 @@
 #include "filter_module_new.h"
 #include "lfo_module_new.h"
 #include "adsr_module_new.h"
+#include "reverb_module_new.h"
 
 namespace model {
 ModulePool::~ModulePool() { }
@@ -30,6 +31,7 @@ void ModulePool::Retire(std::shared_ptr<Module> modulator) {
 ModulePool::ModulePool() {
   blocks.spawn({ "osc" }, [](std::string type, int number) { return std::make_shared<model::OscillatorModule>(number); });
   blocks.spawn({ "filter" }, [](std::string type, int number) { return std::make_shared<model::FilterModule>(number); });
+  blocks.spawn({ "reverb" }, [](std::string type, int number) { return std::make_shared<model::ReverbModule>(number); });
   modulators.spawn({ "lfo" }, [](std::string type, int number) { return std::make_shared<model::LFOModule>(number); });
   modulators.spawn({ "adsr" }, [](std::string type, int number) { return std::make_shared<model::ADSRModule>(number); });
 
