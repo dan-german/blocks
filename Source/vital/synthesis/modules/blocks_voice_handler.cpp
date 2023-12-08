@@ -149,7 +149,7 @@ void BlocksVoiceHandler::unplugAll() {
         voice_sum_->unplug(processor_matrix_[column][row].get());
         last_node_->unplug(processor_matrix_[column][row].get());
         
-        if (auto processor_above = findProcessorAbove({column, row})) {
+        if (auto processor_above = findProcessorAbove({row, column})) {
           std::cout << "wow unplugging " << std::endl;
           processor->unplug(processor_above.get());
         }
