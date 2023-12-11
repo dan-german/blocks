@@ -29,29 +29,29 @@
 
 WavetableComponent* WavetableComponentFactory::createComponent(ComponentType type) {
   switch (type) {
-    case kWaveSource:
-      return new WaveSource();
-    case kLineSource:
-      return new WaveLineSource();
-    case kFileSource:
-      return new FileSource();
-    case kShepardToneSource:
-      return new ShepardToneSource();
-    case kPhaseModifier:
-      return new PhaseModifier();
-    case kWaveWindow:
-      return new WaveWindowModifier();
-    case kFrequencyFilter:
-      return new FrequencyFilterModifier();
-    case kSlewLimiter:
-      return new SlewLimitModifier();
-    case kWaveFolder:
-      return new WaveFoldModifier();
-    case kWaveWarp:
-      return new WaveWarpModifier();
-    default:
-      VITAL_ASSERT(false);
-      return nullptr;
+  case kWaveSource:
+    return new WaveSource();
+  case kLineSource:
+    return new WaveLineSource();
+  case kFileSource:
+    return new FileSource();
+  case kShepardToneSource:
+    return new ShepardToneSource();
+  case kPhaseModifier:
+    return new PhaseModifier();
+  case kWaveWindow:
+    return new WaveWindowModifier();
+  case kFrequencyFilter:
+    return new FrequencyFilterModifier();
+  case kSlewLimiter:
+    return new SlewLimitModifier();
+  case kWaveFolder:
+    return new WaveFoldModifier();
+  case kWaveWarp:
+    return new WaveWarpModifier();
+  default:
+    VITAL_ASSERT(false);
+    return nullptr;
   }
 }
 
@@ -83,27 +83,27 @@ WavetableComponent* WavetableComponentFactory::createComponent(const std::string
 
 std::string WavetableComponentFactory::getComponentName(ComponentType type) {
   switch (type) {
-    case kWaveSource:
-      return "Wave Source";
-    case kLineSource:
-      return "Line Source";
-    case kFileSource:
-      return "Audio File Source";
-    case kShepardToneSource:
-      return "Shepard Tone Source";
-    case kPhaseModifier:
-      return "Phase Shift";
-    case kWaveWindow:
-      return "Wave Window";
-    case kFrequencyFilter:
-      return "Frequency Filter";
-    case kSlewLimiter:
-      return "Slew Limiter";
-    case kWaveFolder:
-      return "Wave Folder";
-    case kWaveWarp:
-      return "Wave Warp";
-    default:
-      return "";
+  case kWaveSource:
+    return "Wave Source";
+  case kLineSource:
+    return "Line Source";
+  case kFileSource:
+    return "Audio File Source";
+  case kShepardToneSource:
+    return "Shepard Tone Source";
+  case kPhaseModifier:
+    return "Phase Shift";
+  case kWaveWindow:
+    return "Wave Window";
+  case kFrequencyFilter:
+    return "Frequency Filter";
+  case kSlewLimiter:
+    return "Slew Limiter";
+  case kWaveFolder:
+    return "Wave Folder";
+  case kWaveWarp:
+    return "Wave Warp";
+  default:
+    return "";
   }
 }

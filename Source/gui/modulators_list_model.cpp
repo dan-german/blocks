@@ -58,7 +58,7 @@ String formatValue(float value, vital::ValueDetails details) {
     if (max_decimal_places == 0)
       format = String(std::roundf(value));
     else
-    format = String(value, 3);
+      format = String(value, 3);
 
     int display_characters = 5;//max_display_characters_;
     if (format[0] == '-')

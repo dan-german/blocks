@@ -19,67 +19,67 @@
 
 namespace vital {
 
-  PhaserModule::PhaserModule(const Output* beats_per_second) :
-      SynthModule(1, kNumOutputs), beats_per_second_(beats_per_second), phaser_(nullptr) { 
-        phaser_ = new Phaser();
-      }
+PhaserModule::PhaserModule(const Output* beats_per_second):
+  SynthModule(1, kNumOutputs), beats_per_second_(beats_per_second), phaser_(nullptr) {
+  phaser_ = new Phaser();
+}
 
-  PhaserModule::~PhaserModule() {
-  }
+PhaserModule::~PhaserModule() {
+}
 
-  void PhaserModule::init() {
-    // phaser_ = new Phaser();
-    phaser_->useOutput(output(kAudioOutput), Phaser::kAudioOutput);
-    phaser_->useOutput(output(kCutoffOutput), Phaser::kCutoffOutput);
-    addIdleProcessor(phaser_);
+void PhaserModule::init() {
+  // phaser_ = new Phaser();
+  phaser_->useOutput(output(kAudioOutput), Phaser::kAudioOutput);
+  phaser_->useOutput(output(kCutoffOutput), Phaser::kCutoffOutput);
+  addIdleProcessor(phaser_);
 
-    Output* phaser_free_frequency = createMonoModControl("phaser_frequency");
-    Output* phaser_frequency = createTempoSyncSwitch("phaser", phaser_free_frequency->owner,
-                                                     beats_per_second_, false);
-    Output* phaser_feedback = createMonoModControl("phaser_feedback");
-    Output* phaser_wet = createMonoModControl("phaser_dry_wet");
-    Output* phaser_center = createMonoModControl("phaser_center", true, true);
-    Output* phaser_mod_depth = createMonoModControl("phaser_mod_depth");
-    Output* phaser_phase_offset = createMonoModControl("phaser_phase_offset");
-    Output* phaser_blend = createMonoModControl("phaser_blend");
+  Output* phaser_free_frequency = createMonoModControl("phaser_frequency");
+  Output* phaser_frequency = createTempoSyncSwitch("phaser", phaser_free_frequency->owner,
+    beats_per_second_, false);
+  Output* phaser_feedback = createMonoModControl("phaser_feedback");
+  Output* phaser_wet = createMonoModControl("phaser_dry_wet");
+  Output* phaser_center = createMonoModControl("phaser_center", true, true);
+  Output* phaser_mod_depth = createMonoModControl("phaser_mod_depth");
+  Output* phaser_phase_offset = createMonoModControl("phaser_phase_offset");
+  Output* phaser_blend = createMonoModControl("phaser_blend");
 
-    phaser_->plug(phaser_frequency, Phaser::kRate);
-    phaser_->plug(phaser_wet, Phaser::kMix);
-    phaser_->plug(phaser_feedback, Phaser::kFeedbackGain);
-    phaser_->plug(phaser_center, Phaser::kCenter);
-    phaser_->plug(phaser_mod_depth, Phaser::kModDepth);
-    phaser_->plug(phaser_phase_offset, Phaser::kPhaseOffset);
-    phaser_->plug(phaser_blend, Phaser::kBlend);
-    phaser_->init();
-    enable(true);
-    // phaser->enable(true); 
+  phaser_->plug(phaser_frequency, Phaser::kRate);
+  phaser_->plug(phaser_wet, Phaser::kMix);
+  phaser_->plug(phaser_feedback, Phaser::kFeedbackGain);
+  phaser_->plug(phaser_center, Phaser::kCenter);
+  phaser_->plug(phaser_mod_depth, Phaser::kModDepth);
+  phaser_->plug(phaser_phase_offset, Phaser::kPhaseOffset);
+  phaser_->plug(phaser_blend, Phaser::kBlend);
+  phaser_->init();
+  enable(true);
+  // phaser->enable(true); 
 
-    SynthModule::init();
-  }
+  SynthModule::init();
+}
 
-  void PhaserModule::hardReset() {
+void PhaserModule::hardReset() {
+  phaser_->hardReset();
+}
+
+void PhaserModule::enable(bool enable) {
+  SynthModule::enable(enable);
+  process(1);
+  if (enable)
     phaser_->hardReset();
-  }
+}
 
-  void PhaserModule::enable(bool enable) {
-    SynthModule::enable(enable);
-    process(1);
-    if (enable)
-      phaser_->hardReset();
-  }
+void PhaserModule::correctToTime(double seconds) {
+  SynthModule::correctToTime(seconds);
+  phaser_->correctToTime(seconds);
+}
 
-  void PhaserModule::correctToTime(double seconds) {
-    SynthModule::correctToTime(seconds);
-    phaser_->correctToTime(seconds);
-  }
+void PhaserModule::setSampleRate(int sample_rate) {
+  SynthModule::setSampleRate(sample_rate);
+  phaser_->setSampleRate(sample_rate);
+}
 
-  void PhaserModule::setSampleRate(int sample_rate) {
-    SynthModule::setSampleRate(sample_rate);
-    phaser_->setSampleRate(sample_rate);
-  }
-
-  void PhaserModule::processWithInput(const poly_float* audio_in, int num_samples) {
-    SynthModule::process(num_samples);
-    phaser_->processWithInput(audio_in, num_samples);
-  }
+void PhaserModule::processWithInput(const poly_float* audio_in, int num_samples) {
+  SynthModule::process(num_samples);
+  phaser_->processWithInput(audio_in, num_samples);
+}
 } // namespace vital

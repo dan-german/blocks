@@ -24,13 +24,13 @@
 #include "vital/synthesis/lookups/wavetable.h"
 
 namespace {
-  int getFirstNonZeroSample(const float* audio_buffer, int num_samples) {
-    for (int i = 0; i < num_samples; ++i) {
-      if (audio_buffer[i])
-        return i;
-    }
-    return 0;
+int getFirstNonZeroSample(const float* audio_buffer, int num_samples) {
+  for (int i = 0; i < num_samples; ++i) {
+    if (audio_buffer[i])
+      return i;
   }
+  return 0;
+}
 }
 
 int WavetableCreator::getGroupIndex(WavetableGroup* group) {
@@ -44,7 +44,7 @@ int WavetableCreator::getGroupIndex(WavetableGroup* group) {
 void WavetableCreator::moveUp(int index) {
   if (index <= 0)
     return;
-  
+
   groups_[index].swap(groups_[index - 1]);
 }
 
@@ -98,7 +98,7 @@ void WavetableCreator::render() {
     last_waveframe = std::max(last_waveframe, group->getLastKeyframePosition());
     shepard = shepard && group->isShepardTone();
   }
-  
+
   wavetable_->setNumFrames(last_waveframe + 1);
   wavetable_->setShepardTable(shepard);
   float max_span = 0.0f;
@@ -195,7 +195,7 @@ void WavetableCreator::initPredefinedWaves() {
 }
 
 void WavetableCreator::initFromAudioFile(const float* audio_buffer, int num_samples, int sample_rate,
-                                         AudioFileLoadStyle load_style, FileSource::FadeStyle fade_style) {
+  AudioFileLoadStyle load_style, FileSource::FadeStyle fade_style) {
   int beginning_sample = getFirstNonZeroSample(audio_buffer, num_samples);
   int shortened_num_samples = num_samples - beginning_sample;
   if (load_style == kVocoded)
@@ -209,7 +209,7 @@ void WavetableCreator::initFromAudioFile(const float* audio_buffer, int num_samp
 }
 
 void WavetableCreator::initFromSplicedAudioFile(const float* audio_buffer, int num_samples, int sample_rate,
-                                                FileSource::FadeStyle fade_style) {
+  FileSource::FadeStyle fade_style) {
   clear();
 
   WavetableGroup* new_group = new WavetableGroup();
@@ -226,8 +226,7 @@ void WavetableCreator::initFromSplicedAudioFile(const float* audio_buffer, int n
     int num_cycles = std::max<int>(1, num_samples / window_size);
     int buffer_frames = vital::kNumOscillatorWaveFrames / num_cycles;
     file_source->insertNewKeyframe(std::max(0, vital::kNumOscillatorWaveFrames - 1 - buffer_frames));
-  }
-  else
+  } else
     file_source->insertNewKeyframe(vital::kNumOscillatorWaveFrames - 1);
 
   file_source->getKeyframe(0)->setStartPosition(0);
@@ -241,7 +240,7 @@ void WavetableCreator::initFromSplicedAudioFile(const float* audio_buffer, int n
 }
 
 void WavetableCreator::initFromVocodedAudioFile(const float* audio_buffer, int num_samples,
-                                                int sample_rate, bool ttwt) {
+  int sample_rate, bool ttwt) {
   static constexpr float kMaxTTWTPeriod = .02f;
   clear();
 

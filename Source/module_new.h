@@ -30,7 +30,7 @@ public:
   Module(std::string prefix, int number): name(prefix + "_" + std::to_string(number)) {
     id = { prefix, number };
     display_name = prefix + " " + std::to_string(number);
-  } 
+  }
 
   void add(vital::ValueDetails parameter) {
     parameter.display_name = parameter.display_name != "" ? parameter.display_name : parameter.name;

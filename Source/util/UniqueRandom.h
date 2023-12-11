@@ -11,7 +11,7 @@ private:
   int border;
 
 public:
-  UniqueRandom(int min, int max, int cooldown) : repetitionBuffer(cooldown) {
+  UniqueRandom(int min, int max, int cooldown): repetitionBuffer(cooldown) {
     srand(time(NULL));
     setSize(min, max, cooldown);
   }

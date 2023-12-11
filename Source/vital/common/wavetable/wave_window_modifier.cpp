@@ -45,8 +45,8 @@ void WaveWindowModifier::WaveWindowModifierKeyframe::copy(const WavetableKeyfram
 }
 
 void WaveWindowModifier::WaveWindowModifierKeyframe::interpolate(const WavetableKeyframe* from_keyframe,
-                                                                 const WavetableKeyframe* to_keyframe,
-                                                                 float t) {
+  const WavetableKeyframe* to_keyframe,
+  float t) {
   const WaveWindowModifierKeyframe* from = dynamic_cast<const WaveWindowModifierKeyframe*>(from_keyframe);
   const WaveWindowModifierKeyframe* to = dynamic_cast<const WaveWindowModifierKeyframe*>(to_keyframe);
 

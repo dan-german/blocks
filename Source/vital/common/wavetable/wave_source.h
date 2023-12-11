@@ -24,76 +24,76 @@ class WaveSourceKeyframe;
 using Base64 = juce::Base64;
 using String = juce::String;
 
-class WaveSource : public WavetableComponent {
-  public:
-    enum InterpolationMode {
-      kTime,
-      kFrequency
-    };
+class WaveSource: public WavetableComponent {
+public:
+  enum InterpolationMode {
+    kTime,
+    kFrequency
+  };
 
-    WaveSource();
-    virtual ~WaveSource();
+  WaveSource();
+  virtual ~WaveSource();
 
-    virtual WavetableKeyframe* createKeyframe(int position) override;
-    virtual void render(vital::WaveFrame* wave_frame, float position) override;
-    virtual WavetableComponentFactory::ComponentType getType() override;
-    virtual json stateToJson() override;
-    virtual void jsonToState(json data) override;
+  virtual WavetableKeyframe* createKeyframe(int position) override;
+  virtual void render(vital::WaveFrame* wave_frame, float position) override;
+  virtual WavetableComponentFactory::ComponentType getType() override;
+  virtual json stateToJson() override;
+  virtual void jsonToState(json data) override;
 
-    vital::WaveFrame* getWaveFrame(int index);
-    WaveSourceKeyframe* getKeyframe(int index);
+  vital::WaveFrame* getWaveFrame(int index);
+  WaveSourceKeyframe* getKeyframe(int index);
 
-    void setInterpolationMode(InterpolationMode mode) { interpolation_mode_ = mode; }
-    InterpolationMode getInterpolationMode() const { return interpolation_mode_; }
+  void setInterpolationMode(InterpolationMode mode) { interpolation_mode_ = mode; }
+  InterpolationMode getInterpolationMode() const { return interpolation_mode_; }
 
-  protected:
-    std::unique_ptr<WaveSourceKeyframe> compute_frame_;
-    InterpolationMode interpolation_mode_;
- 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(WaveSource)
+protected:
+  std::unique_ptr<WaveSourceKeyframe> compute_frame_;
+  InterpolationMode interpolation_mode_;
+
+  JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(WaveSource)
 };
 
-class WaveSourceKeyframe : public WavetableKeyframe {
-  public:
-    WaveSourceKeyframe() : interpolation_mode_(WaveSource::kFrequency) {
-      wave_frame_ = std::make_unique<vital::WaveFrame>();
-    }
-    virtual ~WaveSourceKeyframe() { }
+class WaveSourceKeyframe: public WavetableKeyframe {
+public:
+  WaveSourceKeyframe(): interpolation_mode_(WaveSource::kFrequency) {
+    wave_frame_ = std::make_unique<vital::WaveFrame>();
+  }
+  virtual ~WaveSourceKeyframe() { }
 
-    vital::WaveFrame* wave_frame() { return wave_frame_.get(); }
+  vital::WaveFrame* wave_frame() { return wave_frame_.get(); }
 
-    void copy(const WavetableKeyframe* keyframe) override;
-    void linearTimeInterpolate(const vital::WaveFrame* from, const vital::WaveFrame* to, float t);
+  void copy(const WavetableKeyframe* keyframe) override;
+  void linearTimeInterpolate(const vital::WaveFrame* from, const vital::WaveFrame* to, float t);
 
-    void cubicTimeInterpolate(const vital::WaveFrame* prev, const vital::WaveFrame* from,
-                              const vital::WaveFrame* to, const vital::WaveFrame* next,
-                              float range_prev, float range, float range_next, float t);
-    void linearFrequencyInterpolate(const vital::WaveFrame* from, const vital::WaveFrame* to, float t);
+  void cubicTimeInterpolate(const vital::WaveFrame* prev, const vital::WaveFrame* from,
+    const vital::WaveFrame* to, const vital::WaveFrame* next,
+    float range_prev, float range, float range_next, float t);
+  void linearFrequencyInterpolate(const vital::WaveFrame* from, const vital::WaveFrame* to, float t);
 
-    void cubicFrequencyInterpolate(const vital::WaveFrame* prev, const vital::WaveFrame* from,
-                                   const vital::WaveFrame* to, const vital::WaveFrame* next,
-                                   float range_prev, float range, float range_next, float t);
-    
-    void interpolate(const WavetableKeyframe* from_keyframe,
-                     const WavetableKeyframe* to_keyframe, float t) override;
-    void smoothInterpolate(const WavetableKeyframe* prev_keyframe,
-                           const WavetableKeyframe* from_keyframe,
-                           const WavetableKeyframe* to_keyframe,
-                           const WavetableKeyframe* next_keyframe, float t) override;
-     
-    void render(vital::WaveFrame* wave_frame) override {
-      wave_frame->copy(wave_frame_.get());
-    }
+  void cubicFrequencyInterpolate(const vital::WaveFrame* prev, const vital::WaveFrame* from,
+    const vital::WaveFrame* to, const vital::WaveFrame* next,
+    float range_prev, float range, float range_next, float t);
 
-    json stateToJson() override;
-    void jsonToState(json data) override;
+  void interpolate(const WavetableKeyframe* from_keyframe,
+    const WavetableKeyframe* to_keyframe, float t) override;
+  void smoothInterpolate(const WavetableKeyframe* prev_keyframe,
+    const WavetableKeyframe* from_keyframe,
+    const WavetableKeyframe* to_keyframe,
+    const WavetableKeyframe* next_keyframe, float t) override;
 
-    void setInterpolationMode(WaveSource::InterpolationMode mode) { interpolation_mode_ = mode; }
-    WaveSource::InterpolationMode getInterpolationMode() const { return interpolation_mode_; }
+  void render(vital::WaveFrame* wave_frame) override {
+    wave_frame->copy(wave_frame_.get());
+  }
 
-  protected:
-    std::unique_ptr<vital::WaveFrame> wave_frame_;
-    WaveSource::InterpolationMode interpolation_mode_;
+  json stateToJson() override;
+  void jsonToState(json data) override;
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(WaveSourceKeyframe)
+  void setInterpolationMode(WaveSource::InterpolationMode mode) { interpolation_mode_ = mode; }
+  WaveSource::InterpolationMode getInterpolationMode() const { return interpolation_mode_; }
+
+protected:
+  std::unique_ptr<vital::WaveFrame> wave_frame_;
+  WaveSource::InterpolationMode interpolation_mode_;
+
+  JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(WaveSourceKeyframe)
 };

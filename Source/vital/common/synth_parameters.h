@@ -23,131 +23,131 @@
 #include <string>
 
 namespace vital {
-  struct ValueDetails {
-    enum ValueScale {
-      kIndexed,
-      kLinear,
-      kQuadratic,
-      kCubic,
-      kQuartic,
-      kSquareRoot,
-      kExponential
-    };
-
-    std::string name;
-    int version_added = 0;
-    mono_float min = 0.0f;
-    mono_float max = 1.0f;
-    mono_float default_value = 0.0f;
-    // post_offset used to offset quadratic and exponential scaling.
-    mono_float post_offset = 0.0f;
-    mono_float display_multiply = 1.0f;
-    ValueScale value_scale = kLinear;
-    bool display_invert = false;
-    std::string display_units = "";
-    std::string display_name;
-    const std::string* string_lookup = nullptr;
-    std::string local_description;
-    bool audio_rate = false;
-    bool smooth_value = false;
-    bool internal_modulation = false;
-    bool reset = false;
-    Value* val;
-    int decimal_places = 2;
-    bool hidden = false;
-    std::vector<std::string> choices; // equals to string_lookup basically... not the best design choice
+struct ValueDetails {
+  enum ValueScale {
+    kIndexed,
+    kLinear,
+    kQuadratic,
+    kCubic,
+    kQuartic,
+    kSquareRoot,
+    kExponential
   };
 
-  class ValueDetailsLookup {
-    public:
-      ValueDetailsLookup();
-      const bool isParameter(const std::string& name) const {
-        return details_lookup_.count(name);
-      }
+  std::string name;
+  int version_added = 0;
+  mono_float min = 0.0f;
+  mono_float max = 1.0f;
+  mono_float default_value = 0.0f;
+  // post_offset used to offset quadratic and exponential scaling.
+  mono_float post_offset = 0.0f;
+  mono_float display_multiply = 1.0f;
+  ValueScale value_scale = kLinear;
+  bool display_invert = false;
+  std::string display_units = "";
+  std::string display_name;
+  const std::string* string_lookup = nullptr;
+  std::string local_description;
+  bool audio_rate = false;
+  bool smooth_value = false;
+  bool internal_modulation = false;
+  bool reset = false;
+  Value* val;
+  int decimal_places = 2;
+  bool hidden = false;
+  std::vector<std::string> choices; // equals to string_lookup basically... not the best design choice
+};
 
-      const ValueDetails& getDetails(const std::string& name) const {
-        auto details = details_lookup_.find(name);
-        VITAL_ASSERT(details != details_lookup_.end());
-        return details->second;
-      }
+class ValueDetailsLookup {
+public:
+  ValueDetailsLookup();
+  const bool isParameter(const std::string& name) const {
+    return details_lookup_.count(name);
+  }
 
-      const ValueDetails* getDetails(int index) const {
-        return details_list_[index];
-      }
+  const ValueDetails& getDetails(const std::string& name) const {
+    auto details = details_lookup_.find(name);
+    VITAL_ASSERT(details != details_lookup_.end());
+    return details->second;
+  }
 
-      std::string getDisplayName(const std::string& name) const {
-        return getDetails(name).display_name;
-      }
+  const ValueDetails* getDetails(int index) const {
+    return details_list_[index];
+  }
 
-      int getNumParameters() const {
-        return static_cast<int>(details_list_.size());
-      }
+  std::string getDisplayName(const std::string& name) const {
+    return getDetails(name).display_name;
+  }
 
-      mono_float getParameterRange(const std::string& name) const {
-        auto details = details_lookup_.find(name);
-        VITAL_ASSERT(details != details_lookup_.end());
-        return details->second.max - details->second.min;
-      }
+  int getNumParameters() const {
+    return static_cast<int>(details_list_.size());
+  }
 
-      std::map<std::string, ValueDetails> getAllDetails() const {
-        return details_lookup_;
-      }
+  mono_float getParameterRange(const std::string& name) const {
+    auto details = details_lookup_.find(name);
+    VITAL_ASSERT(details != details_lookup_.end());
+    return details->second.max - details->second.min;
+  }
 
-      void addParameterGroup(const ValueDetails* list, int num_parameters, int index,
-                             std::string id_prefix, std::string name_prefix, int version = -1);
+  std::map<std::string, ValueDetails> getAllDetails() const {
+    return details_lookup_;
+  }
 
-      void addParameterGroup(const ValueDetails* list, int num_parameters, std::string id,
-                             std::string id_prefix, std::string name_prefix, int version = -1);
+  void addParameterGroup(const ValueDetails* list, int num_parameters, int index,
+    std::string id_prefix, std::string name_prefix, int version = -1);
 
-      static const ValueDetails parameter_list[];
-      static const ValueDetails env_parameter_list[];
-      static const ValueDetails lfo_parameter_list[];
-      static const ValueDetails random_lfo_parameter_list[];
-      static const ValueDetails filter_parameter_list[];
-      static const ValueDetails osc_parameter_list[];
-      static const ValueDetails mod_parameter_list[];
+  void addParameterGroup(const ValueDetails* list, int num_parameters, std::string id,
+    std::string id_prefix, std::string name_prefix, int version = -1);
 
-    private:
-      std::map<std::string, ValueDetails> details_lookup_;
-      std::vector<const ValueDetails*> details_list_;
+  static const ValueDetails parameter_list[];
+  static const ValueDetails env_parameter_list[];
+  static const ValueDetails lfo_parameter_list[];
+  static const ValueDetails random_lfo_parameter_list[];
+  static const ValueDetails filter_parameter_list[];
+  static const ValueDetails osc_parameter_list[];
+  static const ValueDetails mod_parameter_list[];
 
-      JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ValueDetailsLookup)
-  };
+private:
+  std::map<std::string, ValueDetails> details_lookup_;
+  std::vector<const ValueDetails*> details_list_;
 
-  class Parameters {
-    public:
-      static const ValueDetails& getDetails(const std::string& name) {
-        return lookup_.getDetails(name);
-      }
+  JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ValueDetailsLookup)
+};
 
-      static int getNumParameters() {
-        return lookup_.getNumParameters();
-      }
+class Parameters {
+public:
+  static const ValueDetails& getDetails(const std::string& name) {
+    return lookup_.getDetails(name);
+  }
 
-      static const ValueDetails* getDetails(int index) {
-        return lookup_.getDetails(index);
-      }
+  static int getNumParameters() {
+    return lookup_.getNumParameters();
+  }
 
-      static std::string getDisplayName(const std::string& name) {
-        return lookup_.getDisplayName(name);
-      }
+  static const ValueDetails* getDetails(int index) {
+    return lookup_.getDetails(index);
+  }
 
-      static const mono_float getParameterRange(const std::string& name) {
-        return lookup_.getParameterRange(name);
-      }
+  static std::string getDisplayName(const std::string& name) {
+    return lookup_.getDisplayName(name);
+  }
 
-      static const bool isParameter(const std::string& name) {
-        return lookup_.isParameter(name);
-      }
+  static const mono_float getParameterRange(const std::string& name) {
+    return lookup_.getParameterRange(name);
+  }
 
-      static std::map<std::string, ValueDetails> getAllDetails() {
-        return lookup_.getAllDetails();
-      }
+  static const bool isParameter(const std::string& name) {
+    return lookup_.isParameter(name);
+  }
 
-      static ValueDetailsLookup lookup_;
+  static std::map<std::string, ValueDetails> getAllDetails() {
+    return lookup_.getAllDetails();
+  }
 
-    private:
-      Parameters() { }
-  };
+  static ValueDetailsLookup lookup_;
+
+private:
+  Parameters() { }
+};
 } // namespace vital
 

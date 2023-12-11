@@ -21,19 +21,19 @@
 #include "vital/synthesis/framework/utils.h"
 
 namespace {
-  inline double highResPowerScale(float value, float power) {
-    static constexpr float kMinPower = 0.01f;
-    if (fabsf(power) < kMinPower)
-      return value;
+inline double highResPowerScale(float value, float power) {
+  static constexpr float kMinPower = 0.01f;
+  if (fabsf(power) < kMinPower)
+    return value;
 
-    double abs_value = fabsf(value);
+  double abs_value = fabsf(value);
 
-    double numerator = exp(power * abs_value) - 1.0f;
-    double denominator = exp(power) - 1.0f;
-    if (value >= 0.0f)
-      return numerator / denominator;
-    return -numerator / denominator;
-  }
+  double numerator = exp(power * abs_value) - 1.0f;
+  double denominator = exp(power) - 1.0f;
+  if (value >= 0.0f)
+    return numerator / denominator;
+  return -numerator / denominator;
+}
 }
 
 WaveWarpModifier::WaveWarpModifierKeyframe::WaveWarpModifierKeyframe() {
@@ -50,8 +50,8 @@ void WaveWarpModifier::WaveWarpModifierKeyframe::copy(const WavetableKeyframe* k
 }
 
 void WaveWarpModifier::WaveWarpModifierKeyframe::interpolate(const WavetableKeyframe* from_keyframe,
-                                                             const WavetableKeyframe* to_keyframe,
-                                                             float t) {
+  const WavetableKeyframe* to_keyframe,
+  float t) {
   const WaveWarpModifierKeyframe* from = dynamic_cast<const WaveWarpModifierKeyframe*>(from_keyframe);
   const WaveWarpModifierKeyframe* to = dynamic_cast<const WaveWarpModifierKeyframe*>(to_keyframe);
 

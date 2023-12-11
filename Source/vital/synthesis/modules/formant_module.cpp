@@ -19,78 +19,78 @@
 
 namespace vital {
 
-  FormantModule::FormantModule(std::string prefix) :
-    SynthModule(kNumInputs, 1), prefix_(std::move(prefix)),
-    formant_filters_(), last_style_(0), mono_(false) { }
+FormantModule::FormantModule(std::string prefix):
+  SynthModule(kNumInputs, 1), prefix_(std::move(prefix)),
+  formant_filters_(), last_style_(0), mono_(false) { }
 
-  Output* FormantModule::createModControl(std::string name, bool audio_rate, bool smooth_value) {
-    if (mono_)
-      return createMonoModControl(name, audio_rate, smooth_value);
-    return createPolyModControl(name, audio_rate, smooth_value, nullptr, input(kReset));
+Output* FormantModule::createModControl(std::string name, bool audio_rate, bool smooth_value) {
+  if (mono_)
+    return createMonoModControl(name, audio_rate, smooth_value);
+  return createPolyModControl(name, audio_rate, smooth_value, nullptr, input(kReset));
+}
+
+void FormantModule::init() {
+  Output* formant_x = createModControl(prefix_ + "_formant_x", true, true);
+  Output* formant_y = createModControl(prefix_ + "_formant_y", true, true);
+  Output* formant_transpose = createModControl(prefix_ + "_formant_transpose", true, true);
+  Output* formant_resonance = createModControl(prefix_ + "_formant_resonance");
+  Output* formant_spread = createModControl(prefix_ + "_formant_spread");
+
+  for (int i = 0; i < FormantFilter::kNumFormantStyles; ++i) {
+    FormantFilter* formant_filter = new FormantFilter(i);
+    formant_filters_[i] = formant_filter;
+    addProcessor(formant_filter);
+    formant_filter->enable(false);
+
+    formant_filter->useInput(input(kAudio), FormantFilter::kAudio);
+    formant_filter->useInput(input(kReset), FormantFilter::kReset);
+    formant_filter->plug(formant_spread, FormantFilter::kSpread);
+    formant_filter->plug(formant_x, FormantFilter::kInterpolateX);
+    formant_filter->plug(formant_y, FormantFilter::kInterpolateY);
+    formant_filter->plug(formant_transpose, FormantFilter::kTranspose);
+    formant_filter->plug(formant_resonance, FormantFilter::kResonance);
+    formant_filter->useOutput(output());
   }
 
-  void FormantModule::init() {
-    Output* formant_x = createModControl(prefix_ + "_formant_x", true, true);
-    Output* formant_y = createModControl(prefix_ + "_formant_y", true, true);
-    Output* formant_transpose = createModControl(prefix_ + "_formant_transpose", true, true);
-    Output* formant_resonance = createModControl(prefix_ + "_formant_resonance");
-    Output* formant_spread = createModControl(prefix_ + "_formant_spread");
+  VocalTract* vocal_tract = new VocalTract();
+  vocal_tract->useInput(input(kAudio), VocalTract::kAudio);
+  vocal_tract->useInput(input(kReset), VocalTract::kReset);
+  vocal_tract->useInput(input(kBlend), VocalTract::kBlend);
+  vocal_tract->plug(formant_x, VocalTract::kTonguePosition);
+  vocal_tract->plug(formant_y, VocalTract::kTongueHeight);
+  vocal_tract->useOutput(output());
+  formant_filters_[FormantFilter::kVocalTract] = vocal_tract;
+  addProcessor(vocal_tract);
+  vocal_tract->enable(false);
 
-    for (int i = 0; i < FormantFilter::kNumFormantStyles; ++i) {
-      FormantFilter* formant_filter = new FormantFilter(i);
-      formant_filters_[i] = formant_filter;
-      addProcessor(formant_filter);
-      formant_filter->enable(false);
+  formant_filters_[last_style_]->enable(true);
 
-      formant_filter->useInput(input(kAudio), FormantFilter::kAudio);
-      formant_filter->useInput(input(kReset), FormantFilter::kReset);
-      formant_filter->plug(formant_spread, FormantFilter::kSpread);
-      formant_filter->plug(formant_x, FormantFilter::kInterpolateX);
-      formant_filter->plug(formant_y, FormantFilter::kInterpolateY);
-      formant_filter->plug(formant_transpose, FormantFilter::kTranspose);
-      formant_filter->plug(formant_resonance, FormantFilter::kResonance);
-      formant_filter->useOutput(output());
-    }
+  SynthModule::init();
+}
 
-    VocalTract* vocal_tract = new VocalTract();
-    vocal_tract->useInput(input(kAudio), VocalTract::kAudio);
-    vocal_tract->useInput(input(kReset), VocalTract::kReset);
-    vocal_tract->useInput(input(kBlend), VocalTract::kBlend);
-    vocal_tract->plug(formant_x, VocalTract::kTonguePosition);
-    vocal_tract->plug(formant_y, VocalTract::kTongueHeight);
-    vocal_tract->useOutput(output());
-    formant_filters_[FormantFilter::kVocalTract] = vocal_tract;
-    addProcessor(vocal_tract);
-    vocal_tract->enable(false);
+void FormantModule::process(int num_samples) {
+  mono_float max_style = FormantFilter::kTotalFormantFilters - 1;
+  int style = static_cast<int>(utils::clamp(input(kStyle)->at(0)[0], 0.0f, max_style));
+  setStyle(style);
 
-    formant_filters_[last_style_]->enable(true);
+  SynthModule::process(num_samples);
+}
 
-    SynthModule::init();
-  }
+void FormantModule::reset(poly_mask reset_mask) {
+  getLocalProcessor(formant_filters_[last_style_])->reset(reset_mask);
+}
 
-  void FormantModule::process(int num_samples) {
-    mono_float max_style = FormantFilter::kTotalFormantFilters - 1;
-    int style = static_cast<int>(utils::clamp(input(kStyle)->at(0)[0], 0.0f, max_style));
-    setStyle(style);
+void FormantModule::hardReset() {
+  getLocalProcessor(formant_filters_[last_style_])->hardReset();
+}
 
-    SynthModule::process(num_samples);
-  }
+force_inline void FormantModule::setStyle(int new_style) {
+  if (last_style_ == new_style)
+    return;
 
-  void FormantModule::reset(poly_mask reset_mask) {
-    getLocalProcessor(formant_filters_[last_style_])->reset(reset_mask);
-  }
-
-  void FormantModule::hardReset() {
-    getLocalProcessor(formant_filters_[last_style_])->hardReset();
-  }
-
-  force_inline void FormantModule::setStyle(int new_style) {
-    if (last_style_ == new_style)
-      return;
-
-    formant_filters_[last_style_]->enable(false);
-    formant_filters_[new_style]->enable(true);
-    last_style_ = new_style;
-    reset(constants::kFullMask);
-  }
+  formant_filters_[last_style_]->enable(false);
+  formant_filters_[new_style]->enable(true);
+  last_style_ = new_style;
+  reset(constants::kFullMask);
+}
 } // namespace vital

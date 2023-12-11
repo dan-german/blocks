@@ -197,8 +197,8 @@ void WaveTableConstants::fft(int length, float* realArray, float* imaginaryArray
 
 // Sine has 1 harmonic so he gets special treatment
 void WaveTableConstants::setupSineWaveTable(int tableLength) {
-    std::vector<float> sineHarmonics(tableLength);
-    std::vector<float> sineWaveform(tableLength, 0.0);
+  std::vector<float> sineHarmonics(tableLength);
+  std::vector<float> sineWaveform(tableLength, 0.0);
 
   fillSineHarmonics(sineHarmonics.data(), tableLength);
   fft(tableLength, sineHarmonics.data(), sineWaveform.data());
@@ -264,5 +264,5 @@ WaveTable* WaveTableConstants::getWaveTable(WaveTableConstants::WaveTableType ty
   case WaveTableType::count:
     return nullptr;
   }
-  return nullptr; 
+  return nullptr;
 }

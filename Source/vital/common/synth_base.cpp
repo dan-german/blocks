@@ -822,7 +822,7 @@ std::shared_ptr<model::Module> SynthBase::addModulator(Model::Type type, int num
   return modulator;
 }
 
-void SynthBase::repositionBlock(Index from, Index to) { 
+void SynthBase::repositionBlock(Index from, Index to) {
   auto block = getModuleManager().getBlock(from);
 
   if (block->length > 1) {

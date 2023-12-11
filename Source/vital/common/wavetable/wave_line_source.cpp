@@ -23,8 +23,8 @@
 #include "vital/common/wavetable/wavetable_component_factory.h"
 #include "vital/common/line_generator.h"
 
-WaveLineSource::WaveLineSourceKeyframe::WaveLineSourceKeyframe() :
-    line_generator_(vital::WaveFrame::kWaveformSize) {
+WaveLineSource::WaveLineSourceKeyframe::WaveLineSourceKeyframe():
+  line_generator_(vital::WaveFrame::kWaveformSize) {
   pull_power_ = 0.0f;
 }
 
@@ -41,8 +41,8 @@ void WaveLineSource::WaveLineSourceKeyframe::copy(const WavetableKeyframe* keyfr
 }
 
 void WaveLineSource::WaveLineSourceKeyframe::interpolate(const WavetableKeyframe* from_keyframe,
-                                                         const WavetableKeyframe* to_keyframe,
-                                                         float t) {
+  const WavetableKeyframe* to_keyframe,
+  float t) {
   const WaveLineSourceKeyframe* from = dynamic_cast<const WaveLineSourceKeyframe*>(from_keyframe);
   const WaveLineSourceKeyframe* to = dynamic_cast<const WaveLineSourceKeyframe*>(to_keyframe);
   VITAL_ASSERT(from->getNumPoints() == to->getNumPoints());
@@ -62,7 +62,7 @@ void WaveLineSource::WaveLineSourceKeyframe::interpolate(const WavetableKeyframe
     line_generator_.setPoint(i, {
       linearTween(from_point.first, to_point.first, adjusted_t),
       linearTween(from_point.second, to_point.second, adjusted_t),
-    });
+      });
     line_generator_.setPower(i, linearTween(from_generator->getPower(i), to_generator->getPower(i), adjusted_t));
   }
 }

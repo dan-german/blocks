@@ -20,7 +20,7 @@
 //   default:
 //     break;
 //   }
-  
+
 //   float display_multiply_ = 1.0f;
 
 //   adjusted_value += details.post_offset;

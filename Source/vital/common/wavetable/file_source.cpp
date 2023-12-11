@@ -36,8 +36,8 @@ void FileSource::FileSourceKeyframe::copy(const WavetableKeyframe* keyframe) {
 }
 
 void FileSource::FileSourceKeyframe::interpolate(const WavetableKeyframe* from_keyframe,
-                                                 const WavetableKeyframe* to_keyframe,
-                                                 float t) {
+  const WavetableKeyframe* to_keyframe,
+  float t) {
   const FileSourceKeyframe* from = dynamic_cast<const FileSourceKeyframe*>(from_keyframe);
   const FileSourceKeyframe* to = dynamic_cast<const FileSourceKeyframe*>(to_keyframe);
   VITAL_ASSERT(from);
@@ -56,7 +56,7 @@ force_inline float FileSource::FileSourceKeyframe::getScaledInterpolatedSample(f
   vital::matrix interpolation_matrix = vital::utils::getCatmullInterpolationMatrix(t);
   vital::matrix value_matrix = vital::utils::getValueMatrix(buffer, start_index);
   value_matrix.transpose();
-  
+
   return interpolation_matrix.multiplyAndSumRows(value_matrix)[0];
 }
 
@@ -221,10 +221,10 @@ void FileSource::FileSourceKeyframe::jsonToState(json data) {
   window_size_ = data["window_size"];
 }
 
-FileSource::FileSource() : compute_frame_(&sample_buffer_), overridden_phase_(),
-                           fade_style_(kWaveBlend), phase_style_(kNone),
-                           normalize_gain_(false), normalize_mult_(false),
-                           random_generator_(-vital::kPi, vital::kPi) {
+FileSource::FileSource(): compute_frame_(&sample_buffer_), overridden_phase_(),
+fade_style_(kWaveBlend), phase_style_(kNone),
+normalize_gain_(false), normalize_mult_(false),
+random_generator_(-vital::kPi, vital::kPi) {
   window_size_ = vital::WaveFrame::kWaveformSize;
   random_seed_ = random_generator_.next() * (INT_MAX / vital::kPi);
 }
@@ -343,8 +343,7 @@ void FileSource::writePhaseOverrideBuffer() {
       overridden_phase_[2 * i] = -0.5f * vital::kPi;
       overridden_phase_[2 * i + 1] = 0.5f * vital::kPi;
     }
-  }
-  else if (phase_style_ == kVocode) {
+  } else if (phase_style_ == kVocode) {
     random_generator_.seed(random_seed_);
     for (int i = 0; i < vital::WaveFrame::kWaveformSize; ++i)
       overridden_phase_[i] = random_generator_.next();

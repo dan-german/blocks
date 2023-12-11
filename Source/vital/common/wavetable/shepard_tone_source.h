@@ -19,17 +19,17 @@
 #include <juce_core/juce_core.h>
 #include "vital/common/wavetable/wave_source.h"
 
-class ShepardToneSource : public WaveSource {
-  public:
-    ShepardToneSource();
-    virtual ~ShepardToneSource();
+class ShepardToneSource: public WaveSource {
+public:
+  ShepardToneSource();
+  virtual ~ShepardToneSource();
 
-    virtual void render(vital::WaveFrame* wave_frame, float position) override;
-    virtual WavetableComponentFactory::ComponentType getType() override;
-    virtual bool hasKeyframes() override { return false; }
+  virtual void render(vital::WaveFrame* wave_frame, float position) override;
+  virtual WavetableComponentFactory::ComponentType getType() override;
+  virtual bool hasKeyframes() override { return false; }
 
-  protected: 
-    std::unique_ptr<WaveSourceKeyframe> loop_frame_;
+protected:
+  std::unique_ptr<WaveSourceKeyframe> loop_frame_;
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ShepardToneSource)
+  JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ShepardToneSource)
 };

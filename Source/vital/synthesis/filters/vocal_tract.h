@@ -22,30 +22,30 @@
 
 namespace vital {
 
-  class VocalTract : public ProcessorRouter {
-    public:
-      enum {
-        kAudio,
-        kReset,
-        kBlend,
-        kTonguePosition,
-        kTongueHeight,
-        kNumInputs
-      };
-
-      VocalTract();
-      virtual ~VocalTract();
-
-      virtual Processor* clone() const override { return new VocalTract(*this); }
-
-      void reset(poly_mask reset_mask) override;
-      void hardReset() override;
-
-      virtual void process(int num_samples) override;
-      virtual void processWithInput(const poly_float* audio_in, int num_samples) override;
-
-    private:
-      JUCE_LEAK_DETECTOR(VocalTract)
+class VocalTract: public ProcessorRouter {
+public:
+  enum {
+    kAudio,
+    kReset,
+    kBlend,
+    kTonguePosition,
+    kTongueHeight,
+    kNumInputs
   };
+
+  VocalTract();
+  virtual ~VocalTract();
+
+  virtual Processor* clone() const override { return new VocalTract(*this); }
+
+  void reset(poly_mask reset_mask) override;
+  void hardReset() override;
+
+  virtual void process(int num_samples) override;
+  virtual void processWithInput(const poly_float* audio_in, int num_samples) override;
+
+private:
+  JUCE_LEAK_DETECTOR(VocalTract)
+};
 } // namespace vital
 

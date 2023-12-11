@@ -21,7 +21,7 @@ using GraphConnection = AudioProcessorGraph::Connection;
 
 class Processor;
 
-namespace dsp { 
+namespace dsp {
 class GraphManager {
 public:
   struct Connections;

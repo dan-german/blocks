@@ -14,7 +14,7 @@
 #include <juce_gui_basics/juce_gui_basics.h>
 using namespace juce;
 
-class HighlightComponent : public juce::Component {
+class HighlightComponent: public juce::Component {
 public:
   Colour colour;
   ValueAnimator valueAnimator;

@@ -29,24 +29,24 @@
 using File = juce::File;
 
 namespace {
-  const std::string kLinuxUserDataDirectory = "~/.local/share/vital/";
-  const std::string kAvailablePacksFile = "available_packs.json";
-  const std::string kInstalledPacksFile = "packs.json";
+const std::string kLinuxUserDataDirectory = "~/.local/share/vital/";
+const std::string kAvailablePacksFile = "available_packs.json";
+const std::string kInstalledPacksFile = "packs.json";
 
-  Time getBuildTime() {
-    StringArray date_tokens;
-    date_tokens.addTokens(STRINGIFY(BUILD_DATE), true);
-    if (date_tokens.size() != 5)
-      return Time::getCompilationDate();
+Time getBuildTime() {
+  StringArray date_tokens;
+  date_tokens.addTokens(STRINGIFY(BUILD_DATE), true);
+  if (date_tokens.size() != 5)
+    return Time::getCompilationDate();
 
-    int year = date_tokens[0].getIntValue();
-    int month = date_tokens[1].getIntValue() - 1;
-    int day = date_tokens[2].getIntValue();
-    int hour = date_tokens[3].getIntValue();
-    int minute = date_tokens[4].getIntValue();
+  int year = date_tokens[0].getIntValue();
+  int month = date_tokens[1].getIntValue() - 1;
+  int day = date_tokens[2].getIntValue();
+  int hour = date_tokens[3].getIntValue();
+  int minute = date_tokens[4].getIntValue();
 
-    return Time(year, month, day, hour, minute);
-  }
+  return Time(year, month, day, hour, minute);
+}
 } // namespace
 
 const std::string LoadSave::kUserDirectoryName = "User";
@@ -159,8 +159,7 @@ void LoadSave::loadControls(SynthBase* synth, const json& data) {
     if (data.count(name)) {
       vital::mono_float value = data[name];
       control.second->set(value);
-    }
-    else {
+    } else {
       vital::ValueDetails details = vital::Parameters::getDetails(name);
       control.second->set(details.default_value);
     }
@@ -180,10 +179,10 @@ void LoadSave::loadModulations(SynthBase* synth, const json& modulations) {
     index++;
 
     if (synth->getEngine()->getModulationSource(source) == nullptr ||
-        synth->getEngine()->getMonoModulationDestination(destination) == nullptr) {
+      synth->getEngine()->getMonoModulationDestination(destination) == nullptr) {
       continue;
     }
-    
+
     if (source.length() && destination.length()) {
       connection->source_name = source;
       connection->destination_name = destination;
@@ -252,8 +251,7 @@ void LoadSave::loadSaveState(std::map<std::string, String>& state, json data) {
     if (data.count(key)) {
       std::string name = data[key];
       state[key] = name;
-    }
-    else
+    } else
       state[key] = "MACRO " + std::to_string(i + 1);
   }
 }
@@ -710,7 +708,7 @@ json LoadSave::updateFromOldVersion(json state) {
     settings["osc_3_tune"] = settings["sub_tune"];
     settings["osc_3_phase"] = 0.25f;
     settings["osc_3_random_phase"] = 0.0f;
-    
+
     float sub_waveform = settings["sub_waveform"];
     settings["osc_3_wave_frame"] = sub_waveform * 257.0f / 6.0f;
 
@@ -973,7 +971,7 @@ json LoadSave::updateFromOldVersion(json state) {
       if (osc_2_spectral_morph_type == 10.0f)
         settings["osc_2_spectral_morph_type"] = 7.0f;
     }
-    
+
     if (settings.count("osc_3_spectral_morph_type")) {
       float osc_3_spectral_morph_type = settings["osc_3_spectral_morph_type"];
       if (osc_3_spectral_morph_type == 10.0f)
@@ -1028,15 +1026,15 @@ json LoadSave::updateFromOldVersion(json state) {
 
 bool LoadSave::jsonToState(SynthBase* synth, std::map<std::string, String>& save_info, json data) {
   std::string version = data["synth_version"];
-  
+
   // int compare_feature_versions = compareFeatureVersionStrings(version, ProjectInfo::versionString);
   // if (compare_feature_versions > 0)
   //   return false;
-  
+
   // int compare_versions = compareVersionStrings(version, ProjectInfo::versionString);
   // if (compare_versions < 0 || data["settings"].count("sub_octave"))
   //   data = updateFromOldVersion(data);
-  
+
   json settings = data["settings"];
   json modulations = settings["modulations"];
   json sample = settings["sample"];
@@ -1050,7 +1048,7 @@ bool LoadSave::jsonToState(SynthBase* synth, std::map<std::string, String>& save
   loadLfos(synth, lfos);
   loadSaveState(save_info, data);
   synth->checkOversampling();
-  
+
   return true;
 }
 
@@ -1074,8 +1072,7 @@ String LoadSave::getAuthorFromFile(const File& file) {
     try {
       json parsed_json_state = json::parse(file.loadFileAsString().toStdString(), nullptr, false);
       return getAuthor(parsed_json_state);
-    }
-    catch (const json::exception& e) {
+    } catch (const json::exception& e) {
       return "";
     }
   }
@@ -1158,7 +1155,7 @@ void LoadSave::writeCrashLog(String crash_log) {
 void LoadSave::writeErrorLog(String error_log) {
   File data_dir = getDataDirectory();
   if (!data_dir.exists() || !data_dir.isDirectory())
-    return; 
+    return;
 
   File file = getDataDirectory().getChildFile("errors.txt");
   file.appendText(error_log + "\n");
@@ -1171,11 +1168,11 @@ File LoadSave::getFavoritesFile() {
   config_options.osxLibrarySubFolder = "Application Support";
   config_options.filenameSuffix = "favorites";
 
-// #ifdef LINUX
-//   config_options.folderName = "." + String(ProjectInfo::projectName).toLowerCase();
-// #else
-//   config_options.folderName = String(ProjectInfo::projectName).toLowerCase();
-// #endif
+  // #ifdef LINUX
+  //   config_options.folderName = "." + String(ProjectInfo::projectName).toLowerCase();
+  // #else
+  //   config_options.folderName = String(ProjectInfo::projectName).toLowerCase();
+  // #endif
 
   return config_options.getDefaultFile();
 #else
@@ -1190,11 +1187,11 @@ File LoadSave::getDefaultSkin() {
   config_options.osxLibrarySubFolder = "Application Support";
   config_options.filenameSuffix = "skin";
 
-// #ifdef LINUX
-//   config_options.folderName = "." + String(ProjectInfo::projectName).toLowerCase();
-// #else
-//   config_options.folderName = String(ProjectInfo::projectName).toLowerCase();
-// #endif
+  // #ifdef LINUX
+  //   config_options.folderName = "." + String(ProjectInfo::projectName).toLowerCase();
+  // #else
+  //   config_options.folderName = String(ProjectInfo::projectName).toLowerCase();
+  // #endif
 
   return config_options.getDefaultFile();
 #else
@@ -1212,8 +1209,7 @@ json LoadSave::getConfigJson() {
     if (parsed.is_discarded())
       return json();
     return parsed;
-  }
-  catch (const json::exception& e) {
+  } catch (const json::exception& e) {
     return json();
   }
 }
@@ -1228,8 +1224,7 @@ json LoadSave::getFavoritesJson() {
     if (parsed.is_discarded())
       return json();
     return parsed;
-  }
-  catch (const json::exception& e) {
+  } catch (const json::exception& e) {
     return json();
   }
 }
@@ -1252,7 +1247,7 @@ void LoadSave::removeFavorite(const File& old_favorite) {
 
 std::set<std::string> LoadSave::getFavorites() {
   json favorites_json = getFavoritesJson();
-  
+
   std::set<std::string> favorites;
   for (auto& pair : favorites_json.items())
     favorites.insert(pair.key());
@@ -1354,8 +1349,7 @@ void LoadSave::saveLayoutConfig(vital::StringLayout* layout) {
     chromatic_layout = layout->getLayout();
     up_key = layout->getUpKey();
     down_key = layout->getDownKey();
-  }
-  else {
+  } else {
     chromatic_layout = getComputerKeyboardLayout();
     std::pair<wchar_t, wchar_t> octave_controls = getComputerKeyboardOctaveControls();
     down_key = octave_controls.first;
@@ -1466,8 +1460,7 @@ json LoadSave::getAvailablePacks() {
     if (parsed.is_discarded())
       return json();
     return parsed;
-  }
-  catch (const json::exception& e) {
+  } catch (const json::exception& e) {
     return json();
   }
 }
@@ -1495,8 +1488,7 @@ json LoadSave::getInstalledPacks() {
     if (parsed.is_discarded())
       return json();
     return parsed;
-  }
-  catch (const json::exception& e) {
+  } catch (const json::exception& e) {
     return json();
   }
 }
@@ -1634,7 +1626,7 @@ int LoadSave::getOversamplingAmount() {
 
 float LoadSave::loadWindowSize() {
   static constexpr float kMinWindowSize = 0.25f;
-  
+
   json data = getConfigJson();
 
   if (!data.count("window_size"))
@@ -1744,7 +1736,7 @@ File LoadSave::getDataDirectory() {
 
 #ifdef LINUX
   File directory = File(kLinuxUserDataDirectory);
-  String xdg_data_home = SystemStats::getEnvironmentVariable ("XDG_DATA_HOME", {});
+  String xdg_data_home = SystemStats::getEnvironmentVariable("XDG_DATA_HOME", {});
 
   if (!xdg_data_home.trim().isEmpty())
     directory = File(xdg_data_home).getChildFile("vial");
@@ -1842,7 +1834,7 @@ File LoadSave::getUserLfoDirectory() {
 }
 
 void LoadSave::getAllFilesOfTypeInDirectories(juce::Array<File>& files, const String& extensions,
-                                              const std::vector<File>& directories) {
+  const std::vector<File>& directories) {
   files.clear();
   for (const File& directory : directories) {
     if (directory.exists() && directory.isDirectory())
@@ -1882,7 +1874,7 @@ void LoadSave::getAllUserWavetables(juce::Array<File>& wavetables) {
   std::vector<File> directories = {
     getDataDirectory().getChildFile(kWavetableFolderName),
     getUserWavetableDirectory()
-  }; 
+  };
   getAllFilesOfTypeInDirectories(wavetables, vital::kWavetableExtensionsList, directories);
 }
 
@@ -1898,7 +1890,7 @@ void LoadSave::getAllUserSamples(juce::Array<File>& samples) {
   std::vector<File> directories = {
     getDataDirectory().getChildFile(kSampleFolderName),
     getUserSampleDirectory()
-  }; 
+  };
   getAllFilesOfTypeInDirectories(samples, "*.wav", directories);
 }
 
@@ -1907,7 +1899,7 @@ int LoadSave::compareFeatureVersionStrings(String a, String b) {
   b.trim();
 
   return compareVersionStrings(a.upToLastOccurrenceOf(".", false, true),
-                               b.upToLastOccurrenceOf(".", false, true));
+    b.upToLastOccurrenceOf(".", false, true));
 }
 
 int LoadSave::compareVersionStrings(String a, String b) {
@@ -1933,11 +1925,11 @@ int LoadSave::compareVersionStrings(String a, String b) {
   else if (major_value_a < major_value_b)
     return -1;
   return compareVersionStrings(a.fromFirstOccurrenceOf(".", false, true),
-                               b.fromFirstOccurrenceOf(".", false, true));
+    b.fromFirstOccurrenceOf(".", false, true));
 }
 
 File LoadSave::getShiftedFile(const String directory_name, const String& extensions,
-                              const std::string& additional_folders_name, const File& current_file, int shift) {
+  const std::string& additional_folders_name, const File& current_file, int shift) {
   FileSorterAscending file_sorter;
 
   std::vector<File> directories = getDirectories(directory_name);

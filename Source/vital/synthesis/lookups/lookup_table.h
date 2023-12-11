@@ -21,37 +21,37 @@
 
 namespace vital {
 
-  template<mono_float(*function)(mono_float), size_t resolution>
-  class OneDimLookup {
-    static constexpr int kExtraValues = 4;
-    public:
-      OneDimLookup(float scale = 1.0f) {
-        scale_ = resolution / scale;
-        for (int i = 0; i < resolution + kExtraValues; ++i) {
-          mono_float t = (i - 1.0f) / (resolution - 1.0f);
-          lookup_[i] = function(t * scale);
-        }
-      }
+template<mono_float(*function)(mono_float), size_t resolution>
+class OneDimLookup {
+  static constexpr int kExtraValues = 4;
+public:
+  OneDimLookup(float scale = 1.0f) {
+    scale_ = resolution / scale;
+    for (int i = 0; i < resolution + kExtraValues; ++i) {
+      mono_float t = (i - 1.0f) / (resolution - 1.0f);
+      lookup_[i] = function(t * scale);
+    }
+  }
 
-      ~OneDimLookup() { }
+  ~OneDimLookup() { }
 
-      force_inline poly_float cubicLookup(poly_float value) const {
-        poly_float boost = value * scale_;
-        poly_int indices = utils::clamp(utils::toInt(boost), 0, resolution);
-        poly_float t = boost - utils::toFloat(indices);
+  force_inline poly_float cubicLookup(poly_float value) const {
+    poly_float boost = value * scale_;
+    poly_int indices = utils::clamp(utils::toInt(boost), 0, resolution);
+    poly_float t = boost - utils::toFloat(indices);
 
-        matrix interpolation_matrix = utils::getCatmullInterpolationMatrix(t);
-        matrix value_matrix = utils::getValueMatrix(lookup_, indices);
-        value_matrix.transpose();
+    matrix interpolation_matrix = utils::getCatmullInterpolationMatrix(t);
+    matrix value_matrix = utils::getValueMatrix(lookup_, indices);
+    value_matrix.transpose();
 
-        return interpolation_matrix.multiplyAndSumRows(value_matrix);
-      }
+    return interpolation_matrix.multiplyAndSumRows(value_matrix);
+  }
 
-    private:
-      mono_float lookup_[resolution + kExtraValues];
-      mono_float scale_;
+private:
+  mono_float lookup_[resolution + kExtraValues];
+  mono_float scale_;
 
-      JUCE_LEAK_DETECTOR(OneDimLookup)
-  };
+  JUCE_LEAK_DETECTOR(OneDimLookup)
+};
 } // namespace vital
 

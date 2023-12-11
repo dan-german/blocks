@@ -129,7 +129,7 @@ void BlocksVoiceHandler::connectAll() {
   }
 }
 
-std::shared_ptr<vital::Processor> BlocksVoiceHandler::findProcessorAbove(Index index) { 
+std::shared_ptr<vital::Processor> BlocksVoiceHandler::findProcessorAbove(Index index) {
   std::cout << "finding processor above: " << index.column << ", " << index.row << std::endl;
   for (int i = index.row - 1; i >= 0; i--) {
     auto processor = processor_matrix_[index.column][i];
@@ -148,8 +148,8 @@ void BlocksVoiceHandler::unplugAll() {
       if (processor != nullptr) {
         voice_sum_->unplug(processor_matrix_[column][row].get());
         last_node_->unplug(processor_matrix_[column][row].get());
-        
-        if (auto processor_above = findProcessorAbove({row, column})) {
+
+        if (auto processor_above = findProcessorAbove({ row, column })) {
           std::cout << "wow unplugging " << std::endl;
           processor->unplug(processor_above.get());
         }

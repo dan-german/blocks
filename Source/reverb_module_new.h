@@ -6,7 +6,7 @@
 
 namespace model {
 class ReverbModule: public Block {
-public: 
+public:
   ReverbModule(int number): Block("reverb", number) {
     // add({ .name = "style", .max = 9.0 });
     // add({ .name = "cutoff", .min = 8.0, .max = 136.0, .default_value = 60.0 });

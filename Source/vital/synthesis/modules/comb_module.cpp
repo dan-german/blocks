@@ -20,29 +20,29 @@
 
 namespace vital {
 
-  CombModule::CombModule() : SynthModule(kNumInputs, 1), comb_filter_(nullptr) { }
+CombModule::CombModule(): SynthModule(kNumInputs, 1), comb_filter_(nullptr) { }
 
-  void CombModule::init() {
-    comb_filter_ = new CombFilter(kMaxFeedbackSamples);
-    addProcessor(comb_filter_);
+void CombModule::init() {
+  comb_filter_ = new CombFilter(kMaxFeedbackSamples);
+  addProcessor(comb_filter_);
 
-    comb_filter_->useInput(input(kAudio), CombFilter::kAudio);
-    comb_filter_->useInput(input(kMidiCutoff), CombFilter::kMidiCutoff);
-    comb_filter_->useInput(input(kStyle), CombFilter::kStyle);
-    comb_filter_->useInput(input(kMidiBlendTranspose), CombFilter::kTranspose);
-    comb_filter_->useInput(input(kFilterCutoffBlend), CombFilter::kPassBlend);
-    comb_filter_->useInput(input(kResonance), CombFilter::kResonance);
-    comb_filter_->useInput(input(kReset), CombFilter::kReset);
-    comb_filter_->useOutput(output());
+  comb_filter_->useInput(input(kAudio), CombFilter::kAudio);
+  comb_filter_->useInput(input(kMidiCutoff), CombFilter::kMidiCutoff);
+  comb_filter_->useInput(input(kStyle), CombFilter::kStyle);
+  comb_filter_->useInput(input(kMidiBlendTranspose), CombFilter::kTranspose);
+  comb_filter_->useInput(input(kFilterCutoffBlend), CombFilter::kPassBlend);
+  comb_filter_->useInput(input(kResonance), CombFilter::kResonance);
+  comb_filter_->useInput(input(kReset), CombFilter::kReset);
+  comb_filter_->useOutput(output());
 
-    SynthModule::init();
-  }
+  SynthModule::init();
+}
 
-  void CombModule::reset(poly_mask reset_mask) {
-    getLocalProcessor(comb_filter_)->reset(reset_mask);
-  }
+void CombModule::reset(poly_mask reset_mask) {
+  getLocalProcessor(comb_filter_)->reset(reset_mask);
+}
 
-  void CombModule::hardReset() {
-    getLocalProcessor(comb_filter_)->hardReset();
-  }
+void CombModule::hardReset() {
+  getLocalProcessor(comb_filter_)->hardReset();
+}
 } // namespace vital

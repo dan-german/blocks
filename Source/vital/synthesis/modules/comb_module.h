@@ -21,36 +21,36 @@
 #include "vital/common/synth_constants.h"
 
 namespace vital {
-  class CombFilter;
-  
-  class CombModule : public SynthModule {
-    public:
-      static constexpr int kMaxFeedbackSamples = 25000;
+class CombFilter;
 
-      enum {
-        kAudio,
-        kReset,
-        kMidiCutoff,
-        kMidiBlendTranspose,
-        kFilterCutoffBlend,
-        kStyle,
-        kResonance,
-        kMidi,
-        kNumInputs
-      };
+class CombModule: public SynthModule {
+public:
+  static constexpr int kMaxFeedbackSamples = 25000;
 
-      CombModule();
-      virtual ~CombModule() { }
-
-      void init() override;
-      void reset(poly_mask reset_mask) override;
-      void hardReset() override;
-      virtual Processor* clone() const override { return new CombModule(*this); }
-
-    protected:
-      CombFilter* comb_filter_;
-
-    JUCE_LEAK_DETECTOR(CombModule)
+  enum {
+    kAudio,
+    kReset,
+    kMidiCutoff,
+    kMidiBlendTranspose,
+    kFilterCutoffBlend,
+    kStyle,
+    kResonance,
+    kMidi,
+    kNumInputs
   };
+
+  CombModule();
+  virtual ~CombModule() { }
+
+  void init() override;
+  void reset(poly_mask reset_mask) override;
+  void hardReset() override;
+  virtual Processor* clone() const override { return new CombModule(*this); }
+
+protected:
+  CombFilter* comb_filter_;
+
+  JUCE_LEAK_DETECTOR(CombModule)
+};
 } // namespace vital
 

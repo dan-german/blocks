@@ -14,7 +14,7 @@
 
 using namespace juce;
 
-class DragIndicatorComponent : public juce::Component {
+class DragIndicatorComponent: public juce::Component {
 public:
   DragIndicatorComponent();
   ~DragIndicatorComponent() override;

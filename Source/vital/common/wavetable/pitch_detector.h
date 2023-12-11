@@ -19,24 +19,24 @@
 #include <juce_core/juce_core.h>
 
 class PitchDetector {
-  public:
-    static constexpr int kNumPoints = 2520;
+public:
+  static constexpr int kNumPoints = 2520;
 
-    PitchDetector();
+  PitchDetector();
 
-    void setSize(int size) { size_ = size; }
-    void loadSignal(const float* signal, int size);
+  void setSize(int size) { size_ = size; }
+  void loadSignal(const float* signal, int size);
 
-    float getPeriodError(float period);
-    float findYinPeriod(int max_period);
-    float matchPeriod(int max_period);
+  float getPeriodError(float period);
+  float findYinPeriod(int max_period);
+  float matchPeriod(int max_period);
 
-    const float* data() const { return signal_data_.get(); }
+  const float* data() const { return signal_data_.get(); }
 
-  protected:
-    int size_;
-    std::unique_ptr<float[]> signal_data_;
+protected:
+  int size_;
+  std::unique_ptr<float[]> signal_data_;
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PitchDetector)
+  JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PitchDetector)
 };
 

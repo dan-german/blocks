@@ -16,26 +16,26 @@
 #include "vital/common/synth_parameters.h"
 
 namespace model {
-  struct Connection {
-    Connection(Module* target, Module* modulator, int parameterIndex, float magnitude, int number, bool bipolar = false);
-    Connection(int number);
-    ~Connection();
-    std::shared_ptr<vital::ValueDetails> magnitude_parameter_;
-    std::shared_ptr<vital::ValueDetails> bipolar_parameter_;
+struct Connection {
+  Connection(Module* target, Module* modulator, int parameterIndex, float magnitude, int number, bool bipolar = false);
+  Connection(int number);
+  ~Connection();
+  std::shared_ptr<vital::ValueDetails> magnitude_parameter_;
+  std::shared_ptr<vital::ValueDetails> bipolar_parameter_;
 
 
-    int id = 0;
-    int number;
-    std::string name;
-    std::shared_ptr<Module> source;
-    std::shared_ptr<Module> target;
-    std::string parameter_name_;
+  int id = 0;
+  int number;
+  std::string name;
+  std::shared_ptr<Module> source;
+  std::shared_ptr<Module> target;
+  std::string parameter_name_;
 
-    bool isOscGainEnvelope();
+  bool isOscGainEnvelope();
 
-    void reset();
-    void setMagnitude(float magnitude);
-    void setPolarity(bool bipolar);
-    bool operator==(Connection const& rhs) const;
-  };
+  void reset();
+  void setMagnitude(float magnitude);
+  void setPolarity(bool bipolar);
+  bool operator==(Connection const& rhs) const;
+};
 }

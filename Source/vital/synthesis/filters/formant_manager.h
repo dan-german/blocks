@@ -21,31 +21,31 @@
 
 namespace vital {
 
-  class DigitalSvf;
+class DigitalSvf;
 
-  class FormantManager : public ProcessorRouter {
-    public:
-      static constexpr mono_float kMinResonance = 4.0f;
-      static constexpr mono_float kMaxResonance = 30.0f;
+class FormantManager: public ProcessorRouter {
+public:
+  static constexpr mono_float kMinResonance = 4.0f;
+  static constexpr mono_float kMaxResonance = 30.0f;
 
-      FormantManager(int num_formants = 4);
-      virtual ~FormantManager() { }
+  FormantManager(int num_formants = 4);
+  virtual ~FormantManager() { }
 
-      virtual void init() override;
-      void reset(poly_mask reset_mask) override;
-      void hardReset() override;
+  virtual void init() override;
+  void reset(poly_mask reset_mask) override;
+  void hardReset() override;
 
-      virtual Processor* clone() const override {
-        return new FormantManager(*this);
-      }
+  virtual Processor* clone() const override {
+    return new FormantManager(*this);
+  }
 
-      DigitalSvf* getFormant(int index = 0) { return formants_[index]; }
-      int numFormants() { return static_cast<int>(formants_.size()); }
+  DigitalSvf* getFormant(int index = 0) { return formants_[index]; }
+  int numFormants() { return static_cast<int>(formants_.size()); }
 
-    protected:
-      std::vector<DigitalSvf*> formants_;
+protected:
+  std::vector<DigitalSvf*> formants_;
 
-      JUCE_LEAK_DETECTOR(FormantManager)
-  };
+  JUCE_LEAK_DETECTOR(FormantManager)
+};
 } // namespace vital
 

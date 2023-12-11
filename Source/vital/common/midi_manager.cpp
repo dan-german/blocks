@@ -21,28 +21,28 @@
 #include "vital/common/synth_base.h"
 
 namespace {
-  constexpr int kMidiControlBits = 7;
-  constexpr float kHighResolutionMax = (1 << (2 * kMidiControlBits)) - 1.0f;
-  constexpr float kControlMax = (1 << kMidiControlBits) - 1.0f;
+constexpr int kMidiControlBits = 7;
+constexpr float kHighResolutionMax = (1 << (2 * kMidiControlBits)) - 1.0f;
+constexpr float kControlMax = (1 << kMidiControlBits) - 1.0f;
 
-  force_inline vital::mono_float toHighResolutionValue(int msb, int lsb) {
-    if (lsb < 0)
-      return msb / kControlMax;
+force_inline vital::mono_float toHighResolutionValue(int msb, int lsb) {
+  if (lsb < 0)
+    return msb / kControlMax;
 
-    return ((msb << kMidiControlBits) + lsb) / kHighResolutionMax;
-  }
+  return ((msb << kMidiControlBits) + lsb) / kHighResolutionMax;
+}
 } // namespace
 
 MidiManager::MidiManager(SynthBase* synth, juce::MidiKeyboardState* keyboard_state,
-                         std::map<std::string, String>* gui_state, Listener* listener) :
-    synth_(synth), keyboard_state_(keyboard_state), gui_state_(gui_state),
-    listener_(listener), armed_value_(nullptr),
-    msb_pressure_values_(), msb_slide_values_() {
+  std::map<std::string, String>* gui_state, Listener* listener):
+  synth_(synth), keyboard_state_(keyboard_state), gui_state_(gui_state),
+  listener_(listener), armed_value_(nullptr),
+  msb_pressure_values_(), msb_slide_values_() {
   engine_ = synth_->getEngine();
   current_bank_ = -1;
   current_folder_ = -1;
   current_preset_ = -1;
-  
+
   for (int i = 0; i < vital::kNumMidiChannels; ++i) {
     lsb_slide_values_[i] = -1;
     lsb_pressure_values_[i] = -1;
@@ -138,14 +138,12 @@ void MidiManager::processSustain(const MidiMessage& midi_message, int sample_pos
       engine_->sustainOnRange(lowerZoneStartChannel(), lowerZoneEndChannel());
     else
       engine_->sustainOffRange(sample_position, lowerZoneStartChannel(), lowerZoneEndChannel());
-  }
-  else if (isMpeChannelMasterUpperZone(channel)) {
+  } else if (isMpeChannelMasterUpperZone(channel)) {
     if (on)
       engine_->sustainOnRange(upperZoneStartChannel(), upperZoneEndChannel());
     else
       engine_->sustainOffRange(sample_position, upperZoneStartChannel(), upperZoneEndChannel());
-  }
-  else {
+  } else {
     if (on)
       engine_->sustainOn(channel);
     else
@@ -160,14 +158,12 @@ void MidiManager::processSostenuto(const MidiMessage& midi_message, int sample_p
       engine_->sostenutoOnRange(lowerZoneStartChannel(), lowerZoneEndChannel());
     else
       engine_->sostenutoOffRange(sample_position, lowerZoneStartChannel(), lowerZoneEndChannel());
-  }
-  else if (isMpeChannelMasterUpperZone(channel)) {
+  } else if (isMpeChannelMasterUpperZone(channel)) {
     if (on)
       engine_->sostenutoOnRange(upperZoneStartChannel(), upperZoneEndChannel());
     else
       engine_->sostenutoOffRange(sample_position, upperZoneStartChannel(), upperZoneEndChannel());
-  }
-  else {
+  } else {
     if (on)
       engine_->sostenutoOn(channel);
     else
@@ -183,13 +179,11 @@ void MidiManager::processPitchBend(const MidiMessage& midi_message, int sample_p
     engine_->setZonedPitchWheel(value, lowerMasterChannel(), lowerMasterChannel() + 1);
     engine_->setZonedPitchWheel(value, lowerZoneStartChannel(), lowerZoneEndChannel());
     listener_->pitchWheelMidiChanged(value);
-  }
-  else if (isMpeChannelMasterUpperZone(channel)) {
+  } else if (isMpeChannelMasterUpperZone(channel)) {
     engine_->setZonedPitchWheel(value, upperMasterChannel(), upperMasterChannel() + 1);
     engine_->setZonedPitchWheel(value, upperZoneStartChannel(), upperZoneEndChannel());
     listener_->pitchWheelMidiChanged(value);
-  }
-  else if (mpe_enabled_)
+  } else if (mpe_enabled_)
     engine_->setPitchWheel(value, channel);
   else {
     engine_->setZonedPitchWheel(value, channel, channel);
@@ -232,90 +226,90 @@ void MidiManager::processMidiMessage(const MidiMessage& midi_message, int sample
   int channel = midi_message.getChannel() - 1;
   MidiMainType type = static_cast<MidiMainType>(midi_message.getRawData()[0] & 0xf0);
   switch (type) {
-    case kProgramChange:
-      return;
-    case kNoteOn: {
-      juce::uint8 velocity = midi_message.getVelocity();
-      if (velocity)
-        engine_->noteOn(midi_message.getNoteNumber(), velocity / kControlMax, sample_position, channel);
-      else
-        engine_->noteOff(midi_message.getNoteNumber(), velocity / kControlMax, sample_position, channel);
-      return;
+  case kProgramChange:
+    return;
+  case kNoteOn: {
+    juce::uint8 velocity = midi_message.getVelocity();
+    if (velocity)
+      engine_->noteOn(midi_message.getNoteNumber(), velocity / kControlMax, sample_position, channel);
+    else
+      engine_->noteOff(midi_message.getNoteNumber(), velocity / kControlMax, sample_position, channel);
+    return;
+  }
+  case kNoteOff: {
+    vital::mono_float velocity = midi_message.getVelocity() / kControlMax;
+    engine_->noteOff(midi_message.getNoteNumber(), velocity, sample_position, channel);
+    return;
+  }
+  case kAftertouch: {
+    int note = midi_message.getNoteNumber();
+    vital::mono_float value = midi_message.getAfterTouchValue() / kControlMax;
+    engine_->setAftertouch(note, value, sample_position, channel);
+    return;
+  }
+  case kChannelPressure: {
+    msb_pressure_values_[channel] = midi_message.getChannelPressureValue();
+    processPressure(midi_message, sample_position, channel);
+    return;
+  }
+  case kPitchWheel: {
+    processPitchBend(midi_message, sample_position, channel);
+    return;
+  }
+  case kController: {
+    MidiSecondaryType secondary_type = static_cast<MidiSecondaryType>(midi_message.getControllerNumber());
+    switch (secondary_type) {
+    case kSlide: {
+      msb_slide_values_[channel] = midi_message.getControllerValue();
+      processSlide(midi_message, sample_position, channel);
+      break;
     }
-    case kNoteOff: {
-      vital::mono_float velocity = midi_message.getVelocity() / kControlMax;
-      engine_->noteOff(midi_message.getNoteNumber(), velocity, sample_position, channel);
-      return;
-    }
-    case kAftertouch: {
-      int note = midi_message.getNoteNumber();
-      vital::mono_float value = midi_message.getAfterTouchValue() / kControlMax;
-      engine_->setAftertouch(note, value, sample_position, channel);
-      return;
-    }
-    case kChannelPressure: {
-      msb_pressure_values_[channel] = midi_message.getChannelPressureValue();
+    case kLsbPressure: {
+      lsb_pressure_values_[channel] = midi_message.getControllerValue();
       processPressure(midi_message, sample_position, channel);
+      break;
+    }
+    case kLsbSlide: {
+      lsb_slide_values_[channel] = midi_message.getControllerValue();
+      processSlide(midi_message, sample_position, channel);
+      break;
+    }
+    case kSustainPedal: {
+      processSustain(midi_message, sample_position, channel);
+      break;
+    }
+    case kSostenutoPedal: {
+      processSostenuto(midi_message, sample_position, channel);
+      break;
+    }
+    case kSoftPedalOn: // TODO
+      break;
+    case kModWheel: {
+      vital::mono_float percent = (1.0f * midi_message.getControllerValue()) / kControlMax;
+      engine_->setModWheel(percent, channel);
+      listener_->modWheelMidiChanged(percent);
+      break;
+    }
+    case kAllNotesOff:
+    case kAllControllersOff:
+      processAllNotesOff(midi_message, sample_position, channel);
+      return;
+    case kAllSoundsOff:
+      processAllSoundsOff();
+      break;
+    case kBankSelect:
+      current_bank_ = midi_message.getControllerValue();
+      return;
+    case kFolderSelect:
+      current_folder_ = midi_message.getControllerValue();
       return;
     }
-    case kPitchWheel: {
-      processPitchBend(midi_message, sample_position, channel);
-      return;
-    }
-    case kController: {
-      MidiSecondaryType secondary_type = static_cast<MidiSecondaryType>(midi_message.getControllerNumber());
-      switch (secondary_type) {
-        case kSlide: {
-          msb_slide_values_[channel] = midi_message.getControllerValue();
-          processSlide(midi_message, sample_position, channel);
-          break;
-        }
-        case kLsbPressure: {
-          lsb_pressure_values_[channel] = midi_message.getControllerValue();
-          processPressure(midi_message, sample_position, channel);
-          break;
-        }
-        case kLsbSlide: {
-          lsb_slide_values_[channel] = midi_message.getControllerValue();
-          processSlide(midi_message, sample_position, channel);
-          break;
-        }
-        case kSustainPedal: {
-          processSustain(midi_message, sample_position, channel);
-          break;
-        }
-        case kSostenutoPedal: {
-          processSostenuto(midi_message, sample_position, channel);
-          break;
-        }
-        case kSoftPedalOn: // TODO
-          break;
-        case kModWheel: {
-          vital::mono_float percent = (1.0f * midi_message.getControllerValue()) / kControlMax;
-          engine_->setModWheel(percent, channel);
-          listener_->modWheelMidiChanged(percent);
-          break;
-        }
-        case kAllNotesOff:
-        case kAllControllersOff:
-          processAllNotesOff(midi_message, sample_position, channel);
-          return;
-        case kAllSoundsOff:
-          processAllSoundsOff();
-          break;
-        case kBankSelect:
-          current_bank_ = midi_message.getControllerValue();
-          return;
-        case kFolderSelect:
-          current_folder_ = midi_message.getControllerValue();
-          return;
-      }
-      midiInput(midi_message.getControllerNumber(), midi_message.getControllerValue());
-    }
+    midiInput(midi_message.getControllerNumber(), midi_message.getControllerValue());
+  }
   }
 }
 
-void MidiManager::handleIncomingMidiMessage(juce::MidiInput* source, const MidiMessage &midi_message) {
+void MidiManager::handleIncomingMidiMessage(juce::MidiInput* source, const MidiMessage& midi_message) {
   midi_collector_.addMessageToQueue(midi_message);
 }
 

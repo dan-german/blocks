@@ -21,28 +21,28 @@
 #include "vital/synthesis/lookups/wave_frame.h"
 
 namespace {
-  constexpr float kMinPower = -9.0f;
-  constexpr float kMaxPower = 9.0f;
-  constexpr int kMaxSlopeReach = 128;
+constexpr float kMinPower = -9.0f;
+constexpr float kMaxPower = 9.0f;
+constexpr int kMaxSlopeReach = 128;
 
-  force_inline double powerScale(double value, double power) {
-    static constexpr float kMinPower = 0.01f;
-    if (fabs(power) < kMinPower)
-      return value;
+force_inline double powerScale(double value, double power) {
+  static constexpr float kMinPower = 0.01f;
+  if (fabs(power) < kMinPower)
+    return value;
 
-    double abs_value = fabs(value);
+  double abs_value = fabs(value);
 
-    double numerator = exp(power * abs_value) - 1.0f;
-    double denominator = exp(power) - 1.0f;
-    if (value >= 0.0f)
-      return numerator / denominator;
-    return -numerator / denominator;
-  }
+  double numerator = exp(power * abs_value) - 1.0f;
+  double denominator = exp(power) - 1.0f;
+  if (value >= 0.0f)
+    return numerator / denominator;
+  return -numerator / denominator;
+}
 
-  force_inline float combWave(float t, float power) {
-    float range = t - floorf(t);
-    return 2.0f * powerScale(1.0f - fabsf(2.0f * range - 1.0f), power);
-  }
+force_inline float combWave(float t, float power) {
+  float range = t - floorf(t);
+  return 2.0f * powerScale(1.0f - fabsf(2.0f * range - 1.0f), power);
+}
 } // namespace
 
 FrequencyFilterModifier::FrequencyFilterModifierKeyframe::FrequencyFilterModifierKeyframe() {
@@ -59,8 +59,8 @@ void FrequencyFilterModifier::FrequencyFilterModifierKeyframe::copy(const Waveta
 }
 
 void FrequencyFilterModifier::FrequencyFilterModifierKeyframe::interpolate(const WavetableKeyframe* from_keyframe,
-                                                                           const WavetableKeyframe* to_keyframe,
-                                                                           float t) {
+  const WavetableKeyframe* to_keyframe,
+  float t) {
   const FrequencyFilterModifierKeyframe* from = dynamic_cast<const FrequencyFilterModifierKeyframe*>(from_keyframe);
   const FrequencyFilterModifierKeyframe* to = dynamic_cast<const FrequencyFilterModifierKeyframe*>(to_keyframe);
 

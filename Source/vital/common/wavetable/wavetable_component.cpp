@@ -86,19 +86,18 @@ void WavetableComponent::interpolate(WavetableKeyframe* dest, float position) {
     int to_position = keyframes_[index + 1]->position();
     float t = (1.0f * position - from_position) / (to_position - from_position);
     dest->interpolate(from_frame, to_frame, t);
-  }
-  else if (interpolation_style_ == kCubic) {
+  } else if (interpolation_style_ == kCubic) {
     int next_index = index + 2;
     int prev_index = index - 1;
     if (next_index >= numFrames())
       next_index = index;
     if (prev_index < 0)
       prev_index = index + 1;
-    
+
     WavetableKeyframe* to_frame = keyframes_[index + 1].get();
     WavetableKeyframe* next_frame = keyframes_[next_index].get();
     WavetableKeyframe* prev_frame = keyframes_[prev_index].get();
-    
+
     int from_position = keyframes_[index]->position();
     int to_position = keyframes_[index + 1]->position();
     float t = (1.0f * position - from_position) / (to_position - from_position);

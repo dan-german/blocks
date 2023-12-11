@@ -30,9 +30,9 @@ void Startup::doStartupChecks(MidiManager* midi_manager, vital::StringLayout* la
 }
 
 bool Startup::isComputerCompatible() {
-  #if defined(__ARM_NEON__)
+#if defined(__ARM_NEON__)
   return true;
-  #else
+#else
   return juce::SystemStats::hasSSE2() || juce::SystemStats::hasAVX2();
-  #endif
+#endif
 }

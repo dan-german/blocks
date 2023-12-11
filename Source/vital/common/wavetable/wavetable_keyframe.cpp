@@ -24,7 +24,7 @@ float WavetableKeyframe::linearTween(float point_from, float point_to, float t) 
 }
 
 float WavetableKeyframe::cubicTween(float point_prev, float point_from, float point_to, float point_next,
-                                    float range_prev, float range, float range_next, float t) {
+  float range_prev, float range, float range_next, float t) {
   float slope_from = 0.0f;
   float slope_to = 0.0f;
   if (range_prev > 0.0f)

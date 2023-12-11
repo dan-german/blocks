@@ -19,86 +19,86 @@
 #include "vital/synthesis/framework/utils.h"
 
 namespace {
-  constexpr char kScalaFileExtension[] = ".scl";
-  constexpr char kKeyboardMapExtension[] = ".kbm";
-  constexpr char kTunFileExtension[] = ".tun";
-  constexpr int kDefaultMidiReference = 60;
-  constexpr char kScalaKbmComment = '!';
-  constexpr char kTunComment = ';';
+constexpr char kScalaFileExtension[] = ".scl";
+constexpr char kKeyboardMapExtension[] = ".kbm";
+constexpr char kTunFileExtension[] = ".tun";
+constexpr int kDefaultMidiReference = 60;
+constexpr char kScalaKbmComment = '!';
+constexpr char kTunComment = ';';
 
-  enum ScalaReadingState {
-    kDescription,
-    kScaleLength,
-    kScaleRatios
-  };
+enum ScalaReadingState {
+  kDescription,
+  kScaleLength,
+  kScaleRatios
+};
 
-  enum KbmPositions {
-    kMapSizePosition,
-    kStartMidiMapPosition,
-    kEndMidiMapPosition,
-    kMidiMapMiddlePosition,
-    kReferenceNotePosition,
-    kReferenceFrequencyPosition,
-    kScaleDegreePosition,
-  };
+enum KbmPositions {
+  kMapSizePosition,
+  kStartMidiMapPosition,
+  kEndMidiMapPosition,
+  kMidiMapMiddlePosition,
+  kReferenceNotePosition,
+  kReferenceFrequencyPosition,
+  kScaleDegreePosition,
+};
 
-  enum TunReadingState {
-    kScanningForSection,
-    kTuning,
-    kExactTuning
-  };
+enum TunReadingState {
+  kScanningForSection,
+  kTuning,
+  kExactTuning
+};
 
-  String extractFirstToken(const String& source) {
-    StringArray tokens;
-    tokens.addTokens(source, false);
-    return tokens[0];
-  }
+String extractFirstToken(const String& source) {
+  StringArray tokens;
+  tokens.addTokens(source, false);
+  return tokens[0];
+}
 
-  float readCentsToTranspose(const String& cents) {
-    return cents.getFloatValue() / vital::kCentsPerNote;
-  }
+float readCentsToTranspose(const String& cents) {
+  return cents.getFloatValue() / vital::kCentsPerNote;
+}
 
-  float readRatioToTranspose(const String& ratio) {
-    StringArray tokens;
-    tokens.addTokens(ratio, "/", "");
-    float value = tokens[0].getIntValue();
+float readRatioToTranspose(const String& ratio) {
+  StringArray tokens;
+  tokens.addTokens(ratio, "/", "");
+  float value = tokens[0].getIntValue();
 
-    if (tokens.size() == 2)
-      value /= tokens[1].getIntValue();
+  if (tokens.size() == 2)
+    value /= tokens[1].getIntValue();
 
-    return vital::utils::ratioToMidiTranspose(value);
-  }
+  return vital::utils::ratioToMidiTranspose(value);
+}
 
-  String readTunSection(const String& line) {
-    return line.substring(1, line.length() - 1).toLowerCase();
-  }
+String readTunSection(const String& line) {
+  return line.substring(1, line.length() - 1).toLowerCase();
+}
 
-  bool isBaseFrequencyAssignment(const String& line) {
-    return line.upToFirstOccurrenceOf("=", false, true).toLowerCase().trim() == "basefreq";
-  }
+bool isBaseFrequencyAssignment(const String& line) {
+  return line.upToFirstOccurrenceOf("=", false, true).toLowerCase().trim() == "basefreq";
+}
 
-  int getNoteAssignmentIndex(const String& line) {
-    String variable = line.upToFirstOccurrenceOf("=", false, true);
-    StringArray tokens;
-    tokens.addTokens(variable, false);
-    if (tokens.size() <= 1 || tokens[0].toLowerCase() != "note")
-      return -1;
-    int index = tokens[1].getIntValue();
-    if (index < 0 || index >= vital::kMidiSize)
-      return -1;
-    return index;
-  }
+int getNoteAssignmentIndex(const String& line) {
+  String variable = line.upToFirstOccurrenceOf("=", false, true);
+  StringArray tokens;
+  tokens.addTokens(variable, false);
+  if (tokens.size() <= 1 || tokens[0].toLowerCase() != "note")
+    return -1;
+  int index = tokens[1].getIntValue();
+  if (index < 0 || index >= vital::kMidiSize)
+    return -1;
+  return index;
+}
 
-  float getAssignmentValue(const String& line) {
-    String value = line.fromLastOccurrenceOf("=", false, true).trim();
-    return value.getFloatValue();
-  }
+float getAssignmentValue(const String& line) {
+  String value = line.fromLastOccurrenceOf("=", false, true).trim();
+  return value.getFloatValue();
+}
 }
 
 String Tuning::allFileExtensions() {
   return String("*") + kScalaFileExtension + String(";") +
-         String("*") + kKeyboardMapExtension + String(";") +
-         String("*") + kTunFileExtension;
+    String("*") + kKeyboardMapExtension + String(";") +
+    String("*") + kTunFileExtension;
 }
 
 int Tuning::noteToMidiKey(const String& note_text) {
@@ -119,8 +119,7 @@ int Tuning::noteToMidiKey(const String& note_text) {
   if (text[0] == '#') {
     text = text.substring(1);
     offset++;
-  }
-  else if (text[0] == 'b') {
+  } else if (text[0] == 'b') {
     text = text.substring(1);
     offset--;
   }
@@ -174,21 +173,21 @@ void Tuning::loadScalaFile(const StringArray& scala_lines) {
       break;
 
     switch (state) {
-      case kDescription:
-        state = kScaleLength;
-        break;
-      case kScaleLength:
-        scale_length = extractFirstToken(trimmed_line).getIntValue();
-        state = kScaleRatios;
-        break;
-      case kScaleRatios: {
-        String tuning = extractFirstToken(trimmed_line);
-        if (tuning.contains("."))
-          scale.push_back(readCentsToTranspose(tuning));
-        else
-          scale.push_back(readRatioToTranspose(tuning));
-        break;
-      }
+    case kDescription:
+      state = kScaleLength;
+      break;
+    case kScaleLength:
+      scale_length = extractFirstToken(trimmed_line).getIntValue();
+      state = kScaleRatios;
+      break;
+    case kScaleRatios: {
+      String tuning = extractFirstToken(trimmed_line);
+      if (tuning.contains("."))
+        scale.push_back(readCentsToTranspose(tuning));
+      else
+        scale.push_back(readRatioToTranspose(tuning));
+      break;
+    }
     }
   }
 
@@ -231,13 +230,12 @@ void Tuning::loadKeyboardMapFile(File kbm_file) {
       String token = extractFirstToken(trimmed_line);
       if (token.toLowerCase()[0] != 'x')
         last_scale_value = token.getIntValue();
-     
+
       keyboard_mapping_.push_back(last_scale_value);
 
       if (keyboard_mapping_.size() >= map_size)
         break;
-    }
-    else {
+    } else {
       header_data[header_position] = extractFirstToken(trimmed_line).getFloatValue();
       if (header_position == kMapSizePosition)
         map_size = header_data[header_position];
@@ -278,8 +276,7 @@ void Tuning::loadTunFile(File tun_file) {
         state = kExactTuning;
       else
         state = kScanningForSection;
-    }
-    else if (state == kTuning || state == kExactTuning) {
+    } else if (state == kTuning || state == kExactTuning) {
       if (isBaseFrequencyAssignment(trimmed_line))
         base_frequency = getAssignmentValue(trimmed_line);
       else {
@@ -292,21 +289,21 @@ void Tuning::loadTunFile(File tun_file) {
   }
 
   scale.resize(last_read_note + 1);
-  
+
   loadScale(scale);
   setStartMidiNote(0);
   setReferenceFrequency(base_frequency);
   tuning_name_ = tun_file.getFileNameWithoutExtension().toStdString();
 }
 
-Tuning::Tuning() : default_(true) {
+Tuning::Tuning(): default_(true) {
   scale_start_midi_note_ = kDefaultMidiReference;
   reference_midi_note_ = 0;
 
   setDefaultTuning();
 }
 
-Tuning::Tuning(File file) : Tuning() {
+Tuning::Tuning(File file): Tuning() {
   loadFile(file);
 }
 
@@ -409,7 +406,7 @@ void Tuning::jsonToState(const json& data) {
   tuning_name_ = tuning_name;
   std::string mapping_name = data["mapping_name"];
   mapping_name_ = mapping_name;
-  
+
   if (data.count("default"))
     default_ = data["default"];
 

@@ -18,7 +18,7 @@
 #include "connection.h"
 
 // using namespace Model;
-namespace model { 
+namespace model {
 struct ModulePool {
 public:
   ColourPool colourPool;

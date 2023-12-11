@@ -42,39 +42,39 @@ struct SynthGuiData {
 };
 
 class SynthGuiInterface {
-  public:
-    SynthGuiInterface(SynthBase* synth, bool use_gui = true);
-    virtual ~SynthGuiInterface();
+public:
+  SynthGuiInterface(SynthBase* synth, bool use_gui = true);
+  virtual ~SynthGuiInterface();
 
-    virtual juce::AudioDeviceManager* getAudioDeviceManager() { return nullptr; }
-    SynthBase* getSynth() { return synth_; }
-    virtual void updateFullGui();
-    virtual void updateGuiControl(const std::string& name, vital::mono_float value);
-    vital::mono_float getControlValue(const std::string& name);
+  virtual juce::AudioDeviceManager* getAudioDeviceManager() { return nullptr; }
+  SynthBase* getSynth() { return synth_; }
+  virtual void updateFullGui();
+  virtual void updateGuiControl(const std::string& name, vital::mono_float value);
+  vital::mono_float getControlValue(const std::string& name);
 
-    void notifyModulationsChanged();
-    void notifyModulationValueChanged(int index);
-    void connectModulation(std::string source, std::string destination);
-    void connectModulation(vital::ModulationConnection* connection);
-    void setModulationValues(const std::string& source, const std::string& destination,
-                             vital::mono_float amount, bool bipolar, bool stereo, bool bypass);
-    void initModulationValues(const std::string& source, const std::string& destination);
-    void disconnectModulation(std::string source, std::string destination);
-    void disconnectModulation(vital::ModulationConnection* connection);
+  void notifyModulationsChanged();
+  void notifyModulationValueChanged(int index);
+  void connectModulation(std::string source, std::string destination);
+  void connectModulation(vital::ModulationConnection* connection);
+  void setModulationValues(const std::string& source, const std::string& destination,
+    vital::mono_float amount, bool bipolar, bool stereo, bool bypass);
+  void initModulationValues(const std::string& source, const std::string& destination);
+  void disconnectModulation(std::string source, std::string destination);
+  void disconnectModulation(vital::ModulationConnection* connection);
 
-    void setFocus();
-    void notifyChange();
-    void notifyFresh();
-    void openSaveDialog();
-    void externalPresetLoaded(File preset);
-    void setGuiSize(float scale);
-    // FullInterface* getGui() { return gui_.get(); }
+  void setFocus();
+  void notifyChange();
+  void notifyFresh();
+  void openSaveDialog();
+  void externalPresetLoaded(File preset);
+  void setGuiSize(float scale);
+  // FullInterface* getGui() { return gui_.get(); }
 
-  protected:
-    SynthBase* synth_;
+protected:
+  SynthBase* synth_;
 
-    // std::unique_ptr<FullInterface> gui_;
-  
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SynthGuiInterface)
+  // std::unique_ptr<FullInterface> gui_;
+
+  JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SynthGuiInterface)
 };
 

@@ -21,30 +21,30 @@
 
 namespace vital {
 
-  class Reverb;
+class Reverb;
 
-  class ReverbModule : public SynthModule {
-    public:
-      ReverbModule();
-      virtual ~ReverbModule();
+class ReverbModule: public SynthModule {
+public:
+  ReverbModule();
+  virtual ~ReverbModule();
 
-      void init() override;
-      void hardReset() override;
-      void enable(bool enable) override;
+  void init() override;
+  void hardReset() override;
+  void enable(bool enable) override;
 
-      void setSampleRate(int sample_rate) override;
-      void processWithInput(const poly_float* audio_in, int num_samples) override;
-      Processor* clone() const override { return new ReverbModule(*this); }
+  void setSampleRate(int sample_rate) override;
+  void processWithInput(const poly_float* audio_in, int num_samples) override;
+  Processor* clone() const override { return new ReverbModule(*this); }
 
   void process(int num_samples) override {
     processWithInput(input(0)->source->buffer, num_samples);
   }
 
-    public:
-      Reverb* reverb_;
-    protected:
+public:
+  Reverb* reverb_;
+protected:
 
-      JUCE_LEAK_DETECTOR(ReverbModule)
-  };
+  JUCE_LEAK_DETECTOR(ReverbModule)
+};
 } // namespace vital
 

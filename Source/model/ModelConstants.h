@@ -13,9 +13,9 @@
 #include "model/Module.h"
 
 namespace Model {
-  const StringArray waveforms { "saw", "sine", "square", "triangle", "noise" };
-  const StringArray modulators { "lfo", "envelope" };
-  const StringArray effects { "filter", "reverb", "delay", "drive", "mixer" };
-  const StringArray tabs { "oscillator", "modulator", "effect" };
-  constexpr int MAX_MODULES_PER_TYPE = 5;
+const StringArray waveforms { "saw", "sine", "square", "triangle", "noise" };
+const StringArray modulators { "lfo", "envelope" };
+const StringArray effects { "filter", "reverb", "delay", "drive", "mixer" };
+const StringArray tabs { "oscillator", "modulator", "effect" };
+constexpr int MAX_MODULES_PER_TYPE = 5;
 }

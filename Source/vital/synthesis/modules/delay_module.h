@@ -23,31 +23,31 @@
 
 namespace vital {
 
-  class DelayModule : public SynthModule {
-    public:
-      static constexpr mono_float kMaxDelayTime = 4.0f;
-    
-      DelayModule(const Output* beats_per_second);
-      virtual ~DelayModule();
+class DelayModule: public SynthModule {
+public:
+  static constexpr mono_float kMaxDelayTime = 4.0f;
 
-      virtual void init() override;
-      virtual void hardReset() override { delay_->hardReset(); }
-      virtual void enable(bool enable) override {
-        SynthModule::enable(enable);
-        process(1);
-        if (!enable)
-          delay_->hardReset();
-      }
-      virtual void setSampleRate(int sample_rate) override;
-      virtual void setOversampleAmount(int oversample) override;
-      virtual void processWithInput(const poly_float* audio_in, int num_samples) override;
-      virtual Processor* clone() const override { return new DelayModule(*this); }
-    
-    protected:
-      const Output* beats_per_second_;
-      StereoDelay* delay_;
+  DelayModule(const Output* beats_per_second);
+  virtual ~DelayModule();
 
-      JUCE_LEAK_DETECTOR(DelayModule)
-  };
+  virtual void init() override;
+  virtual void hardReset() override { delay_->hardReset(); }
+  virtual void enable(bool enable) override {
+    SynthModule::enable(enable);
+    process(1);
+    if (!enable)
+      delay_->hardReset();
+  }
+  virtual void setSampleRate(int sample_rate) override;
+  virtual void setOversampleAmount(int oversample) override;
+  virtual void processWithInput(const poly_float* audio_in, int num_samples) override;
+  virtual Processor* clone() const override { return new DelayModule(*this); }
+
+protected:
+  const Output* beats_per_second_;
+  StereoDelay* delay_;
+
+  JUCE_LEAK_DETECTOR(DelayModule)
+};
 } // namespace vital
 

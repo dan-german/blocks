@@ -21,7 +21,7 @@
 #include "vital/common/load_save.h"
 #include "vital/common/synth_base.h"
 
-SynthGuiData::SynthGuiData(SynthBase* synth_base) : synth(synth_base) {
+SynthGuiData::SynthGuiData(SynthBase* synth_base): synth(synth_base) {
   controls = synth->getControls();
   mono_modulations = synth->getEngine()->getMonoModulations();
   poly_modulations = synth->getEngine()->getPolyModulations();
@@ -32,7 +32,7 @@ SynthGuiData::SynthGuiData(SynthBase* synth_base) : synth(synth_base) {
 
 #if HEADLESS
 
-SynthGuiInterface::SynthGuiInterface(SynthBase* synth, bool use_gui) : synth_(synth) { }
+SynthGuiInterface::SynthGuiInterface(SynthBase* synth, bool use_gui): synth_(synth) { }
 SynthGuiInterface::~SynthGuiInterface() { }
 void SynthGuiInterface::updateFullGui() { }
 void SynthGuiInterface::updateGuiControl(const std::string& name, vital::mono_float value) { }
@@ -40,7 +40,7 @@ vital::mono_float SynthGuiInterface::getControlValue(const std::string& name) { 
 void SynthGuiInterface::connectModulation(std::string source, std::string destination) { }
 void SynthGuiInterface::connectModulation(vital::ModulationConnection* connection) { }
 void SynthGuiInterface::setModulationValues(const std::string& source, const std::string& destination,
-                                            vital::mono_float amount, bool bipolar, bool stereo, bool bypass) { }
+  vital::mono_float amount, bool bipolar, bool stereo, bool bypass) { }
 void SynthGuiInterface::disconnectModulation(std::string source, std::string destination) { }
 void SynthGuiInterface::disconnectModulation(vital::ModulationConnection* connection) { }
 void SynthGuiInterface::setFocus() { }
@@ -55,7 +55,7 @@ void SynthGuiInterface::setGuiSize(float scale) { }
 // #include "vital/interface/look_and_feel/default_look_and_feel.h"
 // #include "vital/interface/editor_sections/full_interface.h"
 
-SynthGuiInterface::SynthGuiInterface(SynthBase* synth, bool use_gui) : synth_(synth) {
+SynthGuiInterface::SynthGuiInterface(SynthBase* synth, bool use_gui): synth_(synth) {
   if (use_gui) {
     // LineGenerator* lfo_sources[vital::kNumLfos];
     // for (int i = 0; i < vital::kNumLfos; ++i)
@@ -121,7 +121,7 @@ void SynthGuiInterface::initModulationValues(const std::string& source, const st
 }
 
 void SynthGuiInterface::setModulationValues(const std::string& source, const std::string& destination,
-                                            vital::mono_float amount, bool bipolar, bool stereo, bool bypass) {
+  vital::mono_float amount, bool bipolar, bool stereo, bool bypass) {
   int connection_index = synth_->getConnectionIndex(source, destination);
   if (connection_index < 0)
     return;

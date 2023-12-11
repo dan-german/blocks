@@ -27,59 +27,59 @@ using String = juce::String;
 using StringArray = juce::StringArray;
 
 class Tuning {
-  public:
-    static constexpr int kTuningSize = 2 * vital::kMidiSize;
-    static constexpr int kTuningCenter = vital::kMidiSize;
-    static Tuning getTuningForFile(File file);
+public:
+  static constexpr int kTuningSize = 2 * vital::kMidiSize;
+  static constexpr int kTuningCenter = vital::kMidiSize;
+  static Tuning getTuningForFile(File file);
 
-    static String allFileExtensions();
-    static int noteToMidiKey(const String& note);
+  static String allFileExtensions();
+  static int noteToMidiKey(const String& note);
 
-    Tuning();
-    Tuning(File file);
+  Tuning();
+  Tuning(File file);
 
-    void loadScale(std::vector<float> scale);
-    void loadFile(File file);
-    void setConstantTuning(float note);
-    void setDefaultTuning();
-    vital::mono_float convertMidiNote(int note) const;
-    void setStartMidiNote(int start_midi_note) { scale_start_midi_note_ = start_midi_note; }
-    void setReferenceNote(int reference_note) { reference_midi_note_ = reference_note; }
-    void setReferenceFrequency(float frequency);
-    void setReferenceNoteFrequency(int midi_note, float frequency);
-    void setReferenceRatio(float ratio);
-    std::string getName() const { 
-      if (mapping_name_.size() == 0)
-        return tuning_name_;
-      if (tuning_name_.size() == 0)
-        return mapping_name_;
-      return tuning_name_ + " / " + mapping_name_;
-    }
+  void loadScale(std::vector<float> scale);
+  void loadFile(File file);
+  void setConstantTuning(float note);
+  void setDefaultTuning();
+  vital::mono_float convertMidiNote(int note) const;
+  void setStartMidiNote(int start_midi_note) { scale_start_midi_note_ = start_midi_note; }
+  void setReferenceNote(int reference_note) { reference_midi_note_ = reference_note; }
+  void setReferenceFrequency(float frequency);
+  void setReferenceNoteFrequency(int midi_note, float frequency);
+  void setReferenceRatio(float ratio);
+  std::string getName() const {
+    if (mapping_name_.size() == 0)
+      return tuning_name_;
+    if (tuning_name_.size() == 0)
+      return mapping_name_;
+    return tuning_name_ + " / " + mapping_name_;
+  }
 
-    void setName(const std::string& name) {
-      mapping_name_ = "";
-      tuning_name_ = name;
-    }
-    bool isDefault() const { return default_; }
+  void setName(const std::string& name) {
+    mapping_name_ = "";
+    tuning_name_ = name;
+  }
+  bool isDefault() const { return default_; }
 
-    json stateToJson() const;
-    void jsonToState(const json& data);
-    void loadScalaFile(const StringArray& scala_lines);
+  json stateToJson() const;
+  void jsonToState(const json& data);
+  void loadScalaFile(const StringArray& scala_lines);
 
-  private:
-    void loadScalaFile(File scala_file);
-    void loadKeyboardMapFile(File kbm_file);
-    void loadTunFile(File tun_file);
+private:
+  void loadScalaFile(File scala_file);
+  void loadKeyboardMapFile(File kbm_file);
+  void loadTunFile(File tun_file);
 
-    int scale_start_midi_note_;
-    float reference_midi_note_;
-    std::vector<float> scale_;
-    std::vector<int> keyboard_mapping_;
-    vital::mono_float tuning_[kTuningSize];
-    std::string tuning_name_;
-    std::string mapping_name_;
-    bool default_;
+  int scale_start_midi_note_;
+  float reference_midi_note_;
+  std::vector<float> scale_;
+  std::vector<int> keyboard_mapping_;
+  vital::mono_float tuning_[kTuningSize];
+  std::string tuning_name_;
+  std::string mapping_name_;
+  bool default_;
 
-    JUCE_LEAK_DETECTOR(Tuning)
+  JUCE_LEAK_DETECTOR(Tuning)
 };
 

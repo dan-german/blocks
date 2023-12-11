@@ -15,17 +15,17 @@
 #include "model/ModuleParameter.h"
 
 namespace Model {
-  struct FilterModule : public Block {
-    enum Parameters { pType, pFrequency, pQ };
-    ~FilterModule() {}
+struct FilterModule: public Block {
+  enum Parameters { pType, pFrequency, pQ };
+  ~FilterModule() {}
 
-    FilterModule(int number) : Block(Types::filter, number) {
-      category = Module::Category::effect;
-      StringArray filterTypes{ "LP4", "LP2", "HP2", "HP4", "BP2", "BP4" }; 
+  FilterModule(int number): Block(Types::filter, number) {
+    category = Module::Category::effect;
+    StringArray filterTypes { "LP4", "LP2", "HP2", "HP4", "BP2", "BP4" };
 
-      createChoiceParameter({ "type", filterTypes, 0 });
-      createFloatParameter({ .name = "cutoff", .defaultValue = 440.0f, .range = { 20.0f, 20480.0f, 0.01f }, .valueSuffix = "hz", .skew = 0.35f });
-      createFloatParameter({ .name = "q", .defaultValue = 0.0f });
-    }
-  };
+    createChoiceParameter({ "type", filterTypes, 0 });
+    createFloatParameter({ .name = "cutoff", .defaultValue = 440.0f, .range = { 20.0f, 20480.0f, 0.01f }, .valueSuffix = "hz", .skew = 0.35f });
+    createFloatParameter({ .name = "q", .defaultValue = 0.0f });
+  }
+};
 }

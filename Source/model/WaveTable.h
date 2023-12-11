@@ -33,9 +33,9 @@ public:
     for (auto& waveform : waveforms) {
       if (phaseIncrement < waveform.topFrequency)
         return &waveform;
-    } 
+    }
     return &waveforms.back();
-  
+
   }
 private:
   std::vector<Waveform> waveforms;

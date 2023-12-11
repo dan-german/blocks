@@ -15,7 +15,7 @@
 #include "gui/controls/ExitButton.h"
 
 #include "gui/ThemeManager.h"
-class ConnectionComponent : public juce::Component, public ThemeListener {
+class ConnectionComponent: public juce::Component, public ThemeListener {
 public:
   struct Listener;
   Listener* delegate;

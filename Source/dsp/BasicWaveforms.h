@@ -13,8 +13,8 @@
 #include <vector>
 
 struct LookUpTable {
-    
-  explicit LookUpTable(std::size_t size) : array(size) {}
+
+  explicit LookUpTable(std::size_t size): array(size) {}
   LookUpTable(const LookUpTable&) = delete;
   LookUpTable(LookUpTable&&) noexcept = default;
   LookUpTable& operator=(const LookUpTable&) = delete;
@@ -27,10 +27,10 @@ class BasicWaveforms {
 private:
   static constexpr size_t size = 100;
 
-  inline static LookUpTable sine{size};
-  inline static LookUpTable saw{size};
-  inline static LookUpTable square{size};
-  inline static LookUpTable triangle{size};
+  inline static LookUpTable sine { size };
+  inline static LookUpTable saw { size };
+  inline static LookUpTable square { size };
+  inline static LookUpTable triangle { size };
 
   static void setupSine();
   static void setupSaw();

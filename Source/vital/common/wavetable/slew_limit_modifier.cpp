@@ -30,8 +30,8 @@ void SlewLimitModifier::SlewLimitModifierKeyframe::copy(const WavetableKeyframe*
 }
 
 void SlewLimitModifier::SlewLimitModifierKeyframe::interpolate(const WavetableKeyframe* from_keyframe,
-                                                               const WavetableKeyframe* to_keyframe,
-                                                               float t) {
+  const WavetableKeyframe* to_keyframe,
+  float t) {
   const SlewLimitModifierKeyframe* from = dynamic_cast<const SlewLimitModifierKeyframe*>(from_keyframe);
   const SlewLimitModifierKeyframe* to = dynamic_cast<const SlewLimitModifierKeyframe*>(to_keyframe);
 

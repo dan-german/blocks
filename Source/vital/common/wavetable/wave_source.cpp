@@ -74,19 +74,19 @@ void WaveSourceKeyframe::linearTimeInterpolate(const vital::WaveFrame* from, con
 }
 
 void WaveSourceKeyframe::cubicTimeInterpolate(const vital::WaveFrame* prev, const vital::WaveFrame* from,
-                                              const vital::WaveFrame* to, const vital::WaveFrame* next,
-                                              float range_prev, float range, float range_next, float t) {
+  const vital::WaveFrame* to, const vital::WaveFrame* next,
+  float range_prev, float range, float range_next, float t) {
 
   for (int i = 0; i < vital::WaveFrame::kWaveformSize; ++i) {
     wave_frame_->time_domain[i] = cubicTween(prev->time_domain[i], from->time_domain[i],
-                                             to->time_domain[i], next->time_domain[i],
-                                             range_prev, range, range_next, t);
+      to->time_domain[i], next->time_domain[i],
+      range_prev, range, range_next, t);
   }
   wave_frame_->toFrequencyDomain();
 }
 
 void WaveSourceKeyframe::linearFrequencyInterpolate(const vital::WaveFrame* from,
-                                                    const vital::WaveFrame* to, float t) {
+  const vital::WaveFrame* to, float t) {
   for (int i = 0; i < vital::WaveFrame::kNumRealComplex; ++i) {
     float amplitude_from = sqrtf(std::abs(from->frequency_domain[i]));
     float amplitude_to = sqrtf(std::abs(to->frequency_domain[i]));
@@ -114,15 +114,15 @@ void WaveSourceKeyframe::linearFrequencyInterpolate(const vital::WaveFrame* from
 }
 
 void WaveSourceKeyframe::cubicFrequencyInterpolate(const vital::WaveFrame* prev, const vital::WaveFrame* from,
-                                                   const vital::WaveFrame* to, const vital::WaveFrame* next,
-                                                   float range_prev, float range, float range_next, float t) {
+  const vital::WaveFrame* to, const vital::WaveFrame* next,
+  float range_prev, float range, float range_next, float t) {
   for (int i = 0; i < vital::WaveFrame::kNumRealComplex; ++i) {
     float amplitude_prev = sqrtf(std::abs(prev->frequency_domain[i]));
     float amplitude_from = sqrtf(std::abs(from->frequency_domain[i]));
     float amplitude_to = sqrtf(std::abs(to->frequency_domain[i]));
     float amplitude_next = sqrtf(std::abs(next->frequency_domain[i]));
     float amplitude = cubicTween(amplitude_prev, amplitude_from, amplitude_to, amplitude_next,
-                                 range_prev, range, range_next, t);
+      range_prev, range, range_next, t);
     amplitude *= amplitude;
 
     float phase_delta_from = std::arg(std::conj(prev->frequency_domain[i]) * from->frequency_domain[i]);
@@ -155,13 +155,13 @@ void WaveSourceKeyframe::cubicFrequencyInterpolate(const vital::WaveFrame* prev,
   float last_harmonic_to = to->frequency_domain[last].real();
   float last_harmonic_next = next->frequency_domain[last].real();
   wave_frame_->frequency_domain[last] = cubicTween(last_harmonic_prev, last_harmonic_from,
-                                                   last_harmonic_to, last_harmonic_next, 
-                                                   range_prev, range, range_next, t);
+    last_harmonic_to, last_harmonic_next,
+    range_prev, range, range_next, t);
   wave_frame_->toTimeDomain();
 }
 
 void WaveSourceKeyframe::interpolate(const WavetableKeyframe* from_keyframe,
-                                     const WavetableKeyframe* to_keyframe, float t) {
+  const WavetableKeyframe* to_keyframe, float t) {
   const WaveSourceKeyframe* from = dynamic_cast<const WaveSourceKeyframe*>(from_keyframe);
   const WaveSourceKeyframe* to = dynamic_cast<const WaveSourceKeyframe*>(to_keyframe);
 
@@ -172,9 +172,9 @@ void WaveSourceKeyframe::interpolate(const WavetableKeyframe* from_keyframe,
 }
 
 void WaveSourceKeyframe::smoothInterpolate(const WavetableKeyframe* prev_keyframe,
-                                           const WavetableKeyframe* from_keyframe,
-                                           const WavetableKeyframe* to_keyframe,
-                                           const WavetableKeyframe* next_keyframe, float t) {
+  const WavetableKeyframe* from_keyframe,
+  const WavetableKeyframe* to_keyframe,
+  const WavetableKeyframe* next_keyframe, float t) {
   const vital::WaveFrame* prev = dynamic_cast<const WaveSourceKeyframe*>(prev_keyframe)->wave_frame_.get();
   const vital::WaveFrame* from = dynamic_cast<const WaveSourceKeyframe*>(from_keyframe)->wave_frame_.get();
   const vital::WaveFrame* to = dynamic_cast<const WaveSourceKeyframe*>(to_keyframe)->wave_frame_.get();

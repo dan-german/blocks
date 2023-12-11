@@ -20,48 +20,48 @@
 #include "vital/synthesis/producers/synth_oscillator.h"
 
 namespace vital {
-  class Wavetable;
+class Wavetable;
 
-  class OscillatorModule : public SynthModule {
-    public:
-      enum {
-        kReset,
-        kRetrigger,
-        kMidi,
-        kActiveVoices,
-        kNumInputs
-      };
-
-      enum {
-        kRaw,
-        kLevelled,
-        kNumOutputs
-      };
-
-      OscillatorModule(std::string prefix = "");
-      virtual ~OscillatorModule() { }
-
-      void process(int num_samples) override;
-      void init() override;
-      virtual Processor* clone() const override { return new OscillatorModule(*this); }
-
-      Wavetable* getWavetable() { return wavetable_.get(); }
-      force_inline SynthOscillator* oscillator() { return oscillator_; }
-      SynthOscillator::DistortionType getDistortionType() {
-        int val = distortion_type_->value();
-        return static_cast<SynthOscillator::DistortionType>(val);
-      }
-
-      Value* on_;
-    protected:
-      std::string prefix_;
-      std::shared_ptr<Wavetable> wavetable_;
-      std::shared_ptr<bool> was_on_;
-
-      SynthOscillator* oscillator_;
-      Value* distortion_type_;
-
-      JUCE_LEAK_DETECTOR(OscillatorModule)
+class OscillatorModule: public SynthModule {
+public:
+  enum {
+    kReset,
+    kRetrigger,
+    kMidi,
+    kActiveVoices,
+    kNumInputs
   };
+
+  enum {
+    kRaw,
+    kLevelled,
+    kNumOutputs
+  };
+
+  OscillatorModule(std::string prefix = "");
+  virtual ~OscillatorModule() { }
+
+  void process(int num_samples) override;
+  void init() override;
+  virtual Processor* clone() const override { return new OscillatorModule(*this); }
+
+  Wavetable* getWavetable() { return wavetable_.get(); }
+  force_inline SynthOscillator* oscillator() { return oscillator_; }
+  SynthOscillator::DistortionType getDistortionType() {
+    int val = distortion_type_->value();
+    return static_cast<SynthOscillator::DistortionType>(val);
+  }
+
+  Value* on_;
+protected:
+  std::string prefix_;
+  std::shared_ptr<Wavetable> wavetable_;
+  std::shared_ptr<bool> was_on_;
+
+  SynthOscillator* oscillator_;
+  Value* distortion_type_;
+
+  JUCE_LEAK_DETECTOR(OscillatorModule)
+};
 } // namespace vital
 

@@ -25,7 +25,7 @@ String getArgumentValue(int argc, const char* argv[], const String& flag, const 
     if (arg == flag || arg == full_flag)
       return argv[i + 1];
   }
-  
+
   return "";
 }
 
@@ -42,38 +42,38 @@ bool hasFlag(int argc, const char* argv[], const String& flag, const String& ful
 float getRenderLength(int argc, const char* argv[]) {
   static constexpr float kDefaultRenderLength = 5.0f;
   static constexpr float kMaxRenderLength = 15.0f;
-  
+
   String string_length = getArgumentValue(argc, argv, "-l", "--length");
   float length = kDefaultRenderLength;
   if (string_length.isEmpty())
     return kDefaultRenderLength;
-  
+
   float float_val = string_length.getFloatValue();
   if (float_val > 0.0f)
     length = std::min(float_val, kMaxRenderLength);
-  
+
   return length;
 }
 
 std::vector<int> getRenderMidiNotes(int argc, const char* argv[]) {
   static constexpr int kDefaultMidiNote = 48;
-  
+
   String string_midi = getArgumentValue(argc, argv, "-m", "--midi");
   std::vector<int> midi_notes;
   if (!string_midi.isEmpty()) {
     StringArray midi_tokens;
     midi_tokens.addTokens(string_midi, ",", "");
-    
+
     for (const String& midi_token : midi_tokens) {
       int midi = Tuning::noteToMidiKey(midi_token);
       if (midi >= 0)
         midi_notes.push_back(midi);
     }
   }
-  
+
   if (midi_notes.empty())
     midi_notes.push_back(kDefaultMidiNote);
-  
+
   return midi_notes;
 }
 
@@ -97,10 +97,10 @@ void doRenderToFile(HeadlessSynth& headless_synth, int argc, const char* argv[])
 
   if (string_output_file.isEmpty())
     return;
-  
+
   if (!string_output_file.startsWith("/"))
     string_output_file = "./" + string_output_file;
-  
+
   File output_file(string_output_file);
   if (!output_file.hasWriteAccess()) {
     std::cout << "Error: Don't have permission to write output file." << juce::newLine;
@@ -110,7 +110,7 @@ void doRenderToFile(HeadlessSynth& headless_synth, int argc, const char* argv[])
   float length = getRenderLength(argc, argv);
   float bpm = getRenderBpm(argc, argv);
   std::vector<int> midi_notes = getRenderMidiNotes(argc, argv);
-  
+
   headless_synth.renderAudioToFile(output_file, length, bpm, midi_notes, render_images);
 }
 
@@ -121,7 +121,7 @@ bool loadFromCommandLine(HeadlessSynth& synth, const String& command_line) {
   File file = File::getCurrentWorkingDirectory().getChildFile(file_path);
   if (!file.exists())
     return false;
-  
+
   std::string error;
   synth.loadFromFile(file, error);
   return true;
@@ -129,7 +129,7 @@ bool loadFromCommandLine(HeadlessSynth& synth, const String& command_line) {
 
 int main(int argc, const char* argv[]) {
   HeadlessSynth headless_synth;
-  
+
   bool last_arg_was_option = false;
   for (int i = 1; i < argc; ++i) {
     std::string arg = argv[i];
@@ -138,6 +138,6 @@ int main(int argc, const char* argv[]) {
 
     last_arg_was_option = arg[0] == '-' && arg != "--headless";
   }
-  
+
   doRenderToFile(headless_synth, argc, argv);
 }

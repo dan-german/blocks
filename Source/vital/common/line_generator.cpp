@@ -18,8 +18,8 @@
 #include "vital/synthesis/framework/poly_utils.h"
 #include "vital/synthesis/framework/futils.h"
 
-LineGenerator::LineGenerator(int resolution) : points_(), powers_(), num_points_(2), resolution_(resolution),
-                                               loop_(false), smooth_(false), linear_(true), render_count_(0) {
+LineGenerator::LineGenerator(int resolution): points_(), powers_(), num_points_(2), resolution_(resolution),
+loop_(false), smooth_(false), linear_(true), render_count_(0) {
   buffer_ = std::make_unique<vital::mono_float[]>(resolution + kExtraValues);
   initLinear();
 }
@@ -184,7 +184,7 @@ void LineGenerator::render() {
       t = smoothTransition(t);
 
     t = vital::utils::clamp(vital::futils::powerScale(t, current_power), 0.0f, 1.0f);
-    
+
     float y = last_point.second + t * (current_point.second - last_point.second);
     buffer_[i + 1] = 1.0f - y;
 
@@ -204,8 +204,7 @@ void LineGenerator::render() {
     buffer_[0] = buffer_[resolution_];
     buffer_[resolution_ + 1] = buffer_[1];
     buffer_[resolution_ + 2] = buffer_[2];
-  }
-  else {
+  } else {
     buffer_[0] = buffer_[1];
     buffer_[resolution_ + 1] = buffer_[resolution_];
     buffer_[resolution_ + 2] = buffer_[resolution_];
@@ -220,8 +219,8 @@ float LineGenerator::valueAtPhase(float phase) {
 
 void LineGenerator::checkLineIsLinear() {
   linear_ = !smooth_ && num_points_ == 2 && powers_[0] == 0.0f &&
-            points_[0] == std::pair<float, float>(0.0f, 1.0f) &&
-            points_[1] == std::pair<float, float>(1.0f, 0.0f);
+    points_[0] == std::pair<float, float>(0.0f, 1.0f) &&
+    points_[1] == std::pair<float, float>(1.0f, 0.0f);
 }
 
 float LineGenerator::getValueBetweenPoints(float x, int index_from, int index_to) {
