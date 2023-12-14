@@ -194,7 +194,7 @@ void BlocksVoiceHandler::init() {
 
     // processor->initializeBaseValue(data_->controls[amount_name]);
 
-    Output* modulation_power = createPolyModControl("modulation_" + number + "_power");
+    Output* modulation_power = createPolyModControl("modulation_power");
     processor->plug(modulation_power, ModulationConnectionProcessor::kModulationPower);
 
     addProcessor(processor);
@@ -213,7 +213,7 @@ void BlocksVoiceHandler::init() {
   }
 
   for (int i = 0; i < kNumRandomLfos; ++i) {
-    std::string name = "random_" + std::to_string(i + 1);
+    std::string name = "random_";
     data_->mod_sources[name] = random_lfos_[i]->output();
     createStatusOutput(name, random_lfos_[i]->output());
   }
@@ -276,14 +276,15 @@ std::shared_ptr<SynthModule> BlocksVoiceHandler::createProcessor(std::shared_ptr
 
   if (module->id.type == "osc") {
     auto osc = oscillators_[0];
+    osc->control_map_["on"]->set(1.0f);
     processor = osc;
-    module->parameters_[0]->val = osc->control_map_["wave_frame"];
-    module->parameters_[1]->val = osc->control_map_["transpose"];
-    module->parameters_[2]->val = osc->control_map_["tune"];
-    module->parameters_[3]->val = osc->control_map_["unison_voices"];
-    module->parameters_[4]->val = osc->control_map_["unison_detune"];
-    module->parameters_[5]->val = osc->control_map_["level"];
-    module->parameters_[6]->val = osc->control_map_["pan"];
+    module->parameter_map_["wave"]->val = osc->control_map_["wave_frame"];
+    module->parameter_map_["transpose"]->val = osc->control_map_["transpose"];
+    module->parameter_map_["tune"]->val = osc->control_map_["tune"];
+    module->parameter_map_["unison_voices"]->val = osc->control_map_["unison_voices"];
+    module->parameter_map_["unison_detune"]->val = osc->control_map_["unison_detune"];
+    module->parameter_map_["level"]->val = osc->control_map_["level"];
+    module->parameter_map_["pan"]->val = osc->control_map_["pan"];
     oscillators_.erase(oscillators_.begin());
   } else if (module->id.type == "filter") {
     auto filter = std::make_shared<FilterModule>(name);
@@ -320,8 +321,8 @@ std::shared_ptr<SynthModule> BlocksVoiceHandler::createProcessor(std::shared_ptr
 void BlocksVoiceHandler::createOscillators() {
   std::string type = "osc";
   for (int i = 0; i < 5; i++) {
-    auto name = type + "_" + std::to_string(i + 1);
-    auto osc = std::make_shared<OscillatorModule>(name);
+    // auto name = type + "_" + std::to_string(i + 1);
+    auto osc = std::make_shared<OscillatorModule>();
 
     osc->plug(reset(), OscillatorModule::kReset);
     osc->plug(retrigger(), OscillatorModule::kRetrigger);
@@ -339,7 +340,7 @@ void BlocksVoiceHandler::createModulators() {
   for (int i = 0; i < kNumLfos; ++i) {
     lfo_sources_[i].setLoop(false);
     lfo_sources_[i].initTriangle();
-    std::string prefix = std::string("lfo_") + std::to_string(i + 1);
+    std::string prefix = std::string("lfo");
     auto lfo = std::make_shared<LfoModule>(prefix, &lfo_sources_[i], beats_per_second_);
     addSubmodule(lfo.get());
     addProcessor(lfo.get());
@@ -355,13 +356,12 @@ void BlocksVoiceHandler::createModulators() {
   }
 
   for (int i = 0; i < kNumEnvelopes; ++i) {
-    std::string prefix = std::string("env_") + std::to_string(i + 1);
+    std::string prefix = std::string("env");
     auto envelope = std::make_shared<EnvelopeModule>(prefix, i == 0);
     envelope->plug(retrigger(), EnvelopeModule::kTrigger);
     addSubmodule(envelope.get());
     addProcessor(envelope.get());
     envelopes_.push_back(envelope);
-    // envelopes_[i] = envelope;
 
     data_->mod_sources[prefix] = envelope->output();
     createStatusOutput(prefix, envelope->output(EnvelopeModule::kValue));
@@ -373,7 +373,7 @@ void BlocksVoiceHandler::createModulators() {
   addProcessor(random_);
 
   for (int i = 0; i < kNumRandomLfos; ++i) {
-    std::string name = "random_" + std::to_string(i + 1);
+    std::string name = "random";
     random_lfos_[i] = new RandomLfoModule(name, beats_per_second_);
     random_lfos_[i]->plug(retrigger(), RandomLfoModule::kNoteTrigger);
     random_lfos_[i]->plug(bent_midi_, RandomLfoModule::kMidi);

@@ -59,7 +59,7 @@ ModulationConnectionBank::~ModulationConnectionBank() { }
 ModulationConnection* ModulationConnectionBank::createConnection(const std::string& from, const std::string& to) {
   int index = 1;
   for (auto& connection : all_connections_) {
-    std::string invalid_connection = "modulation_" + std::to_string(index++) + "_amount";
+    std::string invalid_connection = "modulation_amount";
     if (to != invalid_connection && isConnectionAvailable(connection.get())) {
       connection->resetConnection(from, to);
       connection->modulation_processor->setBipolar(ModulationConnection::isModulationSourceDefaultBipolar(from));

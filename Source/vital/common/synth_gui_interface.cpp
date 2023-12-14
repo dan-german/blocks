@@ -115,7 +115,7 @@ void SynthGuiInterface::initModulationValues(const std::string& source, const st
   LineGenerator* map_generator = connection->modulation_processor->lineMapGenerator();
   map_generator->initLinear();
 
-  std::string power_name = "modulation_" + std::to_string(connection_index + 1) + "_power";
+  std::string power_name = "modulation_power";
   synth_->valueChanged(power_name, 0.0f);
   // gui_->setValue(power_name, 0.0f, NotificationType::dontSendNotification);
 }

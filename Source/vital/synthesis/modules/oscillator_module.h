@@ -38,7 +38,7 @@ public:
     kNumOutputs
   };
 
-  OscillatorModule(std::string prefix = "");
+  OscillatorModule();
   virtual ~OscillatorModule() { }
 
   void process(int num_samples) override;

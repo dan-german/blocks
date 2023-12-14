@@ -29,8 +29,6 @@ MainComponent::MainComponent(juce::MidiKeyboardState& keyboard_state, Delegate* 
 
   auto osc_block = addBlock(0, { 0, 0 });
   spawnBlockComponent(osc_block);
-  auto reverb_block = addBlock(6, { 1, 0 });
-  spawnBlockComponent(reverb_block);
 }
 
 void MainComponent::updateDotPosition(const Point<int> position) {
@@ -324,7 +322,7 @@ std::shared_ptr<model::Block> MainComponent::addBlock(int code, Index index) {
 
     const float code_wavetable_frame = 
       code / 4.0 * (vital::kNumOscillatorWaveFrames - 1);
-    block->parameters_[0]->val->set(code_wavetable_frame);
+    block->parameter_map_["wave"]->val->set(code_wavetable_frame);
 
     // if (block == nullptr) return nullptr; // todo - grey out the button in the block selection popup if the block is not available
     // auto range = block->parameters[0]->audioParameter->getNormalisableRange();

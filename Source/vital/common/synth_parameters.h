@@ -21,6 +21,7 @@
 
 #include <map>
 #include <string>
+#include <regex>
 
 namespace vital {
 struct ValueDetails {
@@ -68,7 +69,11 @@ public:
   const ValueDetails& getDetails(const std::string& name) const {
     auto details = details_lookup_.find(name);
     VITAL_ASSERT(details != details_lookup_.end());
+    std::cout << "og: " << name << std::endl;
+    // std::cout << "ad: " << adjusted_name << std::endl;
+    std::cout << " " << std::endl;
     return details->second;
+    // return lookup_.getDetails(adjusted_name);
   }
 
   const ValueDetails* getDetails(int index) const {

@@ -743,6 +743,7 @@ void SynthOscillator::setWaveBuffers(poly_float phase_inc, int index) {
   else if (voice_block_.spectral_morph == kInharmonicScale)
     setFourierWaveBuffers<inharmonicScaleMorph>(phase_inc, index, false);
   else if (voice_block_.spectral_morph == kSmear)
+  
     setFourierWaveBuffers<smearMorph>(phase_inc, index, false);
   else if (voice_block_.spectral_morph == kRandomAmplitudes)
     setFourierWaveBuffers<randomAmplitudeMorph>(phase_inc, index, false);

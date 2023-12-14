@@ -482,4 +482,29 @@ void SynthModule::addMonoProcessor(Processor* processor, bool own) {
 void SynthModule::addIdleMonoProcessor(Processor* processor) {
   getMonoRouter()->addIdleProcessor(processor);
 }
+
+Value* SynthModule::createBaseControl2(AddControlInput input) {
+  Value* val = nullptr;
+  if (input.audio_rate) {
+    if (input.smooth_value) {
+      val = new SmoothValue(input.default_value);
+      addMonoProcessor(val, false);
+    } else {
+      val = new Value(input.default_value);
+      addIdleMonoProcessor(val);
+    }
+  } else {
+    if (smooth_value) {
+      val = new cr::SmoothValue(input.default_value);
+      addMonoProcessor(val, false);
+    } else {
+      val = new cr::Value(input.default_value);
+      addIdleMonoProcessor(val);
+    }
+  }
+
+  data_->controls[input.name] = val;
+  control_map_[input.name] = val;
+  return val;
+}
 } // namespace vital

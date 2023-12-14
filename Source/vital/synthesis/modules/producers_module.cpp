@@ -22,7 +22,7 @@ ProducersModule::ProducersModule():
   filter1_on_(nullptr), filter2_on_(nullptr) {
   for (int i = 0; i < kNumOscillators; ++i) {
     std::string number = std::to_string(i + 1);
-    oscillators_[i] = new OscillatorModule("osc_" + number);
+    oscillators_[i] = new OscillatorModule();
     addSubmodule(oscillators_[i]);
     addProcessor(oscillators_[i]);
     oscillators_[i]->enable(false);

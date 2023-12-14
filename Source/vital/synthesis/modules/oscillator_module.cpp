@@ -21,8 +21,8 @@
 
 namespace vital {
 
-OscillatorModule::OscillatorModule(std::string prefix):
-  SynthModule(kNumInputs, kNumOutputs), prefix_(std::move(prefix)), on_(nullptr), distortion_type_(nullptr) {
+OscillatorModule::OscillatorModule():
+  SynthModule(kNumInputs, kNumOutputs), prefix_(std::move("osc")), on_(nullptr), distortion_type_(nullptr) {
   wavetable_ = std::make_shared<Wavetable>(kNumOscillatorWaveFrames);
   was_on_ = std::make_shared<bool>(true);
 }
