@@ -14,19 +14,6 @@
 **blocks is a modular synthesizer available as standalone, VST3 & AU for Windows, macOS & Linux.**
 </div>
 
-## How to use
-
-[**Playthrough**](https://youtu.be/f-hJaOvzaT4?si=DZZIarRXv_In-7eQ)
-
-At the center lies the block grid, where you can add sound sources and effects. Sound flows downwards, meaning any effect will shape the sound sources above it.
-
-To the right stands the modulators menu, a space for adding LFOs and envelopes; And to the left you'll find the the modulation matrix, which controls connections between modulators and blocks.
-
-Tabs, placed above the block grid, control which column of blocks activates when a note is played.
-
-## Architecture
-<img src="./packaging/uml.svg" width="100%">
-
 ## How to build
 
 Download [CMake](https://cmake.org)
@@ -58,6 +45,19 @@ cmake --build build --config Release
 This will result in a release build in the build directory.
 
 For more detailed instructions please refer to the [JUCE CMake API](https://github.com/juce-framework/JUCE/blob/master/docs/CMake%20API.md)
+
+## How to use
+
+[**Playthrough**](https://youtu.be/f-hJaOvzaT4?si=DZZIarRXv_In-7eQ)
+
+At the center lies the block grid, where you can add sound sources and effects. Sound flows downwards, meaning any effect will shape the sound sources above it.
+
+To the right stands the modulators menu, a space for adding LFOs and envelopes; And to the left you'll find the the modulation matrix, which controls connections between modulators and blocks.
+
+Tabs, placed above the block grid, control which column of blocks activates when a note is played.
+
+## Architecture
+<img src="./packaging/uml.svg" width="100%">
 
 ## Contributing 
 If you're interesting in contributing, [**join our discord channel**](https://discord.gg/MjkFj859vW)!
