@@ -14,6 +14,38 @@
 **blocks is a modular synthesizer available as standalone, VST3 & AU for Windows, macOS & Linux.**
 </div>
 
+## How to build
+
+Download [CMake](https://cmake.org)
+
+Clone the repo
+
+```
+git clone https://github.com/dan-german/blocks
+```
+
+Change to project directory
+
+```
+cd blocks
+```
+
+Populate [JUCE](https://juce.com)
+
+```
+git submodule update --init
+```
+
+Then build with CMake
+
+```
+cmake -Bbuild -DCMAKE_BUILD_TYPE=Release
+cmake --build build --config Release
+```
+This will result in a release build in the build directory.
+
+For more detailed instructions please refer to the [JUCE CMake API](https://github.com/juce-framework/JUCE/blob/master/docs/CMake%20API.md)
+
 ## How to use
 
 [**Playthrough**](https://youtu.be/f-hJaOvzaT4?si=DZZIarRXv_In-7eQ)
@@ -27,6 +59,5 @@ Tabs, placed above the block grid, control which column of blocks activates when
 ## Architecture
 <img src="./packaging/uml.svg" width="100%">
 
-
 ## Contributing 
-If you're interesting in contributing, [**join our discord channel**](https://discord.gg/MjkFj859vW)!
+If you're interested in contributing, [**join our discord channel**](https://discord.gg/MjkFj859vW)!
