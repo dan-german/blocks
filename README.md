@@ -60,4 +60,4 @@ Tabs, placed above the block grid, control which column of blocks activates when
 <img src="./packaging/uml.svg" width="100%">
 
 ## Contributing 
-If you're interesting in contributing, [**join our discord channel**](https://discord.gg/MjkFj859vW)!
+If you're interested in contributing, [**join our discord channel**](https://discord.gg/MjkFj859vW)!
