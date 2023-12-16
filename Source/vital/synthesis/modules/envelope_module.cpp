@@ -20,29 +20,27 @@
 
 namespace vital {
 
-EnvelopeModule::EnvelopeModule(const std::string& prefix, bool force_audio_rate):
-  SynthModule(kNumInputs, kNumOutputs), prefix_(prefix), force_audio_rate_(force_audio_rate) {
+EnvelopeModule::EnvelopeModule(bool force_audio_rate):
+  SynthModule(kNumInputs, kNumOutputs), prefix_("env"), force_audio_rate_(force_audio_rate) {
   envelope_ = new Envelope();
   envelope_->useInput(input(kTrigger), Envelope::kTrigger);
-
   envelope_->useOutput(output(kValue), Envelope::kValue);
   envelope_->useOutput(output(kPhase), Envelope::kPhase);
   addProcessor(envelope_);
-
   setControlRate(!force_audio_rate_);
 }
 
 void EnvelopeModule::init() {
-  Output* delay = createPolyModControl(prefix_ + "_delay");
-  Output* attack = createPolyModControl(prefix_ + "_attack");
-  Output* hold = createPolyModControl(prefix_ + "_hold");
-  Output* decay = createPolyModControl(prefix_ + "_decay");
-  Output* sustain = createPolyModControl(prefix_ + "_sustain");
-  Output* release = createPolyModControl(prefix_ + "_release");
+  Output* delay = createPolyModControl2({ .name = "delay", .max = 1.41421, .value_scale = ValueScale::kQuadratic });
+  Output* attack = createPolyModControl2({ .name = "attack", .max = 2.37842, .default_value = 0.1495, .value_scale = ValueScale::kQuartic });
+  Output* hold = createPolyModControl2({ .name = "hold", .max = 1.41421, .value_scale = ValueScale::kQuadratic });
+  Output* decay = createPolyModControl2({ .name = "decay", .max = 2.37842, .default_value = 1.0, .value_scale = ValueScale::kQuartic });
+  Output* sustain = createPolyModControl2({ .name = "sustain", .default_value = 1.0, });
+  Output* release = createPolyModControl2({ .name = "release", .max = 2.37842, .default_value = 0.5476, .value_scale = ValueScale::kQuartic });
 
-  Value* attack_power = createBaseControl(prefix_ + "_attack_power");
-  Value* decay_power = createBaseControl(prefix_ + "_decay_power");
-  Value* release_power = createBaseControl(prefix_ + "_release_power");
+  Value* attack_power = createBaseControl2({ .name = "attack_power", .min = -20.0, .max = 20.0 });
+  Value* decay_power = createBaseControl2({ .name = "decay_power", .min = -20.0, .max = 20.0, .default_value = -2.0 });
+  Value* release_power = createBaseControl2({ .name = "release_power", .min = -20.0, .max = 20.0, .default_value = -2.0, .value_scale = ValueScale::kLinear });
 
   envelope_->plug(delay, Envelope::kDelay);
   envelope_->plug(attack, Envelope::kAttack);

@@ -548,40 +548,40 @@ ValueDetailsLookup::ValueDetailsLookup() {
   }
 
   int num_env_parameters = sizeof(env_parameter_list) / sizeof(ValueDetails);
-  for (int env = 0; env < kNumEnvelopes; ++env)
+  for (int env = 0; env < 1; ++env)
     addParameterGroup(env_parameter_list, num_env_parameters, env, kEnvIdPrefix, kEnvNamePrefix);
 
   int num_lfo_parameters = sizeof(lfo_parameter_list) / sizeof(ValueDetails);
-  for (int lfo = 0; lfo < kNumLfos; ++lfo)
+  for (int lfo = 0; lfo < 1; ++lfo)
     addParameterGroup(lfo_parameter_list, num_lfo_parameters, lfo, kLfoIdPrefix, kLfoNamePrefix);
 
   int num_random_lfo_parameters = sizeof(random_lfo_parameter_list) / sizeof(ValueDetails);
-  for (int lfo = 0; lfo < kNumRandomLfos; ++lfo)
+  for (int lfo = 0; lfo < 1; ++lfo)
     addParameterGroup(random_lfo_parameter_list, num_random_lfo_parameters, lfo, kRandomIdPrefix, kRandomNamePrefix);
 
   int num_osc_parameters = sizeof(osc_parameter_list) / sizeof(ValueDetails);
   for (int osc = 0; osc < 1; ++osc)
     addParameterGroup(osc_parameter_list, num_osc_parameters, osc, kOscIdPrefix, kOscNamePrefix);
-  for (int osc = kNumOscillatorsOld; osc < kNumOscillators; ++osc) {
+  for (int osc = kNumOscillatorsOld; osc < 0; ++osc) {
     addParameterGroup(osc_parameter_list, num_osc_parameters, osc, kOscIdPrefix,
       kOscNamePrefix, kNewOscillatorVersion);
   }
 
   int num_filter_parameters = sizeof(filter_parameter_list) / sizeof(ValueDetails);
-  for (int filter = 0; filter < kNumFilters; ++filter)
+  for (int filter = 0; filter < 1; ++filter)
     addParameterGroup(filter_parameter_list, num_filter_parameters, filter, kFilterIdPrefix, kFilterNamePrefix);
 
   addParameterGroup(filter_parameter_list, num_filter_parameters, "fx", kFilterIdPrefix, kFilterNamePrefix);
 
   int num_mod_parameters = sizeof(mod_parameter_list) / sizeof(ValueDetails);
-  for (int modulation = 0; modulation < kOldMaxModulations; ++modulation) {
+  for (int modulation = 0; modulation < 1; ++modulation) {
     addParameterGroup(mod_parameter_list, num_mod_parameters, modulation,
       kModulationIdPrefix, kModulationNamePrefix);
   }
-  for (int modulation = kOldMaxModulations; modulation < kMaxModulationConnections; ++modulation) {
-    addParameterGroup(mod_parameter_list, num_mod_parameters, modulation,
-      kModulationIdPrefix, kModulationNamePrefix, kNewModulationVersion);
-  }
+  // for (int modulation = kOldMaxModulations; modulation < 1; ++modulation) {
+  //   addParameterGroup(mod_parameter_list, num_mod_parameters, modulation,
+  //     kModulationIdPrefix, kModulationNamePrefix, kNewModulationVersion);
+  // }
 
   // details_lookup_["osc_1_on"].default_value = 1.0f;
   // details_lookup_["osc_1_pan"].default_value = -1.0f;
@@ -600,6 +600,12 @@ ValueDetailsLookup::ValueDetailsLookup() {
   // details_lookup_["filter_5_on"].default_value = 1.0f;
 
   std::sort(details_list_.begin(), details_list_.end(), compareValueDetails);
+
+  // for (auto d : details_list_) {
+  //   std::cout << "name:" << d->name << "|min:" << d->min << "|max:" << d->max << "|default:" << d->default_value << "|value_scale:" << d->value_scale << "|post_offset:" << d->post_offset << std::endl;
+  // }
+
+  // throw std::runtime_error("stop");
 }
 
 void ValueDetailsLookup::addParameterGroup(const ValueDetails* list, int num_parameters, int index, std::string id_prefix, std::string name_prefix, int version) {
@@ -623,13 +629,6 @@ void ValueDetailsLookup::addParameterGroup(const ValueDetails* list, int num_par
     details_list_.push_back(&details_lookup_[details.name]);
   }
 
-  for (auto d : details_list_) {
-    std::cout << "name: " << d->name << " min: " << d->min << " max: " << d->max << " default: " << d->default_value << " value_scale: " << d->value_scale << " post_offset: " << d->post_offset << std::endl;
-
-    // std::cout << std::endl;
-  }
-
-  throw std::runtime_error("stop");
 }
 
 ValueDetailsLookup Parameters::lookup_;

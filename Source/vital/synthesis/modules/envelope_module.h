@@ -34,7 +34,7 @@ public:
     kNumOutputs
   };
 
-  EnvelopeModule(const std::string& prefix, bool force_audio_rate = false);
+  EnvelopeModule(bool force_audio_rate = false);
   virtual ~EnvelopeModule() { }
 
   void init() override;

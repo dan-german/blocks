@@ -29,15 +29,16 @@ class SynthModule;
 
 struct AddControlInput { 
   std::string name;
-  bool audio_rate;
-  bool smooth_value
+  bool audio_rate = false;
+  bool smooth_value = false;
   Output* internal_modulation;
   Input* reset;
-  mono_float post_offset;
-  ValueScale value_scale;
-  mono_float min;
-  mono_float max;
-}
+  mono_float post_offset = 0.0f;
+  ValueScale value_scale = ValueScale::kLinear;
+  mono_float min = 0.0f;
+  mono_float max = 1.0f;
+  mono_float default_value = 0.0f;
+};
 
 class StatusOutput {
 public:
@@ -136,8 +137,10 @@ protected:
 
   void createStatusOutput(std::string name, Output* source);
 
-  // void createBaseCon
-  void createBaseControl2(AddControlInput input);
+  Value* createBaseControl2(AddControlInput input);
+  Output* createBaseModControl2(AddControlInput input);
+  Output* createMonoModControl2(AddControlInput input);
+  Output* createPolyModControl2(AddControlInput input);
 
   std::shared_ptr<ModuleData> data_;
 

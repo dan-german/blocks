@@ -113,7 +113,6 @@ void BlocksVoiceHandler::connectAll() {
       auto processor = processor_matrix_[column][row];
       if (processor != nullptr) {
         if (current) {
-          std::cout << "plugging " << current << " into " << processor << std::endl;
           processor->plug(current, 0);
         }
 
@@ -122,7 +121,6 @@ void BlocksVoiceHandler::connectAll() {
     }
 
     if (current) {
-      std::cout << "plugging " << current << " into last node " << last_node_ << " at column: " << column << std::endl;
       last_node_->plug(current, column);
     }
     current = nullptr;
@@ -130,11 +128,9 @@ void BlocksVoiceHandler::connectAll() {
 }
 
 std::shared_ptr<vital::Processor> BlocksVoiceHandler::findProcessorAbove(Index index) {
-  std::cout << "finding processor above: " << index.column << ", " << index.row << std::endl;
   for (int i = index.row - 1; i >= 0; i--) {
     auto processor = processor_matrix_[index.column][i];
     if (processor != nullptr) {
-      std::cout << "found processor above: " << index.column << ", " << i << std::endl;
       return processor;
     }
   }
@@ -187,7 +183,7 @@ void BlocksVoiceHandler::init() {
 
     processor->plug(reset(), ModulationConnectionProcessor::kReset);
 
-    std::string number = std::to_string(i + 1);
+    // std::string number = std::to_string(i + 1);
     // std::string amount_name = "modulation_" + number + "_amount";
     // Output* modulation_amount = createPolyModControl(amount_name);
     // processor->plug(modulation_amount, ModulationConnectionProcessor::kModulationAmount);
@@ -321,7 +317,6 @@ std::shared_ptr<SynthModule> BlocksVoiceHandler::createProcessor(std::shared_ptr
 void BlocksVoiceHandler::createOscillators() {
   std::string type = "osc";
   for (int i = 0; i < 5; i++) {
-    // auto name = type + "_" + std::to_string(i + 1);
     auto osc = std::make_shared<OscillatorModule>();
 
     osc->plug(reset(), OscillatorModule::kReset);
@@ -333,6 +328,12 @@ void BlocksVoiceHandler::createOscillators() {
 
     processors_[type].push_back(osc);
     oscillators_.push_back(osc);
+
+    // Processor* control_amplitude = new SmoothMultiply();
+    // control_amplitude->plug(envelope, SmoothMultiply::kAudioRate);
+    // control_amplitude->plug(output(kRaw), SmoothMultiply::kControlRate);
+    // control_amplitude->plug(reset->source, SmoothMultiply::kReset);
+    // oscillator_->useOutput(control_amplitude->output(), SynthOscillator::kRaw);
   }
 }
 
@@ -356,16 +357,7 @@ void BlocksVoiceHandler::createModulators() {
   }
 
   for (int i = 0; i < kNumEnvelopes; ++i) {
-    std::string prefix = std::string("env");
-    auto envelope = std::make_shared<EnvelopeModule>(prefix, i == 0);
-    envelope->plug(retrigger(), EnvelopeModule::kTrigger);
-    addSubmodule(envelope.get());
-    addProcessor(envelope.get());
-    envelopes_.push_back(envelope);
-
-    data_->mod_sources[prefix] = envelope->output();
-    createStatusOutput(prefix, envelope->output(EnvelopeModule::kValue));
-    createStatusOutput(prefix + "_phase", envelope->output(EnvelopeModule::kPhase));
+    createEnvelope();
   }
 
   random_ = new TriggerRandom();
@@ -401,6 +393,19 @@ void BlocksVoiceHandler::createModulators() {
   createStatusOutput("lift", lift());
   createStatusOutput("mod_wheel", mod_wheel());
   createStatusOutput("pitch_wheel", pitch_wheel_percent());
+}
+
+std::shared_ptr<EnvelopeModule> BlocksVoiceHandler::createEnvelope(bool audio_rate) {
+  auto envelope = std::make_shared<EnvelopeModule>(audio_rate);
+  envelope->plug(retrigger(), EnvelopeModule::kTrigger);
+  addSubmodule(envelope.get());
+  addProcessor(envelope.get());
+  envelopes_.push_back(envelope);
+
+  createStatusOutput("env", envelope->output(EnvelopeModule::kValue));
+  createStatusOutput("env_phase", envelope->output(EnvelopeModule::kPhase));
+  data_->mod_sources["env"] = envelope->output();
+  return envelope;
 }
 
 void BlocksVoiceHandler::createNoteArticulation() {
@@ -463,20 +468,29 @@ void BlocksVoiceHandler::createVoiceOutput() {
   amplitude->plug(voice_amplitude, 1);
   addProcessor(amplitude);
 
-  amplitude_envelope_ = envelopes_[0].get();
-  amplitude_envelope_->setControlRate(false);
+  // default_amplitude_envelope_ = createEnvelope(true);
+  // amplitude_envelope_ = default_amplitude_envelope_;
 
-  Processor* control_amplitude = new SmoothMultiply();
-  control_amplitude->plug(amplitude_envelope_->output(Envelope::kValue), SmoothMultiply::kAudioRate);
-  control_amplitude->plug(amplitude, SmoothMultiply::kControlRate);
-  control_amplitude->plug(reset(), SmoothMultiply::kReset);
+  Value* val = new Value(0.5f);
+  addProcessor(val);
+
+  // Processor* control_amplitude = new SmoothMultiply();
+  // control_amplitude->plug(val, SmoothMultiply::kAudioRate);
+  // control_amplitude->plug(amplitude, SmoothMultiply::kControlRate);
+  // control_amplitude->plug(reset(), SmoothMultiply::kReset);
 
   amplitude_ = new Square();
-  amplitude_->plug(control_amplitude);
+  amplitude_->plug(val);
+  // amplitude_->plug(control_amplitude);
 
-  addProcessor(control_amplitude);
+  // addProcessor(control_amplitude);
   addProcessor(amplitude_);
 }
+
+// Processor* control_amplitude = new SmoothMultiply();
+// control_amplitude->plug(amplitude_envelope_->output(Envelope::kValue), SmoothMultiply::kAudioRate);
+// control_amplitude->plug(amplitude, SmoothMultiply::kControlRate);
+// control_amplitude->plug(reset(), SmoothMultiply::kReset);
 
 void BlocksVoiceHandler::process(int num_samples) {
   poly_mask reset_mask = reset()->trigger_mask;
@@ -525,7 +539,7 @@ void BlocksVoiceHandler::noteOff(int note, mono_float lift, int sample, int chan
 }
 
 bool BlocksVoiceHandler::shouldAccumulate(Output* output) {
-  if (output->owner == amplitude_envelope_)
+  if (output->owner == amplitude_envelope_.get())
     return false;
 
   return VoiceHandler::shouldAccumulate(output);

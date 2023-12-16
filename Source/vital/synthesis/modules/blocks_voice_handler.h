@@ -96,6 +96,7 @@ private:
   void setupPolyModulationReadouts();
 
   std::shared_ptr<SynthModule> createProcessor(std::shared_ptr<model::Block> module);
+  std::shared_ptr<EnvelopeModule> createEnvelope(bool audio_rate = false);
 
   ModulationConnectionBank modulation_bank_;
   CircularQueue<ModulationConnectionProcessor*> enabled_modulation_processors_;
@@ -105,7 +106,8 @@ private:
   Output* midi_offset_output_;
   Processor* bent_midi_;
   Processor* current_midi_note_;
-  EnvelopeModule* amplitude_envelope_;
+  std::shared_ptr<EnvelopeModule> amplitude_envelope_;
+  std::shared_ptr<EnvelopeModule> default_amplitude_envelope_;
   Processor* amplitude_;
   Processor* pitch_wheel_;
   Processor* voice_sum_;

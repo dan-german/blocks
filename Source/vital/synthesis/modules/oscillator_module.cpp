@@ -18,6 +18,7 @@
 
 #include "vital/synthesis/producers/synth_oscillator.h"
 #include "vital/synthesis/lookups/wavetable.h"
+#include "vital/synthesis/modules/envelope_module.h"
 
 namespace vital {
 
@@ -30,37 +31,37 @@ OscillatorModule::OscillatorModule():
 void OscillatorModule::init() {
   oscillator_ = new SynthOscillator(wavetable_.get());
 
-  createBaseControl(prefix_ + "_view_2d");
-  on_ = createBaseControl(prefix_ + "_on");
-  Value* midi_track = createBaseControl(prefix_ + "_midi_track");
-  Value* smooth_interpolation = createBaseControl(prefix_ + "_smooth_interpolation");
-  Value* spectral_unison = createBaseControl(prefix_ + "_spectral_unison");
-  Value* stack_style = createBaseControl(prefix_ + "_stack_style");
-  Value* transpose_quantize = createBaseControl(prefix_ + "_transpose_quantize");
+  createBaseControl2({ .name = "view_2d" });
+  on_ = createBaseControl2({ .name = "on" });
+  Value* midi_track = createBaseControl2({ .name = "midi_track", .value_scale = ValueScale::kIndexed, .default_value = 1.0 });
+  Value* smooth_interpolation = createBaseControl2({ .name = "smooth_interpolation", .value_scale = ValueScale::kIndexed });
+  Value* spectral_unison = createBaseControl2({ .name = "spectral_unison", .value_scale = ValueScale::kIndexed, .default_value = 1.0 });
+  Value* stack_style = createBaseControl2({ .name = "stack_style", .max = 10.0, .value_scale = ValueScale::kIndexed });
+  Value* transpose_quantize = createBaseControl2({ .name = "transpose_quantize", .max = 8191.0, .value_scale = ValueScale::kIndexed });
 
   Input* reset = input(kReset);
 
-  Output* wave_frame = createPolyModControl(prefix_ + "_wave_frame");
-  Output* transpose = createPolyModControl(prefix_ + "_transpose", true, false, nullptr, reset);
-  Output* tune = createPolyModControl(prefix_ + "_tune", true, false, nullptr, reset);
-  Output* unison_voices = createPolyModControl(prefix_ + "_unison_voices");
-  Output* unison_detune = createPolyModControl(prefix_ + "_unison_detune");
-  Output* detune_power = createPolyModControl(prefix_ + "_detune_power");
-  Output* detune_range = createPolyModControl(prefix_ + "_detune_range");
-  Output* amplitude = createPolyModControl(prefix_ + "_level", true, true, nullptr, reset);
-  Output* pan = createPolyModControl(prefix_ + "_pan");
-  Output* phase = createPolyModControl(prefix_ + "_phase", true, true, nullptr, reset);
-  Output* distortion_phase = createPolyModControl(prefix_ + "_distortion_phase");
-  Output* rand_phase = createPolyModControl(prefix_ + "_random_phase");
-  Output* blend = createPolyModControl(prefix_ + "_unison_blend");
-  Output* stereo_spread = createPolyModControl(prefix_ + "_stereo_spread");
-  Output* frame_spread = createPolyModControl(prefix_ + "_frame_spread");
-  Output* distortion_spread = createPolyModControl(prefix_ + "_distortion_spread");
-  distortion_type_ = createBaseControl(prefix_ + "_distortion_type");
-  Output* distortion_amount = createPolyModControl(prefix_ + "_distortion_amount");
-  Output* spectral_morph_spread = createPolyModControl(prefix_ + "_spectral_morph_spread");
-  Value* spectral_morph_type = createBaseControl(prefix_ + "_spectral_morph_type");
-  Output* spectral_morph_amount = createPolyModControl(prefix_ + "_spectral_morph_amount");
+  Output* wave_frame = createPolyModControl2({ .name = "wave_frame", .max = 256 });
+  Output* transpose = createPolyModControl2({ .name = "transpose", .audio_rate = true, .reset = reset, .min = -48, .max = 48, .value_scale = ValueScale::kIndexed });
+  Output* tune = createPolyModControl2({ .name = "tune", .audio_rate = true, .reset = reset, .max = 1.0 });
+  Output* unison_voices = createPolyModControl2({ .name = "unison_voices", .min = 1.0, .max = 16.0, .value_scale = ValueScale::kIndexed, .default_value = 1.0 });
+  Output* unison_detune = createPolyModControl2({ .name = "unison_detune", .value_scale = ValueScale::kQuadratic, .default_value = 4.472135955 });
+  Output* detune_power = createPolyModControl2({ .name = "detune_power" });
+  Output* detune_range = createPolyModControl2({ .name = "detune_range", .max = 48, .default_value = 2.0 });
+  Output* amplitude = createPolyModControl2({ .name = "amplitude", .audio_rate = true, .smooth_value = true, .reset = reset });
+  Output* pan = createPolyModControl2({ .name = "pan", .min = -1.0 });
+  Output* phase = createPolyModControl2({ .name = "phase", .audio_rate = true, .smooth_value = true, .reset = reset, .default_value = 0.5 });
+  Output* distortion_phase = createPolyModControl2({ .name = "distortion_phase", .default_value = 0.5 });
+  Output* rand_phase = createPolyModControl2({ .name = "random_phase", .default_value = 1.0 });
+  Output* blend = createPolyModControl2({ .name = "unison_blend", .default_value = 0.8 });
+  Output* stereo_spread = createPolyModControl2({ .name = "stereo_spread", .default_value = 1.0 });
+  Output* frame_spread = createPolyModControl2({ .name = "frame_spread", .min = -128.0, .max = 128.0 });
+  Output* distortion_spread = createPolyModControl2({ .name = "distortion_spread", .min = -0.5, .max = 0.5 });
+  distortion_type_ = createBaseControl2({ .name = "distortion_type", .max = 12.0, .value_scale = ValueScale::kIndexed });
+  Output* distortion_amount = createPolyModControl2({ .name = "distortion_amount", .default_value = 0.5 });
+  Output* spectral_morph_spread = createPolyModControl2({ .name = "spectral_morph_spread", .min = -0.5, .max = 0.5 });
+  Value* spectral_morph_type = createBaseControl2({ .name = "spectral_morph_type", .max = 11.0, .value_scale = ValueScale::kIndexed });
+  Output* spectral_morph_amount = createPolyModControl2({ .name = "spectral_morph_amount", .default_value = 0.5 });
 
   oscillator_->useInput(input(kReset), SynthOscillator::kReset);
   oscillator_->useInput(input(kRetrigger), SynthOscillator::kRetrigger);
@@ -92,10 +93,22 @@ void OscillatorModule::init() {
   oscillator_->plug(spectral_morph_spread, SynthOscillator::kUnisonSpectralMorphSpread);
   oscillator_->plug(spectral_morph_type, SynthOscillator::kSpectralMorphType);
   oscillator_->plug(spectral_morph_amount, SynthOscillator::kSpectralMorphAmount);
-  oscillator_->useOutput(output(kRaw), SynthOscillator::kRaw);
-  oscillator_->useOutput(output(kLevelled), SynthOscillator::kLevelled);
+  // oscillator_->useOutput(output(kRaw), SynthOscillator::kRaw);
+  // oscillator_->useOutput(output(kLevelled), SynthOscillator::kLevelled);
 
   addProcessor(oscillator_);
+
+  auto envelope = new EnvelopeModule(true);
+  addProcessor(envelope);
+
+  auto env = new Multiply();
+  addProcessor(env);
+  env->plug(envelope->output(), 0);
+  env->plug(oscillator_, 1);
+
+  env->useOutput(output(kRaw), 0);
+  envelope->plug(input(kRetrigger)->source, EnvelopeModule::kTrigger);
+
   SynthModule::init();
 }
 
