@@ -18,7 +18,6 @@
 
 #include "vital/synthesis/producers/synth_oscillator.h"
 #include "vital/synthesis/lookups/wavetable.h"
-#include "vital/synthesis/modules/envelope_module.h"
 
 namespace vital {
 
@@ -93,21 +92,19 @@ void OscillatorModule::init() {
   oscillator_->plug(spectral_morph_spread, SynthOscillator::kUnisonSpectralMorphSpread);
   oscillator_->plug(spectral_morph_type, SynthOscillator::kSpectralMorphType);
   oscillator_->plug(spectral_morph_amount, SynthOscillator::kSpectralMorphAmount);
-  // oscillator_->useOutput(output(kRaw), SynthOscillator::kRaw);
-  // oscillator_->useOutput(output(kLevelled), SynthOscillator::kLevelled);
 
   addProcessor(oscillator_);
 
-  auto envelope = new EnvelopeModule(true);
-  addProcessor(envelope);
+  amplitude_envelope_ = std::make_shared<EnvelopeModule>(true);
+  addProcessor(amplitude_envelope_.get());
 
-  auto env = new Multiply();
-  addProcessor(env);
-  env->plug(envelope->output(), 0);
-  env->plug(oscillator_, 1);
+  auto multiply = new Multiply();
+  addProcessor(multiply);
+  multiply->plug(amplitude_envelope_->output(), 0);
+  multiply->plug(oscillator_, 1);
 
-  env->useOutput(output(kRaw), 0);
-  envelope->plug(input(kRetrigger)->source, EnvelopeModule::kTrigger);
+  multiply->useOutput(output(kRaw), 0);
+  amplitude_envelope_.get()->plug(input(kRetrigger)->source, EnvelopeModule::kTrigger);
 
   SynthModule::init();
 }

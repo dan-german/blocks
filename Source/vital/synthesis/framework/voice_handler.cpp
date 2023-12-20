@@ -317,8 +317,9 @@ void VoiceHandler::process(int num_samples) {
 
     // Remove voice if the right processor has a full silent buffer.
     poly_mask alive_mask = constants::kFullMask;
-    if (voice_killer_) 
+    if (voice_killer_) { 
       alive_mask = ~utils::getSilentMask(voice_killer_->buffer, num_samples);
+    }
     for (Voice* single_voice : aggregate_voice->voices) {
       bool released = single_voice->state().event == kVoiceOff || single_voice->state().event == kVoiceKill;
       bool alive = (single_voice->voice_mask() & alive_mask).sum();

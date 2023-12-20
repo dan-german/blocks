@@ -263,7 +263,7 @@ void PluginProcessor::editorAdjustedModulator(int parameter, int index, float va
 }
 
 void PluginProcessor::editorAdjustedBlock(Index index, int parameter, float value) {
-  DBG("value: " << value);
+  // DBG("value: " << value);
   auto block = synth_->getModuleManager().getBlock(index);
   auto param = block->parameters_[parameter]->val;
   param->set(value);

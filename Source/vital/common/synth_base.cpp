@@ -788,6 +788,7 @@ void SynthBase::connectModulation(int modulator_index, std::string target_name, 
   auto target = module_manager_.getModule(target_name);
   auto source = module_manager_.getModulator(modulator_index);
   auto connection_module = module_manager_.addConnection(source, target, parameter_name);
+
   std::cout << "connection: " << connection_module->id << std::endl;
   auto connection_name = "modulation_" + std::to_string(connection_module->number) + "_amount";
   getControls()[connection_name]->set(1.0f);

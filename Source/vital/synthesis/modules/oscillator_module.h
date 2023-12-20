@@ -18,6 +18,7 @@
 
 #include "vital/synthesis/framework/synth_module.h"
 #include "vital/synthesis/producers/synth_oscillator.h"
+#include "vital/synthesis/modules/envelope_module.h"
 
 namespace vital {
 class Wavetable;
@@ -47,10 +48,15 @@ public:
 
   Wavetable* getWavetable() { return wavetable_.get(); }
   force_inline SynthOscillator* oscillator() { return oscillator_; }
+
   SynthOscillator::DistortionType getDistortionType() {
     int val = distortion_type_->value();
     return static_cast<SynthOscillator::DistortionType>(val);
   }
+
+  std::shared_ptr<EnvelopeModule> amplitude_envelope_;
+
+  // function setEnvelope
 
   Value* on_;
 protected:

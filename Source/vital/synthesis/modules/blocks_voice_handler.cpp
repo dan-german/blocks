@@ -176,7 +176,7 @@ void BlocksVoiceHandler::init() {
   for (int i = 0; i < kNumMacros; ++i)
     macros[i] = createMonoModControl("macro_control_" + std::to_string(i + 1));
 
-  setVoiceKiller(amplitude_->output());
+  setVoiceKiller(last_node_->output());
 
   for (int i = 0; i < vital::kMaxModulationConnections; ++i) {
     ModulationConnectionProcessor* processor = modulation_bank_.atIndex(i)->modulation_processor.get();
@@ -279,7 +279,7 @@ std::shared_ptr<SynthModule> BlocksVoiceHandler::createProcessor(std::shared_ptr
     module->parameter_map_["tune"]->val = osc->control_map_["tune"];
     module->parameter_map_["unison_voices"]->val = osc->control_map_["unison_voices"];
     module->parameter_map_["unison_detune"]->val = osc->control_map_["unison_detune"];
-    module->parameter_map_["level"]->val = osc->control_map_["level"];
+    module->parameter_map_["level"]->val = osc->control_map_["amplitude"];
     module->parameter_map_["pan"]->val = osc->control_map_["pan"];
     oscillators_.erase(oscillators_.begin());
   } else if (module->id.type == "filter") {
@@ -486,11 +486,6 @@ void BlocksVoiceHandler::createVoiceOutput() {
   // addProcessor(control_amplitude);
   addProcessor(amplitude_);
 }
-
-// Processor* control_amplitude = new SmoothMultiply();
-// control_amplitude->plug(amplitude_envelope_->output(Envelope::kValue), SmoothMultiply::kAudioRate);
-// control_amplitude->plug(amplitude, SmoothMultiply::kControlRate);
-// control_amplitude->plug(reset(), SmoothMultiply::kReset);
 
 void BlocksVoiceHandler::process(int num_samples) {
   poly_mask reset_mask = reset()->trigger_mask;
