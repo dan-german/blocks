@@ -94,6 +94,7 @@ public:
     return details_lookup_;
   }
 
+  void addParameterGroupOld(const ValueDetails* list, int num_parameters, std::string id, std::string id_prefix, std::string name_prefix, int version);
   void addParameterGroup(const ValueDetails* list, int num_parameters, int index, std::string id_prefix, std::string name_prefix, int version = -1);
   void addParameterGroupNumberBased(const ValueDetails* list, int num_parameters, int index, std::string id_prefix, std::string name_prefix, int version = -1);
   void addParameterGroup(const ValueDetails* list, int num_parameters, std::string id, std::string id_prefix, std::string name_prefix, int version = -1);

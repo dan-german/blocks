@@ -613,11 +613,30 @@ void ValueDetailsLookup::addParameterGroup(const ValueDetails* list, int num_par
 
 void ValueDetailsLookup::addParameterGroupNumberBased(const ValueDetails* list, int num_parameters, int index, std::string id_prefix, std::string name_prefix, int version) {
   std::string string_num = std::to_string(index + 1);
-  addParameterGroup(list, num_parameters, string_num, id_prefix, name_prefix, version);
+  addParameterGroupOld(list, num_parameters, string_num, id_prefix, name_prefix, version);
 }
 
 void ValueDetailsLookup::addParameterGroup(const ValueDetails* list, int num_parameters, std::string id, std::string id_prefix, std::string name_prefix, int version) {
   std::string id_start = id_prefix + kIdDelimiter;
+  std::string name_start = name_prefix + kNameDelimiter + id + kNameDelimiter;
+
+  for (int i = 0; i < num_parameters; ++i) {
+    ValueDetails details = list[i];
+    if (version > details.version_added)
+      details.version_added = version;
+
+    details.name = id_start + details.name;
+    details.local_description = details.display_name;
+    details.display_name = name_start + details.display_name;
+    details_lookup_[details.name] = details;
+    details_list_.push_back(&details_lookup_[details.name]);
+  }
+
+}
+
+void ValueDetailsLookup::addParameterGroupOld(const ValueDetails* list, int num_parameters, std::string id, std::string id_prefix, std::string name_prefix, int version) {
+  // std::string id_start = id_prefix + kIdDelimiter;
+  std::string id_start = id_prefix + kIdDelimiter + id + kIdDelimiter;
   std::string name_start = name_prefix + kNameDelimiter + id + kNameDelimiter;
 
   for (int i = 0; i < num_parameters; ++i) {
