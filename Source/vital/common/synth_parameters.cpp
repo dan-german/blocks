@@ -575,12 +575,11 @@ ValueDetailsLookup::ValueDetailsLookup() {
 
   int num_mod_parameters = sizeof(mod_parameter_list) / sizeof(ValueDetails);
   for (int modulation = 0; modulation < 1; ++modulation) {
-    addParameterGroup(mod_parameter_list, num_mod_parameters, modulation,
-      kModulationIdPrefix, kModulationNamePrefix);
+    addParameterGroupNumberBased(mod_parameter_list, num_mod_parameters, modulation, kModulationIdPrefix, kModulationNamePrefix);
   }
-  for (int modulation = kOldMaxModulations; modulation < 1; ++modulation) {
-    addParameterGroup(mod_parameter_list, num_mod_parameters, modulation, kModulationIdPrefix, kModulationNamePrefix, kNewModulationVersion);
-  }
+  // for (int modulation = kOldMaxModulations; modulation < 1; ++modulation) {
+  //   addParameterGroup(mod_parameter_list, num_mod_parameters, modulation, kModulationIdPrefix, kModulationNamePrefix, kNewModulationVersion);
+  // }
 
   // details_lookup_["osc_1_on"].default_value = 1.0f;
   // details_lookup_["osc_1_pan"].default_value = -1.0f;
@@ -612,6 +611,11 @@ void ValueDetailsLookup::addParameterGroup(const ValueDetails* list, int num_par
   addParameterGroup(list, num_parameters, "", id_prefix, name_prefix, version);
 }
 
+void ValueDetailsLookup::addParameterGroupNumberBased(const ValueDetails* list, int num_parameters, int index, std::string id_prefix, std::string name_prefix, int version) {
+  std::string string_num = std::to_string(index + 1);
+  addParameterGroup(list, num_parameters, string_num, id_prefix, name_prefix, version);
+}
+
 void ValueDetailsLookup::addParameterGroup(const ValueDetails* list, int num_parameters, std::string id, std::string id_prefix, std::string name_prefix, int version) {
   std::string id_start = id_prefix + kIdDelimiter;
   std::string name_start = name_prefix + kNameDelimiter + id + kNameDelimiter;
@@ -629,6 +633,7 @@ void ValueDetailsLookup::addParameterGroup(const ValueDetails* list, int num_par
   }
 
 }
+
 
 ValueDetailsLookup Parameters::lookup_;
 
