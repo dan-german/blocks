@@ -84,10 +84,12 @@ void BlocksVoiceHandler::addModulator(std::shared_ptr<model::Module> modulator) 
     modulator->parameter_map_["mode"]->val = lfo->control_map_["sync_type"]; // mode
   } else if (type == "adsr") {
     auto adsr = envelopes_[0];
-    modulator->parameters_[0]->val = adsr->control_map_["attack"];
-    modulator->parameters_[1]->val = adsr->control_map_["decay"];
-    modulator->parameters_[2]->val = adsr->control_map_["release"];
-    modulator->parameters_[3]->val = adsr->control_map_["sustain"];
+    adsr->setModule(modulator);
+    // modulator->parameters_[0]->val = adsr->control_map_["attack"];
+    // modulator->parameters_[1]->val = adsr->control_map_["decay"];
+    // modulator->parameters_[2]->val = adsr->control_map_["release"];
+    // modulator->parameters_[3]->val = adsr->control_map_["sustain"];
+    // modulator  
   }
 }
 
@@ -183,12 +185,12 @@ void BlocksVoiceHandler::init() {
 
     processor->plug(reset(), ModulationConnectionProcessor::kReset);
 
-    // std::string number = std::to_string(i + 1);
-    // std::string amount_name = "modulation_" + number + "_amount";
-    // Output* modulation_amount = createPolyModControl(amount_name);
-    // processor->plug(modulation_amount, ModulationConnectionProcessor::kModulationAmount);
+    std::string number = std::to_string(i + 1);
+    std::string amount_name = "modulation_" + number + "_amount";
+    Output* modulation_amount = createPolyModControl(amount_name);
+    processor->plug(modulation_amount, ModulationConnectionProcessor::kModulationAmount);
 
-    // processor->initializeBaseValue(data_->controls[amount_name]);
+    processor->initializeBaseValue(data_->controls[amount_name]);
 
     Output* modulation_power = createPolyModControl("modulation_power");
     processor->plug(modulation_power, ModulationConnectionProcessor::kModulationPower);
@@ -199,7 +201,6 @@ void BlocksVoiceHandler::init() {
   }
 
   VoiceHandler::init();
-  // control_map_["amount"]->set(1.0f);
   setupPolyModulationReadouts();
 
   for (int i = 0; i < kNumMacros; ++i) {

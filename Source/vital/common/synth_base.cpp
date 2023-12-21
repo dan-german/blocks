@@ -119,8 +119,10 @@ void SynthBase::valueChangedExternal(const std::string& name, vital::mono_float 
 
 vital::ModulationConnection* SynthBase::getConnection(const std::string& source, const std::string& destination) {
   for (vital::ModulationConnection* connection : mod_connections_) {
-    if (connection->source_name == source && connection->destination_name == destination)
+    if (connection->source_name == source && connection->destination_name == destination) {
+      std::cout << "found matching connection" << std::endl;  
       return connection;
+    }
   }
   return nullptr;
 }
@@ -167,6 +169,12 @@ bool SynthBase::isInvalidConnection(const vital::modulation_change& change) {
 }
 
 void SynthBase::connectModulation(vital::ModulationConnection* connection) {
+  // i think this is the best place to put 
+  // if (env to osc amp) handle it differently
+  // atm
+  // if (
+
+
   vital::modulation_change change = createModulationChange(connection);
   if (isInvalidConnection(change)) {
     connection->destination_name = "";
@@ -784,12 +792,12 @@ void SynthBase::ValueChangedCallback::messageCallback() {
 }
 
 void SynthBase::connectModulation(int modulator_index, std::string target_name, std::string parameter_name) {
-  std::cout << "mod index: " << modulator_index << " param name: " << parameter_name << std::endl;
+  // std::cout << "mod index: " << modulator_index << " param name: " << parameter_name << std::endl;
   auto target = module_manager_.getModule(target_name);
   auto source = module_manager_.getModulator(modulator_index);
   auto connection_module = module_manager_.addConnection(source, target, parameter_name);
 
-  std::cout << "connection: " << connection_module->id << std::endl;
+  // std::cout << "connection: " << connection_module->id << std::endl;
   auto connection_name = "modulation_" + std::to_string(connection_module->number) + "_amount";
   getControls()[connection_name]->set(1.0f);
 

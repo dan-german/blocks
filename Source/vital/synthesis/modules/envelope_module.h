@@ -17,6 +17,7 @@
 #pragma once
 
 #include "vital/synthesis/framework/synth_module.h"
+#include "adsr_module_new.h"
 
 namespace vital {
 class Envelope;
@@ -46,6 +47,13 @@ public:
   //     envelope_->setControlRate(control_rate);
   // }
 
+  void setModule(std::shared_ptr<model::Module> module) { // this should be setProcessor in model::Module?
+    module->parameter_map_["attack"]->val = control_map_["attack"];
+    module->parameter_map_["decay"]->val = control_map_["decay"];
+    module->parameter_map_["sustain"]->val = control_map_["sustain"];
+    module->parameter_map_["release"]->val = control_map_["release"];
+  };
+
 protected:
   std::string prefix_;
   Envelope* envelope_;
@@ -54,4 +62,3 @@ protected:
   JUCE_LEAK_DETECTOR(EnvelopeModule)
 };
 } // namespace vital
-

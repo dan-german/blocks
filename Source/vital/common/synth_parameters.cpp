@@ -578,10 +578,9 @@ ValueDetailsLookup::ValueDetailsLookup() {
     addParameterGroup(mod_parameter_list, num_mod_parameters, modulation,
       kModulationIdPrefix, kModulationNamePrefix);
   }
-  // for (int modulation = kOldMaxModulations; modulation < 1; ++modulation) {
-  //   addParameterGroup(mod_parameter_list, num_mod_parameters, modulation,
-  //     kModulationIdPrefix, kModulationNamePrefix, kNewModulationVersion);
-  // }
+  for (int modulation = kOldMaxModulations; modulation < 1; ++modulation) {
+    addParameterGroup(mod_parameter_list, num_mod_parameters, modulation, kModulationIdPrefix, kModulationNamePrefix, kNewModulationVersion);
+  }
 
   // details_lookup_["osc_1_on"].default_value = 1.0f;
   // details_lookup_["osc_1_pan"].default_value = -1.0f;
