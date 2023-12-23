@@ -58,24 +58,26 @@ FilterModule::FilterModule(std::string prefix):
 }
 
 void FilterModule::init() {
-  Output* keytrack_amount = createModControl(prefix_ + "_keytrack");
+  Output* keytrack_amount = createPolyModControl2({ .name = "keytrack", .min = -1.0f });
   cr::Multiply* current_keytrack = new cr::Multiply();
   current_keytrack->useInput(input(kKeytrack), 0);
   current_keytrack->plug(keytrack_amount, 1);
 
-  Output* midi_cutoff = createModControl(prefix_ + "_cutoff", true, true, current_keytrack->output());
-  Output* resonance = createModControl(prefix_ + "_resonance");
-  Output* drive = createModControl(prefix_ + "_drive");
-  Output* blend = createModControl(prefix_ + "_blend");
-  Output* blend_transpose = createModControl(prefix_ + "_blend_transpose");
+  AddControlInput midi_cutoff_input = { .name = "cutoff", .min = 8.0f, .max = 136.0f, .post_offset = -60.0f, .default_value = 30.0f, .audio_rate = true, .smooth_value = true, .internal_modulation = current_keytrack->output() };
+  Output* midi_cutoff = createPolyModControl2(midi_cutoff_input);
+
+  Output* resonance = createPolyModControl2({ .name = "resonance", .default_value = 0.5f });
+  Output* drive = createPolyModControl2({ .name = "drive", .max = 20.0f, .default_value = 0.85f });
+  Output* blend = createPolyModControl2({ .name = "blend", .max = 2.0f });
+  Output* blend_transpose = createPolyModControl2({ .name = "blend_transpose", .min = 0.3f, .default_value = 0.85f });
 
   if (create_on_value_)
-    on_ = createBaseControl(prefix_ + "_on");
+    on_ = createBaseControl2({ .name = "on", .value_scale = ValueScale::kIndexed });
 
-  Value* filter_style = createBaseControl(prefix_ + "_style");
-  filter_model_ = createBaseControl(prefix_ + "_model");
+  Value* filter_style = createBaseControl2({ .name = "style", .max = 9.0f, .value_scale = ValueScale::kIndexed });
+  filter_model_ = createBaseControl2({ .name = "model", .max = 7.0f, .value_scale = ValueScale::kIndexed });
 
-  filter_mix_ = createModControl(prefix_ + "_mix");
+  filter_mix_ = createPolyModControl2({ .name = "mix", .default_value = 1.0f });
 
   comb_filter_->useInput(input(kAudio), CombModule::kAudio);
   comb_filter_->plug(filter_style, CombModule::kStyle);
@@ -172,8 +174,7 @@ void FilterModule::hardReset() {
   sallen_key_filter_->hardReset();
 }
 
-Output* FilterModule::createModControl(std::string name, bool audio_rate, bool smooth_value,
-  Output* internal_modulation) {
+Output* FilterModule::createModControl(std::string name, bool audio_rate, bool smooth_value, Output* internal_modulation) {
   if (mono_)
     return createMonoModControl(name, audio_rate, smooth_value, internal_modulation);
   return createPolyModControl(name, audio_rate, smooth_value, internal_modulation, input(kReset));

@@ -26,12 +26,11 @@ struct ModuleContainer {
     // module->reset();
     map[module->id.type].add(module);
 
-    // struct Sorter
-    // {
-    //   bool operator() (const std::shared_ptr<Module> a, const std::shared_ptr<Module> b) const noexcept { return a->id.number < b->id.number; }
-    // };
+    struct Sorter {
+      bool operator() (const std::shared_ptr<M> a, const std::shared_ptr<M> b) const noexcept { return a->id.number < b->id.number; }
+    };
 
-    // std::sort(map[module->id.type].begin(), map[module->id.type].end(), Sorter());
+    std::sort(map[module->id.type].begin(), map[module->id.type].end(), Sorter());
   }
 
   std::shared_ptr<M> get(ID id) {

@@ -39,9 +39,9 @@ public:
   std::shared_ptr<model::Module> getModulator(std::string code, int number, int colourId);
   std::shared_ptr<model::Connection> getConnection(int number = -1);
 
-  void Retire(std::shared_ptr<model::Connection> modulationConnection);
-  void Retire(std::shared_ptr<model::Block> block);
-  void Retire(std::shared_ptr<model::Module> modulator);
+  void retire(std::shared_ptr<model::Connection> modulationConnection);
+  void retire(std::shared_ptr<model::Block> block);
+  void retire(std::shared_ptr<model::Module> modulator);
   // void retire(std::shared_ptr<Tab> tab);
 };
 } // namespace model

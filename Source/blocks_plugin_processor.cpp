@@ -378,8 +378,22 @@ std::shared_ptr<Tab> PluginProcessor::editorAddedTab(int column) {
 }
 
 void PluginProcessor::editorRemovedModulator(int index) {
-  // Analytics::shared()->countAction("Modulator Removed");
-  // removeModulator(index);
+  auto modulator = synth_->getModuleManager().getModulator(index);
+  // auto m = synth_->getModuleManager().connectionsof
+  // auto connections = synth_->getSourceConnections(modulator->name);
+
+  // for (auto connection : connections) {
+  //   // synth_->getModuleManager().removeConnection(
+  //   synth_->disconnectModulation(connection);
+  // }
+
+  auto module_connections = synth_->getModuleManager().getConnectionsOfSource(modulator);
+  for (auto connection : module_connections) {
+    synth_->disconnectModulation(connection->vital_connection_);
+    synth_->getModuleManager().removeConnection(connection);
+  }
+
+  getVoiceHandler()->removeModulator(index, modulator->id.type, modulator->name);
 }
 
 #pragma warning(default:4716)
@@ -393,7 +407,22 @@ std::shared_ptr<model::Module> PluginProcessor::editorAddedModulator2(Model::Typ
 
 void PluginProcessor::editorRemovedBlock(Index index) {
   // Analytics::shared()->countAction("Block Removed");
-  // removeBlock(index);
+  auto block = synth_->getModuleManager().getBlock(index);
+
+  for (auto connection : synth_->getModuleManager().getConnectionsOfSource(block)) {
+    synth_->disconnectModulation(connection->vital_connection_);
+    synth_->getModuleManager().removeConnection(connection);
+  }
+
+  getVoiceHandler()->removeBlock(index, block);
+  synth_->getModuleManager().removeBlock(block);  
+
+  // for (auto* voice : blockVoices)
+  //   for (int i = 0; i < block->length; i++)
+  //     voice->removeBlock(block->index.toTheRight(i));
+
+  // removeConnectionsFromTarget(block);
+  // moduleManager.removeBlock(block);
 }
 
 std::shared_ptr<Block> PluginProcessor::editorAddedBlock(Model::Type type, Index index) {

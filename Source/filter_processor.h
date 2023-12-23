@@ -56,7 +56,6 @@ public:
   }
 
   const Value* getOnValue() { return on_; }
-  void setModule(model::Module module) override;
 
 protected:
   void setModel(int new_model);

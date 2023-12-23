@@ -22,7 +22,7 @@ void ModuleManager::removeBlock(std::shared_ptr<model::Block> block) {
   nameToModuleMap.erase(block->name);
   blockMatrix[block->index.row][block->index.column] = nullptr;
   blocks.erase(std::remove(blocks.begin(), blocks.end(), block), blocks.end());
-  pool.Retire(block);
+  pool.retire(block);
 }
 
 std::shared_ptr<Module> ModuleManager::addModulator(std::string code, int number, int colourId) {
@@ -60,7 +60,7 @@ void ModuleManager::RemoveModulator(int index) {
   for (auto connection : getConnectionsOfSource(modulator))
     removeConnection(connection);
 
-  pool.Retire(modulator);
+  pool.retire(modulator);
   nameToModuleMap.erase(modulator->name);
 }
 
@@ -100,12 +100,15 @@ void ModuleManager::removeConnection(int index) {
   auto connection = connections[index];
   // connection->target->removeConnection(connection);
   connections.erase(connections.begin() + index);
-  pool.Retire(connection);
+  pool.retire(connection);
 }
 
 void ModuleManager::removeConnection(std::shared_ptr<Connection> connection) {
-  // connection->target->removeConnection(connection);
-  // pool.retire(connections.removeAndReturn(connections.indexOf(connection)));
+  auto it = std::find(connections.begin(), connections.end(), connection);
+  auto index = std::distance(connections.begin(), it);
+  auto connectionToRemove = connections[index];
+  connections.erase(connections.begin() + index);
+  pool.retire(connectionToRemove);
 }
 
 std::vector<std::shared_ptr<Connection>> ModuleManager::getConnections() {

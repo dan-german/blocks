@@ -59,91 +59,6 @@ FilterProcessor::FilterProcessor(std::string prefix):
 }
 
 void FilterProcessor::init() {
-}
-
-void FilterProcessor::hardReset() {
-  comb_filter_->hardReset();
-  digital_svf_->hardReset();
-  diode_filter_->hardReset();
-  dirty_filter_->hardReset();
-  formant_filter_->hardReset();
-  ladder_filter_->hardReset();
-  phaser_filter_->hardReset();
-  sallen_key_filter_->hardReset();
-}
-
-Output* FilterProcessor::createModControl(std::string name, bool audio_rate, bool smooth_value,
-  Output* internal_modulation) {
-  if (mono_)
-    return createMonoModControl(name, audio_rate, smooth_value, internal_modulation);
-  return createPolyModControl(name, audio_rate, smooth_value, internal_modulation, input(kReset));
-}
-
-force_inline void FilterProcessor::setModel(int new_model) {
-  comb_filter_->enable(new_model == constants::kComb);
-  digital_svf_->enable(new_model == constants::kDigital);
-  diode_filter_->enable(new_model == constants::kDiode);
-  dirty_filter_->enable(new_model == constants::kDirty);
-  formant_filter_->enable(new_model == constants::kFormant);
-  ladder_filter_->enable(new_model == constants::kLadder);
-  phaser_filter_->enable(new_model == constants::kPhase);
-  sallen_key_filter_->enable(new_model == constants::kAnalog);
-
-  if (new_model == last_model_)
-    return;
-
-  Processor* to_reset = nullptr;
-  if (new_model == constants::kAnalog)
-    to_reset = sallen_key_filter_;
-  else if (new_model == constants::kComb)
-    to_reset = comb_filter_;
-  else if (new_model == constants::kDigital)
-    to_reset = digital_svf_;
-  else if (new_model == constants::kDiode)
-    to_reset = diode_filter_;
-  else if (new_model == constants::kDirty)
-    to_reset = dirty_filter_;
-  else if (new_model == constants::kFormant)
-    to_reset = formant_filter_;
-  else if (new_model == constants::kLadder)
-    to_reset = ladder_filter_;
-  else if (new_model == constants::kPhase)
-    to_reset = phaser_filter_;
-
-  if (to_reset)
-    getLocalProcessor(to_reset)->hardReset();
-
-  last_model_ = new_model;
-}
-
-void FilterProcessor::process(int num_samples) {
-  bool on = on_ == nullptr || on_->value() > 0.5f;
-  setModel(static_cast<int>(roundf(filter_model_->value())));
-
-  if (on) {
-    SynthModule::process(num_samples);
-
-    poly_float current_mix = mix_;
-    mix_ = utils::clamp(filter_mix_->buffer[0], 0.0f, 1.0f);
-    current_mix = utils::maskLoad(current_mix, mix_, getResetMask(kReset));
-    poly_float delta_mix = (mix_ - current_mix) * (1.0f / num_samples);
-
-    poly_float* audio_out = output()->buffer;
-    const poly_float* audio_in = input(kAudio)->source->buffer;
-    for (int i = 0; i < num_samples; ++i) {
-      current_mix += delta_mix;
-      audio_out[i] = utils::interpolate(audio_in[i], audio_out[i], current_mix);
-    }
-  } else
-    utils::zeroBuffer(output()->buffer, num_samples);
-}
-
-void FilterProcessor::setMono(bool mono) {
-  mono_ = mono;
-  formant_filter_->setMono(mono);
-}
-
-void FilterProcessor::setModule(model::Module module) {
   Output* keytrack_amount = createModControl(prefix_ + "_keytrack");
   cr::Multiply* current_keytrack = new cr::Multiply();
   current_keytrack->useInput(input(kKeytrack), 0);
@@ -244,5 +159,88 @@ void FilterProcessor::setModule(model::Module module) {
   ladder_filter_->enable(false);
   sallen_key_filter_->enable(false);
 
+
+}
+
+void FilterProcessor::hardReset() {
+  comb_filter_->hardReset();
+  digital_svf_->hardReset();
+  diode_filter_->hardReset();
+  dirty_filter_->hardReset();
+  formant_filter_->hardReset();
+  ladder_filter_->hardReset();
+  phaser_filter_->hardReset();
+  sallen_key_filter_->hardReset();
+}
+
+Output* FilterProcessor::createModControl(std::string name, bool audio_rate, bool smooth_value,
+  Output* internal_modulation) {
+  if (mono_)
+    return createMonoModControl(name, audio_rate, smooth_value, internal_modulation);
+  return createPolyModControl(name, audio_rate, smooth_value, internal_modulation, input(kReset));
+}
+
+force_inline void FilterProcessor::setModel(int new_model) {
+  comb_filter_->enable(new_model == constants::kComb);
+  digital_svf_->enable(new_model == constants::kDigital);
+  diode_filter_->enable(new_model == constants::kDiode);
+  dirty_filter_->enable(new_model == constants::kDirty);
+  formant_filter_->enable(new_model == constants::kFormant);
+  ladder_filter_->enable(new_model == constants::kLadder);
+  phaser_filter_->enable(new_model == constants::kPhase);
+  sallen_key_filter_->enable(new_model == constants::kAnalog);
+
+  if (new_model == last_model_)
+    return;
+
+  Processor* to_reset = nullptr;
+  if (new_model == constants::kAnalog)
+    to_reset = sallen_key_filter_;
+  else if (new_model == constants::kComb)
+    to_reset = comb_filter_;
+  else if (new_model == constants::kDigital)
+    to_reset = digital_svf_;
+  else if (new_model == constants::kDiode)
+    to_reset = diode_filter_;
+  else if (new_model == constants::kDirty)
+    to_reset = dirty_filter_;
+  else if (new_model == constants::kFormant)
+    to_reset = formant_filter_;
+  else if (new_model == constants::kLadder)
+    to_reset = ladder_filter_;
+  else if (new_model == constants::kPhase)
+    to_reset = phaser_filter_;
+
+  if (to_reset)
+    getLocalProcessor(to_reset)->hardReset();
+
+  last_model_ = new_model;
+}
+
+void FilterProcessor::process(int num_samples) {
+  bool on = on_ == nullptr || on_->value() > 0.5f;
+  setModel(static_cast<int>(roundf(filter_model_->value())));
+
+  if (on) {
+    SynthModule::process(num_samples);
+
+    poly_float current_mix = mix_;
+    mix_ = utils::clamp(filter_mix_->buffer[0], 0.0f, 1.0f);
+    current_mix = utils::maskLoad(current_mix, mix_, getResetMask(kReset));
+    poly_float delta_mix = (mix_ - current_mix) * (1.0f / num_samples);
+
+    poly_float* audio_out = output()->buffer;
+    const poly_float* audio_in = input(kAudio)->source->buffer;
+    for (int i = 0; i < num_samples; ++i) {
+      current_mix += delta_mix;
+      audio_out[i] = utils::interpolate(audio_in[i], audio_out[i], current_mix);
+    }
+  } else
+    utils::zeroBuffer(output()->buffer, num_samples);
+}
+
+void FilterProcessor::setMono(bool mono) {
+  mono_ = mono;
+  formant_filter_->setMono(mono);
 }
 } // namespace vital

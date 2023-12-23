@@ -80,14 +80,16 @@ public:
   }
 
   void addBlock(std::shared_ptr<model::Block> block);
+  void removeBlock(Index index, std::shared_ptr<model::Block> block);
   void connectAll();
   void unplugAll();
   void addModulator(std::shared_ptr<model::Module> module);
+  void removeModulator(int index, std::string type, std::string name);
   void repositionBlock(Index from, Index to);
   std::shared_ptr<vital::Processor> findProcessorAbove(Index index);
   void setAmplitudeEnvelope(std::shared_ptr<model::Module> adsr, std::shared_ptr<model::Module> target);
 
-  std::vector<std::shared_ptr<model::Module>> active_modulators_;
+  std::vector<std::shared_ptr<SynthModule>> active_modulators_;
   std::map<std::string, std::shared_ptr<SynthModule>> active_modulators_map_;
 
   std::map<std::string, std::shared_ptr<SynthModule>> active_processor_map_;
@@ -120,8 +122,13 @@ private:
 
   std::vector<std::vector<std::shared_ptr<Processor>>> processor_matrix_;
   std::vector<std::shared_ptr<OscillatorModule>> oscillators_;
-  std::vector<std::shared_ptr<LfoModule>> lfos_;
-  std::vector<std::shared_ptr<EnvelopeModule>> envelopes_;
+
+  std::vector<std::shared_ptr<SynthModule>> lfos_;
+  std::vector<std::shared_ptr<SynthModule>> envelopes_;
+
+  std::vector<std::shared_ptr<SynthModule>> lfo_pool_;
+  std::vector<std::shared_ptr<SynthModule>> envelope_pool_;
+
   std::vector<FilterModule*> filters_;
 
   FiltersModule* filters_module_;

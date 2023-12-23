@@ -47,7 +47,7 @@ public:
   //     envelope_->setControlRate(control_rate);
   // }
 
-  void setModule(std::shared_ptr<model::Module> module) { // this should be setProcessor in model::Module?
+  void setModule(std::shared_ptr<model::Module> module) override { // this should be setProcessor in model::Module?
     module->parameter_map_["attack"]->val = control_map_["attack"];
     module->parameter_map_["decay"]->val = control_map_["decay"];
     module->parameter_map_["sustain"]->val = control_map_["sustain"];

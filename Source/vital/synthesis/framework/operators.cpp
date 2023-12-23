@@ -337,7 +337,6 @@ void TempoChooser::process(int num_samples) {
   poly_mask keytrack_mask = poly_float::equal(sync, kKeytrack);
   poly_float midi = input(kKeytrackTranspose)->at(0) + input(kKeytrackTune)->at(0) + input(kMidi)->at(0);
   poly_float keytrack_frequency = utils::midiNoteToFrequency(midi);
-  std::cout << input(kFrequency)->at(0)[0] << std::endl;
   poly_float result = utils::maskLoad(tempo_adjusted, input(kFrequency)->at(0), frequency_mask);
   output()->buffer[0] = utils::maskLoad(result, keytrack_frequency, keytrack_mask);
 }

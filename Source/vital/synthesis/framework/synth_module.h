@@ -120,7 +120,7 @@ public:
 
   virtual Processor* clone() const override { return new SynthModule(*this); }
   void addSubmodule(SynthModule* module) { data_->sub_modules.push_back(module); }
-  virtual void setModule(model::Module module) {};
+  virtual void setModule(std::shared_ptr<model::Module> module) {};
   std::map<std::string, Value*> control_map_;
 
 protected:

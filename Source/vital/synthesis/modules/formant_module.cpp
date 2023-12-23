@@ -30,11 +30,11 @@ Output* FormantModule::createModControl(std::string name, bool audio_rate, bool 
 }
 
 void FormantModule::init() {
-  Output* formant_x = createModControl(prefix_ + "_formant_x", true, true);
-  Output* formant_y = createModControl(prefix_ + "_formant_y", true, true);
-  Output* formant_transpose = createModControl(prefix_ + "_formant_transpose", true, true);
-  Output* formant_resonance = createModControl(prefix_ + "_formant_resonance");
-  Output* formant_spread = createModControl(prefix_ + "_formant_spread");
+  Output* formant_x = createPolyModControl2({ .name = "formant_x", .audio_rate = true, .smooth_value = true, .default_value = 0.5f });
+  Output* formant_y = createPolyModControl2({ .name = "formant_y", .audio_rate = true, .smooth_value = true, .default_value = 0.5f });
+  Output* formant_transpose = createPolyModControl2({ .name = "formant_transpose", .audio_rate = true, .smooth_value = true, .min = -12.0f, .max = 12.0f });
+  Output* formant_resonance = createPolyModControl2({ .name = "formant_resonance", .min = 0.3f, .default_value = 0.85f });
+  Output* formant_spread = createPolyModControl2({ .name = "formant_spread", .min = -1.0f });
 
   for (int i = 0; i < FormantFilter::kNumFormantStyles; ++i) {
     FormantFilter* formant_filter = new FormantFilter(i);

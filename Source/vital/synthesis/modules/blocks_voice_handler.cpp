@@ -68,6 +68,18 @@ BlocksVoiceHandler::BlocksVoiceHandler(Output* beats_per_second):
   }
 }
 
+void BlocksVoiceHandler::removeModulator(int index, std::string type, std::string name) { 
+  auto modulator = active_modulators_[index];
+  active_modulators_.erase(active_modulators_.begin() + index);
+  active_modulators_map_[name] = nullptr;
+
+  if (type == "lfo") {
+    lfo_pool_.push_back(modulator);
+  } else if (type == "adsr") {
+    envelopes_.push_back(modulator);
+  }
+}
+
 void BlocksVoiceHandler::addModulator(std::shared_ptr<model::Module> modulator) {
   auto type = modulator->id.type;
 
@@ -75,12 +87,11 @@ void BlocksVoiceHandler::addModulator(std::shared_ptr<model::Module> modulator) 
 
   std::cout << "adding modulators of type: " << type << std::endl;
   if (type == "lfo") {
-    auto lfo = lfos_[0];
+    auto lfo = lfo_pool_[0];
+    lfo_pool_.erase(lfo_pool_.begin());
+
     modulator_processor = lfo;
-
     lfo->control_map_["sync"]->set(0.0f);
-    auto cm = lfo->control_map_;
-
     modulator->parameter_map_["wave"]->val = lfo->control_map_["tempo"];
     modulator->parameter_map_["tempo"]->val = lfo->control_map_["tempo"];
     modulator->parameter_map_["frequency"]->val = lfo->control_map_["frequency"];
@@ -89,12 +100,9 @@ void BlocksVoiceHandler::addModulator(std::shared_ptr<model::Module> modulator) 
   } else if (type == "adsr") {
     auto adsr = envelopes_[0];
     adsr->setModule(modulator);
-    // modulator->parameters_[0]->val = adsr->control_map_["attack"];
-    // modulator->parameters_[1]->val = adsr->control_map_["decay"];
-    // modulator->parameters_[2]->val = adsr->control_map_["release"];
-    // modulator->parameters_[3]->val = adsr->control_map_["sustain"];
-    // modulator  
   }
+
+  active_modulators_.push_back(modulator_processor);
   active_modulators_map_[modulator->name] = modulator_processor;
 }
 
@@ -103,6 +111,27 @@ void BlocksVoiceHandler::repositionBlock(Index from, Index to) {
   std::cout << "from: " << from.column << ", " << from.row << " | to: " << to.column << ", " << to.row << std::endl;
   processor_matrix_[to.column][to.row] = processor_matrix_[from.column][from.row];
   processor_matrix_[from.column][from.row] = nullptr;
+  connectAll();
+}
+
+void BlocksVoiceHandler::removeBlock(Index index, std::shared_ptr<model::Block> block) {   
+  // auto processor = graphManager.getModuleProcessor(index);
+  // listeners.removeFirstMatchingValue(processor.get());
+  // graphManager.removeNode(processor, index);
+  // pool->retire(processor);
+  unplugAll();
+  auto processor = processor_matrix_[index.column][index.row];
+  if (block->id.type == "osc") { 
+    auto osc = std::static_pointer_cast<OscillatorModule>(processor);
+    osc->control_map_["on"]->set(0.0f); 
+    oscillators_.push_back(osc);
+  } else (block->id.type == "filter") { 
+    auto filter = std::static_pointer_cast<FilterModule>(processor);
+    filter->control_map_["on"]->set(0.0f); 
+    processors_["filter"].push_back(filter);
+  }
+
+  processor_matrix_[index.column][index.row] = nullptr;
   connectAll();
 }
 
@@ -353,6 +382,7 @@ void BlocksVoiceHandler::createModulators() {
     addSubmodule(lfo.get());
     addProcessor(lfo.get());
     lfos_.push_back(lfo);
+    lfo_pool_.push_back(lfo);
     lfo->plug(retrigger(), LfoModule::kNoteTrigger);
     lfo->plug(note_count(), LfoModule::kNoteCount);
     lfo->plug(bent_midi_, LfoModule::kMidi);
@@ -408,6 +438,7 @@ std::shared_ptr<EnvelopeModule> BlocksVoiceHandler::createEnvelope(bool audio_ra
   addSubmodule(envelope.get());
   addProcessor(envelope.get());
   envelopes_.push_back(envelope);
+  envelope_pool_.push_back(envelope);
 
   createStatusOutput("env", envelope->output(EnvelopeModule::kValue));
   createStatusOutput("env_phase", envelope->output(EnvelopeModule::kPhase));
