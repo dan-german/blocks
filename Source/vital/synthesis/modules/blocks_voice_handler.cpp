@@ -70,9 +70,13 @@ BlocksVoiceHandler::BlocksVoiceHandler(Output* beats_per_second):
 
 void BlocksVoiceHandler::addModulator(std::shared_ptr<model::Module> modulator) {
   auto type = modulator->id.type;
+
+  std::shared_ptr<SynthModule> modulator_processor;
+
   std::cout << "adding modulators of type: " << type << std::endl;
   if (type == "lfo") {
     auto lfo = lfos_[0];
+    modulator_processor = lfo;
 
     lfo->control_map_["sync"]->set(0.0f);
     auto cm = lfo->control_map_;
@@ -91,6 +95,7 @@ void BlocksVoiceHandler::addModulator(std::shared_ptr<model::Module> modulator) 
     // modulator->parameters_[3]->val = adsr->control_map_["sustain"];
     // modulator  
   }
+  active_modulators_map_[modulator->name] = modulator_processor;
 }
 
 void BlocksVoiceHandler::repositionBlock(Index from, Index to) {
@@ -187,12 +192,12 @@ void BlocksVoiceHandler::init() {
 
     std::string number = std::to_string(i + 1);
     std::string amount_name = "modulation_" + number + "_amount";
-    Output* modulation_amount = createPolyModControl(amount_name);
+    Output* modulation_amount = createPolyModControl2({ .name = "amount", .min = -1.0f });
     processor->plug(modulation_amount, ModulationConnectionProcessor::kModulationAmount);
 
     processor->initializeBaseValue(data_->controls[amount_name]);
 
-    Output* modulation_power = createPolyModControl("modulation_power");
+    Output* modulation_power = createPolyModControl2({ .name = "power", .min = -10.0f, .max = 10.0f });
     processor->plug(modulation_power, ModulationConnectionProcessor::kModulationPower);
 
     addProcessor(processor);
@@ -311,6 +316,7 @@ std::shared_ptr<SynthModule> BlocksVoiceHandler::createProcessor(std::shared_ptr
     // filter->control_map_["on"]->set(1.0f);
   }
   processor_matrix_[index.column][index.row] = processor;
+  active_processor_map_[module->name] = processor;
   processors_[module->id.type].push_back(processor);
   return processor;
 }
@@ -351,7 +357,7 @@ void BlocksVoiceHandler::createModulators() {
     lfo->plug(note_count(), LfoModule::kNoteCount);
     lfo->plug(bent_midi_, LfoModule::kMidi);
 
-    data_->mod_sources[prefix] = lfo->output(LfoModule::kValue);
+    data_->mod_sources[prefix + std::to_string(i + 1)] = lfo->output(LfoModule::kValue);
     createStatusOutput(prefix, lfo->output(LfoModule::kValue));
     createStatusOutput(prefix + "_phase", lfo->output(LfoModule::kOscPhase));
     createStatusOutput(prefix + "_frequency", lfo->output(LfoModule::kOscFrequency));
@@ -585,4 +591,11 @@ void BlocksVoiceHandler::setupPolyModulationReadouts() {
 output_map& BlocksVoiceHandler::getPolyModulations() {
   return poly_readouts_;
 }
+
+void BlocksVoiceHandler::setAmplitudeEnvelope(std::shared_ptr<model::Module> adsr, std::shared_ptr<model::Module> target) {
+  // auto osc = dynamic_cast<OscillatorModule*>(processor_matrix_[index.column][index.row].get());
+  auto osc = dynamic_cast<OscillatorModule*>(active_processor_map_[target->name].get());
+  osc->amplitude_envelope_->setModule(adsr);
+}
+
 } // namespace vital

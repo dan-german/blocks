@@ -14,6 +14,7 @@
 #include "module_new.h"
 #include <juce_audio_processors/juce_audio_processors.h>
 #include "vital/common/synth_parameters.h"
+#include "vital/common/synth_types.h"
 
 namespace model {
 struct Connection {
@@ -22,7 +23,7 @@ struct Connection {
   ~Connection();
   std::shared_ptr<vital::ValueDetails> magnitude_parameter_;
   std::shared_ptr<vital::ValueDetails> bipolar_parameter_;
-
+  vital::ModulationConnection* vital_connection_;
 
   int id = 0;
   int number;

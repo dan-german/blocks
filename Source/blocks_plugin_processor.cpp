@@ -351,6 +351,9 @@ void PluginProcessor::editorConnectedModulation(int modulatorIndex, std::string 
 }
 
 void PluginProcessor::editorDisconnectedModulation(int index) {
+  auto connection = synth_->getModuleManager().getConnection(index);
+  synth_->disconnectModulation(connection->vital_connection_);
+  synth_->getModuleManager().removeConnection(index);
   // Analytics::shared()->countAction("Modulation Disconnected");
   // disconnect(index);
 }

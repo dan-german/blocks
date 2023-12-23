@@ -45,7 +45,9 @@ struct ModulationConnection {
 
   std::string source_name;
   std::string destination_name;
+  std::string parameter_name;
   std::unique_ptr<ModulationConnectionProcessor> modulation_processor;
+  mono_float destination_scale;
 
 private: JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ModulationConnection)
 };

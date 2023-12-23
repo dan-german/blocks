@@ -197,15 +197,15 @@ void BlockComponent::themeChanged(Theme theme) {
     painter->waveColour = selectionColour;
 }
 
-void BlockComponent::setConfig(std::shared_ptr<Module> m) {
+void BlockComponent::setConfig(std::shared_ptr<model::Module> m) {
   indicators.reset();
 
   std::unordered_set<std::shared_ptr<Module>> uniqueSources;
   std::vector<std::shared_ptr<Module>> uniqueSourceVector;
 
-  for (const auto& param : m->parameters)
-    for (const auto& connection : param->connections)
-      uniqueSources.insert(connection->source);
+  // for (const auto& param : m->parameters_)
+  //   for (const auto& connection : param->connections)
+  //     uniqueSources.insert(connection->source);
 
   uniqueSourceVector.assign(uniqueSources.begin(), uniqueSources.end());
 

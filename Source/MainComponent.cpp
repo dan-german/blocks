@@ -29,6 +29,10 @@ MainComponent::MainComponent(juce::MidiKeyboardState& keyboard_state, Delegate* 
 
   auto osc_block = addBlock(0, { 0, 0 });
   spawnBlockComponent(osc_block);
+
+  addModulator(Model::Types::lfo);
+
+  // delegate->editorConnectedModulation(0, "osc_1", "tune");
 }
 
 void MainComponent::updateDotPosition(const Point<int> position) {
@@ -332,7 +336,7 @@ std::shared_ptr<model::Block> MainComponent::addBlock(int code, Index index) {
   // case 4: // noise 
   case 5: block = delegate->editorAddedBlock2(Model::Types::filter, index); break;
     // case 5: block = delegate->editorAddedBlock(Model::Types::filter, index); break;
-    case 6: block = delegate->editorAddedBlock2(Model::Types::reverb, index); break;
+  case 6: block = delegate->editorAddedBlock2(Model::Types::reverb, index); break;
     // case 7: block = delegate->editorAddedBlock(Model::Types::delay, index); break;
     // case 8: block = delegate->editorAddedBlock(Model::Types::drive, index); break;
     // case 9: block = delegate->editorAddedBlock(Model::Types::mixer, index); break;
@@ -585,7 +589,7 @@ void MainComponent::connectionDeleted(ConnectionComponent* component) {
   ui_layer_.setConnections(delegate->getModulations());
 
   if (inspector_.isVisible()) inspector_.setConfiguration(delegate->getBlock2(focused_grid_item_->index));
-  for (auto block : blocks) block->setConfig(delegate->getBlock(block->index));
+  for (auto block : blocks) block->setConfig(delegate->getBlock2(block->index));
 }
 
 void MainComponent::sliderValueChanged(Slider* slider) {
@@ -728,7 +732,7 @@ void MainComponent::modulatorRemoved(ModulatorComponent* component) {
   ui_layer_.setConnections(delegate->getModulations());
 
   // if (inspector.isVisible()) inspector.setConfiguration(delegate->getBlock(focusedGridItem->index));
-  for (auto block : blocks) block->setConfig(delegate->getBlock(block->index));
+  for (auto block : blocks) block->setConfig(delegate->getBlock2(block->index));
 }
 
 void MainComponent::setupPopupMenus() {

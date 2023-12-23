@@ -37,15 +37,15 @@ ModulationConnectionProcessor::ModulationConnectionProcessor(int index):
 }
 
 void ModulationConnectionProcessor::init() {
-  std::string amount_name = "modulation_amount";
-  Output* modulation_amount = createPolyModControl(amount_name);
-  initializeBaseValue(control_map_[amount_name]);
+  // std::string amount_name = "modulation_amount";
+  Output* modulation_amount = createPolyModControl2({ .name = "amount", .min = -1.0f });
+  initializeBaseValue(control_map_["amount"]);
 
   plug(modulation_amount, ModulationConnectionProcessor::kModulationAmount);
 
-  bipolar_ = createBaseControl("modulation_bipolar");
-  stereo_ = createBaseControl("modulation_stereo");
-  bypass_ = createBaseControl("modulation_bypass");
+  bipolar_ = createBaseControl2({ .name = "bipolar" });
+  stereo_ = createBaseControl2({ .name = "stereo" });
+  bypass_ = createBaseControl2({ .name = "bypass" });
 
   SynthModule::init();
 }

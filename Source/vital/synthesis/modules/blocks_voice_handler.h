@@ -32,6 +32,7 @@
  // #include "osc.h"
 #include "vital/synthesis/modules/oscillator_module.h"
 #include "model/module_manager.h"
+#include "model/id.h"
 
 namespace vital {
 class AudioRateEnvelope;
@@ -84,8 +85,12 @@ public:
   void addModulator(std::shared_ptr<model::Module> module);
   void repositionBlock(Index from, Index to);
   std::shared_ptr<vital::Processor> findProcessorAbove(Index index);
+  void setAmplitudeEnvelope(std::shared_ptr<model::Module> adsr, std::shared_ptr<model::Module> target);
 
   std::vector<std::shared_ptr<model::Module>> active_modulators_;
+  std::map<std::string, std::shared_ptr<SynthModule>> active_modulators_map_;
+
+  std::map<std::string, std::shared_ptr<SynthModule>> active_processor_map_;
 private:
   void createNoteArticulation();
   void createOscillators();

@@ -23,6 +23,20 @@
 #include <string>
 #include <regex>
 
+// {
+//    "amount",
+//     0x000000,
+//      -1.0,
+//       1.0,
+//        0.0,
+//         0.0,
+//          1.0,
+//     ValueDetails::kLinear,
+//      false,
+//       "",
+//        "Amount",
+//         nullptr },
+
 namespace vital {
 struct ValueDetails {
   enum ValueScale {

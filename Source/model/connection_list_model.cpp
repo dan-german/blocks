@@ -27,10 +27,19 @@ Component* ModulationsListBoxModel::refreshComponentForRow(int rowNumber, bool i
   if (rowNumber >= connections_.size()) return component;
   auto connection = connections_[rowNumber];
 
-  auto magnitude_parameter = connection->magnitude_parameter_;
-  component->slider.setRange(magnitude_parameter->min, magnitude_parameter->max);
-  component->slider.setValue(magnitude_parameter->val->value(), dontSendNotification);
-  component->source.setText(connection->source->display_name, dontSendNotification);
+  bool envelopeToOscGain = connection->source->id.type == "adsr" && connection->target->id.type == "osc";
+  if (envelopeToOscGain) {
+    component->handleOscGainEnvelope();
+  } else {
+    auto magnitude_parameter = connection->magnitude_parameter_;
+    component->slider.setRange(magnitude_parameter->min, magnitude_parameter->max);
+    component->slider.setValue(magnitude_parameter->val->value(), dontSendNotification);
+    component->source.setText(connection->source->display_name, dontSendNotification);
+
+    bool bipolar = static_cast<bool>(connection->bipolar_parameter_->val->value());
+    component->indicator.setBipolar(bipolar);
+    component->bipolarButton.setState(bipolar);
+  }
 
   auto stringo = connection->parameter_name_;
   for (char& c : stringo) {
@@ -45,13 +54,8 @@ Component* ModulationsListBoxModel::refreshComponentForRow(int rowNumber, bool i
   component->delegate = delegate_;
   component->indicator.setColour(connection->source->colour.colour);
 
-  bool bipolar = static_cast<bool>(connection->bipolar_parameter_->val->value());
-  component->indicator.setBipolar(bipolar);
-  component->bipolarButton.setState(bipolar);
 
   // using Parameters = Model::OscillatorModule::Parameters;
-  // bool envelopeToOscGain = connection->source->isEnvelope() && connection->target->isOscillator() && Parameters(connection->parameterIndex) == Parameters::pGain;
-  // if (envelopeToOscGain) component->handleOscGainEnvelope();
 
   component->row = rowNumber;
 

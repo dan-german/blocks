@@ -56,8 +56,6 @@ public:
 
   std::shared_ptr<EnvelopeModule> amplitude_envelope_;
 
-  // function setEnvelope
-
   Value* on_;
 protected:
   std::string prefix_;
