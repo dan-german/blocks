@@ -68,14 +68,16 @@ BlocksVoiceHandler::BlocksVoiceHandler(Output* beats_per_second):
   }
 }
 
-void BlocksVoiceHandler::removeModulator(int index, std::string type, std::string name) { 
+void BlocksVoiceHandler::removeModulator(int index, std::string type, std::string name) {
   auto modulator = active_modulators_[index];
+  std::cout << "old count: " << active_modulators_.size() << std::endl;
   active_modulators_.erase(active_modulators_.begin() + index);
+  std::cout << "new count: " << active_modulators_.size() << std::endl;
   active_modulators_map_[name] = nullptr;
 
   if (type == "lfo") {
     lfo_pool_.push_back(modulator);
-  } else if (type == "adsr") {
+  } else if (type == "envelope") {
     envelopes_.push_back(modulator);
   }
 }
@@ -97,12 +99,16 @@ void BlocksVoiceHandler::addModulator(std::shared_ptr<model::Module> modulator) 
     modulator->parameter_map_["frequency"]->val = lfo->control_map_["frequency"];
     modulator->parameter_map_["sync"]->val = lfo->control_map_["sync"];
     modulator->parameter_map_["mode"]->val = lfo->control_map_["sync_type"]; // mode
-  } else if (type == "adsr") {
-    auto adsr = envelopes_[0];
-    adsr->setModule(modulator);
+  } else if (type == "envelope") {
+    auto env = envelopes_[0];
+    env->setModule(modulator);
+    envelope_pool_.erase(envelope_pool_.begin());
+    modulator_processor = env;
   }
 
+  std::cout << "old count: " << active_modulators_.size() << std::endl;
   active_modulators_.push_back(modulator_processor);
+  std::cout << "new count: " << active_modulators_.size() << std::endl;
   active_modulators_map_[modulator->name] = modulator_processor;
 }
 
@@ -114,23 +120,23 @@ void BlocksVoiceHandler::repositionBlock(Index from, Index to) {
   connectAll();
 }
 
-void BlocksVoiceHandler::removeBlock(Index index, std::shared_ptr<model::Block> block) {   
+void BlocksVoiceHandler::removeBlock(Index index, std::shared_ptr<model::Block> block) {
   // auto processor = graphManager.getModuleProcessor(index);
   // listeners.removeFirstMatchingValue(processor.get());
   // graphManager.removeNode(processor, index);
   // pool->retire(processor);
+
   unplugAll();
   auto processor = processor_matrix_[index.column][index.row];
-  if (block->id.type == "osc") { 
-    auto osc = std::static_pointer_cast<OscillatorModule>(processor);
-    osc->control_map_["on"]->set(0.0f); 
-    oscillators_.push_back(osc);
-  } else (block->id.type == "filter") { 
-    auto filter = std::static_pointer_cast<FilterModule>(processor);
-    filter->control_map_["on"]->set(0.0f); 
-    processors_["filter"].push_back(filter);
+  processor->control_map_["on"]->set(0.0f);
+  if (block->id.type == "osc") {
+  } else if (block->id.type == "filter") {
+    // auto filter = std::static_pointer_cast<FilterModule>(processor);
+    // filter->control_map_["on"]->set(0.0f); 
+    // processors_["filter"].push_back(filter);
   }
 
+  processors_[block->id.type].push_back(processor);
   processor_matrix_[index.column][index.row] = nullptr;
   connectAll();
 }
@@ -194,6 +200,7 @@ void BlocksVoiceHandler::init() {
   createNoteArticulation();
   createOscillators();
   createModulators();
+  createFilters(note_from_reference_->output());
   createVoiceOutput();
 
   last_node_ = new VariableAdd(5);
@@ -278,10 +285,10 @@ void BlocksVoiceHandler::prepareDestroy() {
 
 void BlocksVoiceHandler::createFilters(Output* keytrack) {
   for (int i = 0; i < 5; i++) {
-    auto name = "filter_" + std::to_string(i + 1);
-    auto filter = std::make_shared<FilterModule>(name);
+    auto filter = std::make_shared<FilterModule>("filter");
     filter->plug(reset(), FilterModule::kReset);
     filter->plug(bent_midi_, FilterModule::kMidi);
+    filter->plug(keytrack, FilterModule::kKeytrack);
     addSubmodule(filter.get());
     addProcessor(filter.get());
     processors_["filter"].push_back(filter);
@@ -303,33 +310,32 @@ void BlocksVoiceHandler::createFilters(Output* keytrack) {
 std::shared_ptr<SynthModule> BlocksVoiceHandler::createProcessor(std::shared_ptr<model::Block> module) {
   auto index = module->index;
   auto name = module->name;
-  std::shared_ptr<SynthModule> processor;
+  std::shared_ptr<SynthModule> processor = processors_[module->id.type][0];
+  processors_[module->id.type].erase(processors_[module->id.type].begin());
 
   if (module->id.type == "osc") {
-    auto osc = oscillators_[0];
-    osc->control_map_["on"]->set(1.0f);
-    processor = osc;
-    module->parameter_map_["wave"]->val = osc->control_map_["wave_frame"];
-    module->parameter_map_["transpose"]->val = osc->control_map_["transpose"];
-    module->parameter_map_["tune"]->val = osc->control_map_["tune"];
-    module->parameter_map_["unison_voices"]->val = osc->control_map_["unison_voices"];
-    module->parameter_map_["unison_detune"]->val = osc->control_map_["unison_detune"];
-    module->parameter_map_["level"]->val = osc->control_map_["amplitude"];
-    module->parameter_map_["pan"]->val = osc->control_map_["pan"];
-    oscillators_.erase(oscillators_.begin());
+    // auto osc = oscillators_[0];
+    processor->control_map_["on"]->set(1.0f);
+    // processor = osc;
+    module->parameter_map_["wave"]->val = processor->control_map_["wave_frame"];
+    module->parameter_map_["transpose"]->val = processor->control_map_["transpose"];
+    module->parameter_map_["tune"]->val = processor->control_map_["tune"];
+    module->parameter_map_["unison_voices"]->val = processor->control_map_["unison_voices"];
+    module->parameter_map_["unison_detune"]->val = processor->control_map_["unison_detune"];
+    module->parameter_map_["level"]->val = processor->control_map_["amplitude"];
+    module->parameter_map_["pan"]->val = processor->control_map_["pan"];
+    // oscillators_.erase(oscillators_.begin());
   } else if (module->id.type == "filter") {
-    auto filter = std::make_shared<FilterModule>(name);
-    addProcessor(filter.get());
-    addSubmodule(filter.get());
-    filter->init();
-    module->parameters_[0]->val = filter->control_map_["style"];
-    module->parameters_[1]->val = filter->control_map_["cutoff"];
-    processor = filter;
-    filter->plug(reset(), FilterModule::kReset);
-    filter->plug(bent_midi_, FilterModule::kMidi);
-    filter->plug(note_from_reference_->output(), FilterModule::kKeytrack);
-    processors_["filter"].push_back(filter);
-    filter->control_map_["on"]->set(1.0f);
+    // auto filter = std::make_shared<FilterModule>(name);
+    // auto filter = processors_["filter"][0];
+    // processors_["filter"].erase(processors_["filter"].begin()); 
+
+    // filter->init();
+    module->parameters_[0]->val = processor->control_map_["style"];
+    module->parameters_[1]->val = processor->control_map_["cutoff"];
+    processor = processor;
+    // processors_["filter"].push_back(filter);
+    processor->control_map_["on"]->set(1.0f);
   } else if (module->id.type == "reverb") {
     auto reverb = std::make_shared<ReverbModule>();
     addProcessor(reverb.get());

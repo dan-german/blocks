@@ -82,7 +82,6 @@ String getSliderTextFromValue(double value, vital::ValueDetails details) {
   }
 
   double adjusted_value = getAdjustedValue(value, details);
-  // return String(adjusted_value);
   return formatValue(adjusted_value, details);
 }
 
@@ -113,6 +112,35 @@ Component* ModulatorsListModel::refreshComponentForRow(int rowNumber, bool isRow
 void ModulatorsListModel::setupModulatorComponent(std::shared_ptr<model::Module> model, ModulatorComponent& component) const {
   component.title.setText(model->display_name, dontSendNotification);
 
+
+  component.delegate_ = modulator_listener;
+  component.setColour(model->colour.colour);
+
+  if (model->id.type == Model::Types::lfo) {
+    component.oscillatorPainter.setVisible(true);
+  } else {
+    component.oscillatorPainter.setVisible(false);
+    component.envelopePath.setVisible(true);
+  }
+
+  // todo: update the skew only after rate value changes... atm it looks weird
+  if (model->id.type == Model::Types::lfo) {
+    component.onSliderValueChange = [model, &component, this](int index, float value) {
+      this->onLFOParameterChange(model, component, index, value);
+    };
+  } else if (model->id.type == Model::Types::adsr) {
+    component.onSliderValueChange = [&component, &model](int index, float value) {
+      // auto normalizedValue = model.parameters[index]->audioParameter->convertTo0to1(value);
+      // switch (index) {
+      // case 0: component.envelopePath.setAttack(normalizedValue); break;
+      // case 1: component.envelopePath.setDecay(normalizedValue); break;
+      // case 2: component.envelopePath.setSustain(normalizedValue); break;
+      // case 3: component.envelopePath.setRelease(normalizedValue); break;
+      // default: break;
+      // }
+    };
+  }
+
   for (int i = 0; i < model->parameters_.size(); i++) {
     auto parameter = model->parameters_[i];
     if (parameter->hidden) continue;
@@ -136,42 +164,16 @@ void ModulatorsListModel::setupModulatorComponent(std::shared_ptr<model::Module>
     if (parameter->string_lookup) {
       slider->box_slider_.slider.textFromValueFunction = [parameter](double value) { return juce::String(parameter->string_lookup[(int)value]); };
     } else {
-      slider->box_slider_.slider.textFromValueFunction = {};
+      slider->box_slider_.slider.textFromValueFunction = [parameter](double value) { return getSliderTextFromValue(value, *parameter ); };
+      // slider->box_slider_.slider.textFromValueFunction = {};
     }
 
     slider->box_slider_.slider.setValue(value, dontSendNotification);
-    // slider->boxSlider.slider.getTextFromValue(value);
-    // slider->boxSlider.valueLabel.setText(slider->boxSlider.slider.getTextFromValue(value), dontSendNotification);
-  }
+    slider->box_slider_.valueLabel.setText(slider->box_slider_.slider.getTextFromValue(value), dontSendNotification);
 
-  component.delegate_ = modulator_listener;
-  component.setColour(model->colour.colour);
-
-  if (model->id.type == Model::Types::lfo) {
-    component.oscillatorPainter.setVisible(true);
-    // auto parameter = model.parameter(Model::LFOModule::Parameters::pWaveform);
-    // auto value = parameter->audioParameter->getNormalisableRange().convertFrom0to1(parameter->audioParameter->getValue());
-    // component.oscillatorPainter.setWaveformType(static_cast<OscillatorPainter::WaveformType>((int)value));
-    // component.envelopePath.setVisible(false);
-  } else {
-    component.oscillatorPainter.setVisible(false);
-    component.envelopePath.setVisible(true);
-  }
-
-  // todo: update the skew only after rate value changes... atm it looks weird
-  if (model->id.type == Model::Types::lfo) {
-    component.onSliderValueChange = [model, &component, this](int index, float value) { this->onLFOParameterChange(model, component, index, value); };
-  } else if (model->id.type == Model::Types::adsr) {
-    component.onSliderValueChange = [&component, &model](int index, float value) {
-      // auto normalizedValue = model.parameters[index]->audioParameter->convertTo0to1(value);
-      // switch (index) {
-      // case 0: component.envelopePath.setAttack(normalizedValue); break;
-      // case 1: component.envelopePath.setDecay(normalizedValue); break;
-      // case 2: component.envelopePath.setSustain(normalizedValue); break;
-      // case 3: component.envelopePath.setRelease(normalizedValue); break;
-      // default: break;
-      // }
-    };
+    if (model->id.type == Model::Types::lfo) {
+      onLFOParameterChange(model, component, i, value);
+    }
   }
 }
 
@@ -192,9 +194,9 @@ void ModulatorsListModel::onLFOParameterChange(std::shared_ptr<model::Module> mo
     }
   }
 
-  bool is_changing_temp = index == 1;
+  bool is_changing_tempo = index == 1;
   bool is_not_seconds = int(component.sliders[2]->box_slider_.slider.getValue()) != 0;
-  if (is_changing_temp && is_not_seconds) {
+  if (is_changing_tempo && is_not_seconds) {
     auto value = component.sliders[1]->box_slider_.slider.getValue();
     std::string value_string = std::to_string(value);
     auto integer_part_length = value_string.substr(0, value_string.find(".")).size();
@@ -206,10 +208,6 @@ void ModulatorsListModel::setSliderAsFrequency(std::shared_ptr<model::Module> mo
   slider->label.setText("seconds", dontSendNotification);
 
   slider->box_slider_.slider.textFromValueFunction = [slider, module](double value) {
-    // // auto value = component.sliders[1]->box_slider_.slider.getValue();
-    // std::string value_string = std::to_string(value);
-    // auto integer_part_length = value_string.substr(0, value_string.find(".")).size();
-    // slider->box_slider_.slider.setNumDecimalPlacesToDisplay(4 - integer_part_length);
     return getSliderTextFromValue(value, *(module->parameter_map_["frequency"]));
   };
 

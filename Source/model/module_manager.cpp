@@ -53,7 +53,7 @@ std::vector<std::shared_ptr<Connection>> ModuleManager::getConnectionsOfTarget(s
   return targetConnections;
 }
 
-void ModuleManager::RemoveModulator(int index) {
+void ModuleManager::removeModulator(int index) {
   auto modulator = modulators[index];
   modulators.erase(modulators.begin() + index);
 
@@ -123,7 +123,7 @@ void ModuleManager::clear() {
   // for (int i = tabs.size() - 1; i >= 0; i--) removeTab(tabs[i]);
   for (int i = blocks.size() - 1; i >= 0; i--) removeBlock(blocks[i]);
   for (int i = connections.size() - 1; i >= 0; i--) removeConnection(i);
-  for (int i = modulators.size() - 1; i >= 0; i--) RemoveModulator(i);
+  for (int i = modulators.size() - 1; i >= 0; i--) removeModulator(i);
 }
 
 // void ModuleManager::removeTab(std::shared_ptr<Tab> tab) {

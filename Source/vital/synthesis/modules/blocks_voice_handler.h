@@ -120,7 +120,7 @@ private:
   Processor* voice_sum_;
   VariableAdd* last_node_;
 
-  std::vector<std::vector<std::shared_ptr<Processor>>> processor_matrix_;
+  std::vector<std::vector<std::shared_ptr<SynthModule>>> processor_matrix_;
   std::vector<std::shared_ptr<OscillatorModule>> oscillators_;
 
   std::vector<std::shared_ptr<SynthModule>> lfos_;

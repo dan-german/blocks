@@ -27,11 +27,17 @@ MainComponent::MainComponent(juce::MidiKeyboardState& keyboard_state, Delegate* 
   note_logger_.listener = this;
   ThemeManager::shared()->set(UserSettings::shared()->getInt("theme", 0));
 
-  auto osc_block = addBlock(0, { 0, 0 });
-  spawnBlockComponent(osc_block);
+  // auto osc_block = addBlock(0, { 0, 0 });
+  // spawnBlockComponent(osc_block);
 
-  addModulator(Model::Types::lfo);
+  // auto osc_block_2 = addBlock(0, { 0, 1 });
+  // spawnBlockComponent(osc_block_2);
 
+  // auto f = addBlock(5, { 1, 0 });
+  // spawnBlockComponent(f);
+
+  // addModulator(Model::Types::lfo);
+  ui_layer_.modulators_.setVisible(true);
   // delegate->editorConnectedModulation(0, "osc_1", "tune");
 }
 
@@ -396,7 +402,7 @@ void MainComponent::removeBlock(GridItemComponent* block) {
 
   delegate->editorRemovedBlock(index);
   ui_layer_.setConnections(delegate->getModulations());
-  ResetDownFlowingDots();
+  // resetDownFlowingDots();
 }
 
 void MainComponent::handleModuleLandedOnInspector(BlockComponent* moduleComponent, const Point<int>& inspectorRelativePosition) {
@@ -551,7 +557,7 @@ void MainComponent::clear() {
   ui_layer_.preset_button_.label.setText("empty", dontSendNotification);
   ui_layer_.setConnections(delegate->getModulations());
   ui_layer_.setModulators(delegate->getModulators2());
-  ResetDownFlowingDots();
+  resetDownFlowingDots();
 }
 
 void MainComponent::modulationConnectionBipolarPressed(ConnectionComponent* component, bool bipolar) {
@@ -861,10 +867,10 @@ void MainComponent::notesStarted(Array<int> notes) {
 
 void MainComponent::notesEnded(Array<int> notes) { }
 
-void MainComponent::ResetDownFlowingDots() {
+void MainComponent::resetDownFlowingDots() {
   std::set<int> columns_with_blocks;
   for (auto block_component : blocks) {
-    auto block_model = delegate->getBlock(block_component->index);
+    auto block_model = delegate->getBlock2(block_component->index);
     if (block_model->id.type != Model::Types::osc) continue;
     columns_with_blocks.insert(block_component->index.column);
   }

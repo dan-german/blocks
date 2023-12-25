@@ -33,7 +33,7 @@ ModulePool::ModulePool() {
   blocks.spawn({ "filter" }, [](std::string type, int number) { return std::make_shared<model::FilterModule>(number); });
   blocks.spawn({ "reverb" }, [](std::string type, int number) { return std::make_shared<model::ReverbModule>(number); });
   modulators.spawn({ "lfo" }, [](std::string type, int number) { return std::make_shared<model::LFOModule>(number); });
-  modulators.spawn({ "adsr" }, [](std::string type, int number) { return std::make_shared<model::ADSRModule>(number); });
+  modulators.spawn({ "envelope" }, [](std::string type, int number) { return std::make_shared<model::ADSRModule>(number); });
 
   for (int i = 1; i <= 40; i++) connections.push_back(std::make_shared<Connection>(i));
 

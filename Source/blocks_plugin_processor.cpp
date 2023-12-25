@@ -379,13 +379,8 @@ std::shared_ptr<Tab> PluginProcessor::editorAddedTab(int column) {
 
 void PluginProcessor::editorRemovedModulator(int index) {
   auto modulator = synth_->getModuleManager().getModulator(index);
-  // auto m = synth_->getModuleManager().connectionsof
-  // auto connections = synth_->getSourceConnections(modulator->name);
 
-  // for (auto connection : connections) {
-  //   // synth_->getModuleManager().removeConnection(
-  //   synth_->disconnectModulation(connection);
-  // }
+  getModuleManager().removeModulator(index);
 
   auto module_connections = synth_->getModuleManager().getConnectionsOfSource(modulator);
   for (auto connection : module_connections) {

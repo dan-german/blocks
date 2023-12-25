@@ -6,17 +6,48 @@
 
 namespace model {
 class ADSRModule: public Module {
+// struct ValueDetails {
+//   enum ValueScale {
+//     kIndexed,
+//     kLinear,
+//     kQuadratic,
+//     kCubic,
+//     kQuartic,
+//     kSquareRoot,
+//     kExponential
+//   };
+
+//   std::string name;
+//   int version_added = 0;
+//   mono_float min = 0.0f;
+//   mono_float max = 1.0f;
+//   mono_float default_value = 0.0f;
+//   // post_offset used to offset quadratic and exponential scaling.
+//   mono_float post_offset = 0.0f;
+//   mono_float display_multiply = 1.0f;
+//   ValueScale value_scale = kLinear;
+//   bool display_invert = false;
+//   std::string display_units = "";
+//   std::string display_name;
+//   const std::string* string_lookup = nullptr;
+//   std::string local_description;
+//   bool audio_rate = false;
+//   bool smooth_value = false;
+//   bool internal_modulation = false;
+//   bool reset = false;
+//   Value* val;
+//   int decimal_places = 2;
+//   bool hidden = false;
+//   std::vector<std::string> choices; // equals to string_lookup basically... not the best design choice
+// };
+
 public:
-  ADSRModule(int number): Module("adsr", number) {
-    // add({ .name = "delay", .min = -7.0, .max = 12.0 });
-    add({ .name = "attack", .min = -7.0, .max = 12.0 });
-    // add({ .name = "hold", .min = -7.0, .max = 12.0 });
-    add({ .name = "decay", .min = -7.0, .max = 9.0 });
-    add({ .name = "release", .min = 0.0, .max = 4.0 });
-    add({ .name = "sustain", .min = 0.0, .max = 5.0 });
-    // add({ .name = "attack_power", .min = 0.0, .max = 5.0 });
-    // add({ .name = "decay_power", .min = 0.0, .max = 5.0 });
-    // add({ .name = "release_power", .min = 0.0, .max = 5.0 });
+  ADSRModule(int number): Module("envelope", number) {
+    add({ .name = "attack", .min = 0.0f, .max = 2.37842, .default_value = 0.1495, .value_scale = ValueScale::kQuartic });
+    add({ .name = "decay", .max = 2.37842f, .default_value = 1.0f, .value_scale = ValueScale::kQuartic });
+    add({ .name = "release", .max = 2.37842f, .default_value = 0.5476f, .value_scale = ValueScale::kQuartic });
+    add({ .name = "sustain", .default_value = 1.0f });
+
   };
 };
 }

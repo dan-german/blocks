@@ -24,7 +24,7 @@ public:
   int length = 1;
 
   inline bool isModulator() { return category == Category::modulator; }
-  inline bool isEnvelope() { return id.type == "adsr"; }
+  inline bool isEnvelope() { return id.type == "envelope"; }
   inline bool isOscillator() { return id.type == "osc"; }
 
   Module(std::string prefix, int number): name(prefix + "_" + std::to_string(number)) {

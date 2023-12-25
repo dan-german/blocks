@@ -44,7 +44,7 @@ public:
   std::shared_ptr<model::Module> addModulator(std::string type, int number, int colourId);
   std::shared_ptr<model::Module> getModulator(int index) { return modulators[index]; }
   std::vector<std::shared_ptr<model::Module>> getModulators();
-  void RemoveModulator(int index);
+  void removeModulator(int index);
 
   std::shared_ptr<model::Connection> addConnection(std::shared_ptr<Module> source, std::shared_ptr<Module> target, std::string parameter_name, int number = -1);
   std::shared_ptr<model::Connection> getConnection(int index) { return connections[index]; }

@@ -83,7 +83,7 @@ private:
   void setupPopupMenus();
   void darkBackgroundClicked(Component* darkBackground);
   void setupDarkBackground(DarkBackground* component, int layer);
-  void ResetDownFlowingDots();
+  void resetDownFlowingDots();
 
   void toggleGridItemSelection(GridComponent* grid, GridItemComponent* item, bool selected);
   void ShowBlocksPopup(Index index);

@@ -138,8 +138,10 @@ int SynthBase::getConnectionIndex(const std::string& source, const std::string& 
 
 vital::modulation_change SynthBase::createModulationChange(vital::ModulationConnection* connection) {
   vital::modulation_change change;
-  change.source = getVoiceHandler()->active_modulators_map_[connection->source_name]->output();
+  auto source = getVoiceHandler()->active_modulators_map_[connection->source_name];
   auto target_processor = getVoiceHandler()->active_processor_map_[connection->destination_name];
+
+  change.source = source->output();
   change.mono_destination = target_processor->getMonoModulationDestination(connection->parameter_name);
   change.mono_modulation_switch = target_processor->getMonoModulationSwitch(connection->parameter_name);
 
@@ -148,8 +150,9 @@ vital::modulation_change SynthBase::createModulationChange(vital::ModulationConn
   VITAL_ASSERT(change.mono_modulation_switch != nullptr);
 
   change.destination_scale = connection->destination_scale;
-  change.poly_modulation_switch = engine_->getPolyModulationSwitch(connection->destination_name);
-  change.poly_destination = engine_->getPolyModulationDestination(connection->destination_name);
+  // change.poly_modulation_switch = engine_->getPolyModulationSwitch(connection->destination_name);
+  change.poly_modulation_switch = target_processor->getPolyModulationSwitch(connection->parameter_name);
+  change.poly_destination = target_processor->getPolyModulationDestination(connection->parameter_name); //engine_->getPolyModulationDestination(connection->destination_name);
   change.modulation_processor = connection->modulation_processor.get();
 
   int num_audio_rate = 0;
@@ -788,14 +791,13 @@ void SynthBase::ValueChangedCallback::messageCallback() {
 }
 
 void SynthBase::connectModulation(int modulator_index, std::string target_name, std::string parameter_name) {
-  // std::cout << "mod index: " << modulator_index << " param name: " << parameter_name << std::endl;
   auto target = module_manager_.getModule(target_name);
   auto source = module_manager_.getModulator(modulator_index);
   auto connection_module = module_manager_.addConnection(source, target, parameter_name);
 
   auto connection_name = "modulation_" + std::to_string(connection_module->number) + "_amount";
 
-  bool addingADSRtoOSCLevel = source->id.type == "adsr" && target->id.type == "osc" && parameter_name == "level";
+  bool addingADSRtoOSCLevel = source->id.type == "envelope" && target->id.type == "osc" && parameter_name == "level";
   if (addingADSRtoOSCLevel) {
     getVoiceHandler()->setAmplitudeEnvelope(source, target);
     return;

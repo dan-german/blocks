@@ -23,7 +23,7 @@ using Type = std::string;
 
 namespace Types {
 inline const Type lfo = "lfo";
-inline const Type adsr = "adsr";
+inline const Type adsr = "envelope";
 
 inline const Type osc = "osc";
 inline const Type filter = "filter";
