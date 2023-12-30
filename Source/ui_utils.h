@@ -16,7 +16,7 @@ struct UIUtils {
       adjusted_value *= adjusted_value;
       break;
     case vital::ValueDetails::kExponential:
-      adjusted_value = powf(2.0, adjusted_value); //display_exponential_base_ will be different for each module. i think just env?
+      adjusted_value = powf(2.0, adjusted_value);
       break;
     case vital::ValueDetails::kSquareRoot:
       adjusted_value = sqrtf(std::max(adjusted_value, 0.0));
@@ -25,7 +25,7 @@ struct UIUtils {
       break;
     }
 
-    float display_multiply_ = 1.0f;
+    float display_multiply_ = details.display_multiply;
 
     adjusted_value += details.post_offset;
     if (details.display_invert)

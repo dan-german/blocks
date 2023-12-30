@@ -90,8 +90,8 @@ const std::string kUnisonStackNames[] = {
 const std::string kFilterStyleNames[] = {
   "12dB",
   "24dB",
-  "Notch Blend",
-  "Notch Spread",
+  "blend",
+  "spread",
   "B/P/N"
 };
 
@@ -142,14 +142,14 @@ const std::string kDistortionFilterOrderNames[] = {
 };
 
 const std::string kFilterModelNames[] = {
-  "Analog",
-  "Dirty",
-  "Ladder",
-  "Digital",
-  "Diode",
-  "Formant",
-  "Comb",
-  "Phaser",
+  "analog",
+  "dirty",
+  "ladder",
+  "digital",
+  "diode",
+  "formant",
+  "comb",
+  "phaser",
 };
 
 const std::string kPredefinedWaveformNames[] = {

@@ -324,8 +324,11 @@ std::shared_ptr<SynthModule> BlocksVoiceHandler::createProcessor(std::shared_ptr
     module->parameter_map_["level"]->val = processor->control_map_["amplitude"];
     module->parameter_map_["pan"]->val = processor->control_map_["pan"];
   } else if (module->id.type == "filter") {
-    module->parameters_[0]->val = processor->control_map_["style"];
-    module->parameters_[1]->val = processor->control_map_["cutoff"];
+    module->parameters_[0]->val = processor->control_map_["model"];
+    module->parameters_[1]->val = processor->control_map_["style"];
+    module->parameters_[2]->val = processor->control_map_["cutoff"];
+    module->parameters_[3]->val = processor->control_map_["resonance"];
+    module->parameters_[4]->val = processor->control_map_["blend"];
     processor->control_map_["on"]->set(1.0f);
   } else if (module->id.type == "reverb") {
     processor->enable(true);
