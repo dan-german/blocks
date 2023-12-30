@@ -804,7 +804,7 @@ void SynthOscillator::computeSpectralWaveBufferPair(int phase_update, int index,
 template<void(*spectralMorph)(const Wavetable::WavetableData*, int, poly_float*,
   FourierTransform*, float, int, const poly_float*)>
 void SynthOscillator::setFourierWaveBuffers(poly_float phase_inc, int index, bool formant_shift) {
-  poly_float wave_frame = input(kWaveFrame)->at(0);
+  poly_float wave_frame = input(kWaveFrame)->at(0) * 64.0f;
   poly_float frame_spread = input(kUnisonFrameSpread)->at(0);
   phase_inc = utils::max(0.0f, phase_inc);
   float phase_inc_adjustment = getPhaseIncAdjustment();

@@ -40,7 +40,7 @@ void OscillatorModule::init() {
 
   Input* reset = input(kReset);
 
-  Output* wave_frame = createPolyModControl2({ .name = "wave_frame", .max = 256 });
+  Output* wave_frame = createPolyModControl2({ .name = "wave_frame", .max = 3.0, .value_scale = ValueScale::kIndexed });
   Output* transpose = createPolyModControl2({ .name = "transpose", .audio_rate = true, .reset = reset, .min = -48, .max = 48, .value_scale = ValueScale::kIndexed });
   Output* tune = createPolyModControl2({ .name = "tune", .audio_rate = true, .reset = reset, .max = 1.0 });
   Output* unison_voices = createPolyModControl2({ .name = "unison_voices", .min = 1.0, .max = 16.0, .value_scale = ValueScale::kIndexed, .default_value = 1.0 });

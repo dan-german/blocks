@@ -58,10 +58,7 @@ struct UIUtils {
         format = format.removeCharacters(".");
     }
 
-    // if (use_suffix_)
-    //   return format + getDisplayDetails()->display_units;
-
-    return format;
+    return format + details.display_units;
   }
 
   static juce::String getSliderTextFromValue(double value, vital::ValueDetails details) {

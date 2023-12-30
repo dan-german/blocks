@@ -301,9 +301,7 @@ void BlocksVoiceHandler::createReverbs() {
     auto reverb = std::make_shared<ReverbModule>();
     addSubmodule(reverb.get());
     addProcessor(reverb.get());
-    // reverb->init();
     reverb->enable(false);
-    // reverb->control_map_["on"]->set(0.0f);
     processors_["reverb"].push_back(reverb);
   }
 }

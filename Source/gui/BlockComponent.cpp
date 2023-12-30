@@ -170,12 +170,12 @@ BlockComponent* BlockComponent::create(std::shared_ptr<model::Block> block) {
   component->colour = block->colour.colour;
 
   if (block->id.type == Model::Types::osc) {
-    // float waveformFloat = block->parameters[0]->audioParameter->getValue();
-    // int waveformInt = static_cast<int>(block->parameters[0]->audioParameter->convertFrom0to1(waveformFloat));
-    // auto painter = new OscillatorPainter();
-    // painter->setWaveformType(static_cast<OscillatorPainter::WaveformType>(waveformInt));
-    // painter->thickness = 2.0f;
-    // component->setPainter(painter);
+    float waveformFloat = block->parameters_[0]->val->value();  
+    int waveformInt = static_cast<int>(waveformFloat);
+    auto painter = new OscillatorPainter();
+    painter->setWaveformType(static_cast<OscillatorPainter::WaveformType>(waveformInt));
+    painter->thickness = 2.0f;
+    component->setPainter(painter);
   } else if (block->id.type == Model::Types::adsr) {
     component->setEnvelopePath(component->colour);
     // component->getEnvelopePath()->setAttack(block->parameters[0]->audioParameter->getValue());

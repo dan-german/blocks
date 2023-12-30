@@ -125,7 +125,7 @@ private:
   void sliderValueChanged(Slider* slider) override;
   void setupBlockGrid();
   void setupTabGrid();
-  void updateModuleComponentVisuals(int sliderIndex, float value, std::shared_ptr<Block> block);
+  void updateModuleComponentVisuals(int sliderIndex, float value, std::shared_ptr<model::Module> block);
   void setupListeners();
   void clickOnGrid(Index& index);
 

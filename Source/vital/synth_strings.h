@@ -141,6 +141,8 @@ const std::string kDistortionFilterOrderNames[] = {
   "Post",
 };
 
+const std::string waves[] = { "saw", "sine", "square", "triangle" };
+
 const std::string kFilterModelNames[] = {
   "analog",
   "dirty",
