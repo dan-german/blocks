@@ -795,6 +795,10 @@ void SynthBase::connectModulation(int modulator_index, std::string target_name, 
   auto source = module_manager_.getModulator(modulator_index);
   auto connection_module = module_manager_.addConnection(source, target, parameter_name);
 
+  if (!connection_module) {
+    return;
+  }
+
   auto connection_name = "modulation_" + std::to_string(connection_module->number) + "_amount";
 
   bool addingADSRtoOSCLevel = source->id.type == "envelope" && target->id.type == "osc" && parameter_name == "level";

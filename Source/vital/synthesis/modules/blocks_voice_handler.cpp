@@ -199,6 +199,7 @@ void BlocksVoiceHandler::unplugAll() {
 void BlocksVoiceHandler::init() {
   createNoteArticulation();
   createOscillators();
+  createReverbs();
   createModulators();
   createFilters(note_from_reference_->output());
   createVoiceOutput();
@@ -295,17 +296,17 @@ void BlocksVoiceHandler::createFilters(Output* keytrack) {
   }
 }
 
-// void BlocksVoiceHandler::createReverbs() {
-//   for (int i = 0; i < 5; i++) {
-//     auto name = "reverb_" + std::to_string(i + 1);
-//     auto reverb = std::make_shared<ReverbModule>(name);
-//     reverb->plug(reset(), ReverbModule::kReset);
-//     reverb->plug(bent_midi_, ReverbModule::kMidi);
-//     addSubmodule(reverb.get());
-//     addProcessor(reverb.get());
-//     processors_["reverb"].push_back(reverb);
-//   }
-// }
+void BlocksVoiceHandler::createReverbs() {
+  for (int i = 0; i < 5; i++) {
+    auto reverb = std::make_shared<ReverbModule>();
+    addSubmodule(reverb.get());
+    addProcessor(reverb.get());
+    // reverb->init();
+    reverb->enable(false);
+    // reverb->control_map_["on"]->set(0.0f);
+    processors_["reverb"].push_back(reverb);
+  }
+}
 
 std::shared_ptr<SynthModule> BlocksVoiceHandler::createProcessor(std::shared_ptr<model::Block> module) {
   auto index = module->index;
@@ -314,9 +315,7 @@ std::shared_ptr<SynthModule> BlocksVoiceHandler::createProcessor(std::shared_ptr
   processors_[module->id.type].erase(processors_[module->id.type].begin());
 
   if (module->id.type == "osc") {
-    // auto osc = oscillators_[0];
     processor->control_map_["on"]->set(1.0f);
-    // processor = osc;
     module->parameter_map_["wave"]->val = processor->control_map_["wave_frame"];
     module->parameter_map_["transpose"]->val = processor->control_map_["transpose"];
     module->parameter_map_["tune"]->val = processor->control_map_["tune"];
@@ -324,32 +323,14 @@ std::shared_ptr<SynthModule> BlocksVoiceHandler::createProcessor(std::shared_ptr
     module->parameter_map_["unison_detune"]->val = processor->control_map_["unison_detune"];
     module->parameter_map_["level"]->val = processor->control_map_["amplitude"];
     module->parameter_map_["pan"]->val = processor->control_map_["pan"];
-    // oscillators_.erase(oscillators_.begin());
   } else if (module->id.type == "filter") {
-    // auto filter = std::make_shared<FilterModule>(name);
-    // auto filter = processors_["filter"][0];
-    // processors_["filter"].erase(processors_["filter"].begin()); 
-
-    // filter->init();
     module->parameters_[0]->val = processor->control_map_["style"];
     module->parameters_[1]->val = processor->control_map_["cutoff"];
-    processor = processor;
-    // processors_["filter"].push_back(filter);
     processor->control_map_["on"]->set(1.0f);
   } else if (module->id.type == "reverb") {
-    auto reverb = std::make_shared<ReverbModule>();
-    addProcessor(reverb.get());
-    addSubmodule(reverb.get());
-    reverb->init();
-    // module->parameters_[0]->val = filter->control_map_["style"];
-    // module->parameters_[1]->val = filter->control_map_["cutoff"];
-    processor = reverb;
-    // filter->plug(reset(), FilterModule::kReset);
-    // filter->plug(bent_midi_, FilterModule::kMidi);
-    // filter->plug(note_from_reference_->output(), FilterModule::kKeytrack);
-    processors_["reverb"].push_back(reverb);
-    // filter->control_map_["on"]->set(1.0f);
+    processor->enable(true);
   }
+
   processor_matrix_[index.column][index.row] = processor;
   active_processor_map_[module->name] = processor;
   processors_[module->id.type].push_back(processor);
@@ -370,12 +351,6 @@ void BlocksVoiceHandler::createOscillators() {
 
     processors_[type].push_back(osc);
     oscillators_.push_back(osc);
-
-    // Processor* control_amplitude = new SmoothMultiply();
-    // control_amplitude->plug(envelope, SmoothMultiply::kAudioRate);
-    // control_amplitude->plug(output(kRaw), SmoothMultiply::kControlRate);
-    // control_amplitude->plug(reset->source, SmoothMultiply::kReset);
-    // oscillator_->useOutput(control_amplitude->output(), SynthOscillator::kRaw);
   }
 }
 

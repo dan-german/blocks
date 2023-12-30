@@ -47,7 +47,7 @@ void OscillatorModule::init() {
   Output* unison_detune = createPolyModControl2({ .name = "unison_detune", .value_scale = ValueScale::kQuadratic, .default_value = 4.472135955 });
   Output* detune_power = createPolyModControl2({ .name = "detune_power" });
   Output* detune_range = createPolyModControl2({ .name = "detune_range", .max = 48, .default_value = 2.0 });
-  Output* amplitude = createPolyModControl2({ .name = "amplitude", .audio_rate = true, .smooth_value = true, .reset = reset });
+  Output* amplitude = createPolyModControl2({ .name = "amplitude", .audio_rate = true, .smooth_value = true, .reset = reset, .default_value = 0.70710678119 });
   Output* pan = createPolyModControl2({ .name = "pan", .min = -1.0 });
   Output* phase = createPolyModControl2({ .name = "phase", .audio_rate = true, .smooth_value = true, .reset = reset, .default_value = 0.5 });
   Output* distortion_phase = createPolyModControl2({ .name = "distortion_phase", .default_value = 0.5 });

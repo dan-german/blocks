@@ -11,6 +11,7 @@
 #include "gui/InspectorComponent.h"
 #include "model/ModuleParameter.h"
 #include "module_new.h"
+#include "ui_utils.h"
 
 InspectorComponent::InspectorComponent() {}
 InspectorComponent::~InspectorComponent() { }
@@ -40,6 +41,10 @@ void InspectorComponent::spawnSlider(vital::ValueDetails parameter) {
   slider->slider.addListener(this);
   slider->titleLabel.setText(parameter.display_name, dontSendNotification);
   slider->slider.setNumDecimalPlacesToDisplay(parameter.decimal_places);
+
+  // slider->box_slider_.slider.textFromValueFunction = [parameter](double value) { return getSliderTextFromValue(value, *parameter); };
+  slider->slider.textFromValueFunction = [parameter](double value) { return UIUtils::getSliderTextFromValue(value, parameter); };
+
   // slider->slider.setSkewFactor(parameter->skew, false);
   // slider->slider.setTextValueSuffix(parameter->valueSuffix);
 

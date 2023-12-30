@@ -410,7 +410,7 @@ void PluginProcessor::editorRemovedBlock(Index index) {
   }
 
   getVoiceHandler()->removeBlock(index, block);
-  synth_->getModuleManager().removeBlock(block);  
+  synth_->getModuleManager().removeBlock(block);
 
   // for (auto* voice : blockVoices)
   //   for (int i = 0; i < block->length; i++)

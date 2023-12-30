@@ -99,7 +99,7 @@ private:
   void createModulators();
   void createVoiceOutput();
   void createFilters(Output* keytrack);
-  // void createReverbs();
+  void createReverbs();
   void setupPolyModulationReadouts();
 
   std::shared_ptr<SynthModule> createProcessor(std::shared_ptr<model::Block> module);

@@ -12,78 +12,7 @@
 #include "model/ModuleParameter.h"
 #include "lfo_module_new.h"
 #include "module_new.h"
-
-double getAdjustedValue(double value, vital::ValueDetails details) { // this should be a static method in ValueDetails?? 
-  double adjusted_value = value;
-  switch (details.value_scale) {
-  case vital::ValueDetails::kQuadratic:
-    adjusted_value *= adjusted_value;
-    break;
-  case vital::ValueDetails::kCubic:
-    adjusted_value *= adjusted_value * adjusted_value;
-    break;
-  case vital::ValueDetails::kQuartic:
-    adjusted_value *= adjusted_value;
-    adjusted_value *= adjusted_value;
-    break;
-  case vital::ValueDetails::kExponential:
-    adjusted_value = powf(2.0, adjusted_value); //display_exponential_base_ will be different for each module. i think just env?
-    break;
-  case vital::ValueDetails::kSquareRoot:
-    adjusted_value = sqrtf(std::max(adjusted_value, 0.0));
-    break;
-  default:
-    break;
-  }
-
-  float display_multiply_ = 1.0f;
-
-  adjusted_value += details.post_offset;
-  if (details.display_invert)
-    adjusted_value = 1.0 / adjusted_value;
-  if (display_multiply_)
-    adjusted_value *= display_multiply_;
-  else
-    adjusted_value *= details.display_multiply;
-
-  return adjusted_value;
-}
-
-String formatValue(float value, vital::ValueDetails details) {
-  int max_decimal_places = details.decimal_places;
-  String format;
-  if (details.value_scale == vital::ValueDetails::kIndexed)
-    format = String(value);
-  else {
-    if (max_decimal_places == 0)
-      format = String(std::roundf(value));
-    else
-      format = String(value, 3);
-
-    int display_characters = 5;//max_display_characters_;
-    if (format[0] == '-')
-      display_characters += 1;
-
-    format = format.substring(0, display_characters);
-    if (format.getLastCharacter() == '.')
-      format = format.removeCharacters(".");
-  }
-
-  // if (use_suffix_)
-  //   return format + getDisplayDetails()->display_units;
-
-  return format;
-}
-
-String getSliderTextFromValue(double value, vital::ValueDetails details) {
-  if (details.string_lookup) {
-    int lookup = vital::utils::iclamp(value, 0, details.max);
-    return details.string_lookup[lookup];
-  }
-
-  double adjusted_value = getAdjustedValue(value, details);
-  return formatValue(adjusted_value, details);
-}
+#include "ui_utils.h"
 
 int ModulatorsListModel::getNumRows() { return modulators.size(); }
 void ModulatorsListModel::listBoxItemDoubleClicked(int row, const MouseEvent& event) { ListBoxModel::listBoxItemDoubleClicked(row, event); }
@@ -164,7 +93,7 @@ void ModulatorsListModel::setupModulatorComponent(std::shared_ptr<model::Module>
     if (parameter->string_lookup) {
       slider->box_slider_.slider.textFromValueFunction = [parameter](double value) { return juce::String(parameter->string_lookup[(int)value]); };
     } else {
-      slider->box_slider_.slider.textFromValueFunction = [parameter](double value) { return getSliderTextFromValue(value, *parameter ); };
+      slider->box_slider_.slider.textFromValueFunction = [parameter](double value) { return UIUtils::getSliderTextFromValue(value, *parameter ); };
       // slider->box_slider_.slider.textFromValueFunction = {};
     }
 
@@ -208,7 +137,7 @@ void ModulatorsListModel::setSliderAsFrequency(std::shared_ptr<model::Module> mo
   slider->label.setText("seconds", dontSendNotification);
 
   slider->box_slider_.slider.textFromValueFunction = [slider, module](double value) {
-    return getSliderTextFromValue(value, *(module->parameter_map_["frequency"]));
+    return UIUtils::getSliderTextFromValue(value, *(module->parameter_map_["frequency"]));
   };
 
   slider->box_slider_.slider.setRange(-7.0, 9.0);
