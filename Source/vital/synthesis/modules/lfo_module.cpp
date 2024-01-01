@@ -59,6 +59,16 @@ void LfoModule::correctToTime(double seconds) {
   lfo_->correctToTime(seconds);
 }
 
+void LfoModule::setModule(std::shared_ptr<model::Module> module) {
+  SynthModule::setModule(module);
+
+  module->parameter_map_["wave"]->val = control_map_["tempo"];
+  module->parameter_map_["tempo"]->val = control_map_["tempo"];
+  module->parameter_map_["frequency"]->val = control_map_["frequency"];
+  module->parameter_map_["sync"]->val = control_map_["sync"];
+  module->parameter_map_["mode"]->val = control_map_["sync_type"];
+}
+
 void LfoModule::setControlRate(bool control_rate) {
   Processor::setControlRate(control_rate);
   lfo_->setControlRate(control_rate);

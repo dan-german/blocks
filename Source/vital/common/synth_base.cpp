@@ -793,17 +793,15 @@ void SynthBase::ValueChangedCallback::messageCallback() {
 void SynthBase::connectModulation(int modulator_index, std::string target_name, std::string parameter_name) {
   auto target = module_manager_.getModule(target_name);
   auto source = module_manager_.getModulator(modulator_index);
-  auto connection_module = module_manager_.addConnection(source, target, parameter_name);
 
-  if (!connection_module) {
-    return;
-  }
+  auto connection_module = module_manager_.addConnection(source, target, parameter_name);
+  if (!connection_module) return;
 
   auto connection_name = "modulation_" + std::to_string(connection_module->number) + "_amount";
 
   bool addingADSRtoOSCLevel = source->id.type == "envelope" && target->id.type == "osc" && parameter_name == "level";
   if (addingADSRtoOSCLevel) {
-    getVoiceHandler()->setAmplitudeEnvelope(source, target);
+    getVoiceHandler()->setOSCAmplitudeEnvelope(source, target);
     return;
   }
 
@@ -813,7 +811,7 @@ void SynthBase::connectModulation(int modulator_index, std::string target_name, 
 
   bool create = connection == nullptr;
   if (create) {
-    auto adjusted_name = target_name;// + "_" + parameter_name; 
+    auto adjusted_name = target_name; 
     connection = getModulationBank().createConnection(modulator_name, adjusted_name);
   }
 
@@ -821,7 +819,6 @@ void SynthBase::connectModulation(int modulator_index, std::string target_name, 
     connection_module->magnitude_parameter_->val = connection->modulation_processor->control_map_["amount"];
     connection_module->magnitude_parameter_->val->set(1.0f);
     connection_module->bipolar_parameter_->val = connection->modulation_processor->control_map_["bipolar"];
-    // connection_module->
     auto parameter = target->parameter_map_[parameter_name];
     connection->destination_scale = parameter->max - parameter->min;
     connection->parameter_name = parameter_name;
