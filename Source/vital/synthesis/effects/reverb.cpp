@@ -234,9 +234,9 @@ void Reverb::processWithInput(const poly_float* audio_in, int num_samples) {
     poly_float feedback_read3 = readFeedback(feedback_lookups3, feedback_offset3);
     poly_float feedback_read4 = readFeedback(feedback_lookups4, feedback_offset4);
 
-    poly_float input = audio_in[i] & constants::kFirstMask;
-    input += utils::swapVoices(input);
-    // poly_float input = audio_in[i];
+    //poly_float input = audio_in[i] & constants::kFirstMask;
+    //input += utils::swapVoices(input);
+    poly_float input = audio_in[i];
     poly_float filtered_input = high_pre_filter_.tickBasic(input, current_high_pre_coefficient);
     filtered_input = low_pre_filter_.tickBasic(input, current_low_pre_coefficient) - filtered_input;
     poly_float scaled_input = filtered_input * 0.25f;
@@ -343,8 +343,8 @@ void Reverb::processWithInput(const poly_float* audio_in, int num_samples) {
     total += (feed_forward1 * current_decay1 + feed_forward2 * current_decay2 +
       feed_forward3 * current_decay3 + feed_forward4 * current_decay4) * 0.125f;
 
-    memory_->push(total + utils::swapVoices(total));
-    // memory_->push(total);// + utils::swapVoices(total));
+    //memory_->push(total + utils::swapVoices(total));
+    memory_->push(total);
     audio_out[i] = current_wet * memory_->get(current_sample_delay) + current_dry * input;
 
     current_delay_increment += delta_delay_increment;
