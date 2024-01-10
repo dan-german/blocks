@@ -93,6 +93,9 @@ public:
   void editorChangedBlockLength(Index index, int length) override;
   void editorAdjustedModulator(int parameter, int modulator, float value) override;
   void editorRemovedModulator(int index) override;
+  void removeModulator(int index);
+
+  void disconnect(std::__1::shared_ptr<model::Connection>& connection);
 
   std::shared_ptr<Block> getBlock(Index index) override;
   std::shared_ptr<model::Module> getBlock2(Index index) override;
@@ -103,6 +106,7 @@ public:
   std::shared_ptr<Module> getModulator(int index) override;
   std::shared_ptr<Module> editorAddedModulator(Model::Type code) override;
   PresetInfo editorChangedPreset(int index) override;
+  void clear();
   PresetInfo getStateRepresentation() override;
   juce::Array<std::shared_ptr<Module>> getModulators() override;
   std::vector<std::shared_ptr<model::Module>> getModulators2() override;

@@ -46,6 +46,7 @@ public:
   virtual Processor* clone() const override { return new LfoModule(*this); }
   void correctToTime(double seconds) override;
   void setControlRate(bool control_rate) override;
+  void setModule(std::shared_ptr<model::Module> module) override;
 
 protected:
   std::string prefix_;

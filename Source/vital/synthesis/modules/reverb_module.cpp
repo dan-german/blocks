@@ -28,8 +28,6 @@ ReverbModule::~ReverbModule() {}
 
 void ReverbModule::init() {
   reverb_->useOutput(output());
-  // addProcessor(reverb_);
-  // add
 
   Output* reverb_decay_time = createPolyModControl("reverb_decay_time");
   Output* reverb_pre_low_cutoff = createPolyModControl("reverb_pre_low_cutoff");

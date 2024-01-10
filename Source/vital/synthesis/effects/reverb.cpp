@@ -49,7 +49,7 @@ max_allpass_size_(0), max_feedback_size_(0),
 feedback_mask_(0), allpass_mask_(0), poly_allpass_mask_(0) {
   setupBuffersForSampleRate(kDefaultSampleRate);
 
-  memory_ = std::make_unique<StereoMemory>(kMaxSampleRate);
+  memory_ = new StereoMemory(kMaxSampleRate);
 
   for (int i = 0; i < kNetworkContainers; ++i)
     decays_[i] = 0.0f;
@@ -72,27 +72,31 @@ void Reverb::setupBuffersForSampleRate(int sample_rate) {
   max_feedback_size_ = max_feedback_size;
   feedback_mask_ = max_feedback_size_ - 1;
   for (int i = 0; i < kNetworkSize; ++i) {
-    feedback_memories_[i] = std::make_unique<mono_float[]>(max_feedback_size_ + kExtraLookupSample);
-    feedback_lookups_[i] = feedback_memories_[i].get() + 1;
+    feedback_memories_[i] = new mono_float[max_feedback_size_ + kExtraLookupSample];
+    feedback_memories_[i] = new mono_float[max_feedback_size_ + kExtraLookupSample];
+    feedback_lookups_[i] = feedback_memories_[i] + 1;
   }
 
   max_allpass_size_ = buffer_scale * (1 << kBaseAllpassBits);
   poly_allpass_mask_ = max_allpass_size_ - 1;
   allpass_mask_ = max_allpass_size_ * poly_float::kSize - 1;
   for (int i = 0; i < kNetworkContainers; ++i)
-    allpass_lookups_[i] = std::make_unique<poly_float[]>(max_allpass_size_);
+    allpass_lookups_[i] = new poly_float[max_allpass_size_];
 
   write_index_ &= feedback_mask_;
 }
 
 void Reverb::process(int num_samples) {
   VITAL_ASSERT(inputMatchesBufferSize(kAudio));
+  auto pls = input(kAudio);
   processWithInput(input(kAudio)->source->buffer, num_samples);
 }
 
+int aa = 0;
+
 void Reverb::processWithInput(const poly_float* audio_in, int num_samples) {
   for (int i = 0; i < kNetworkSize; ++i)
-    wrapFeedbackBuffer(feedback_memories_[i].get());
+    wrapFeedbackBuffer(feedback_memories_[i]);
 
   poly_float* audio_out = output()->buffer;
   mono_float tick_increment = 1.0f / num_samples;
@@ -142,10 +146,10 @@ void Reverb::processWithInput(const poly_float* audio_in, int num_samples) {
   poly_float delta_low_amplitude = (low_amplitude_ - current_low_amplitude) * tick_increment;
   poly_float delta_high_amplitude = (high_amplitude_ - current_high_amplitude) * tick_increment;
 
-  const mono_float* allpass_lookup1 = (mono_float*)allpass_lookups_[0].get();
-  const mono_float* allpass_lookup2 = (mono_float*)allpass_lookups_[1].get();
-  const mono_float* allpass_lookup3 = (mono_float*)allpass_lookups_[2].get();
-  const mono_float* allpass_lookup4 = (mono_float*)allpass_lookups_[3].get();
+  const mono_float* allpass_lookup1 = (mono_float*)allpass_lookups_[0];
+  const mono_float* allpass_lookup2 = (mono_float*)allpass_lookups_[1];
+  const mono_float* allpass_lookup3 = (mono_float*)allpass_lookups_[2];
+  const mono_float* allpass_lookup4 = (mono_float*)allpass_lookups_[3];
 
   mono_float* feedback_lookups1[] = { feedback_lookups_[0], feedback_lookups_[1],
                                       feedback_lookups_[2], feedback_lookups_[3] };
@@ -234,9 +238,19 @@ void Reverb::processWithInput(const poly_float* audio_in, int num_samples) {
     poly_float feedback_read3 = readFeedback(feedback_lookups3, feedback_offset3);
     poly_float feedback_read4 = readFeedback(feedback_lookups4, feedback_offset4);
 
-    poly_float input = audio_in[i] & constants::kFirstMask;
+    // std::cout << "audio_in: " << audio_in[i][0] << " " << audio_in[i][1] << " " << audio_in[i][2] << " " << audio_in[i][3] << std::endl;
+    poly_float input = audio_in[i];// & constants::kFirstMask;
+
+
+    // std::cout << "input: " << input[0] << " " << input[1] << " " << input[2] << " " << input[3] << std::endl;
     input += utils::swapVoices(input);
-    // poly_float input = audio_in[i];
+    
+    if (aa % 200 == 0) {
+      for (int j = 0; j < 8; j++) {
+        std::cout << this << " " << input[0] << " " << input[1] << " " << input[2] << " " << input[3] << std::endl;
+      }
+    }
+
     poly_float filtered_input = high_pre_filter_.tickBasic(input, current_high_pre_coefficient);
     filtered_input = low_pre_filter_.tickBasic(input, current_low_pre_coefficient) - filtered_input;
     poly_float scaled_input = filtered_input * 0.25f;
@@ -270,8 +284,7 @@ void Reverb::processWithInput(const poly_float* audio_in, int num_samples) {
     poly_float write3 = other_feedback + allpass_output3;
     poly_float write4 = other_feedback + allpass_output4;
 
-    poly_float::transpose(allpass_output1.value, allpass_output2.value,
-      allpass_output3.value, allpass_output4.value);
+    poly_float::transpose(allpass_output1.value, allpass_output2.value, allpass_output3.value, allpass_output4.value);
     poly_float adjacent_feedback = (allpass_output1 + allpass_output2 + allpass_output3 + allpass_output4) * -0.5f;
 
     write1 += adjacent_feedback[0];
@@ -344,7 +357,7 @@ void Reverb::processWithInput(const poly_float* audio_in, int num_samples) {
       feed_forward3 * current_decay3 + feed_forward4 * current_decay4) * 0.125f;
 
     memory_->push(total + utils::swapVoices(total));
-    // memory_->push(total);// + utils::swapVoices(total));
+    // memory_->push(total);
     audio_out[i] = current_wet * memory_->get(current_sample_delay) + current_dry * input;
 
     current_delay_increment += delta_delay_increment;
@@ -355,7 +368,7 @@ void Reverb::processWithInput(const poly_float* audio_in, int num_samples) {
     current_high_coefficient += delta_high_coefficient;
     current_high_amplitude += delta_high_amplitude;
   }
-
+aa++;
   sample_delay_increment_ = current_delay_increment;
   sample_delay_ = current_sample_delay;
 }

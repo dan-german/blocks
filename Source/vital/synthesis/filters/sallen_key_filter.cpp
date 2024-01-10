@@ -135,10 +135,7 @@ void SallenKeyFilter::process12(const poly_float* audio_in, int num_samples,
   }
 }
 
-void SallenKeyFilter::process24(const poly_float* audio_in, int num_samples,
-  poly_float current_resonance,
-  poly_float current_drive, poly_float current_post_multiply,
-  poly_float current_low, poly_float current_band, poly_float current_high) {
+void SallenKeyFilter::process24(const poly_float* audio_in, int num_samples, poly_float current_resonance, poly_float current_drive, poly_float current_post_multiply, poly_float current_low, poly_float current_band, poly_float current_high) {
   mono_float tick_increment = 1.0f / num_samples;
   poly_float delta_resonance = (resonance_ - current_resonance) * tick_increment;
   poly_float delta_drive = (drive_ - current_drive) * tick_increment;

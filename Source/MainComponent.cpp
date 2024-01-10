@@ -27,18 +27,18 @@ MainComponent::MainComponent(juce::MidiKeyboardState& keyboard_state, Delegate* 
   note_logger_.listener = this;
   ThemeManager::shared()->set(UserSettings::shared()->getInt("theme", 0));
 
-  // auto osc_block = addBlock(0, { 0, 0 });
-  // spawnBlockComponent(osc_block);
+  auto osc_block = addBlock(0, { 0, 0 });
+  spawnBlockComponent(osc_block);
 
   // auto osc_block_2 = addBlock(0, { 0, 1 });
   // spawnBlockComponent(osc_block_2);
 
-  // auto f = addBlock(5, { 1, 0 });
-  // spawnBlockComponent(f);
+  auto f = addBlock(6, { 1, 0 });
+  spawnBlockComponent(f);
 
-  // addModulator(Model::Types::lfo);
-  ui_layer_.modulators_.setVisible(true);
-  // delegate->editorConnectedModulation(0, "osc_1", "tune");
+  // addModulator(Model::Types::adsr);
+  // ui_layer_.modulators_.setVisible(true);
+  // delegate->editorConnectedModulation(0, "osc_1", "level");
 }
 
 void MainComponent::updateDotPosition(const Point<int> position) {
@@ -166,7 +166,6 @@ void MainComponent::setupListeners() {
   ui_layer_.newPresetButton->on_click_ = [this]() {
     DBG("changed preset");
     delegate->editorChangedPreset(-1);
-    return;
     clear();
   };
 
@@ -330,7 +329,7 @@ std::shared_ptr<model::Block> MainComponent::addBlock(int code, Index index) {
     block = delegate->editorAddedBlock2(Model::Types::osc, index);
     DBG(block->parameters_.size());
 
-    const float code_wavetable_frame = 
+    const float code_wavetable_frame =
       code / 4.0 * (vital::kNumOscillatorWaveFrames - 1);
     block->parameter_map_["wave"]->val->set(code_wavetable_frame);
 
@@ -339,7 +338,7 @@ std::shared_ptr<model::Block> MainComponent::addBlock(int code, Index index) {
     // block->parameters[0]->audioParameter->setValue(range.convertTo0to1(code));
     break;
   }
-  // case 4: // noise 
+        // case 4: // noise 
   case 5: block = delegate->editorAddedBlock2(Model::Types::filter, index); break;
     // case 5: block = delegate->editorAddedBlock(Model::Types::filter, index); break;
   case 6: block = delegate->editorAddedBlock2(Model::Types::reverb, index); break;

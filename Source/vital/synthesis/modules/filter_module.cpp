@@ -216,7 +216,7 @@ force_inline void FilterModule::setModel(int new_model) {
 
   last_model_ = new_model;
 }
-
+int i = 0;
 void FilterModule::process(int num_samples) {
   bool on = on_ == nullptr || on_->value() > 0.5f;
   setModel(static_cast<int>(roundf(filter_model_->value())));
@@ -231,12 +231,17 @@ void FilterModule::process(int num_samples) {
 
     poly_float* audio_out = output()->buffer;
     const poly_float* audio_in = input(kAudio)->source->buffer;
+    // if (i % 100) { 
+    std::cout << "fil: " << audio_in[0][0] << " " << audio_in[0][1] << " " << audio_in[0][2] << " " << audio_in[0][3] << std::endl;
+    // }
+    i++;
     for (int i = 0; i < num_samples; ++i) {
       current_mix += delta_mix;
       audio_out[i] = utils::interpolate(audio_in[i], audio_out[i], current_mix);
     }
-  } else
+  } else {
     utils::zeroBuffer(output()->buffer, num_samples);
+  }
 }
 
 void FilterModule::setMono(bool mono) {

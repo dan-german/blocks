@@ -20,6 +20,7 @@
 #include "vital/synthesis/synth_engine/sound_engine.h"
 #include "vital/common/load_save.h"
 #include "vital/synthesis/modules/blocks_voice_handler.h"
+#include "playground.h"
 
 PluginProcessor::PluginProcessor(): juce::AudioProcessor(BusesProperties().withOutput("Output", AudioChannelSet::stereo(), true)), SynthGuiInterface(this, false) {
   // for (auto module : synth.moduleManager.pool.allModules) {
@@ -28,6 +29,9 @@ PluginProcessor::PluginProcessor(): juce::AudioProcessor(BusesProperties().withO
   //     parameter->audioParameter->addListener(this);
   //   }
   // }
+
+  // please();
+  // exit(1);
 
   last_seconds_time_ = 0.0;
 
@@ -316,7 +320,6 @@ std::vector<std::shared_ptr<model::Connection>> PluginProcessor::getModulations(
 
 #pragma warning(default:4716)
 std::shared_ptr<Block> PluginProcessor::getBlock(Index index) {
-
 }
 
 std::shared_ptr<model::Module> PluginProcessor::getBlock2(Index index) {
@@ -352,17 +355,28 @@ void PluginProcessor::editorConnectedModulation(int modulatorIndex, std::string 
 
 void PluginProcessor::editorDisconnectedModulation(int index) {
   auto connection = synth_->getModuleManager().getConnection(index);
-  synth_->disconnectModulation(connection->vital_connection_);
-  synth_->getModuleManager().removeConnection(index);
+  disconnect(connection);
   // Analytics::shared()->countAction("Modulation Disconnected");
-  // disconnect(index);
 }
 
 PresetInfo PluginProcessor::editorChangedPreset(int index) {
-  return PresetInfo();
-  // soun
-  // sound
-  // return changePreset(index);
+  if (index == -1) {
+    clear();
+    return PresetInfo();
+  }
+}
+
+void PluginProcessor::clear()
+{
+  auto num_modulators = synth_->getModuleManager().getModulators().size();
+  for (int i = num_modulators - 1; i >= 0; i--) {
+    removeModulator(i);
+  }
+
+  getModuleManager().clear();
+
+
+  getVoiceHandler()->clear();
 }
 
 void PluginProcessor::editorRemovedTab(int column) {
@@ -378,17 +392,29 @@ std::shared_ptr<Tab> PluginProcessor::editorAddedTab(int column) {
 }
 
 void PluginProcessor::editorRemovedModulator(int index) {
+  removeModulator(index);
+}
+
+void PluginProcessor::removeModulator(int index) {
   auto modulator = synth_->getModuleManager().getModulator(index);
 
-  getModuleManager().removeModulator(index);
-
   auto module_connections = synth_->getModuleManager().getConnectionsOfSource(modulator);
+
   for (auto connection : module_connections) {
-    synth_->disconnectModulation(connection->vital_connection_);
-    synth_->getModuleManager().removeConnection(connection);
+    disconnect(connection);
   }
 
   getVoiceHandler()->removeModulator(index, modulator->id.type, modulator->name);
+  getModuleManager().removeModulator(index);
+}
+
+void PluginProcessor::disconnect(std::__1::shared_ptr<model::Connection>& connection) {
+  if (connection->source->id.type == "envelope" && connection->parameter_name_ == "level") {
+    getVoiceHandler()->resetOSCAmplitudeEnvelope(connection->target);
+  }
+
+  synth_->disconnectModulation(connection->vital_connection_);
+  synth_->getModuleManager().removeConnection(connection);
 }
 
 #pragma warning(default:4716)
@@ -405,8 +431,7 @@ void PluginProcessor::editorRemovedBlock(Index index) {
   auto block = synth_->getModuleManager().getBlock(index);
 
   for (auto connection : synth_->getModuleManager().getConnectionsOfSource(block)) {
-    synth_->disconnectModulation(connection->vital_connection_);
-    synth_->getModuleManager().removeConnection(connection);
+    disconnect(connection);
   }
 
   getVoiceHandler()->removeBlock(index, block);

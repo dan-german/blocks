@@ -3,6 +3,7 @@
 #include "model/id.h"
 #include "gui/ModuleColour.h"
 #include "model/Index.h"
+#include "vital/synthesis/utilities/smooth_value.h"
 
 using ValueScale = vital::ValueDetails::ValueScale;
 
@@ -35,10 +36,27 @@ public:
   void add(vital::ValueDetails parameter) {
     parameter.display_name = parameter.display_name != "" ? parameter.display_name : parameter.name;
     std::string short_name = parameter.name;
-    parameter.name = short_name;//name + "_" + parameter.name;
+    parameter.name = short_name;
     auto shared_ptr = std::make_shared<vital::ValueDetails>(parameter);
     parameters_.push_back(shared_ptr);
     parameter_map_[short_name] = shared_ptr;
+    
+    // vital::Value* val = nullptr;
+    // if (parameter.audio_rate) {
+    //   if (parameter.smooth_value) {
+    //     val = new vital::SmoothValue(parameter.default_value);
+    //   } else {
+    //     val = new vital::Value(parameter.default_value);
+    //   }
+    // } else {
+    //   if (parameter.smooth_value) {
+    //     val = new vital::cr::SmoothValue(parameter.default_value);
+    //   } else {
+    //     val = new vital::cr::Value(parameter.default_value);
+    //   }
+    // }
+
+    // shared_ptr->val = val;
   }
 };
 

@@ -62,11 +62,12 @@ public:
   };
 
   Reverb();
-  virtual ~Reverb() = default;
+  // virtual ~Reverb() = default;
 
   void process(int num_samples) override;
   void processWithInput(const poly_float* audio_in, int num_samples) override;
   force_inline float getSampleRateRatio(int sample_rate) { return sample_rate / (1.0f * kBaseSampleRate); }
+
   force_inline int getBufferScale(int sample_rate) {
     int scale = 1;
     float ratio = getSampleRateRatio(sample_rate);
@@ -74,6 +75,7 @@ public:
       ;
     return scale;
   }
+
   void setSampleRate(int sample_rate) override;
   void setOversampleAmount(int oversample_amount) override;
   void setupBuffersForSampleRate(int sample_rate);
@@ -102,13 +104,13 @@ public:
     buffer[max_feedback_size_ + 3] = buffer[3];
   }
 
-  virtual Processor* clone() const override { VITAL_ASSERT(false); return nullptr; }
+  virtual Processor* clone() const override { return new Reverb(*this); }
 
 private:
-  std::unique_ptr<StereoMemory> memory_;
+  StereoMemory* memory_;
 
-  std::unique_ptr<poly_float[]> allpass_lookups_[kNetworkContainers];
-  std::unique_ptr<mono_float[]> feedback_memories_[kNetworkSize];
+  poly_float* allpass_lookups_[kNetworkContainers];
+  mono_float* feedback_memories_[kNetworkSize];
   mono_float* feedback_lookups_[kNetworkSize];
   poly_float decays_[kNetworkContainers];
 

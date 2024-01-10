@@ -19,6 +19,7 @@
 #include "vital/synthesis/framework/synth_module.h"
 #include "vital/synthesis/producers/synth_oscillator.h"
 #include "vital/synthesis/modules/envelope_module.h"
+#include "adsr_module_new.h"
 
 namespace vital {
 class Wavetable;
@@ -54,7 +55,16 @@ public:
     return static_cast<SynthOscillator::DistortionType>(val);
   }
 
+  std::shared_ptr<model::ADSRModule> default_envelope_module_;
   std::shared_ptr<EnvelopeModule> amplitude_envelope_;
+
+  void resetAmpADSR() {
+    amplitude_envelope_->setModule(default_envelope_module_);
+  }
+
+  void switchLevelEnvelope(EnvelopeModule* envelope) {
+
+  }
 
   Value* on_;
 protected:
@@ -64,6 +74,8 @@ protected:
 
   SynthOscillator* oscillator_;
   Value* distortion_type_;
+
+  Multiply* env_multiply_ = new Multiply();
 
   JUCE_LEAK_DETECTOR(OscillatorModule)
 };

@@ -503,7 +503,6 @@ Value* SynthModule::createBaseControl2(AddControlInput input) {
     }
   }
 
-  // data_->controls[input.name] = val;
   control_map_[input.name] = val;
   return val;
 }

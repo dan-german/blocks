@@ -743,7 +743,7 @@ void SynthOscillator::setWaveBuffers(poly_float phase_inc, int index) {
   else if (voice_block_.spectral_morph == kInharmonicScale)
     setFourierWaveBuffers<inharmonicScaleMorph>(phase_inc, index, false);
   else if (voice_block_.spectral_morph == kSmear)
-  
+
     setFourierWaveBuffers<smearMorph>(phase_inc, index, false);
   else if (voice_block_.spectral_morph == kRandomAmplitudes)
     setFourierWaveBuffers<randomAmplitudeMorph>(phase_inc, index, false);
@@ -1287,8 +1287,7 @@ force_inline void SynthOscillator::setActiveOscillators(int new_active_oscillato
 }
 
 template<poly_float(*snapTranspose)(poly_float, poly_float, float*)>
-void SynthOscillator::setPhaseIncBufferSnap(int num_samples, poly_mask reset_mask,
-  poly_int trigger_sample, poly_mask active_mask, float* snap_buffer) {
+void SynthOscillator::setPhaseIncBufferSnap(int num_samples, poly_mask reset_mask, poly_int trigger_sample, poly_mask active_mask, float* snap_buffer) {
   bool midi_track = poly_float::notEqual(input(kMidiTrack)->at(0), 0.0f).anyMask();
   poly_float current_midi = midi_note_;
   midi_note_ = kNoMidiTrackDefault;
@@ -1329,8 +1328,7 @@ void SynthOscillator::setPhaseIncBufferSnap(int num_samples, poly_mask reset_mas
   }
 }
 
-void SynthOscillator::setPhaseIncBuffer(int num_samples, poly_mask reset_mask,
-  poly_int trigger_sample, poly_mask active_mask) {
+void SynthOscillator::setPhaseIncBuffer(int num_samples, poly_mask reset_mask, poly_int trigger_sample, poly_mask active_mask) {
   int transpose_quantize = static_cast<int>(input(kTransposeQuantize)->at(0)[0]);
   if (!utils::isTransposeSnapping(transpose_quantize)) {
     setPhaseIncBufferSnap<noTransposeSnap>(num_samples, reset_mask, trigger_sample, active_mask, nullptr);
@@ -1345,17 +1343,26 @@ void SynthOscillator::setPhaseIncBuffer(int num_samples, poly_mask reset_mask,
     setPhaseIncBufferSnap<localTransposeSnap>(num_samples, reset_mask, trigger_sample, active_mask, snap_buffer);
 }
 
-template<poly_int(*phaseDistort)(poly_int, poly_float, poly_int, const poly_float*, int),
-  poly_float(*window)(poly_int, poly_int, poly_float, const poly_float*, int)>
+template<poly_int(*phaseDistort)(poly_int, poly_float, poly_int, const poly_float*, int), poly_float(*window)(poly_int, poly_int, poly_float, const poly_float*, int)>
 void SynthOscillator::processOscillators(int num_samples, DistortionType distortion_type) {
+  auto active_voice = input(kActiveVoices)->at(0);
+  // std::cout << this << " ACTIVE VOICE: " << active_voice[0] << " " << active_voice[1] << " " << active_voice[2] << " " << active_voice[3] << std::endl;
+
   poly_mask active_voice_mask = poly_float::equal(input(kActiveVoices)->at(0), 1.0f);
+
+  // std::cout << this << " VOICE MASK:   " << active_voice_mask[0] << " " << active_voice_mask[1] << " " << active_voice_mask[2] << " " << active_voice_mask[3] << std::endl;
   poly_float current_center_amplitude = center_amplitude_;
   poly_float current_detuned_amplitude = detuned_amplitude_;
   setAmplitude();
 
   poly_mask reset_mask = getResetMask(kReset);
+
+  // std::cout << this << reset_mask[0] << " " << reset_mask[1] << " " << reset_mask[2] << " " << reset_mask[3] << std::endl;
+
   poly_int trigger_offset = input(kReset)->source->trigger_offset;
   poly_mask retrigger_mask = getResetMask(kRetrigger) & ~reset_mask;
+
+  // std::cout << retrigger_mask[0] << " " << retrigger_mask[1] << " " << retrigger_mask[2] << " " << retrigger_mask[3] << std::endl;  
 
   current_center_amplitude = utils::maskLoad(current_center_amplitude, center_amplitude_, reset_mask);
   current_detuned_amplitude = utils::maskLoad(current_detuned_amplitude, detuned_amplitude_, reset_mask);

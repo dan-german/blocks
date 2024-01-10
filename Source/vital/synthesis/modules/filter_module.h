@@ -72,14 +72,14 @@ protected:
 
   Output* filter_mix_;
 
-  CombModule* comb_filter_;
-  DigitalSvf* digital_svf_;
-  DiodeFilter* diode_filter_;
-  DirtyFilter* dirty_filter_;
-  FormantModule* formant_filter_;
-  LadderFilter* ladder_filter_;
-  PhaserFilter* phaser_filter_;
-  SallenKeyFilter* sallen_key_filter_;
+  CombModule* comb_filter_; // 287
+  DigitalSvf* digital_svf_; // 430
+  DiodeFilter* diode_filter_; // 150
+  DirtyFilter* dirty_filter_; // 377
+  FormantModule* formant_filter_; // 218
+  LadderFilter* ladder_filter_; //  206
+  PhaserFilter* phaser_filter_; // 167
+  SallenKeyFilter* sallen_key_filter_; // 324
 
   JUCE_LEAK_DETECTOR(FilterModule)
 };

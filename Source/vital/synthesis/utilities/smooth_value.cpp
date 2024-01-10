@@ -40,8 +40,13 @@ void SmoothValue::process(int num_samples) {
     dest[i] = current_value;
   }
 
-  poly_mask equal_mask = poly_float::equal(current_value, current_value_) |
-    poly_float::equal(value_, current_value_);
+  auto a = poly_float::equal(current_value, current_value_);
+  auto b = poly_float::equal(value_, current_value_);
+
+  // poly_mask equal_mask = poly_float::equal(current_value, current_value_) |
+  //   poly_float::equal(value_, current_value_);
+  poly_mask equal_mask = a | b;
+
   if (equal_mask.anyMask())
     linearInterpolate(num_samples, equal_mask);
 

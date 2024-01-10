@@ -212,8 +212,7 @@ void CombFilter::process(int num_samples) {
     VITAL_ASSERT(false);
 }
 
-template<poly_float(*tick)(poly_float, Memory*, OnePoleFilter<>&, OnePoleFilter<>&,
-  poly_float, poly_float, poly_float, poly_float, poly_float, poly_float, poly_float)>
+template<poly_float(*tick)(poly_float, Memory*, OnePoleFilter<>&, OnePoleFilter<>&, poly_float, poly_float, poly_float, poly_float, poly_float, poly_float, poly_float)>
 void CombFilter::processFilter(int num_samples) {
   poly_float current_feedback = feedback_;
   poly_float current_filter_coefficient = filter_coefficient_;

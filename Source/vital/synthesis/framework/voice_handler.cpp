@@ -180,7 +180,13 @@ void VoiceHandler::prepareVoiceValues(AggregateVoice* aggregate_voice) {
   for (Voice* voice : aggregate_voice->voices) {
     poly_mask mask = voice->voice_mask();
     int channel = voice->state().channel;
+
+    auto trigger_value = note_.trigger_value;
+    // std::cout << "index: " << voice->voice_index() << " note: " << trigger_value[0] << " " << trigger_value[1] << " " << trigger_value[2] << " " << trigger_value[3] << std::endl;
+    auto tuned_note = voice->state().tuned_note;
+
     poly_float note = utils::maskLoad(note_.trigger_value, voice->state().tuned_note, mask);
+
     note_.trigger_value = note;
     last_note_.trigger_value = utils::maskLoad(last_note_.trigger_value, voice->state().last_note, mask);
 
@@ -199,7 +205,12 @@ void VoiceHandler::prepareVoiceValues(AggregateVoice* aggregate_voice) {
     slide_.trigger_value = utils::maskLoad(slide_.trigger_value, voice->slide(), mask);
 
     bool dead = voice->key_state() == Voice::kDead;
+    // std::string d = dead ? "ded" : "goo";
+    // std::cout << "index: " << voice->voice_index() << " " << d << "note: " << note[0] << " " << note[1] << " " << note[2] << " " << note[3] << std::endl;
+
     poly_float active_value = dead ? 0.0f : 1.0f;
+
+    // std::cout << "mask: " << mask[0] << " " << mask[1] << " " << mask[2] << " " << mask[3] << std::endl;
     active_mask_.trigger_value = utils::maskLoad(active_mask_.trigger_value, active_value, mask);
 
     mono_float mod_wheel = mod_wheel_values_[channel];
@@ -298,8 +309,9 @@ void VoiceHandler::process(int num_samples) {
   AggregateVoice* last_aggregate_voice = nullptr;
   int last_aggregate_index = 0;
   for (Voice* active_voice : active_voices_) {
-    if (active_aggregate_voices_.count(active_voice->parent()) == 0)
+    if (active_aggregate_voices_.count(active_voice->parent()) == 0) {
       active_aggregate_voices_.push_back(active_voice->parent());
+    }
     last_aggregate_voice = active_voice->parent();
     last_aggregate_index = active_voice->voice_index();
   }
@@ -317,12 +329,15 @@ void VoiceHandler::process(int num_samples) {
 
     // Remove voice if the right processor has a full silent buffer.
     poly_mask alive_mask = constants::kFullMask;
-    if (voice_killer_) { 
+    if (voice_killer_) {
+      auto buffer = voice_killer_->buffer[0];
       alive_mask = ~utils::getSilentMask(voice_killer_->buffer, num_samples);
     }
+
     for (Voice* single_voice : aggregate_voice->voices) {
       bool released = single_voice->state().event == kVoiceOff || single_voice->state().event == kVoiceKill;
-      bool alive = (single_voice->voice_mask() & alive_mask).sum();
+      auto before_sum = single_voice->voice_mask() & alive_mask;
+      bool alive = before_sum.sum();
       bool active = active_voices_.count(single_voice);
       if (released && !alive && active) {
         active_voices_.remove(single_voice);
@@ -762,6 +777,7 @@ void VoiceHandler::setChannelRangeSlide(int from_channel, int to_channel, mono_f
 }
 
 void VoiceHandler::setPolyphony(int polyphony) {
+  // polyphony = 1;
   while (all_voices_.size() < polyphony)
     addParallelVoices();
 
