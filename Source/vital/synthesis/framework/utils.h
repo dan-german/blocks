@@ -210,6 +210,17 @@ force_inline int nextPowerOfTwo(mono_float value) {
   return roundf(powf(2.0f, ceilf(logf(value) * kInvLogOf2)));
 }
 
+force_inline void print(poly_float value, std::string prefix) {
+  std::cout << prefix << ": ";
+  for (int i = 0; i < 4; ++i) {
+    std::cout << std::fixed << std::setprecision(3) << abs(value[i]);
+    if (i < 3) {
+      std::cout << ", ";
+    }
+  }
+  std::cout << std::endl;
+}
+
 force_inline bool isSilent(const mono_float* buffer, int length) {
   for (int i = 0; i < length; ++i) {
     if (!closeToZero(buffer[i]))

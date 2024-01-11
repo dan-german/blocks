@@ -51,12 +51,14 @@ public:
   void hardReset() override;
   virtual Processor* clone() const override {
     FilterModule* newModule = new FilterModule(*this);
+    std::cout << "FilterModule::clone" << newModule->diode_filter_ << std::endl;
     newModule->last_model_ = -1;
     return newModule;
   }
 
   const Value* getOnValue() { return on_; }
 
+  DiodeFilter* diode_filter_; // 150
 protected:
   void setModel(int new_model);
 
@@ -74,7 +76,6 @@ protected:
 
   CombModule* comb_filter_; // 287
   DigitalSvf* digital_svf_; // 430
-  DiodeFilter* diode_filter_; // 150
   DirtyFilter* dirty_filter_; // 377
   FormantModule* formant_filter_; // 218
   LadderFilter* ladder_filter_; //  206

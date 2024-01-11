@@ -21,6 +21,7 @@
 namespace vital {
 DiodeFilter::DiodeFilter(): Processor(DiodeFilter::kNumInputs, 1) {
   hardReset();
+  DBG("DiodeFilter::DiodeFilter");
 }
 
 void DiodeFilter::reset(poly_mask reset_mask) {

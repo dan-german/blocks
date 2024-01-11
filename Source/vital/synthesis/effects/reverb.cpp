@@ -61,6 +61,7 @@ feedback_mask_(0), allpass_mask_(0), poly_allpass_mask_(0) {
   low_amplitude_ = 0.0f;
   high_amplitude_ = 0.0f;
   sample_delay_ = kMinDelay;
+  DBG("Reverb::Reverb()");
 }
 
 void Reverb::setupBuffersForSampleRate(int sample_rate) {
@@ -72,7 +73,6 @@ void Reverb::setupBuffersForSampleRate(int sample_rate) {
   max_feedback_size_ = max_feedback_size;
   feedback_mask_ = max_feedback_size_ - 1;
   for (int i = 0; i < kNetworkSize; ++i) {
-    feedback_memories_[i] = new mono_float[max_feedback_size_ + kExtraLookupSample];
     feedback_memories_[i] = new mono_float[max_feedback_size_ + kExtraLookupSample];
     feedback_lookups_[i] = feedback_memories_[i] + 1;
   }
@@ -88,11 +88,8 @@ void Reverb::setupBuffersForSampleRate(int sample_rate) {
 
 void Reverb::process(int num_samples) {
   VITAL_ASSERT(inputMatchesBufferSize(kAudio));
-  auto pls = input(kAudio);
   processWithInput(input(kAudio)->source->buffer, num_samples);
 }
-
-int aa = 0;
 
 void Reverb::processWithInput(const poly_float* audio_in, int num_samples) {
   for (int i = 0; i < kNetworkSize; ++i)
@@ -109,6 +106,20 @@ void Reverb::processWithInput(const poly_float* audio_in, int num_samples) {
   poly_float current_low_amplitude = low_amplitude_;
   poly_float current_high_coefficient = high_coefficient_;
   poly_float current_high_amplitude = high_amplitude_;
+
+  poly_float current_low_pre_cutoff_midi = utils::clamp(input(kPreLowCutoff)->at(0), 0.0f, 130.0f);
+
+  // poly_mask reset_mask = getResetMask(kReset);
+  // if (reset_mask.anyMask()) {
+    // std::cout << "reset" << std::endl;
+    // reset(reset_mask);
+
+    // current_resonance = utils::maskLoad(current_resonance, resonance_, reset_mask);
+    // current_drive = utils::maskLoad(current_drive, drive_, reset_mask);
+    // current_post_multiply = utils::maskLoad(current_post_multiply, post_multiply_, reset_mask);
+    // current_high_pass_ratio = utils::maskLoad(current_high_pass_ratio, high_pass_ratio_, reset_mask);
+    // current_high_pass_amount = utils::maskLoad(current_high_pass_amount, high_pass_amount_, reset_mask);
+  // }
 
   poly_float wet_in = utils::clamp(input(kWet)->at(0), 0.0f, 1.0f);
   wet_ = futils::equalPowerFade(wet_in);
@@ -159,6 +170,7 @@ void Reverb::processWithInput(const poly_float* audio_in, int num_samples) {
                                       feedback_lookups_[10], feedback_lookups_[11] };
   mono_float* feedback_lookups4[] = { feedback_lookups_[12], feedback_lookups_[13],
                                       feedback_lookups_[14], feedback_lookups_[15] };
+
 
   poly_float size = utils::clamp(input(kSize)->at(0), 0.0f, 1.0f);
   poly_float size_mult = futils::pow(2.0f, size * kSizePowerRange + kMinSizePower);
@@ -238,18 +250,8 @@ void Reverb::processWithInput(const poly_float* audio_in, int num_samples) {
     poly_float feedback_read3 = readFeedback(feedback_lookups3, feedback_offset3);
     poly_float feedback_read4 = readFeedback(feedback_lookups4, feedback_offset4);
 
-    // std::cout << "audio_in: " << audio_in[i][0] << " " << audio_in[i][1] << " " << audio_in[i][2] << " " << audio_in[i][3] << std::endl;
     poly_float input = audio_in[i];// & constants::kFirstMask;
-
-
-    // std::cout << "input: " << input[0] << " " << input[1] << " " << input[2] << " " << input[3] << std::endl;
-    input += utils::swapVoices(input);
-    
-    if (aa % 200 == 0) {
-      for (int j = 0; j < 8; j++) {
-        std::cout << this << " " << input[0] << " " << input[1] << " " << input[2] << " " << input[3] << std::endl;
-      }
-    }
+    // input += utils::swapVoices(input);
 
     poly_float filtered_input = high_pre_filter_.tickBasic(input, current_high_pre_coefficient);
     filtered_input = low_pre_filter_.tickBasic(input, current_low_pre_coefficient) - filtered_input;
@@ -356,8 +358,9 @@ void Reverb::processWithInput(const poly_float* audio_in, int num_samples) {
     total += (feed_forward1 * current_decay1 + feed_forward2 * current_decay2 +
       feed_forward3 * current_decay3 + feed_forward4 * current_decay4) * 0.125f;
 
-    memory_->push(total + utils::swapVoices(total));
-    // memory_->push(total);
+    memory_->push(total);// + utils::swapVoices(total));
+    // const got = memory_->get(current_sample_delay);
+    // const masked_got = utils::maskLoad(got
     audio_out[i] = current_wet * memory_->get(current_sample_delay) + current_dry * input;
 
     current_delay_increment += delta_delay_increment;
@@ -368,7 +371,7 @@ void Reverb::processWithInput(const poly_float* audio_in, int num_samples) {
     current_high_coefficient += delta_high_coefficient;
     current_high_amplitude += delta_high_amplitude;
   }
-aa++;
+
   sample_delay_increment_ = current_delay_increment;
   sample_delay_ = current_sample_delay;
 }
@@ -405,5 +408,16 @@ void Reverb::hardReset() {
     for (int i = 0; i < max_feedback_size_ + kExtraLookupSample; ++i)
       feedback_memories_[n][i] = 0.0f;
   }
+}
+
+Processor* Reverb::clone() const {
+  auto new_reverb = new Reverb(*this);
+  new_reverb->max_feedback_size_ = 0;
+  new_reverb->memory_ = new StereoMemory(kMaxSampleRate); 
+
+  new_reverb->setupBuffersForSampleRate(kDefaultSampleRate);
+  new_reverb->hardReset();
+
+  return new_reverb;
 }
 } // namespace vital

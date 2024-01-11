@@ -21,26 +21,29 @@
 namespace vital {
 
 ReverbModule::ReverbModule(): SynthModule(1, 1), reverb_(nullptr) {
+  DBG("ReverbModule::ReverbModule()");
   reverb_ = new Reverb();
+  addProcessor(reverb_);
 }
 
 ReverbModule::~ReverbModule() {}
 
 void ReverbModule::init() {
+  reverb_->useInput(input());
   reverb_->useOutput(output());
 
-  Output* reverb_decay_time = createPolyModControl("reverb_decay_time");
-  Output* reverb_pre_low_cutoff = createPolyModControl("reverb_pre_low_cutoff");
-  Output* reverb_pre_high_cutoff = createPolyModControl("reverb_pre_high_cutoff");
-  Output* reverb_low_shelf_cutoff = createPolyModControl("reverb_low_shelf_cutoff");
-  Output* reverb_low_shelf_gain = createPolyModControl("reverb_low_shelf_gain");
-  Output* reverb_high_shelf_cutoff = createPolyModControl("reverb_high_shelf_cutoff");
-  Output* reverb_high_shelf_gain = createPolyModControl("reverb_high_shelf_gain");
-  Output* reverb_chorus_amount = createPolyModControl("reverb_chorus_amount");
-  Output* reverb_chorus_frequency = createPolyModControl("reverb_chorus_frequency");
-  Output* reverb_size = createPolyModControl("reverb_size");
-  Output* reverb_delay = createPolyModControl("reverb_delay");
-  Output* reverb_wet = createPolyModControl("reverb_dry_wet");
+  Output* reverb_decay_time = createPolyModControl2({ .name = "reverb_decay_time", .min = -6.0, .max = 6.0, .value_scale = ValueScale::kExponential });
+  Output* reverb_pre_low_cutoff = createPolyModControl2({ .name = "reverb_pre_low_cutoff", .max = 128.0 });
+  Output* reverb_pre_high_cutoff = createPolyModControl2({ .name = "reverb_pre_high_cutoff", .max = 128.0, .default_value = 110.0 });
+  Output* reverb_low_shelf_cutoff = createPolyModControl2({ .name = "reverb_low_shelf_cutoff", .max = 128.0 });
+  Output* reverb_low_shelf_gain = createPolyModControl2({ .name = "reverb_low_shelf_gain", .min = -6.0, .max = 0.0 });
+  Output* reverb_high_shelf_cutoff = createPolyModControl2({ .name = "reverb_high_shelf_cutoff", .max = 128.0, .default_value = 90.0 });
+  Output* reverb_high_shelf_gain = createPolyModControl2({ .name = "reverb_high_shelf_gain", .min = -6.0, .max = 0.0, .default_value = -1.0 });
+  Output* reverb_chorus_amount = createPolyModControl2({ .name = "reverb_chorus_amount", .min = -8.0, .max = 3.0, .default_value = 0.223607 ,.value_scale = ValueScale::kExponential });
+  Output* reverb_chorus_frequency = createPolyModControl2({ .name = "reverb_chorus_frequency", .min = -8.0, .max = 3.0, .default_value = -2.0f, .value_scale = ValueScale::kExponential });
+  Output* reverb_size = createPolyModControl2({ .name = "reverb_size" });
+  Output* reverb_delay = createPolyModControl2({ .name = "reverb_delay", .max = 0.3 });
+  Output* reverb_wet = createPolyModControl2({ .name = "reverb_dry_wet" });
 
   reverb_->plug(reverb_decay_time, Reverb::kDecayTime);
   reverb_->plug(reverb_pre_low_cutoff, Reverb::kPreLowCutoff);
@@ -76,6 +79,10 @@ void ReverbModule::setSampleRate(int sample_rate) {
 
 void ReverbModule::processWithInput(const poly_float* audio_in, int num_samples) {
   SynthModule::process(num_samples);
-  reverb_->processWithInput(audio_in, num_samples);
+  // reverb_->processWithInput(audio_in, num_samples);
+}
+
+Processor* ReverbModule::clone() const {
+  return new ReverbModule(*this);
 }
 } // namespace vital

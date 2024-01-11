@@ -8,13 +8,45 @@ namespace model {
 class ReverbModule: public Block {
 public:
   ReverbModule(int number): Block("reverb", number) {
-    // add({ .name = "style", .max = 9.0 });
-    // add({ .name = "cutoff", .min = 8.0, .max = 136.0, .default_value = 60.0 });
-    // add({ .name = "tune", .min = -1.0, .display_multiply = 100.0, .value_scale = ValueScale::kLinear, .audio_rate = true, .reset = true, .input_index = Osc::kTune });
-    // add({ .name = "unison_voices", .min = 1.0, .max = 16.0, .default_value = 1.0, .value_scale = ValueScale::kIndexed, .input_index = Osc::kUnisonVoices });
-    // add({ .name = "unison_detune", .max = 10.0, .default_value = 4.472135955, .display_multiply = 100.0, .value_scale = ValueScale::kQuadratic, .input_index = Osc::kUnisonDetune });
-    // add({ .name = "level", .default_value = 0.70710678119, .value_scale = ValueScale::kQuadratic, .audio_rate = true, .smooth_value = true, .reset = true, .input_index = Osc::kAmplitude });
-    // add({ .name = "pan", .min = -1.0, .post_offset = 1.0, .display_multiply = 100.0, .value_scale = ValueScale::kLinear, .display_units = "%", .display_name = "Pan", .input_index = Osc::kPan });
+    add({ .name = "chorus_frequency", .min = -8.0, .max = 3.0, .default_value = -2.0, .value_scale = ValueScale::kExponential });
+    add({ .name = "decay_time", .min = -6.0, .max = 6.0, .value_scale = ValueScale::kExponential });
+    add({ .name = "dry_wet", .default_value = 1.0 });
+    add({ .name = "high_shelf_cutoff", .max = 128.0, .default_value = 90.0 });
+    add({ .name = "high_shelf_gain", .min = -6.0, .max = 0.0, .default_value = -1.0 });
+    add({ .name = "low_shelf_cutoff", .max = 128.0, .default_value = 0.0 });
+    add({ .name = "low_shelf_gain", .min = -6.0, .max = 0.0, .default_value = 0.0 });
+    // add({ .name = "on", .default_value = 1.0 });
+    add({ .name = "pre_high_cutoff", .max = 128.0, .default_value = 110.0 });
+    add({ .name = "pre_low_cutoff", .max = 128.0, .default_value = 0.0 });
+    add({ .name = "size", .default_value = 0.5 });
+    add({ .name = "delay", .max = 0.3, .default_value = 0.0 });
   }
 };
 }
+
+// reverb: [
+// {
+// name: 'chorus_frequency',
+// min : -8,
+// max : 3,
+// value_scale : 6,
+// default_value : -2
+// },
+//     {
+//       name: 'decay_time',
+//       min : -6,
+//       max : 6,
+//       value_scale : 6,
+//       default_value : 0
+//     },
+// { name: 'dry_wet', default_value : 1 },
+// { name: 'high_shelf_cutoff', max : 128, default_value : 90 },
+// { name: 'high_shelf_gain', min : -6, max : 0, default_value : -1 },
+// { name: 'low_shelf_cutoff', max : 128, default_value : 0 },
+// { name: 'low_shelf_gain', min : -6, max : 0, default_value : 0 },
+// { name: 'on', value_scale : 0, default_value : 1 },
+// { name: 'pre_high_cutoff', max : 128, default_value : 110 },
+// { name: 'pre_low_cutoff', max : 128, default_value : 0 },
+// { name: 'size', default_value : 0.5 },
+// { name: 'delay', max : 0.3, default_value : 0 }
+// ]

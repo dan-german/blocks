@@ -304,6 +304,19 @@ std::shared_ptr<SynthModule> BlocksVoiceHandler::createProcessor(std::shared_ptr
     processor->control_map_["on"]->set(1.0f);
   } else if (module->id.type == "reverb") {
     processor->enable(true);
+
+    module->parameter_map_["chorus_frequency"]->val = processor->control_map_["reverb_chorus_frequency"];
+    module->parameter_map_["decay_time"]->val = processor->control_map_["reverb_decay_time"];
+    module->parameter_map_["dry_wet"]->val = processor->control_map_["reverb_dry_wet"];
+    module->parameter_map_["high_shelf_cutoff"]->val = processor->control_map_["reverb_high_shelf_cutoff"];
+    module->parameter_map_["high_shelf_gain"]->val = processor->control_map_["reverb_high_shelf_gain"];
+    module->parameter_map_["low_shelf_cutoff"]->val = processor->control_map_["reverb_low_shelf_cutoff"];
+    module->parameter_map_["low_shelf_gain"]->val = processor->control_map_["reverb_low_shelf_gain"];
+    // module->parameter_map_["on"]->val = processor->control_map_["on"];
+    module->parameter_map_["pre_high_cutoff"]->val = processor->control_map_["reverb_pre_high_cutoff"];
+    module->parameter_map_["pre_low_cutoff"]->val = processor->control_map_["reverb_pre_low_cutoff"];
+    module->parameter_map_["size"]->val = processor->control_map_["reverb_size"];
+    module->parameter_map_["delay"]->val = processor->control_map_["reverb_delay"];
   }
 
   auto index = module->index;

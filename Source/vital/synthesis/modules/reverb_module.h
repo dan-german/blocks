@@ -34,7 +34,7 @@ public:
 
   void setSampleRate(int sample_rate) override;
   void processWithInput(const poly_float* audio_in, int num_samples) override;
-  Processor* clone() const override { return new ReverbModule(*this); }
+  Processor* clone() const override;
 
   // int i = 0;
   void process(int num_samples) override {

@@ -34,7 +34,12 @@ public:
   DiodeFilter();
   virtual ~DiodeFilter() { }
 
-  virtual Processor* clone() const override { return new DiodeFilter(*this); }
+  virtual Processor* clone() const override {
+    return new DiodeFilter(*this);
+    // std::cout << "DiodeFilter::clone" << filter << std::endl;
+    // return filter;
+  }
+
   virtual void process(int num_samples) override;
 
   void setupFilter(const FilterState& filter_state) override;
