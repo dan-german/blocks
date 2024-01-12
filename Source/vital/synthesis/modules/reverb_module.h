@@ -28,6 +28,11 @@ public:
   ReverbModule();
   virtual ~ReverbModule();
 
+  enum { 
+    kAudioIn, 
+    kReset
+  };
+
   void init() override;
   void hardReset() override;
   void enable(bool enable) override;
@@ -40,7 +45,6 @@ public:
   void process(int num_samples) override {
     auto buffer = input(0)->source->buffer;
     processWithInput(input(0)->source->buffer, num_samples);
-    // i++;
   }
 
 public:

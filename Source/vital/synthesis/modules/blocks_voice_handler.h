@@ -103,6 +103,7 @@ private:
   void createVoiceOutput();
   void createFilters(Output* keytrack);
   void createReverbs();
+  void createDelays();
   void setupPolyModulationReadouts();
 
   std::shared_ptr<SynthModule> createProcessor(std::shared_ptr<model::Block> module);

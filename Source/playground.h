@@ -4,74 +4,59 @@
 #include "vital/synthesis/utilities/smooth_value.h"
 #include "vital/common/synth_constants.h"
 #include "vital/synthesis/effects/reverb.h"
+#include "vital/synthesis/filters/diode_filter.h"
 
 using namespace vital;
 
-class NineProcessor: public Processor {
-public:
-  NineProcessor(): Processor(0, 1) { }
-  virtual Processor* clone() const override { return new NineProcessor(*this); }
 
-  void process(int num_samples) override {
-    std::cout << "processing" << std::endl;
-    auto output_buffer = output(0);
-    for (int i = 0; i < num_samples; ++i) {
-      output_buffer->buffer[i] = 0.92f;
-    }
+void fillBuffer(poly_float* buffer, int size, float val) {
+  for (int i = 0; i < size; i++) {
+    buffer[i].set(0, val);
+    buffer[i].set(1, val);
+    buffer[i].set(2, val);
+    buffer[i].set(3, val);
   }
-};
+}
 
-class TwoProcessor: public Processor {
-public:
-  TwoProcessor(): Processor(0, 1) { }
-  virtual Processor* clone() const override { return new TwoProcessor(*this); }
+void playFirstVoice(vital::Output* reset, vital::DiodeFilter* diode);
 
-  void process(int num_samples) override {
-    std::cout << "processing" << std::endl;
-    auto output_buffer = output(0);
-    for (int i = 0; i < num_samples; ++i) {
-      output_buffer->buffer[i] = 0.2f;
-    }
-  }
-};
-
-
-class MySynthModule: public SynthModule {
-public:
-  MySynthModule(): SynthModule(0, 1) {
-
-  }
-  virtual SynthModule* clone() const override { return new MySynthModule(*this); }
-
-  void process(int num_samples) override {
-    std::cout << "processing" << std::endl;
-    auto output_buffer = output(0);
-    for (int i = 0; i < num_samples; ++i) {
-      output_buffer->buffer[i] = 0.8f;
-    }
-  }
-};
+void playSecondVoice(vital::Output* reset, vital::DiodeFilter* diode);
 
 void please() {
-  auto reverb = new vital::Reverb();
+  auto diode = new vital::DiodeFilter();
+  auto audio = new vital::Output();
+  auto reset = new vital::Output();
 
-  // auto value = new vital::Value(0.5f);
-  poly_float* buffer = new poly_float[128];
+  auto drive = new vital::Output();
+  fillBuffer(drive->buffer, 128, 0.1f);
 
+  diode->plug(audio, vital::SynthFilter::kAudio);
+  diode->plug(reset, vital::SynthFilter::kReset);
+  diode->plug(drive, vital::SynthFilter::kDriveGain);
 
-  for (int i = 0; i < 128; ++i) {
-    auto factor = 0.5f * ((i % 2 == 0) ? 1.0f : -1.0f);
-    buffer[i].set(0, factor);
-    buffer[i].set(1, factor);
-    buffer[i].set(2, factor);
-    buffer[i].set(3, factor);
-  }
+  playFirstVoice(reset, diode);
 
-  reverb->processWithInput(buffer, 128);
+  reset->clearTrigger();
+  fillBuffer(drive->buffer, 128, 0.7f);
 
-  // for (int i = 0; i < 128; ++i) {
-  //   std::cout << buffer[i][0] << " " << buffer[i][1] << " " << buffer[i][2] << " " << buffer[i][3] << std::endl;
-  // }
+  playSecondVoice(reset, diode);
 
-  std::cout << "pls" << std::endl;
+  reset->clearTrigger();
+  fillBuffer(drive->buffer, 128, 0.35f);
+
+  playFirstVoice(reset, diode);
+}
+
+void playSecondVoice(vital::Output* reset, vital::DiodeFilter* diode) {
+  std::cout << "playing second" << std::endl;
+  poly_mask second_mask = constants::kSecondMask;
+  reset->trigger(second_mask, kVoiceOn, 0);
+  diode->process(128);
+}
+
+void playFirstVoice(vital::Output* reset, vital::DiodeFilter* diode) {
+  std::cout << "playing first" << std::endl;
+  poly_mask first_mask = constants::kFirstMask;
+  reset->trigger(first_mask, kVoiceOn, 0);
+  diode->process(128);
 }

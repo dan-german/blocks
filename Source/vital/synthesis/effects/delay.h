@@ -46,6 +46,7 @@ public:
     kStyle,
     kFilterCutoff,
     kFilterSpread,
+    kReset,
     kNumInputs
   };
 
@@ -61,7 +62,7 @@ public:
   };
 
   Delay(int size): Processor(Delay::kNumInputs, 1) {
-    memory_ = std::make_unique<MemoryType>(size);
+    memory_ = new MemoryType(size);// std::make_unique<MemoryType>(size);
     last_frequency_ = 2.0f;
     feedback_ = 0.0f;
     wet_ = 0.0f;
@@ -76,7 +77,15 @@ public:
 
   virtual ~Delay() { }
 
-  virtual Processor* clone() const override { VITAL_ASSERT(false); return nullptr; }
+  virtual Processor* clone() const override {
+    auto new_delay = new Delay(*this);
+
+    std::cout << "Delay::clone()" << std::endl;
+
+    new_delay->memory_ = new MemoryType(memory_->getSize());
+    new_delay->hardReset();
+    return new_delay;
+  }
 
   void hardReset() override;
   void setMaxSamples(int max_samples);
@@ -137,7 +146,8 @@ public:
 protected:
   Delay(): Processor(0, 0) { }
 
-  std::unique_ptr<MemoryType> memory_;
+  // std::unique_ptr<MemoryType> memory_;
+  MemoryType* memory_;
   poly_float last_frequency_;
   poly_float feedback_;
   poly_float wet_;

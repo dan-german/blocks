@@ -21,7 +21,7 @@
 
 namespace vital {
 
-class StereoMemory;
+class Memory;
 
 class Reverb: public Processor {
 public:
@@ -58,6 +58,7 @@ public:
     kSize,
     kDelay,
     kWet,
+    kReset,
     kNumInputs
   };
 
@@ -103,7 +104,7 @@ public:
   }
 
   virtual Processor* clone() const override;
-  StereoMemory* memory_;
+  Memory* memory_;
   poly_float decays_[kNetworkContainers];
   poly_float* allpass_lookups_[kNetworkContainers];
   mono_float* feedback_memories_[kNetworkSize];
@@ -140,7 +141,7 @@ private:
   poly_mask allpass_mask_;
   int poly_allpass_mask_;
 
-  void reset(poly_mask mask) override;
+  // void reset(poly_mask mask) override;
 
   JUCE_LEAK_DETECTOR(Reverb)
 };

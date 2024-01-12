@@ -44,7 +44,8 @@ void Delay<MemoryType>::hardReset() {
 
 template<class MemoryType>
 void Delay<MemoryType>::setMaxSamples(int max_samples) {
-  memory_ = std::make_unique<MemoryType>(max_samples);
+  memory_ = new MemoryType(max_samples);
+  // std::make_unique<MemoryType>(max_samples);
   period_ = utils::min(period_, max_samples - 1);
 }
 
@@ -66,8 +67,20 @@ void Delay<MemoryType>::processWithInput(const poly_float* audio_in, int num_sam
   poly_float current_low_coefficient = low_coefficient_;
   poly_float current_high_coefficient = high_coefficient_;
 
-  poly_float target_frequency = input(kFrequency)->at(0);
 
+  auto reset_mask = getResetMask(kReset);
+  if (reset_mask.anyMask()) { 
+    // std::cout << this << " reset mask: " << reset_mask[0] << " " << reset_mask[1] << " " << reset_mask[2] << " " << reset_mask[3] << std::endl;
+    current_wet = utils::maskLoad(current_wet, wet_, reset_mask);
+    current_dry = utils::maskLoad(current_dry, dry_, reset_mask);
+    current_feedback = utils::maskLoad(current_feedback, feedback_, reset_mask);
+    current_period = utils::maskLoad(current_period, period_, reset_mask);
+    current_filter_gain = utils::maskLoad(current_filter_gain, filter_gain_, reset_mask);
+    current_low_coefficient = utils::maskLoad(current_low_coefficient, low_coefficient_, reset_mask);
+    current_high_coefficient = utils::maskLoad(current_high_coefficient, high_coefficient_, reset_mask);
+  }
+
+  poly_float target_frequency = input(kFrequency)->at(0);
   Style style = static_cast<Style>(static_cast<int>(input(kStyle)->at(0)[0]));
   if (style == kStereo || style == kPingPong || style == kMidPingPong)
     target_frequency = utils::maskLoad(target_frequency, input(kFrequencyAux)->at(0), constants::kRightMask);
@@ -187,6 +200,7 @@ void Delay<MemoryType>::process(const poly_float* audio_in, int num_samples,
   poly_float current_filter_gain,
   poly_float current_low_coefficient, poly_float current_high_coefficient,
   poly_float current_wet, poly_float current_dry) {
+
   mono_float tick_increment = 1.0f / num_samples;
   poly_float delta_wet = (wet_ - current_wet) * tick_increment;
   poly_float delta_dry = (dry_ - current_dry) * tick_increment;
@@ -314,9 +328,7 @@ force_inline poly_float Delay<MemoryType>::tickCleanUnfiltered(poly_float audio_
 }
 
 template<class MemoryType>
-force_inline poly_float Delay<MemoryType>::tickUnfiltered(poly_float audio_in, poly_float period,
-  poly_float feedback,
-  poly_float wet, poly_float dry) {
+force_inline poly_float Delay<MemoryType>::tickUnfiltered(poly_float audio_in, poly_float period, poly_float feedback, poly_float wet, poly_float dry) {
   poly_float read = memory_->get(period);
   memory_->push(saturate(audio_in + read * feedback));
   return dry * audio_in + wet * read;

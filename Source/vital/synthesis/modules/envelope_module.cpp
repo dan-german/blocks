@@ -36,7 +36,7 @@ void EnvelopeModule::init() {
   Output* hold = createPolyModControl2({ .name = "hold", .max = 1.41421, .value_scale = ValueScale::kQuadratic });
   Output* decay = createPolyModControl2({ .name = "decay", .max = 2.37842, .default_value = 1.0, .value_scale = ValueScale::kQuartic });
   Output* sustain = createPolyModControl2({ .name = "sustain", .default_value = 1.0, });
-  Output* release = createPolyModControl2({ .name = "release", .max = 2.37842, .default_value = 0.5476, .value_scale = ValueScale::kQuartic });
+  Output* release = createPolyModControl2({ .name = "release", .max = 2.37842, .default_value = 1.0476, .value_scale = ValueScale::kQuartic });
 
   Value* attack_power = createBaseControl2({ .name = "attack_power", .min = -20.0, .max = 20.0 });
   Value* decay_power = createBaseControl2({ .name = "decay_power", .min = -20.0, .max = 20.0, .default_value = -2.0 });

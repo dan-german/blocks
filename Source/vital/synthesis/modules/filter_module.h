@@ -51,7 +51,6 @@ public:
   void hardReset() override;
   virtual Processor* clone() const override {
     FilterModule* newModule = new FilterModule(*this);
-    std::cout << "FilterModule::clone" << newModule->diode_filter_ << std::endl;
     newModule->last_model_ = -1;
     return newModule;
   }

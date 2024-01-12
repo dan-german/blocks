@@ -34,6 +34,7 @@
 #include "lfo_module_new.h"
 #include "blocks_voice_handler.h"
 #include "vital/synthesis/modules/reverb_module.h"
+#include "vital/synthesis/modules/delay_module.h"
 
 namespace vital {
 
@@ -174,6 +175,7 @@ void BlocksVoiceHandler::init() {
   createNoteArticulation();
   createOscillators();
   createReverbs();
+  createDelays();
   createModulators();
   createFilters(note_from_reference_->output());
   createVoiceOutput();
@@ -275,8 +277,20 @@ void BlocksVoiceHandler::createReverbs() {
     auto reverb = std::make_shared<ReverbModule>();
     addSubmodule(reverb.get());
     addProcessor(reverb.get());
+    reverb->plug(reset(), ReverbModule::kReset);  
     reverb->enable(false);
     processor_pool_["reverb"].push_back(reverb);
+  }
+}
+
+void BlocksVoiceHandler::createDelays() {
+  for (int i = 0; i < 5; i++) {
+    auto delay = std::make_shared<DelayModule>(beats_per_second_);
+    delay->plug(reset(), DelayModule::kReset);
+    addSubmodule(delay.get());
+    addProcessor(delay.get());
+    delay->enable(false);
+    processor_pool_["delay"].push_back(delay);
   }
 }
 
@@ -303,20 +317,19 @@ std::shared_ptr<SynthModule> BlocksVoiceHandler::createProcessor(std::shared_ptr
     module->parameters_[5]->val = processor->control_map_["mix"];
     processor->control_map_["on"]->set(1.0f);
   } else if (module->id.type == "reverb") {
-    processor->enable(true);
-
     module->parameter_map_["chorus_frequency"]->val = processor->control_map_["reverb_chorus_frequency"];
     module->parameter_map_["decay_time"]->val = processor->control_map_["reverb_decay_time"];
-    module->parameter_map_["dry_wet"]->val = processor->control_map_["reverb_dry_wet"];
+    module->parameter_map_["dry_wet"]->val = processor->control_map_["dry_wet"];
     module->parameter_map_["high_shelf_cutoff"]->val = processor->control_map_["reverb_high_shelf_cutoff"];
     module->parameter_map_["high_shelf_gain"]->val = processor->control_map_["reverb_high_shelf_gain"];
     module->parameter_map_["low_shelf_cutoff"]->val = processor->control_map_["reverb_low_shelf_cutoff"];
     module->parameter_map_["low_shelf_gain"]->val = processor->control_map_["reverb_low_shelf_gain"];
-    // module->parameter_map_["on"]->val = processor->control_map_["on"];
     module->parameter_map_["pre_high_cutoff"]->val = processor->control_map_["reverb_pre_high_cutoff"];
     module->parameter_map_["pre_low_cutoff"]->val = processor->control_map_["reverb_pre_low_cutoff"];
     module->parameter_map_["size"]->val = processor->control_map_["reverb_size"];
     module->parameter_map_["delay"]->val = processor->control_map_["reverb_delay"];
+  } else if (module->id.type == "delay") { 
+
   }
 
   auto index = module->index;

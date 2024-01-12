@@ -21,28 +21,30 @@
 
 namespace vital {
 
-DelayModule::DelayModule(const Output* beats_per_second): SynthModule(0, 1), beats_per_second_(beats_per_second) {
+DelayModule::DelayModule(const Output* beats_per_second): SynthModule(2, 1), beats_per_second_(beats_per_second) {
   int size = kMaxDelayTime * getSampleRate();
-  delay_ = new StereoDelay(size);
-  addIdleProcessor(delay_);
+  delay_ = new MultiDelay(size);
+  addProcessor(delay_);
 }
 
 DelayModule::~DelayModule() { }
 
 void DelayModule::init() {
+  delay_->useInput(input());
   delay_->useOutput(output());
+  delay_->useInput(input(kReset), MultiDelay::kReset);
 
-  Output* free_frequency = createMonoModControl("delay_frequency");
+  Output* free_frequency = createPolyModControl2({ .name = "frequency", .min = -2.0f, .max = 9.0f, .value_scale = ValueScale::kExponential, .default_value = 2.0f });
+  Output* free_frequency_aux = createPolyModControl2({ .name = "aux_frequency", .min = -2.0f, .max = 9.0f, .value_scale = ValueScale::kExponential, .default_value = 2.0f });
+
   Output* frequency = createTempoSyncSwitch("delay", free_frequency->owner, beats_per_second_, false);
-  Output* free_frequency_aux = createMonoModControl("delay_aux_frequency");
   Output* frequency_aux = createTempoSyncSwitch("delay_aux", free_frequency_aux->owner, beats_per_second_, false);
-  Output* feedback = createMonoModControl("delay_feedback");
-  Output* wet = createMonoModControl("delay_dry_wet");
+  Output* feedback = createPolyModControl2({ .name = "feedback", .min = -1.0f, .default_value = 0.5f });
+  Output* wet = createPolyModControl2({ .name = "wet",  .default_value = 0.5f });
 
-  Output* filter_cutoff = createMonoModControl("delay_filter_cutoff");
-  Output* filter_spread = createMonoModControl("delay_filter_spread");
-
-  Value* style = createBaseControl("delay_style");
+  Output* filter_cutoff = createPolyModControl2({ .name = "filter_cutoff", .min = 8.0f, .max = 136.0f, .default_value = 60.0f });
+  Output* filter_spread = createPolyModControl2({ .name = "filter_spread", .default_value = 1.0f });
+  Value* style = createBaseControl2({ .name = "style", .max = 3.0f, .value_scale = ValueScale::kIndexed });
 
   delay_->plug(frequency, StereoDelay::kFrequency);
   delay_->plug(frequency_aux, StereoDelay::kFrequencyAux);
@@ -66,8 +68,16 @@ void DelayModule::setOversampleAmount(int oversample) {
   delay_->setMaxSamples(kMaxDelayTime * getSampleRate());
 }
 
+int i = 0;
+
 void DelayModule::processWithInput(const poly_float* audio_in, int num_samples) {
   SynthModule::process(num_samples);
-  delay_->processWithInput(audio_in, num_samples);
+  // delay_->processWithInput(audio_in, num_samples);
+
+  if (i % 100 == 0) {
+    utils::print(audio_in[0], " de: ", this);
+  }
+
+  i++;
 }
 } // namespace vital

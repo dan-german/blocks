@@ -38,8 +38,13 @@ struct AddControlInput {
   mono_float min = 0.0f;
   mono_float max = 1.0f;
   mono_float default_value = 0.0f;
+  // Processor* frequency = nullptr;
+  // const Output* beats_per_second = nullptr;
+  // bool poly = false;
+  // Input* midi = nullptr;
 };
 
+// std::string name, Processor* frequency, const Output* beats_per_second, bool poly, Input* midi = nullptr
 class StatusOutput {
 public:
   static constexpr float kClearValue = INT_MIN;
@@ -142,6 +147,7 @@ protected:
   Output* createBaseModControl2(AddControlInput input);
   Output* createMonoModControl2(AddControlInput input);
   Output* createPolyModControl2(AddControlInput input);
+  // Output* createTempoSyncSwitch2(AddControlInput input);
 
   std::shared_ptr<ModuleData> data_;
 

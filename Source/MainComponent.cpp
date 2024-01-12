@@ -36,9 +36,9 @@ MainComponent::MainComponent(juce::MidiKeyboardState& keyboard_state, Delegate* 
   auto f = addBlock(6, { 1, 0 });
   spawnBlockComponent(f);
 
-  // addModulator(Model::Types::adsr);
+  addModulator(Model::Types::lfo);
   // ui_layer_.modulators_.setVisible(true);
-  // delegate->editorConnectedModulation(0, "osc_1", "level");
+  // delegate->editorConnectedModulation(0, "reverb_1", "dry_wet");
 }
 
 void MainComponent::updateDotPosition(const Point<int> position) {
@@ -342,7 +342,7 @@ std::shared_ptr<model::Block> MainComponent::addBlock(int code, Index index) {
   case 5: block = delegate->editorAddedBlock2(Model::Types::filter, index); break;
     // case 5: block = delegate->editorAddedBlock(Model::Types::filter, index); break;
   case 6: block = delegate->editorAddedBlock2(Model::Types::reverb, index); break;
-    // case 7: block = delegate->editorAddedBlock(Model::Types::delay, index); break;
+  case 7: block = delegate->editorAddedBlock2(Model::Types::delay, index); break;
     // case 8: block = delegate->editorAddedBlock(Model::Types::drive, index); break;
     // case 9: block = delegate->editorAddedBlock(Model::Types::mixer, index); break;
   default: break;

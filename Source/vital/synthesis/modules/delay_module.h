@@ -27,6 +27,11 @@ class DelayModule: public SynthModule {
 public:
   static constexpr mono_float kMaxDelayTime = 4.0f;
 
+  enum { 
+    kAudioIn, 
+    kReset
+  };
+
   DelayModule(const Output* beats_per_second);
   virtual ~DelayModule();
 
@@ -41,13 +46,22 @@ public:
   virtual void setSampleRate(int sample_rate) override;
   virtual void setOversampleAmount(int oversample) override;
   virtual void processWithInput(const poly_float* audio_in, int num_samples) override;
-  virtual Processor* clone() const override { return new DelayModule(*this); }
+
+  void process(int num_samples) override {
+    auto buffer = input(0)->source->buffer;
+    processWithInput(input(0)->source->buffer, num_samples);
+  }
+
+  virtual Processor* clone() const override {
+    auto r = new DelayModule(*this);
+    std::cout << "DelayModule::clone(): " << std::endl;  
+    return r;
+  }
 
 protected:
   const Output* beats_per_second_;
-  StereoDelay* delay_;
+  MultiDelay* delay_;
 
   JUCE_LEAK_DETECTOR(DelayModule)
 };
 } // namespace vital
-
