@@ -49,7 +49,7 @@ max_allpass_size_(0), max_feedback_size_(0),
 feedback_mask_(0), allpass_mask_(0), poly_allpass_mask_(0) {
   setupBuffersForSampleRate(kDefaultSampleRate);
 
-  memory_ = new Memory(kMaxSampleRate);
+  memory_ = new StereoMemory(kMaxSampleRate);
 
   for (int i = 0; i < kNetworkContainers; ++i)
     decays_[i] = 0.0f;
@@ -111,7 +111,7 @@ void Reverb::processWithInput(const poly_float* audio_in, int num_samples) {
 
   poly_mask reset_mask = getResetMask(kReset);
   if (reset_mask.anyMask()) {
-    // reset(reset_mask);
+    reset(reset_mask);
 
     current_dry = utils::maskLoad(current_dry, dry_, reset_mask);
     current_wet = utils::maskLoad(current_wet, wet_, reset_mask);
@@ -410,10 +410,36 @@ void Reverb::hardReset() {
   }
 }
 
+void Reverb::reset(poly_mask mask) {
+  wet_ = utils::maskLoad(wet_, 0.0f, mask);
+  dry_ = utils::maskLoad(dry_, 0.0f, mask);
+  low_pre_filter_.reset(mask);
+  high_pre_filter_.reset(mask);
+
+  chorus_amount_ = utils::clamp(input(kChorusAmount)->at(0)[0], 0.0f, 1.0f) * kMaxChorusDrift;
+  chorus_amount_ = utils::maskLoad(chorus_amount_, 0.0f, mask);
+
+  for (int i = 0; i < kNetworkContainers; ++i) {
+    low_shelf_filters_[i].reset(mask);
+    high_shelf_filters_[i].reset(mask);
+    decays_[i] = 0.0f;
+  }
+
+  for (int n = 0; n < kNetworkContainers; ++n) {
+    for (int i = 0; i < max_allpass_size_; ++i)
+      allpass_lookups_[n][i] = utils::maskLoad(allpass_lookups_[n][i], 0.0f, mask);
+  }
+
+  for (int n = 0; n < kNetworkSize; ++n) {
+    for (int i = 0; i < max_feedback_size_ + kExtraLookupSample; ++i)
+      feedback_memories_[n][i] = 0.0f; 
+  }
+}
+
 Processor* Reverb::clone() const {
   auto new_reverb = new Reverb(*this);
   new_reverb->max_feedback_size_ = 0;
-  new_reverb->memory_ = new Memory(kMaxSampleRate); 
+  new_reverb->memory_ = new StereoMemory(kMaxSampleRate); 
 
   new_reverb->setupBuffersForSampleRate(kDefaultSampleRate);
   new_reverb->hardReset();

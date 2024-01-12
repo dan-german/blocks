@@ -21,7 +21,7 @@
 
 namespace vital {
 
-class Memory;
+class StereoMemory;
 
 class Reverb: public Processor {
 public:
@@ -79,6 +79,7 @@ public:
   void setOversampleAmount(int oversample_amount) override;
   void setupBuffersForSampleRate(int sample_rate);
   void hardReset() override;
+  void reset(poly_mask mask) override;
 
   force_inline poly_float readFeedback(const mono_float* const* lookups, poly_float offset) {
     poly_float write_offset = poly_float(write_index_) - offset;
@@ -104,7 +105,7 @@ public:
   }
 
   virtual Processor* clone() const override;
-  Memory* memory_;
+  StereoMemory* memory_;
   poly_float decays_[kNetworkContainers];
   poly_float* allpass_lookups_[kNetworkContainers];
   mono_float* feedback_memories_[kNetworkSize];
