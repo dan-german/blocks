@@ -30,7 +30,7 @@ PluginProcessor::PluginProcessor(): juce::AudioProcessor(BusesProperties().withO
   //   }
   // }
 
-  // please(); exit(1);
+  please(); exit(1);
 
   last_seconds_time_ = 0.0;
 

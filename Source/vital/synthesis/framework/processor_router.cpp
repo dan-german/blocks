@@ -129,7 +129,7 @@ void ProcessorRouter::setOversampleAmount(int oversample) {
     local_feedback_order_[i]->setOversampleAmount(oversample);
 }
 
-void ProcessorRouter::addProcessor(Processor* processor) {
+void ProcessorRouter::addProcessordependencies_(Processor* processor) {
   VITAL_ASSERT(processor->router() == nullptr);
   global_order_->ensureSpace();
   global_reorder_->ensureCapacity(global_order_->capacity());
@@ -231,7 +231,7 @@ void ProcessorRouter::reorder(Processor* processor) {
 
   for (int i = 0; i < num_processors; ++i) {
     Processor* current_processor = global_order_->at(i);
-    if (current_processor != processor && !dependencies_->contains(current_processor))
+    if (current_processor != processor && !->contains(current_processor))
       global_reorder_->push_back(current_processor);
   }
 
@@ -376,8 +376,7 @@ void ProcessorRouter::deleteRemovedProcessors() {
 
 const Processor* ProcessorRouter::getContext(const Processor* processor) const {
   const Processor* context = processor;
-  while (context && processors_.find(context) == processors_.end() &&
-    idle_processors_.find(context) == idle_processors_.end()) {
+  while (context && processors_.find(context) == processors_.end() && idle_processors_.find(context) == idle_processors_.end()) {
     context = context->router();
   }
 

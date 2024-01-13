@@ -37,7 +37,7 @@ void PresetManager::loadPresetsDirectory() {
       if (auto preset = coder->decode(stringFile))
         presets.add(*preset);
     } catch (const std::exception& e) {
-      DBG("Error decoding " + file.getFullPathName());
+      // DBG("Error decoding " + file.getFullPathName());
     }
   }
 }

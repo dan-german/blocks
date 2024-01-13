@@ -79,9 +79,6 @@ public:
 
   virtual Processor* clone() const override {
     auto new_delay = new Delay(*this);
-
-    std::cout << "Delay::clone()" << std::endl;
-
     new_delay->memory_ = new MemoryType(memory_->getSize());
     new_delay->hardReset();
     return new_delay;

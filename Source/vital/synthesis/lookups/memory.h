@@ -116,12 +116,8 @@ protected:
 
 class Memory: public MemoryTemplate<poly_float::kSize> {
 public:
-  Memory(int size): MemoryTemplate(size) {
-    DBG("Memory::Memory()");
-  }
-  Memory(Memory& other): MemoryTemplate(other) {
-    DBG("Memory::Memory(Memory& other)");
-  }
+  Memory(int size): MemoryTemplate(size) { }
+  Memory(Memory& other): MemoryTemplate(other) { }
 
   force_inline poly_float get(poly_float past) const {
     VITAL_ASSERT(poly_float::lessThan(past, kMinPeriod).sum() == 0);
@@ -139,13 +135,8 @@ public:
 
 class StereoMemory: public MemoryTemplate<2> {
 public:
-  StereoMemory(int size): MemoryTemplate(size) {
-    DBG("StereoMemory::StereoMemory()");
-  }
-
-  StereoMemory(StereoMemory& other): MemoryTemplate(other) {
-    DBG("StereoMemory::StereoMemory(StereoMemory& other)");
-  }
+  StereoMemory(int size): MemoryTemplate(size) { }
+  StereoMemory(StereoMemory& other): MemoryTemplate(other) { }
 
   force_inline poly_float get(poly_float past) const {
     VITAL_ASSERT(poly_float::lessThan(past, 2.0f).anyMask() == 0);

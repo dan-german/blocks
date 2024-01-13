@@ -52,12 +52,7 @@ public:
     processWithInput(input(0)->source->buffer, num_samples);
   }
 
-  virtual Processor* clone() const override {
-    auto r = new DelayModule(*this);
-    std::cout << "DelayModule::clone(): " << std::endl;  
-    return r;
-  }
-
+  virtual Processor* clone() const override { return new DelayModule(*this); }
 protected:
   const Output* beats_per_second_;
   MultiDelay* delay_;

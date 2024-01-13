@@ -164,7 +164,7 @@ void MainComponent::setupListeners() {
   };
 
   ui_layer_.newPresetButton->on_click_ = [this]() {
-    DBG("changed preset");
+    // DBG("changed preset");
     delegate->editorChangedPreset(-1);
     clear();
   };
@@ -327,7 +327,7 @@ std::shared_ptr<model::Block> MainComponent::addBlock(int code, Index index) {
   case 2:   // sqr
   case 3: { // tri
     block = delegate->editorAddedBlock2(Model::Types::osc, index);
-    DBG(block->parameters_.size());
+    // DBG(block->parameters_.size());
 
     const float code_wavetable_frame =
       code / 4.0 * (vital::kNumOscillatorWaveFrames - 1);

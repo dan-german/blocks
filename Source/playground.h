@@ -8,55 +8,24 @@
 
 using namespace vital;
 
+class MyProcessor: public Processor {
+public:
+  float val;
+  MyProcessor(float val): Processor(1, 1), val(val) {}
+  Processor* clone() const override { return nullptr; }
 
-void fillBuffer(poly_float* buffer, int size, float val) {
-  for (int i = 0; i < size; i++) {
-    buffer[i].set(0, val);
-    buffer[i].set(1, val);
-    buffer[i].set(2, val);
-    buffer[i].set(3, val);
+  void process(int num_samples) override {
+    auto buffer = input()->source->buffer;
+    for (int i = 0; i < num_samples; ++i) { buffer[i] = val; }
+    std::cout << "processing: " << val << std::endl;
   }
-}
-
-void playFirstVoice(vital::Output* reset, vital::DiodeFilter* diode);
-
-void playSecondVoice(vital::Output* reset, vital::DiodeFilter* diode);
+};
 
 void please() {
-  auto diode = new vital::DiodeFilter();
-  auto audio = new vital::Output();
-  auto reset = new vital::Output();
-
-  auto drive = new vital::Output();
-  fillBuffer(drive->buffer, 128, 0.1f);
-
-  diode->plug(audio, vital::SynthFilter::kAudio);
-  diode->plug(reset, vital::SynthFilter::kReset);
-  diode->plug(drive, vital::SynthFilter::kDriveGain);
-
-  playFirstVoice(reset, diode);
-
-  reset->clearTrigger();
-  fillBuffer(drive->buffer, 128, 0.7f);
-
-  playSecondVoice(reset, diode);
-
-  reset->clearTrigger();
-  fillBuffer(drive->buffer, 128, 0.35f);
-
-  playFirstVoice(reset, diode);
-}
-
-void playSecondVoice(vital::Output* reset, vital::DiodeFilter* diode) {
-  std::cout << "playing second" << std::endl;
-  poly_mask second_mask = constants::kSecondMask;
-  reset->trigger(second_mask, kVoiceOn, 0);
-  diode->process(128);
-}
-
-void playFirstVoice(vital::Output* reset, vital::DiodeFilter* diode) {
-  std::cout << "playing first" << std::endl;
-  poly_mask first_mask = constants::kFirstMask;
-  reset->trigger(first_mask, kVoiceOn, 0);
-  diode->process(128);
+  auto processor = new MyProcessor(0.5f);
+  auto processor2 = new MyProcessor(0.6f);
+  auto router = new vital::ProcessorRouter(1, 1);
+  router->addProcessor(processor);
+  router->addProcessor(processor2);
+  router->process(128);
 }
