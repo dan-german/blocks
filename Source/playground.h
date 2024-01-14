@@ -22,10 +22,21 @@ public:
 };
 
 void please() {
-  auto processor = new MyProcessor(0.5f);
-  auto processor2 = new MyProcessor(0.6f);
+  system("clear");
+  auto lfo = new MyProcessor(0.2f); std::cout << "lfo: " << lfo << std::endl;
+  auto osc = new MyProcessor(0.5f); std::cout << "osc: " << osc << std::endl;
+  osc->plug(lfo, 0);
+
+  auto osc2 = new MyProcessor(0.7f); std::cout << "osc2: " << osc2 << std::endl;
+  osc2->plug(lfo, 0);
+
   auto router = new vital::ProcessorRouter(1, 1);
-  router->addProcessor(processor);
-  router->addProcessor(processor2);
-  router->process(128);
+  router->addProcessor(osc);
+  // router->addProcessor(osc2);
+
+  // auto router2 = new vital::ProcessorRouter(1, 1);
+  // router2->addProcessor(osc2);
+
+  // router2->process(128);
+  std::cout << "yes" << std::endl;
 }
