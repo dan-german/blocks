@@ -151,7 +151,6 @@ void SoundEngine::connectModulation(const modulation_change& change) {
     voice_handler_->setActiveNonaccumulatedOutput(change.poly_destination->output());
   }
 
-  auto a = !destination->isControlRate();
   if (!destination->isControlRate() && !change.source->isControlRate()) {
     change.source->owner->setControlRate(false);
     change.modulation_processor->setControlRate(false);
