@@ -73,6 +73,8 @@ void SoundEngine::init() {
   createBaseControl("pitch_wheel");
   createBaseControl("mod_wheel");
 
+  // connect
+
   // Value* effect_chain_order = createBaseControl("effect_chain_order");
   // effect_chain_ = new ReorderableEffectChain(beats_per_second, voice_handler_->midi_offset_output());
   // addSubmodule(effect_chain_);

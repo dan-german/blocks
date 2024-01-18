@@ -516,8 +516,10 @@ Output* SynthModule::createPolyModControl2(AddControlInput input) {
     poly_total = new ModulationSum();
     if (input.reset)
       poly_total->useInput(input.reset, ModulationSum::kReset);
-  } else
+  } else {
     poly_total = new cr::VariableAdd();
+  }
+
   addProcessor(poly_total);
   data_->poly_mod_destinations[input.name] = poly_total;
 

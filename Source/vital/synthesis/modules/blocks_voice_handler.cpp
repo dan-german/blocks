@@ -309,7 +309,7 @@ std::shared_ptr<SynthModule> BlocksVoiceHandler::createProcessor(std::shared_ptr
     module->parameter_map_["tune"]->val = processor->control_map_["tune"];
     module->parameter_map_["unison_voices"]->val = processor->control_map_["unison_voices"];
     module->parameter_map_["unison_detune"]->val = processor->control_map_["unison_detune"];
-    module->parameter_map_["level"]->val = processor->control_map_["amplitude"];
+    module->parameter_map_["level"]->val = processor->control_map_["level"];
     module->parameter_map_["pan"]->val = processor->control_map_["pan"];
   } else if (module->id.type == "filter") {
     module->parameters_[0]->val = processor->control_map_["model"];

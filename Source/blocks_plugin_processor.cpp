@@ -53,6 +53,7 @@ PluginProcessor::PluginProcessor(): juce::AudioProcessor(BusesProperties().withO
   // synth_->addModulator("lfo");
   // synth_->connectModulation(0, "osc_1", "tune");
   // synth_->connectModulation(0, "filter_1", "cutoff");
+  // synth_->connectModulation(
 }
 
 PluginProcessor::~PluginProcessor() {
@@ -347,7 +348,7 @@ void PluginProcessor::editorRepositionedBlock(Index from, Index to) {
 }
 
 void PluginProcessor::editorConnectedModulation(int modulatorIndex, std::string target_name, std::string parameter) {
-  synth_->connectModulation(modulatorIndex, target_name, parameter);
+  synth_->connectModulation(modulatorIndex, target_name, "amp_env_destination");
   // Analytics::shared()->countAction("Modulation Connected");
   // connect(modulatorIndex, targetName, parameter);
 }

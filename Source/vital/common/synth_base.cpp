@@ -60,6 +60,8 @@ SynthBase::SynthBase(): expired_(false) {
   controls_ = engine_->getControls();
 
   Startup::doStartupChecks(midi_manager_.get());
+
+  // connectModulation("osc_1", "level", "envelope_1");
 }
 
 SynthBase::~SynthBase() { }
@@ -799,11 +801,11 @@ void SynthBase::connectModulation(int modulator_index, std::string target_name, 
 
   auto connection_name = "modulation_" + std::to_string(connection_module->number) + "_amount";
 
-  bool addingADSRtoOSCLevel = source->id.type == "envelope" && target->id.type == "osc" && parameter_name == "level";
-  if (addingADSRtoOSCLevel) {
-    getVoiceHandler()->setOSCAmplitudeEnvelope(source, target);
-    return;
-  }
+  // bool addingADSRtoOSCLevel = source->id.type == "envelope" && target->id.type == "osc" && parameter_name == "level";
+  // if (addingADSRtoOSCLevel) {
+  // getVoiceHandler()->setOSCAmplitudeEnvelope(source, target);
+  // return;
+  // }
 
   std::string modulator_name = getModuleManager().getModulator(modulator_index)->name;
 
@@ -811,7 +813,7 @@ void SynthBase::connectModulation(int modulator_index, std::string target_name, 
 
   bool create = connection == nullptr;
   if (create) {
-    auto adjusted_name = target_name; 
+    auto adjusted_name = target_name;
     connection = getModulationBank().createConnection(modulator_name, adjusted_name);
   }
 

@@ -63,7 +63,7 @@ public:
   }
 
   void switchLevelEnvelope(EnvelopeModule* envelope) {
-
+    amp_env_multiply_->plug(envelope->output(), 0);
   }
 
   Value* on_;
@@ -75,7 +75,7 @@ protected:
   SynthOscillator* oscillator_;
   Value* distortion_type_;
 
-  Multiply* env_multiply_ = new Multiply();
+  Multiply* amp_env_multiply_ = new Multiply();
 
   JUCE_LEAK_DETECTOR(OscillatorModule)
 };

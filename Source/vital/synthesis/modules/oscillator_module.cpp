@@ -48,7 +48,7 @@ void OscillatorModule::init() {
   Output* unison_detune = createPolyModControl2({ .name = "unison_detune", .value_scale = ValueScale::kQuadratic, .default_value = 4.472135955 });
   Output* detune_power = createPolyModControl2({ .name = "detune_power" });
   Output* detune_range = createPolyModControl2({ .name = "detune_range", .max = 48, .default_value = 2.0 });
-  Output* amplitude = createPolyModControl2({ .name = "amplitude", .audio_rate = true, .smooth_value = true, .reset = reset, .default_value = 0.70710678119 });
+  Output* amplitude = createPolyModControl2({ .name = "level", .audio_rate = true, .smooth_value = true, .reset = reset, .default_value = 0.70710678119 });
   Output* pan = createPolyModControl2({ .name = "pan", .min = -1.0 });
   Output* phase = createPolyModControl2({ .name = "phase", .audio_rate = true, .smooth_value = true, .reset = reset, .default_value = 0.5 });
   Output* distortion_phase = createPolyModControl2({ .name = "distortion_phase", .default_value = 0.5 });
@@ -94,18 +94,14 @@ void OscillatorModule::init() {
   oscillator_->plug(spectral_morph_type, SynthOscillator::kSpectralMorphType);
   oscillator_->plug(spectral_morph_amount, SynthOscillator::kSpectralMorphAmount);
 
+  Output* amp_env_destination = createPolyModControl2({ .name = "amp_env_destination", .default_value = 0.0, .audio_rate = true });
+
   addProcessor(oscillator_);
+  addProcessor(amp_env_multiply_);
 
-  amplitude_envelope_ = std::make_shared<EnvelopeModule>(true);
-  addProcessor(amplitude_envelope_.get());
-
-  addProcessor(env_multiply_);
-
-  env_multiply_->plug(amplitude_envelope_->output(), 0);
-  env_multiply_->plug(oscillator_, 1);
-  env_multiply_->useOutput(output(kRaw), 0);
-
-  amplitude_envelope_.get()->plug(input(kRetrigger)->source, EnvelopeModule::kTrigger);
+  amp_env_multiply_->plug(amp_env_destination, 0);
+  amp_env_multiply_->plug(oscillator_, 1);
+  amp_env_multiply_->useOutput(output(kRaw), 0);
 
   SynthModule::init();
 }
@@ -121,5 +117,6 @@ void OscillatorModule::process(int num_samples) {
   }
 
   *was_on_ = on;
+  utils::print(output(0)->buffer[0], "osc", this);
 }
 } // namespace vital

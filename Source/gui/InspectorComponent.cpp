@@ -27,6 +27,7 @@ void InspectorComponent::setConfiguration(std::shared_ptr<model::Module> module)
 }
 
 void InspectorComponent::spawnSlider(vital::ValueDetails parameter) {
+  if (parameter.hidden) return;
   auto slider = new InspectorSlider();
   // auto audioParameter = parameter->audioParameter;
 
