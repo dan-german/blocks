@@ -95,10 +95,10 @@ void SynthGuiInterface::notifyModulationValueChanged(int index) {
 }
 
 void SynthGuiInterface::connectModulation(std::string source, std::string destination) {
-  bool created = synth_->connectModulation(source, destination);
-  if (created)
-    initModulationValues(source, destination);
-  notifyModulationsChanged();
+  // bool created = synth_->connectModulation(source, destination);
+  // if (created)
+  //   initModulationValues(source, destination);
+  // notifyModulationsChanged();
 }
 
 void SynthGuiInterface::connectModulation(vital::ModulationConnection* connection) {
@@ -147,8 +147,8 @@ void SynthGuiInterface::setModulationValues(const std::string& source, const std
 }
 
 void SynthGuiInterface::disconnectModulation(std::string source, std::string destination) {
-  synth_->disconnectModulation(source, destination);
-  notifyModulationsChanged();
+  // synth_->disconnectModulation(source, destination);
+  // notifyModulationsChanged();
 }
 
 void SynthGuiInterface::disconnectModulation(vital::ModulationConnection* connection) {

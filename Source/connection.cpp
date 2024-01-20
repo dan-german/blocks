@@ -11,6 +11,7 @@
 #include "connection.h"
 #include <juce_core/juce_core.h>
 #include <juce_audio_processors/juce_audio_processors.h>
+#include "vital/synthesis/modules/modulation_connection_processor.h"  
 
 namespace model {
 
@@ -60,5 +61,12 @@ bool Connection::isOscGainEnvelope() {
   return true;
   // using Parameters = Model::OscillatorModule::Parameters;
   // return source->isEnvelope() && target->isOscillator() && Parameters(parameterIndex) == Parameters::pGain;
+}
+
+void Connection::reset(vital::ModulationConnection* vital_connection) {
+  magnitude_parameter_->val = vital_connection->modulation_processor->control_map_["amount"];
+  magnitude_parameter_->val->set(1.0f);
+  bipolar_parameter_->val = vital_connection->modulation_processor->control_map_["bipolar"];
+  vital_connection_ = vital_connection;
 }
 }

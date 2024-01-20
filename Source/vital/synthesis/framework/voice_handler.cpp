@@ -308,6 +308,7 @@ void VoiceHandler::process(int num_samples) {
   active_aggregate_voices_.clear();
   AggregateVoice* last_aggregate_voice = nullptr;
   int last_aggregate_index = 0;
+  
   for (Voice* active_voice : active_voices_) {
     if (active_aggregate_voices_.count(active_voice->parent()) == 0) {
       active_aggregate_voices_.push_back(active_voice->parent());

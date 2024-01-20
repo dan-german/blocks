@@ -96,6 +96,8 @@ public:
   std::map<std::string, std::shared_ptr<SynthModule>> active_modulators_map_;
   std::vector<std::shared_ptr<SynthModule>> active_processors_;
   std::map<std::string, std::shared_ptr<SynthModule>> active_processor_map_;
+
+  std::shared_ptr<EnvelopeModule> default_amplitude_envelope_;
 private:
   void createNoteArticulation();
   void createOscillators();
@@ -120,7 +122,6 @@ private:
   Processor* bent_midi_;
   Processor* current_midi_note_;
   std::shared_ptr<EnvelopeModule> amplitude_envelope_;
-  std::shared_ptr<EnvelopeModule> default_amplitude_envelope_;
   Processor* amplitude_;
   Processor* pitch_wheel_;
   Processor* voice_sum_;

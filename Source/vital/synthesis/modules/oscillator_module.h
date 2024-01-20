@@ -75,7 +75,7 @@ protected:
   SynthOscillator* oscillator_;
   Value* distortion_type_;
 
-  Multiply* amp_env_multiply_ = new Multiply();
+  SmoothMultiply* amp_env_multiply_ = new SmoothMultiply();
 
   JUCE_LEAK_DETECTOR(OscillatorModule)
 };

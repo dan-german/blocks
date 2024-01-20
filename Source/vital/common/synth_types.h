@@ -38,9 +38,10 @@ struct ModulationConnection {
 
   static bool isModulationSourceDefaultBipolar(const std::string& source);
 
-  void resetConnection(const std::string& from, const std::string& to) {
-    source_name = from;
-    destination_name = to;
+  void resetConnection(const std::string& source, const std::string& target, const std::string& parameter) {
+    source_name = source;
+    destination_name = target;
+    parameter_name = parameter;
   }
 
   std::string source_name;
@@ -56,7 +57,7 @@ class ModulationConnectionBank {
 public:
   ModulationConnectionBank();
   ~ModulationConnectionBank();
-  ModulationConnection* createConnection(const std::string& from, const std::string& to);
+  ModulationConnection* createConnection(const std::string& from, const std::string& to, const std::string& parameter);
 
   ModulationConnection* atIndex(int index) { return all_connections_[index].get(); }
   size_t numConnections() { return all_connections_.size(); }

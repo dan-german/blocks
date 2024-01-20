@@ -64,6 +64,7 @@ public:
   virtual ~SynthBase();
 
   void connectModulation(int modulatorIndex, std::string targetName, std::string parameter);
+  vital::ModulationConnection* createConnection(std::__1::string modulator_name, std::__1::string target_name, std::__1::string parameter_name, float destination_scale);
 
   void valueChanged(const std::string& name, vital::mono_float value);
   void valueChangedThroughMidi(const std::string& name, vital::mono_float value) override;
@@ -74,9 +75,9 @@ public:
   void presetChangedThroughMidi(File preset) override;
   void valueChangedExternal(const std::string& name, vital::mono_float value);
   void valueChangedInternal(const std::string& name, vital::mono_float value);
-  bool connectModulation(const std::string& source, const std::string& destination);
+  // bool connectModulation(const std::string& source, const std::string& destination);
   void connectModulation(vital::ModulationConnection* connection);
-  void disconnectModulation(const std::string& source, const std::string& destination);
+  void disconnectModulation(const std::string& source, const std::string& destination, const std::string& parameter);
   void disconnectModulation(vital::ModulationConnection* connection);
   void clearModulations();
   void forceShowModulation(const std::string& source, bool force);
@@ -158,14 +159,13 @@ public:
     std::string control_name;
     vital::mono_float value;
   };
-
 protected:
   vital::modulation_change createModulationChange(vital::ModulationConnection* connection);
   bool isInvalidConnection(const vital::modulation_change& change);
   virtual SynthGuiInterface* getGuiInterface() = 0;
   json saveToJson();
   bool loadFromJson(const json& state);
-  vital::ModulationConnection* getConnection(const std::string& source, const std::string& destination);
+  vital::ModulationConnection* getConnection(const std::string& source, const std::string& destination, const std::string& parameter);
 
   inline bool getNextModulationChange(vital::modulation_change& change) {
     return modulation_change_queue_.try_dequeue_non_interleaved(change);

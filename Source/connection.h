@@ -37,6 +37,8 @@ struct Connection {
   void reset();
   void setMagnitude(float magnitude);
   void setPolarity(bool bipolar);
+  void reset(vital::ModulationConnection* vital_connection_ );
+
   bool operator==(Connection const& rhs) const;
 };
 }

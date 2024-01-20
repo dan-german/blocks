@@ -31,6 +31,7 @@ EnvelopeModule::EnvelopeModule(bool force_audio_rate):
 }
 
 void EnvelopeModule::init() {
+  std::cout << "EnvelopeModule::init()" << std::endl;
   Output* delay = createPolyModControl2({ .name = "delay", .max = 1.41421, .value_scale = ValueScale::kQuadratic });
   Output* attack = createPolyModControl2({ .name = "attack", .max = 2.37842, .default_value = 0.1495, .value_scale = ValueScale::kQuartic });
   Output* hold = createPolyModControl2({ .name = "hold", .max = 1.41421, .value_scale = ValueScale::kQuadratic });

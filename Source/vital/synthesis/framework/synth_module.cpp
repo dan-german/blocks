@@ -514,8 +514,9 @@ Output* SynthModule::createPolyModControl2(AddControlInput input) {
   Processor* poly_total;
   if (input.audio_rate) {
     poly_total = new ModulationSum();
-    if (input.reset)
+    if (input.reset) {
       poly_total->useInput(input.reset, ModulationSum::kReset);
+    }
   } else {
     poly_total = new cr::VariableAdd();
   }

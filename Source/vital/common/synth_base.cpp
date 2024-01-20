@@ -26,6 +26,7 @@
 #include "vital/common/synth_parameters.h"
 #include "vital/synthesis/framework/utils.h"
 #include "vital/synthesis/modules/blocks_voice_handler.h"
+#include "synth_base.h"
 
 SynthBase::SynthBase(): expired_(false) {
   expired_ = LoadSave::isExpired();
@@ -61,7 +62,8 @@ SynthBase::SynthBase(): expired_(false) {
 
   Startup::doStartupChecks(midi_manager_.get());
 
-  // connectModulation("osc_1", "level", "envelope_1");
+  //  osc_1 // connectModulation();
+  // auto connection = createConnection("default_env", "osc_1", "amp_env_destination", 1.0f);
 }
 
 SynthBase::~SynthBase() { }
@@ -119,9 +121,9 @@ void SynthBase::valueChangedExternal(const std::string& name, vital::mono_float 
   callback->post();
 }
 
-vital::ModulationConnection* SynthBase::getConnection(const std::string& source, const std::string& destination) {
+vital::ModulationConnection* SynthBase::getConnection(const std::string& source, const std::string& destination, const std::string& parameter) {
   for (vital::ModulationConnection* connection : mod_connections_) {
-    if (connection->source_name == source && connection->destination_name == destination) {
+    if (connection->source_name == source && connection->destination_name == destination && connection->parameter_name == parameter) {
       return connection;
     }
   }
@@ -152,9 +154,8 @@ vital::modulation_change SynthBase::createModulationChange(vital::ModulationConn
   VITAL_ASSERT(change.mono_modulation_switch != nullptr);
 
   change.destination_scale = connection->destination_scale;
-  // change.poly_modulation_switch = engine_->getPolyModulationSwitch(connection->destination_name);
   change.poly_modulation_switch = target_processor->getPolyModulationSwitch(connection->parameter_name);
-  change.poly_destination = target_processor->getPolyModulationDestination(connection->parameter_name); //engine_->getPolyModulationDestination(connection->destination_name);
+  change.poly_destination = target_processor->getPolyModulationDestination(connection->parameter_name);
   change.modulation_processor = connection->modulation_processor.get();
 
   int num_audio_rate = 0;
@@ -186,20 +187,20 @@ void SynthBase::connectModulation(vital::ModulationConnection* connection) {
   }
 }
 
-bool SynthBase::connectModulation(const std::string& source, const std::string& destination) {
-  vital::ModulationConnection* connection = getConnection(source, destination);
-  bool create = connection == nullptr;
-  if (create) connection = getModulationBank().createConnection(source, destination);
+// bool SynthBase::connectModulation(const std::string& source, const std::string& destination) {
+//   vital::ModulationConnection* connection = getConnection(source, destination);
+//   bool create = connection == nullptr;
+//   if (create) connection = getModulationBank().createConnection(source, destination);
 
-  if (connection) {
-    connectModulation(connection);
-  }
+//   if (connection) {
+//     connectModulation(connection);
+//   }
 
-  connection->modulation_processor->lineMapGenerator()->initLinear();
-  // initModulationValues(source, destination);
+//   connection->modulation_processor->lineMapGenerator()->initLinear();
+//   // initModulationValues(source, destination);
 
-  return create;
-}
+//   return create;
+// }
 
 void SynthBase::initModulationValues(const std::string& source, const std::string& destination) {
   int connection_index = getConnectionIndex(source, destination);
@@ -228,8 +229,8 @@ void SynthBase::disconnectModulation(vital::ModulationConnection* connection) {
   modulation_change_queue_.enqueue(change);
 }
 
-void SynthBase::disconnectModulation(const std::string& source, const std::string& destination) {
-  vital::ModulationConnection* connection = getConnection(source, destination);
+void SynthBase::disconnectModulation(const std::string& source, const std::string& destination, const std::string& parameter) {
+  vital::ModulationConnection* connection = getConnection(source, destination, parameter);
   if (connection)
     disconnectModulation(connection);
 }
@@ -796,37 +797,34 @@ void SynthBase::connectModulation(int modulator_index, std::string target_name, 
   auto target = module_manager_.getModule(target_name);
   auto source = module_manager_.getModulator(modulator_index);
 
-  auto connection_module = module_manager_.addConnection(source, target, parameter_name);
-  if (!connection_module) return;
-
-  auto connection_name = "modulation_" + std::to_string(connection_module->number) + "_amount";
-
-  // bool addingADSRtoOSCLevel = source->id.type == "envelope" && target->id.type == "osc" && parameter_name == "level";
-  // if (addingADSRtoOSCLevel) {
-  // getVoiceHandler()->setOSCAmplitudeEnvelope(source, target);
-  // return;
-  // }
-
   std::string modulator_name = getModuleManager().getModulator(modulator_index)->name;
 
-  vital::ModulationConnection* connection = getConnection(modulator_name, parameter_name);
+  bool is_env_to_osc_level = source->id.type == "envelope" && target->id.type == "osc" && parameter_name == "level";
+  if (is_env_to_osc_level) {
+    disconnectModulation("default_env", target_name, "amp_env_destination");
+  }
 
+  auto parameter = target->parameter_map_[parameter_name];
+  auto destination_scale = parameter->max - parameter->min;
+
+  auto connection_model = module_manager_.addConnection(source, target, parameter_name);
+  if (!connection_model) return;
+
+  parameter_name = is_env_to_osc_level ? "amp_env_destination" : parameter_name;
+
+  auto connection = createConnection(modulator_name, target_name, parameter_name, destination_scale);
+  if (connection) connection_model->reset(connection);
+}
+
+vital::ModulationConnection* SynthBase::createConnection(std::__1::string modulator_name, std::__1::string target_name, std::__1::string parameter_name, float destination_scale) {
+  vital::ModulationConnection* connection = getConnection(modulator_name, parameter_name, parameter_name);
   bool create = connection == nullptr;
   if (create) {
-    auto adjusted_name = target_name;
-    connection = getModulationBank().createConnection(modulator_name, adjusted_name);
-  }
-
-  if (connection) {
-    connection_module->magnitude_parameter_->val = connection->modulation_processor->control_map_["amount"];
-    connection_module->magnitude_parameter_->val->set(1.0f);
-    connection_module->bipolar_parameter_->val = connection->modulation_processor->control_map_["bipolar"];
-    auto parameter = target->parameter_map_[parameter_name];
-    connection->destination_scale = parameter->max - parameter->min;
-    connection->parameter_name = parameter_name;
-    connection_module->vital_connection_ = connection;
+    connection = getModulationBank().createConnection(modulator_name, target_name, parameter_name);
+    connection->destination_scale = destination_scale;
     connectModulation(connection);
   }
+  return connection;
 }
 
 vital::BlocksVoiceHandler* SynthBase::getVoiceHandler() {
@@ -836,6 +834,13 @@ vital::BlocksVoiceHandler* SynthBase::getVoiceHandler() {
 std::shared_ptr<model::Block> SynthBase::addBlock(std::string type, Index index) {
   auto block = module_manager_.addBlock(type, index);
   getVoiceHandler()->addBlock(block);
+
+  bool is_osc = type == "osc";
+  if (is_osc) {
+    auto connection = createConnection("default_env", block->name, "amp_env_destination", 1.0f);
+    connection->modulation_processor->control_map_["amount"]->set(1.0f);
+  }
+
   return block;
 }
 

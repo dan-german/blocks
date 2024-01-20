@@ -27,8 +27,8 @@ MainComponent::MainComponent(juce::MidiKeyboardState& keyboard_state, Delegate* 
   note_logger_.listener = this;
   ThemeManager::shared()->set(UserSettings::shared()->getInt("theme", 0));
 
-  // auto osc_block = addBlock(0, { 0, 0 });
-  // spawnBlockComponent(osc_block);
+  auto osc_block = addBlock(0, { 0, 0 });
+  spawnBlockComponent(osc_block);
 
   // auto osc_block_2 = addBlock(0, { 0, 1 });
   // spawnBlockComponent(osc_block_2);
@@ -36,9 +36,9 @@ MainComponent::MainComponent(juce::MidiKeyboardState& keyboard_state, Delegate* 
   // auto f = addBlock(6, { 1, 0 });
   // spawnBlockComponent(f);
 
-  // addModulator(Model::Types::lfo);
+  addModulator(Model::Types::adsr);
   // ui_layer_.modulators_.setVisible(true);
-  // delegate->editorConnectedModulation(0, "reverb_1", "dry_wet");
+  // delegate->editorConnectedModulation(0, "osc_1", "level");
 }
 
 void MainComponent::updateDotPosition(const Point<int> position) {

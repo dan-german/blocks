@@ -348,7 +348,7 @@ void PluginProcessor::editorRepositionedBlock(Index from, Index to) {
 }
 
 void PluginProcessor::editorConnectedModulation(int modulatorIndex, std::string target_name, std::string parameter) {
-  synth_->connectModulation(modulatorIndex, target_name, "amp_env_destination");
+  synth_->connectModulation(modulatorIndex, target_name, parameter);
   // Analytics::shared()->countAction("Modulation Connected");
   // connect(modulatorIndex, targetName, parameter);
 }
@@ -408,11 +408,14 @@ void PluginProcessor::removeModulator(int index) {
   getModuleManager().removeModulator(index);
 }
 
-void PluginProcessor::disconnect(std::__1::shared_ptr<model::Connection>& connection) {
-  if (connection->source->id.type == "envelope" && connection->parameter_name_ == "level") {
-    getVoiceHandler()->resetOSCAmplitudeEnvelope(connection->target);
+void PluginProcessor::disconnect(std::shared_ptr<model::Connection>& connection) {
+  bool disconnecting_osc_env = connection->source->id.type == "envelope" && connection->target->id.type == "osc" && connection->parameter_name_ == "level";
+  if (disconnecting_osc_env) { 
+    // createConnection("default_env", "osc_1", "amp_env_destination", 1.0f);
   }
-
+  // if (connection->source->id.type == "envelope" && connection->parameter_name_ == "level") {
+  //   getVoiceHandler()->resetOSCAmplitudeEnvelope(connection->target);
+  // }
   synth_->disconnectModulation(connection->vital_connection_);
   synth_->getModuleManager().removeConnection(connection);
 }

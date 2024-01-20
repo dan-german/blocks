@@ -1509,7 +1509,7 @@ void SynthOscillator::processChunk(poly_float current_center_amplitude, poly_flo
 void SynthOscillator::processBlend(int num_samples, poly_mask reset_mask) {
   poly_float* audio_out = output(kRaw)->buffer;
   stereoBlend(audio_out, num_samples, reset_mask);
-  //levelOutput(output(kLevelled)->buffer, audio_out, num_samples, reset_mask);
-  levelOutput(audio_out, audio_out, num_samples, reset_mask);
+  levelOutput(output(kLevelled)->buffer, audio_out, num_samples, reset_mask);
+  // levelOutput(audio_out, audio_out, num_samples, reset_mask);
 }
 } // namespace vital

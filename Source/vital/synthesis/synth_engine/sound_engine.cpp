@@ -147,7 +147,8 @@ void SoundEngine::connectModulation(const modulation_change& change) {
   Processor* destination = change.mono_destination;
   bool polyphonic = change.source->owner->isPolyphonic() && change.poly_destination;
   change.modulation_processor->setPolyphonicModulation(polyphonic);
-  voice_handler_->enableModulationConnection(change.modulation_processor);
+  voice_handler_->enableModulationConnection(change.modulation_processor); // enabled_modulation_processors_.push_back(processor);
+  
   if (polyphonic) {
     destination = change.poly_destination;
     voice_handler_->setActiveNonaccumulatedOutput(change.poly_destination->output());
@@ -157,6 +158,7 @@ void SoundEngine::connectModulation(const modulation_change& change) {
     change.source->owner->setControlRate(false);
     change.modulation_processor->setControlRate(false);
   }
+
   change.source->owner->enable(true);
   change.modulation_processor->enable(true);
   destination->plugNext(change.modulation_processor);

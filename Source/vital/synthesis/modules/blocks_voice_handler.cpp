@@ -254,6 +254,8 @@ void BlocksVoiceHandler::init() {
     createStatusOutput(modulation_source_prefix + number, source_output);
     createStatusOutput(modulation_amount_prefix + number, pre_scale_output);
   }
+
+  std::cout << " please " << std::endl;
 }
 
 void BlocksVoiceHandler::prepareDestroy() {
@@ -371,7 +373,7 @@ void BlocksVoiceHandler::clear() {
   active_processor_map_.clear();
 
   active_modulators_.clear();
-  active_modulators_map_.clear();
+  active_modulators_map_.clear(); // expect for default env 
 
   unplugAll();
 }
@@ -438,6 +440,7 @@ void BlocksVoiceHandler::createModulators() {
 std::shared_ptr<EnvelopeModule> BlocksVoiceHandler::createEnvelope(bool audio_rate) {
   auto envelope = std::make_shared<EnvelopeModule>(audio_rate);
   envelope->plug(retrigger(), EnvelopeModule::kTrigger);
+  // envelope->plug(reset(), EnvelopeModule::kReset);
   addSubmodule(envelope.get());
   addProcessor(envelope.get());
   envelopes_.push_back(envelope);
@@ -509,8 +512,19 @@ void BlocksVoiceHandler::createVoiceOutput() {
   amplitude->plug(voice_amplitude, 1);
   addProcessor(amplitude);
 
-  // default_amplitude_envelope_ = createEnvelope(true);
-  // amplitude_envelope_ = default_amplitude_envelope_;
+  default_amplitude_envelope_ = createEnvelope(true);
+  // std::cout << "address" << default_amplitude_envelope_ << std::endl;
+  active_modulators_map_["default_env"] = default_amplitude_envelope_;
+
+  // Output* delay = createPolyModControl2({ .name = "delay", .max = 1.41421, .value_scale = ValueScale::kQuadratic });
+  // Output* attack = createPolyModControl2({ .name = "attack", .max = 2.37842, .default_value = 0.1495, .value_scale = ValueScale::kQuartic });
+  // Output* hold = createPolyModControl2({ .name = "hold", .max = 1.41421, .value_scale = ValueScale::kQuadratic });
+  // Output* decay = createPolyModControl2({ .name = "decay", .max = 2.37842, .default_value = 1.0, .value_scale = ValueScale::kQuartic });
+  // Output* sustain = createPolyModControl2({ .name = "sustain", .default_value = 1.0, });
+  // Output* release = createPolyModControl2({ .name = "release", .max = 2.37842, .default_value = 0.5476, .value_scale = ValueScale::kQuartic });
+  // Value* attack_power = createBaseControl2({ .name = "attack_power", .min = -20.0, .max = 20.0 });
+  // Value* decay_power = createBaseControl2({ .name = "decay_power", .min = -20.0, .max = 20.0, .default_value = -2.0 });
+  // Value* release_power = createBaseControl2({ .name = "release_power", .min = -20.0, .max = 20.0, .default_value = -2.0, .value_scale = ValueScale::kLinear });
 
   Value* val = new Value(0.5f);
   addProcessor(val);
@@ -575,8 +589,9 @@ void BlocksVoiceHandler::noteOff(int note, mono_float lift, int sample, int chan
 }
 
 bool BlocksVoiceHandler::shouldAccumulate(Output* output) {
-  if (output->owner == amplitude_envelope_.get())
-    return false;
+  // if (output->owner == amplitude_envelope_.get()) // why? 
+  // if (output->owner == active_modulators_map_["default_env"].get()) // why? 
+    // return false;
 
   return VoiceHandler::shouldAccumulate(output);
 }

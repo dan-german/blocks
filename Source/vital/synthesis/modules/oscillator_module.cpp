@@ -94,13 +94,18 @@ void OscillatorModule::init() {
   oscillator_->plug(spectral_morph_type, SynthOscillator::kSpectralMorphType);
   oscillator_->plug(spectral_morph_amount, SynthOscillator::kSpectralMorphAmount);
 
-  Output* amp_env_destination = createPolyModControl2({ .name = "amp_env_destination", .default_value = 0.0, .audio_rate = true });
+  Output* amp_env_destination = createPolyModControl2({ .name = "amp_env_destination" });
 
   addProcessor(oscillator_);
+  // oscillator_->useOutput(output(kRaw), SynthOscillator::kRaw);
+  // useOutput(oscillator_->output());
+  
+
   addProcessor(amp_env_multiply_);
 
-  amp_env_multiply_->plug(amp_env_destination, 0);
-  amp_env_multiply_->plug(oscillator_, 1);
+  amp_env_multiply_->plug(amp_env_destination, 1);
+  amp_env_multiply_->plug(oscillator_, 0);
+  amp_env_multiply_->plug(input(kReset)->source, 2);
   amp_env_multiply_->useOutput(output(kRaw), 0);
 
   SynthModule::init();
