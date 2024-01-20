@@ -72,6 +72,7 @@ protected:
   std::shared_ptr<Wavetable> wavetable_;
   std::shared_ptr<bool> was_on_;
 
+  int i = 0;
   SynthOscillator* oscillator_;
   Value* distortion_type_;
 

@@ -348,7 +348,7 @@ std::shared_ptr<SynthModule> BlocksVoiceHandler::createProcessor(std::shared_ptr
 
 void BlocksVoiceHandler::createOscillators() {
   std::string type = "osc";
-  for (int i = 0; i < 5; i++) {
+  for (int i = 0; i < 2; i++) {
     auto osc = std::make_shared<OscillatorModule>();
 
     osc->plug(reset(), OscillatorModule::kReset);
@@ -361,6 +361,7 @@ void BlocksVoiceHandler::createOscillators() {
     processor_pool_[type].push_back(osc);
     oscillators_.push_back(osc);
   }
+  std::cout << "creating oscs" << std::endl;
 }
 
 void BlocksVoiceHandler::clear() {
@@ -589,9 +590,8 @@ void BlocksVoiceHandler::noteOff(int note, mono_float lift, int sample, int chan
 }
 
 bool BlocksVoiceHandler::shouldAccumulate(Output* output) {
-  // if (output->owner == amplitude_envelope_.get()) // why? 
-  // if (output->owner == active_modulators_map_["default_env"].get()) // why? 
-    // return false;
+  if (output->owner == amplitude_envelope_.get()) // why? 
+    return false;
 
   return VoiceHandler::shouldAccumulate(output);
 }

@@ -99,7 +99,7 @@ void OscillatorModule::init() {
   addProcessor(oscillator_);
   // oscillator_->useOutput(output(kRaw), SynthOscillator::kRaw);
   // useOutput(oscillator_->output());
-  
+
 
   addProcessor(amp_env_multiply_);
 
@@ -122,6 +122,9 @@ void OscillatorModule::process(int num_samples) {
   }
 
   *was_on_ = on;
-  utils::print(output(0)->buffer[0], "osc", this);
+
+  if (++i % 10 == 0) {
+    utils::print(output(0)->buffer[0], "osc", this);
+  }
 }
 } // namespace vital

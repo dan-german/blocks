@@ -38,7 +38,8 @@ SynthBase::SynthBase(): expired_(false) {
 
   mod_connections_.reserve(vital::kMaxModulationConnections);
 
-  for (int i = 0; i < vital::kNumOscillators; ++i) {
+  // for (int i = 0; i < vital::kNumOscillators; ++i) {
+  for (int i = 0; i < 2; ++i) {
     vital::Wavetable* wavetable = engine_->getWavetable(i);
     if (wavetable) {
       wavetable_creators_[i] = std::make_unique<WavetableCreator>(wavetable);
