@@ -177,16 +177,17 @@ void ProcessorRouter::removeProcessor(Processor* processor) {
 }
 
 void ProcessorRouter::connect(Processor* destination, const Output* source, int index) {
-  if (isDownstream(destination, source->owner)) {
-    // We are introducing a cycle so insert a Feedback node.
-    Feedback* feedback = new cr::Feedback();
-    feedback->plug(source);
-    destination->plug(feedback, index);
-    addFeedback(feedback);
-  } else {
-    // Not introducing a cycle so just make sure _destination_ is in order.
-    reorder(destination);
-  }
+  reorder(destination);
+  // if (isDownstream(destination, source->owner)) {
+  //   // We are introducing a cycle so insert a Feedback node.
+  //   Feedback* feedback = new cr::Feedback();
+  //   feedback->plug(source);
+  //   destination->plug(feedback, index);
+  //   addFeedback(feedback);
+  // } else {
+  //   // Not introducing a cycle so just make sure _destination_ is in order.
+  //   reorder(destination);
+  // }
 }
 
 void ProcessorRouter::disconnect(const Processor* destination, const Output* source) {
@@ -309,8 +310,9 @@ void ProcessorRouter::removeFeedback(Feedback* feedback) {
 }
 
 void ProcessorRouter::updateAllProcessors() {
-  if (local_changes_ == *global_changes_)
+  if (local_changes_ == *global_changes_) {
     return;
+  }
 
   createAddedProcessors();
   deleteRemovedProcessors();
@@ -410,15 +412,23 @@ void ProcessorRouter::getDependencies(const Processor* processor) const {
         if (input->source && input->source->owner && !dependencies_visited_->contains(input->source->owner)) {
           dependency_inputs_->ensureSpace();
           dependency_inputs_->push_back(input->source->owner);
-
-          if (!dependencies_visited_->contains(input->source->owner)) {
-            dependencies_visited_->ensureSpace();
-            dependencies_visited_->push_back(input->source->owner);
-          }
+          dependencies_visited_->ensureSpace();
+          dependencies_visited_->push_back(input->source->owner);
         }
       }
     }
   }
+
+  // std::cout << "context: " << context << std::endl;
+  // std::cout << std::endl;
+  // std::cout << std::endl;
+  // std::cout << "dependency inputs for context: " << context  << " with this " << this << std::endl;
+
+  // for (int i = 0; i < dependency_inputs_->size(); i++) {
+  //   auto dep = dependency_inputs_->at(i);
+  //   std::cout << dep << std::endl;
+  // }
+  // std::cout << std::endl;
 
   dependencies_->removeAll(context);
 }

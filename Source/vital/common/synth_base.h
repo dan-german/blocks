@@ -64,6 +64,7 @@ public:
   virtual ~SynthBase();
 
   void connectModulation(int modulatorIndex, std::string targetName, std::string parameter);
+  void connectModulationFromModel(std::shared_ptr<model::Connection> connection_model);
   vital::ModulationConnection* createConnection(std::__1::string modulator_name, std::__1::string target_name, std::__1::string parameter_name, float destination_scale);
 
   void valueChanged(const std::string& name, vital::mono_float value);
@@ -135,6 +136,8 @@ public:
 
   model::ModuleManager& getModuleManager() { return module_manager_; }
 
+  // void connectModulationFromModel(std::shared_ptr<model::Connection> connection_model);
+  std::shared_ptr<model::Connection> createConnectionModel(int modulator_index, std::string target_name, std::string parameter_name);
   vital::control_map& getControls() { return controls_; }
   vital::SoundEngine* getEngine() { return engine_.get(); }
   vital::BlocksVoiceHandler* getVoiceHandler();

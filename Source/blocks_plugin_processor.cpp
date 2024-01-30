@@ -47,13 +47,6 @@ PluginProcessor::PluginProcessor(): juce::AudioProcessor(BusesProperties().withO
   }
 
   bypass_parameter_ = bridge_lookup_["bypass"];
-
-  // synth_->addBlock("osc", { 0, 0 });
-  // synth_->addBlock("filter", { 1, 0 });
-  // synth_->addModulator("lfo");
-  // synth_->connectModulation(0, "osc_1", "tune");
-  // synth_->connectModulation(0, "filter_1", "cutoff");
-  // synth_->connectModulation(
 }
 
 PluginProcessor::~PluginProcessor() {
@@ -413,9 +406,6 @@ void PluginProcessor::disconnect(std::shared_ptr<model::Connection>& connection)
   if (disconnecting_osc_env) { 
     // createConnection("default_env", "osc_1", "amp_env_destination", 1.0f);
   }
-  // if (connection->source->id.type == "envelope" && connection->parameter_name_ == "level") {
-  //   getVoiceHandler()->resetOSCAmplitudeEnvelope(connection->target);
-  // }
   synth_->disconnectModulation(connection->vital_connection_);
   synth_->getModuleManager().removeConnection(connection);
 }
@@ -453,8 +443,17 @@ std::shared_ptr<Block> PluginProcessor::editorAddedBlock(Model::Type type, Index
 }
 
 std::shared_ptr<model::Block> PluginProcessor::editorAddedBlock2(Model::Type type, Index index) {
-  return synth_->addBlock(type, index);
-  // return synth_->getEngine()->voice_handler_->AddBlock(type, index);
+  clearModulations();
+  auto block = synth_->addBlock(type, index);
+  // reconnect all modulations
+
+  auto connections = synth_->getModuleManager().getConnections();
+
+  for (auto c : connections) { 
+    synth_->connectModulationFromModel(c);
+  }
+
+  return block;
 }
 
 void PluginProcessor::editorRepositionedTab(int oldColumn, int newColumn) {

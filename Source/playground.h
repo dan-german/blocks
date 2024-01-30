@@ -8,35 +8,52 @@
 
 using namespace vital;
 
-class MyProcessor: public Processor {
-public:
-  float val;
-  MyProcessor(float val): Processor(1, 1), val(val) {}
-  Processor* clone() const override { return nullptr; }
-
-  void process(int num_samples) override {
-    auto buffer = input()->source->buffer;
-    for (int i = 0; i < num_samples; ++i) { buffer[i] = val; }
-    std::cout << "processing: " << val << std::endl;
+struct A: public SynthModule { 
+  A(): SynthModule(2, 2) {}
+  void init() override {
+    std::cout << "initing A with address " << this << std::endl;
+    auto param_a = createPolyModControl2({ .name = "param_a" });
+    auto param_b = createPolyModControl2({ .name = "param_b" });
+    std::cout << "A: " << this << std::endl;
+    std::cout << param_a << std::endl;
+    std::cout << param_b << std::endl;
   }
+  void process(int num_samples) override {}
+};
+
+struct B: public SynthModule { 
+  B(): SynthModule(2, 2) {}
+  void init() override {
+    std::cout << "initing B with address " << this << std::endl;
+    auto param_a = createPolyModControl2({ .name = "param_a" });
+    std::cout << "B: " << this << std::endl;
+    std::cout << param_a << std::endl;
+  }
+  void process(int num_samples) override {}
 };
 
 void please() {
   system("clear");
-  auto lfo = new MyProcessor(0.2f); std::cout << "lfo: " << lfo << std::endl;
-  auto osc = new MyProcessor(0.5f); std::cout << "osc: " << osc << std::endl;
-  osc->plug(lfo, 0);
+  auto a = new A();
+  a->init();
 
-  auto osc2 = new MyProcessor(0.7f); std::cout << "osc2: " << osc2 << std::endl;
-  osc2->plug(lfo, 0);
+  auto b = new B();
+  b->init();
 
-  auto router = new vital::ProcessorRouter(1, 1);
-  router->addProcessor(osc);
-  // router->addProcessor(osc2);
+  auto val = new vital::Value(0.39f);
+  auto poly_mod_destinations = a->data_->poly_mod_destinations["param_a"];
+  poly_mod_destinations->plugNext(val);
 
-  // auto router2 = new vital::ProcessorRouter(1, 1);
-  // router2->addProcessor(osc2);
+  auto variable_add_ = new vital::VariableAdd(1);
 
-  // router2->process(128);
-  std::cout << "yes" << std::endl;
+  b->addProcessor(variable_add_);
+
+  variable_add_->plug(a);
+  variable_add_->unplug(a);
+  
+  // osc->init();
+  // Processor* amp_env_destination = osc->data_->poly_mod_destinations["amp_env_destination"];
+  // amp_env_destination->plugNext(val);
+  // amp_env_destination->plug
+  std::cout << "pls" << std::endl;
 }

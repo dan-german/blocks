@@ -39,11 +39,13 @@ public:
   virtual ~EnvelopeModule() { }
 
   void init() override;
-  virtual Processor* clone() const override { return new EnvelopeModule(*this); }
+  virtual Processor* clone() const override {
+    return new EnvelopeModule(*this);
+  }
 
   void setControlRate(bool control_rate) override;
 
-  void setModule(std::shared_ptr<model::Module> module) override { 
+  void setModule(std::shared_ptr<model::Module> module) override {
     // control_map_["attack"] = module->parameter_map_["attack"]->val;
     // control_map_["decay"] = module->parameter_map_["decay"]->val;
     // control_map_["sustain"] = module->parameter_map_["sustain"]->val;
@@ -61,7 +63,7 @@ public:
     SynthModule::setModule(module);
   };
 
-  void followModule(std::shared_ptr<model::Module> module) { 
+  void followModule(std::shared_ptr<model::Module> module) {
     control_map_["attack"] = module->parameter_map_["attack"]->val;
     control_map_["decay"] = module->parameter_map_["decay"]->val;
     control_map_["sustain"] = module->parameter_map_["sustain"]->val;

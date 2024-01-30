@@ -107,10 +107,31 @@ void Multiply::process(int num_samples) {
     dest[i] = source_left[i] * source_right[i];
 }
 
-void SmoothMultiply::process(int num_samples) {
-  processMultiply(num_samples, input(kControlRate)->at(0));
+int h = 0;
+
+void SmoothMultiply2::process(int num_samples) { processMultiply(num_samples, input(kControlRate)->at(0)); }
+void SmoothMultiply2::processMultiply(int num_samples, poly_float multiply) {
+  VITAL_ASSERT(inputMatchesBufferSize(kAudioRate));
+  // utils::print(multiply_, "multiply", this);
+
+  poly_float* audio_out = output()->buffer;
+  const poly_float* audio_in = input(kAudioRate)->source->buffer;
+
+  poly_float current_multiply = multiply_;
+  multiply_ = multiply;
+
+  auto mask = getResetMask(kReset);
+  current_multiply = utils::maskLoad(current_multiply, multiply_, mask);
+  // utils::print(current_multiply, "current_multiply_", this);
+  poly_float delta_multiply = (multiply_ - current_multiply) * (1.0f / num_samples);
+
+  for (int i = 0; i < num_samples; ++i) {
+    current_multiply += delta_multiply;
+    audio_out[i] = audio_in[i] * current_multiply;
+  }
 }
 
+void SmoothMultiply::process(int num_samples) { processMultiply(num_samples, input(kControlRate)->at(0)); }
 void SmoothMultiply::processMultiply(int num_samples, poly_float multiply) {
   VITAL_ASSERT(inputMatchesBufferSize(kAudioRate));
 
@@ -127,7 +148,6 @@ void SmoothMultiply::processMultiply(int num_samples, poly_float multiply) {
     audio_out[i] = audio_in[i] * current_multiply;
   }
 }
-
 void SmoothVolume::process(int num_samples) {
   poly_float db = utils::clamp(input(kDb)->at(0), kMinDb, max_db_);
   poly_float amplitude = futils::dbToMagnitude(db);

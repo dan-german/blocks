@@ -63,6 +63,9 @@ void ModulationConnectionProcessor::process(int num_samples) {
     processControlRate(source);
   else
     processAudioRate(num_samples, source);
+
+  // auto value = output(kModulationOutput)->buffer[0];
+  // utils::print(value, "value at mod pro", output(kModulationOutput));
 }
 
 void ModulationConnectionProcessor::processAudioRate(int num_samples, const Output* source) {
@@ -283,6 +286,8 @@ void ModulationConnectionProcessor::processControlRate(const Output* source) {
   poly_float raw_modulation = (pre_modulation ^ sign_mask) * polarity_post_scale;
   output(kModulationPreScale)->buffer[0] = raw_modulation;
   output(kModulationOutput)->buffer[0] = raw_modulation * (*destination_scale_);
+
+  // utils::print(raw_modulation, "mod processor", this);
   VITAL_ASSERT(utils::isFinite(output()->buffer[0]));
 }
 } // namespace vital

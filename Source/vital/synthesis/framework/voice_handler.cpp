@@ -905,6 +905,7 @@ void VoiceHandler::addParallelVoices() {
     all_voices_.push_back(std::move(single_voice));
   }
 
+  // std::cout << "adding aggregate voice" << std::endl;
   all_aggregate_voices_.push_back(std::move(aggregate_voice));
 }
 } // namespace vital

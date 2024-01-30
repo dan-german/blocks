@@ -119,8 +119,11 @@ void BlocksVoiceHandler::removeBlock(Index index, std::shared_ptr<model::Block> 
   connectAll();
 }
 
+int y = 0;
+
 void BlocksVoiceHandler::addBlock(std::shared_ptr<model::Block> block) {
   createProcessor(block);
+  auto first_osc = oscillators_[0];
   unplugAll();
   connectAll();
 }
@@ -162,16 +165,16 @@ void BlocksVoiceHandler::unplugAll() {
     for (int row = 0; row < processor_matrix_[column].size(); row++) {
       auto processor = processor_matrix_[column][row];
       if (processor != nullptr) {
-        voice_sum_->unplug(processor_matrix_[column][row].get());
-        last_node_->unplug(processor_matrix_[column][row].get());
+        last_node_->unplug(processor.get());
 
         if (auto processor_above = findProcessorAbove({ row, column })) {
-          std::cout << "wow unplugging " << std::endl;
           processor->unplug(processor_above.get());
         }
       }
     }
   }
+
+  // last_node_->hardReset();
 }
 
 void BlocksVoiceHandler::init() {
@@ -185,13 +188,13 @@ void BlocksVoiceHandler::init() {
 
   last_node_ = new VariableAdd(5);
   addProcessor(last_node_);
-  voice_sum_ = new Add();
+  // voice_sum_ = new Add();
   output_->plug(last_node_, 0);
   output_->plug(amplitude_, 1);
 
   direct_output_->plug(amplitude_, 1);
 
-  addProcessor(voice_sum_);
+  // addProcessor(voice_sum_);
   addProcessor(output_);
   addProcessor(direct_output_);
 
@@ -254,8 +257,6 @@ void BlocksVoiceHandler::init() {
     createStatusOutput(modulation_source_prefix + number, source_output);
     createStatusOutput(modulation_amount_prefix + number, pre_scale_output);
   }
-
-  std::cout << " please " << std::endl;
 }
 
 void BlocksVoiceHandler::prepareDestroy() {
@@ -322,15 +323,12 @@ std::shared_ptr<SynthModule> BlocksVoiceHandler::createProcessor(std::shared_ptr
     module->parameters_[5]->val = processor->control_map_["mix"];
     processor->control_map_["on"]->set(1.0f);
   } else if (module->id.type == "reverb") {
-    module->parameter_map_["chorus_frequency"]->val = processor->control_map_["reverb_chorus_frequency"];
-    module->parameter_map_["decay_time"]->val = processor->control_map_["reverb_decay_time"];
-    module->parameter_map_["dry_wet"]->val = processor->control_map_["dry_wet"];
-    module->parameter_map_["high_shelf_cutoff"]->val = processor->control_map_["reverb_high_shelf_cutoff"];
-    module->parameter_map_["high_shelf_gain"]->val = processor->control_map_["reverb_high_shelf_gain"];
-    module->parameter_map_["low_shelf_cutoff"]->val = processor->control_map_["reverb_low_shelf_cutoff"];
-    module->parameter_map_["low_shelf_gain"]->val = processor->control_map_["reverb_low_shelf_gain"];
-    module->parameter_map_["pre_high_cutoff"]->val = processor->control_map_["reverb_pre_high_cutoff"];
-    module->parameter_map_["pre_low_cutoff"]->val = processor->control_map_["reverb_pre_low_cutoff"];
+    module->parameter_map_["mod rate"]->val = processor->control_map_["reverb_chorus_frequency"];
+    module->parameter_map_["mod amount"]->val = processor->control_map_["reverb_chorus_amount"];
+    module->parameter_map_["time"]->val = processor->control_map_["reverb_decay_time"];
+    module->parameter_map_["mix"]->val = processor->control_map_["dry_wet"];
+    module->parameter_map_["high cut"]->val = processor->control_map_["reverb_pre_high_cutoff"];
+    module->parameter_map_["low cut"]->val = processor->control_map_["reverb_pre_low_cutoff"];
     module->parameter_map_["size"]->val = processor->control_map_["reverb_size"];
     module->parameter_map_["delay"]->val = processor->control_map_["reverb_delay"];
   } else if (module->id.type == "delay") {
@@ -361,7 +359,6 @@ void BlocksVoiceHandler::createOscillators() {
     processor_pool_[type].push_back(osc);
     oscillators_.push_back(osc);
   }
-  std::cout << "creating oscs" << std::endl;
 }
 
 void BlocksVoiceHandler::clear() {
@@ -441,7 +438,6 @@ void BlocksVoiceHandler::createModulators() {
 std::shared_ptr<EnvelopeModule> BlocksVoiceHandler::createEnvelope(bool audio_rate) {
   auto envelope = std::make_shared<EnvelopeModule>(audio_rate);
   envelope->plug(retrigger(), EnvelopeModule::kTrigger);
-  // envelope->plug(reset(), EnvelopeModule::kReset);
   addSubmodule(envelope.get());
   addProcessor(envelope.get());
   envelopes_.push_back(envelope);
@@ -513,9 +509,9 @@ void BlocksVoiceHandler::createVoiceOutput() {
   amplitude->plug(voice_amplitude, 1);
   addProcessor(amplitude);
 
-  default_amplitude_envelope_ = createEnvelope(true);
+  // default_amplitude_envelope_ = createEnvelope(true);
   // std::cout << "address" << default_amplitude_envelope_ << std::endl;
-  active_modulators_map_["default_env"] = default_amplitude_envelope_;
+  // active_modulators_map_["default_env"] = default_amplitude_envelope_;
 
   // Output* delay = createPolyModControl2({ .name = "delay", .max = 1.41421, .value_scale = ValueScale::kQuadratic });
   // Output* attack = createPolyModControl2({ .name = "attack", .max = 2.37842, .default_value = 0.1495, .value_scale = ValueScale::kQuartic });
@@ -543,6 +539,7 @@ void BlocksVoiceHandler::createVoiceOutput() {
   addProcessor(amplitude_);
 }
 
+int please = 0;
 void BlocksVoiceHandler::process(int num_samples) {
   poly_mask reset_mask = reset()->trigger_mask;
   if (reset_mask.anyMask())
@@ -558,18 +555,21 @@ void BlocksVoiceHandler::process(int num_samples) {
       status_source.second->clear();
   } else {
     last_active_voice_mask_ = getCurrentVoiceMask();
-    for (auto& status_source : data_->status_outputs)
+    for (auto& status_source : data_->status_outputs) {
       status_source.second->update(last_active_voice_mask_);
+    }
 
     for (ModulationConnectionProcessor* processor : enabled_modulation_processors_) {
       poly_float* buffer = processor->output()->buffer;
       if (processor->isControlRate() || processor->isPolyphonicModulation()) {
         poly_float masked_value = buffer[0] & last_active_voice_mask_;
-        buffer[0] = masked_value + utils::swapVoices(masked_value);
+        // utils::print_mask(last_active_voice_mask_, "mask  at handler", processor->output());
+        buffer[0] = masked_value;// + utils::swapVoices(masked_value);
+        // utils::print(buffer[0], "value at handler", this);
       } else {
         for (int i = 0; i < num_samples; ++i) {
           poly_float masked_value = buffer[i] & last_active_voice_mask_;
-          buffer[i] = masked_value + utils::swapVoices(masked_value);
+          buffer[i] = masked_value;// + utils::swapVoices(masked_value);
         }
       }
     }
@@ -590,8 +590,11 @@ void BlocksVoiceHandler::noteOff(int note, mono_float lift, int sample, int chan
 }
 
 bool BlocksVoiceHandler::shouldAccumulate(Output* output) {
-  if (output->owner == amplitude_envelope_.get()) // why? 
+  for (auto envelope : envelopes_) {
+    if (output->owner == envelope.get())
+      std::cout << "yep" << std::endl;
     return false;
+  }
 
   return VoiceHandler::shouldAccumulate(output);
 }

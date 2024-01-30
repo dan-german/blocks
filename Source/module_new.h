@@ -4,8 +4,10 @@
 #include "gui/ModuleColour.h"
 #include "model/Index.h"
 #include "vital/synthesis/utilities/smooth_value.h"
+// #include "vital/synthesis/framework/synth_module.h"
 
 using ValueScale = vital::ValueDetails::ValueScale;
+// class SynthModule;
 
 namespace model {
 class Module {
@@ -40,24 +42,9 @@ public:
     auto shared_ptr = std::make_shared<vital::ValueDetails>(parameter);
     parameters_.push_back(shared_ptr);
     parameter_map_[short_name] = shared_ptr;
-    
-    // vital::Value* val = nullptr;
-    // if (parameter.audio_rate) {
-    //   if (parameter.smooth_value) {
-    //     val = new vital::SmoothValue(parameter.default_value);
-    //   } else {
-    //     val = new vital::Value(parameter.default_value);
-    //   }
-    // } else {
-    //   if (parameter.smooth_value) {
-    //     val = new vital::cr::SmoothValue(parameter.default_value);
-    //   } else {
-    //     val = new vital::cr::Value(parameter.default_value);
-    //   }
-    // }
-
-    // shared_ptr->val = val;
   }
+
+  // virtual void applyProcessor(std::shared_ptr<SynthModule> processor);
 };
 
 class Block: public Module {

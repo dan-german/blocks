@@ -112,7 +112,7 @@ const ValueDetails ValueDetailsLookup::parameter_list[] = {
     ValueDetails::kLinear, false, "", "Macro 4", nullptr },
   { "pitch_bend_range", 0x000000, 0.0, 48.0, 2.0, 0.0, 1.0,
     ValueDetails::kIndexed, false, " semitones", "Pitch Bend Range", nullptr },
-  { "polyphony", 0x000000, 1.0, kMaxPolyphony - 1, 1.0, 0.0, 1.0,
+  { "polyphony", 0x000000, 1.0, kMaxPolyphony - 1, 8.0, 0.0, 1.0,
     ValueDetails::kIndexed, false, " voices", "Polyphony", nullptr },
   { "voice_tune", 0x000000, -1.0, 1.0, 0.0, 0.0, 100.0,
     ValueDetails::kLinear, false, " cents", "Voice Tune", nullptr },
