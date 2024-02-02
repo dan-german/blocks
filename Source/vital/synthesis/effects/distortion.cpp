@@ -98,8 +98,7 @@ Distortion::Distortion(): Processor(kNumInputs, kNumOutputs),
 last_distorted_value_(0.0f), current_samples_(0.0f), type_(kNumTypes) { }
 
 template<poly_float(*distort)(poly_float, poly_float), poly_float(*scale)(poly_float)>
-void Distortion::processTimeInvariant(int num_samples, const poly_float* audio_in, const poly_float* drive,
-  poly_float* audio_out) {
+void Distortion::processTimeInvariant(int num_samples, const poly_float* audio_in, const poly_float* drive, poly_float* audio_out) {
   for (int i = 0; i < num_samples; ++i) {
     poly_float current_drive = scale(drive[i]);
     poly_float sample = audio_in[i];
@@ -108,8 +107,7 @@ void Distortion::processTimeInvariant(int num_samples, const poly_float* audio_i
   }
 }
 
-void Distortion::processDownSample(int num_samples, const poly_float* audio_in, const poly_float* drive,
-  poly_float* audio_out) {
+void Distortion::processDownSample(int num_samples, const poly_float* audio_in, const poly_float* drive, poly_float* audio_out) {
   mono_float sample_rate = getSampleRate();
   poly_float current_samples = current_samples_;
 
@@ -135,10 +133,11 @@ void Distortion::processWithInput(const poly_float* audio_in, int num_samples) {
 
   int type = static_cast<int>(input(kType)->at(0)[0]);
   poly_float* audio_out = output(kAudioOut)->buffer;
-  poly_float* drive_out = output(kDriveOut)->buffer;
+  poly_float* drive_out = input(kDrive)->source->buffer;
+  // poly
 
-  int compact_samples = compactAudio(audio_out, audio_in, num_samples);
-  compactAudio(drive_out, input(kDrive)->source->buffer, num_samples);
+  // int compact_samples = compactAudio(audio_out, audio_in, num_samples);
+  // compactAudio(drive_out, input(kDrive)->source->buffer, num_samples);
 
   if (type != type_) {
     type_ = type;
@@ -147,30 +146,16 @@ void Distortion::processWithInput(const poly_float* audio_in, int num_samples) {
   }
 
   switch (type) {
-  case kSoftClip:
-    processTimeInvariant<softClip, driveDbScale>(compact_samples, audio_out, drive_out, audio_out);
-    break;
-  case kHardClip:
-    processTimeInvariant<hardClip, driveDbScale>(compact_samples, audio_out, drive_out, audio_out);
-    break;
-  case kLinearFold:
-    processTimeInvariant<linearFold, driveDbScale>(compact_samples, audio_out, drive_out, audio_out);
-    break;
-  case kSinFold:
-    processTimeInvariant<sinFold, driveDbScale>(compact_samples, audio_out, drive_out, audio_out);
-    break;
-  case kBitCrush:
-    processTimeInvariant<bitCrush, bitCrushScale>(compact_samples, audio_out, drive_out, audio_out);
-    break;
-  case kDownSample:
-    processDownSample(compact_samples, audio_out, drive_out, audio_out);
-    break;
-  default:
-    utils::copyBuffer(audio_out, audio_in, num_samples);
-    return;
+  case kSoftClip: processTimeInvariant<softClip, driveDbScale>(num_samples, audio_in, drive_out, audio_out); break;
+  case kHardClip: processTimeInvariant<hardClip, driveDbScale>(num_samples, audio_in, drive_out, audio_out); break;
+  case kLinearFold: processTimeInvariant<linearFold, driveDbScale>(num_samples, audio_in, drive_out, audio_out); break;
+  case kSinFold: processTimeInvariant<sinFold, driveDbScale>(num_samples, audio_in, drive_out, audio_out); break;
+  case kBitCrush: processTimeInvariant<bitCrush, bitCrushScale>(num_samples, audio_in, drive_out, audio_out); break;
+  case kDownSample: processDownSample(num_samples, audio_in, drive_out, audio_out); break;
+  default: utils::copyBuffer(audio_out, audio_in, num_samples); return;
   }
 
-  expandAudio(audio_out, audio_out, num_samples);
+  // expandAudio(audio_out, audio_out, num_samples);
 }
 
 void Distortion::process(int num_samples) {

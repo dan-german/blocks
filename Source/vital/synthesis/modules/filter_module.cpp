@@ -63,7 +63,7 @@ void FilterModule::init() {
   current_keytrack->useInput(input(kKeytrack), 0);
   current_keytrack->plug(keytrack_amount, 1);
 
-  AddControlInput midi_cutoff_input = { .name = "cutoff", .min = 8.0f, .max = 136.0f, .post_offset = -60.0f, .default_value = 30.0f, .audio_rate = true, .smooth_value = true, .internal_modulation = current_keytrack->output() };
+  AddControlInput midi_cutoff_input = { .name = "cutoff", .min = 8.0f, .max = 136.0f, .post_offset = -60.0f, .default_value = 100.0f, .audio_rate = true, .smooth_value = true, .internal_modulation = current_keytrack->output() };
   Output* midi_cutoff = createPolyModControl2(midi_cutoff_input);
 
   Output* resonance = createPolyModControl2({ .name = "resonance", .default_value = 0.5f });

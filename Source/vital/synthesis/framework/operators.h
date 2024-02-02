@@ -233,6 +233,34 @@ private:
   JUCE_LEAK_DETECTOR(SmoothMultiply)
 };
 
+class SmoothMultiply2: public Operator {
+public:
+  enum {
+    kAudioRate,
+    kControlRate,
+    kReset,
+    kNumInputs
+  };
+
+  SmoothMultiply2(): Operator(kNumInputs, 1), multiply_(0.0f) { }
+
+  virtual ~SmoothMultiply2() { }
+
+  virtual Processor* clone() const override { return new SmoothMultiply2(*this); }
+
+  bool hasState() const override { return true; }
+
+  virtual void process(int num_samples) override;
+
+protected:
+  void processMultiply(int num_samples, poly_float multiply);
+
+  poly_float multiply_;
+
+private:
+  JUCE_LEAK_DETECTOR(SmoothMultiply2)
+};
+
 class SmoothVolume: public SmoothMultiply {
 public:
   static constexpr int kDb = kControlRate;
@@ -648,6 +676,34 @@ public:
 
 private:
   JUCE_LEAK_DETECTOR(VariableAdd)
+};
+
+class VariableAdd2: public Operator {
+public:
+  VariableAdd2(int num_inputs = 0): Operator(num_inputs, 1, true) {
+  }
+
+  virtual Processor* clone() const override {
+    return new VariableAdd2(*this);
+  }
+
+  void process(int num_samples) override {
+    int num_inputs = static_cast<int>(inputs_->size());
+    poly_float value = 0.0;
+
+    for (int in = 0; in < num_inputs; ++in) {
+      value += input(in)->at(0);
+    }
+
+    if (num_inputs > 0) {
+      auto pls = input(0);
+      auto source = pls->source;
+    }
+    output()->buffer[0] = value;
+  }
+
+private:
+  JUCE_LEAK_DETECTOR(VariableAdd2)
 };
 
 class FrequencyToPhase: public Operator {

@@ -22,36 +22,36 @@
 namespace vital {
 
 DistortionModule::DistortionModule():
-  SynthModule(0, 1), distortion_(nullptr), filter_(nullptr), mix_(0.0f) { }
+  SynthModule(1, 1), distortion_(new Distortion()), mix_(0.0f) { }
 
 DistortionModule::~DistortionModule() {
 }
 
 void DistortionModule::init() {
-  distortion_ = new Distortion();
+  // distortion_ = new Distortion();
   distortion_->useOutput(output());
-  addIdleProcessor(distortion_);
+  addProcessor(distortion_);
 
-  Value* distortion_type = createBaseControl("distortion_type");
-  Output* distortion_drive = createMonoModControl("distortion_drive", true, true);
-  distortion_mix_ = createMonoModControl("distortion_mix");
+  Value* distortion_type = createBaseControl2({ .name = "type" });
+  Output* distortion_drive = createPolyModControl2({ .name = "drive", .audio_rate = true, .smooth_value = true });
+  distortion_mix_ = createPolyModControl2({ .name = "mix" });
 
   distortion_->plug(distortion_type, Distortion::kType);
   distortion_->plug(distortion_drive, Distortion::kDrive);
 
-  filter_order_ = createBaseControl("distortion_filter_order");
-  Output* midi_cutoff = createMonoModControl("distortion_filter_cutoff", true, true);
-  Output* resonance = createMonoModControl("distortion_filter_resonance");
-  Output* blend = createMonoModControl("distortion_filter_blend");
+  // filter_order_ = createBaseControl("distortion_filter_order");
+  // Output* midi_cutoff = createMonoModControl("distortion_filter_cutoff", true, true);
+  // Output* resonance = createMonoModControl("distortion_filter_resonance");
+  // Output* blend = createMonoModControl("distortion_filter_blend");
 
-  filter_ = new DigitalSvf();
-  filter_->useOutput(output());
-  filter_->plug(midi_cutoff, DigitalSvf::kMidiCutoff);
-  filter_->plug(resonance, DigitalSvf::kResonance);
-  filter_->plug(blend, DigitalSvf::kPassBlend);
-  filter_->setDriveCompensation(false);
-  filter_->setBasic(true);
-  addIdleProcessor(filter_);
+  // filter_ = new DigitalSvf();
+  // filter_->useOutput(output());
+  // filter_->plug(midi_cutoff, DigitalSvf::kMidiCutoff);
+  // filter_->plug(resonance, DigitalSvf::kResonance);
+  // filter_->plug(blend, DigitalSvf::kPassBlend);
+  // filter_->setDriveCompensation(false);
+  // filter_->setBasic(true);
+  // addIdleProcessor(filter_);
 
   SynthModule::init();
 }
@@ -59,22 +59,14 @@ void DistortionModule::init() {
 void DistortionModule::setSampleRate(int sample_rate) {
   SynthModule::setSampleRate(sample_rate);
   distortion_->setSampleRate(sample_rate);
-  filter_->setSampleRate(sample_rate);
+  // filter_->setSampleRate(sample_rate);
 }
 
-void DistortionModule::processWithInput(const poly_float* audio_in, int num_samples) {
-  SynthModule::process(num_samples);
-
-  if (filter_order_->output()->buffer[0][0] < 1.0f)
-    distortion_->processWithInput(audio_in, num_samples);
-  else if (filter_order_->output()->buffer[0][0] > 1.0f) {
-    distortion_->processWithInput(audio_in, num_samples);
-    filter_->processWithInput(output()->buffer, num_samples);
-  } else {
-    filter_->processWithInput(audio_in, num_samples);
-    distortion_->processWithInput(output()->buffer, num_samples);
-  }
-
+void DistortionModule::process(int num_samples) {
+  // bool on = on_ == nullptr || on_->value() > 0.5f;
+  // if (on) {
+  const poly_float* audio_in = input()->source->buffer;
+  distortion_->processWithInput(audio_in, num_samples);
   poly_float current_mix = mix_;
   mix_ = utils::clamp(distortion_mix_->buffer[0], 0.0f, 1.0f);
   poly_float delta_mix = (mix_ - current_mix) * (1.0f / num_samples);
@@ -84,5 +76,8 @@ void DistortionModule::processWithInput(const poly_float* audio_in, int num_samp
     current_mix += delta_mix;
     audio_out[i] = utils::interpolate(audio_in[i], audio_out[i], current_mix);
   }
+  // } else {
+  //   utils::zeroBuffer(output()->buffer, num_samples);
+  // }
 }
 } // namespace vital

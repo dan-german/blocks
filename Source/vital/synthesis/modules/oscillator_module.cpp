@@ -94,25 +94,28 @@ void OscillatorModule::init() {
   oscillator_->plug(spectral_morph_type, SynthOscillator::kSpectralMorphType);
   oscillator_->plug(spectral_morph_amount, SynthOscillator::kSpectralMorphAmount);
 
-  Output* amp_env_destination = createPolyModControl2({ .name = "amp_env_destination" });
+  amp_env_destination = createPolyModControl2({ .name = "amp_env_destination", .reset = reset });
 
   addProcessor(oscillator_);
-  // oscillator_->useOutput(output(kRaw), SynthOscillator::kRaw);
-  // useOutput(oscillator_->output());
-
-
   addProcessor(amp_env_multiply_);
 
   amp_env_multiply_->plug(amp_env_destination, 1);
   amp_env_multiply_->plug(oscillator_, 0);
-  amp_env_multiply_->plug(input(kReset)->source, 2);
+  amp_env_multiply_->useInput(reset, SmoothMultiply2::kReset);
   amp_env_multiply_->useOutput(output(kRaw), 0);
-
   SynthModule::init();
 }
 
 void OscillatorModule::process(int num_samples) {
   bool on = on_->value();
+
+  auto destination = data_->poly_mod_destinations["amp_env_destination"];
+  // std::cout << "osc dest: " << destination << std::endl;
+  if (destination->numInputs() > 0) {
+    auto first_input = destination->input();
+    auto buffer = first_input->source->buffer;
+    // utils::print(buffer[0], "first_input_buffer", this);
+  }
 
   if (on)
     SynthModule::process(num_samples);
@@ -122,9 +125,5 @@ void OscillatorModule::process(int num_samples) {
   }
 
   *was_on_ = on;
-
-  if (++i % 10 == 0) {
-    utils::print(output(0)->buffer[0], "osc", this);
-  }
 }
 } // namespace vital

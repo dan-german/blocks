@@ -47,6 +47,9 @@ public:
   void init() override;
   virtual Processor* clone() const override { return new OscillatorModule(*this); }
 
+  Output* amp_env_destination;
+  poly_float multiply_;
+
   Wavetable* getWavetable() { return wavetable_.get(); }
   force_inline SynthOscillator* oscillator() { return oscillator_; }
 
@@ -63,20 +66,21 @@ public:
   }
 
   void switchLevelEnvelope(EnvelopeModule* envelope) {
-    amp_env_multiply_->plug(envelope->output(), 0);
+    // amp_env_multiply_->plug(envelope->output(), 0);
   }
 
   Value* on_;
+  SynthOscillator* oscillator_;
 protected:
   std::string prefix_;
   std::shared_ptr<Wavetable> wavetable_;
   std::shared_ptr<bool> was_on_;
 
   int i = 0;
-  SynthOscillator* oscillator_;
   Value* distortion_type_;
 
-  SmoothMultiply* amp_env_multiply_ = new SmoothMultiply();
+  SmoothMultiply2* amp_env_multiply_ = new SmoothMultiply2();
+  // Multiply* amp_env_multiply_ = new Multiply();
 
   JUCE_LEAK_DETECTOR(OscillatorModule)
 };

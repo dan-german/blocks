@@ -1357,13 +1357,11 @@ void SynthOscillator::processOscillators(int num_samples, DistortionType distort
 
   poly_mask reset_mask = getResetMask(kReset);
 
-  // std::cout << this << reset_mask[0] << " " << reset_mask[1] << " " << reset_mask[2] << " " << reset_mask[3] << std::endl;
 
   poly_int trigger_offset = input(kReset)->source->trigger_offset;
   poly_mask retrigger_mask = getResetMask(kRetrigger) & ~reset_mask;
 
   // std::cout << retrigger_mask[0] << " " << retrigger_mask[1] << " " << retrigger_mask[2] << " " << retrigger_mask[3] << std::endl;  
-
   current_center_amplitude = utils::maskLoad(current_center_amplitude, center_amplitude_, reset_mask);
   current_detuned_amplitude = utils::maskLoad(current_detuned_amplitude, detuned_amplitude_, reset_mask);
 
@@ -1509,7 +1507,7 @@ void SynthOscillator::processChunk(poly_float current_center_amplitude, poly_flo
 void SynthOscillator::processBlend(int num_samples, poly_mask reset_mask) {
   poly_float* audio_out = output(kRaw)->buffer;
   stereoBlend(audio_out, num_samples, reset_mask);
-  levelOutput(output(kLevelled)->buffer, audio_out, num_samples, reset_mask);
-  // levelOutput(audio_out, audio_out, num_samples, reset_mask);
+  // levelOutput(output(kLevelled)->buffer, audio_out, num_samples, reset_mask);
+  levelOutput(audio_out, audio_out, num_samples, reset_mask);
 }
 } // namespace vital

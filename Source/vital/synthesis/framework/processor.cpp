@@ -182,8 +182,10 @@ void Processor::unplug(const Processor* source) {
       router_->disconnect(this, source->output(i));
   }
   for (unsigned int i = 0; i < inputs_->size(); ++i) {
-    if (inputs_->at(i) && inputs_->at(i)->source->owner == source)
+    if (inputs_->at(i) && inputs_->at(i)->source->owner == source) {
+      auto input = inputs_->at(i);
       inputs_->at(i)->source = &Processor::null_source_;
+    }
   }
   numInputsChanged();
 }

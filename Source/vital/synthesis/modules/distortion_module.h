@@ -31,13 +31,14 @@ public:
 
   virtual void init() override;
   virtual void setSampleRate(int sample_rate) override;
-  virtual void processWithInput(const poly_float* audio_in, int num_samples) override;
+  // virtual void processWithInput(const poly_float* audio_in, int num_samples) override;
   virtual Processor* clone() const override { return new DistortionModule(*this); }
+  void process(int num_samples) override;
 
 protected:
   Distortion* distortion_;
-  Value* filter_order_;
-  DigitalSvf* filter_;
+  // Value* filter_order_;
+  // DigitalSvf* filter_;
   Output* distortion_mix_;
   poly_float mix_;
 

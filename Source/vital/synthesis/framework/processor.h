@@ -228,6 +228,10 @@ public:
   void plug(const Processor* source);
   void plug(const Processor* source, unsigned int input_index);
 
+  void plugWithoutReordering(const Processor* source, int index = 0) {
+    inputs_->at(index)->source = source->output();
+  }
+
   // Attaches an output to the first available input in this processor.
   void plugNext(const Output* source);
   void plugNext(const Processor* source);
@@ -251,7 +255,10 @@ public:
   virtual void numInputsChanged() { }
 
   // Sets the ProcessorRouter that will own this Processor.
-  force_inline void router(ProcessorRouter* router) { router_ = router; VITAL_ASSERT((Processor*)router != this); }
+  force_inline void router(ProcessorRouter* router) {
+    // std::cout << "setting router: " << router << " for this: " << this << std::endl;
+    router_ = router; VITAL_ASSERT((Processor*)router != this);
+  }
 
   // Returns the ProcessorRouter that owns this Processor.
   force_inline ProcessorRouter* router() const { return router_; }
@@ -263,6 +270,10 @@ public:
   virtual Output* registerOutput(Output* output, int index);
   virtual void registerInput(Input* input);
   virtual Output* registerOutput(Output* output);
+
+  // Input* i = new Input();
+  // i->source = current->output();
+  // last_node_->useInput(i, column);
 
   force_inline int numInputs() const { return static_cast<int>(inputs_->size()); }
   force_inline int numOutputs() const { return static_cast<int>(outputs_->size()); }

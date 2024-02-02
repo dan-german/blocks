@@ -8,35 +8,51 @@
 
 using namespace vital;
 
-class MyProcessor: public Processor {
-public:
-  float val;
-  MyProcessor(float val): Processor(1, 1), val(val) {}
-  Processor* clone() const override { return nullptr; }
-
-  void process(int num_samples) override {
-    auto buffer = input()->source->buffer;
-    for (int i = 0; i < num_samples; ++i) { buffer[i] = val; }
-    std::cout << "processing: " << val << std::endl;
+int compactAudio(poly_float* audio_out, const poly_float* audio_in, int num_samples) {
+  int num_full = num_samples / 2;
+  for (int i = 0; i < num_full; ++i) {
+    int in_index = 2 * i;
+    audio_out[i] = utils::compactFirstVoices(audio_in[in_index], audio_in[in_index + 1]);
   }
-};
+
+  for (int i = 0; i < num_full; ++i) {
+    utils::print(audio_out[i], "ao", nullptr);
+  }
+
+  int num_remaining = num_samples % 2;
+
+  if (num_remaining)
+    audio_out[num_full] = audio_in[num_samples - 1];
+
+  return num_full + num_remaining;
+}
 
 void please() {
   system("clear");
-  auto lfo = new MyProcessor(0.2f); std::cout << "lfo: " << lfo << std::endl;
-  auto osc = new MyProcessor(0.5f); std::cout << "osc: " << osc << std::endl;
-  osc->plug(lfo, 0);
 
-  auto osc2 = new MyProcessor(0.7f); std::cout << "osc2: " << osc2 << std::endl;
-  osc2->plug(lfo, 0);
+  int size = 5;
+  poly_float* a = new poly_float[size];
+  poly_float* b = new poly_float[size];
 
-  auto router = new vital::ProcessorRouter(1, 1);
-  router->addProcessor(osc);
-  // router->addProcessor(osc2);
+  for (int i = 0; i < size; i++) {
+    a[i] = 6.0f;
+    b[i] = 9.0f;
+  }
 
-  // auto router2 = new vital::ProcessorRouter(1, 1);
-  // router2->addProcessor(osc2);
+  // std::cout << "yay";
 
-  // router2->process(128);
-  std::cout << "yes" << std::endl;
+  // auto c = utils::compactFirstVoices(a[0], b[0]);
+
+  compactAudio(a, b, size);
 }
+
+
+// i = 0, in_index = 0
+// i = 1, in_index = 2
+// i = 2, in_index = 4
+// i = 3, in_index = 6
+// i = 4, in_index = 8
+
+// a, b, 0, 0
+// a, b, 0, 0
+// a, b, a, b

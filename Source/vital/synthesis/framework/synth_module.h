@@ -40,7 +40,6 @@ struct AddControlInput {
   mono_float default_value = 0.0f;
   // Processor* frequency = nullptr;
   // const Output* beats_per_second = nullptr;
-  // bool poly = false;
   // Input* midi = nullptr;
 };
 
@@ -128,6 +127,7 @@ public:
   virtual void setModule(std::shared_ptr<model::Module> module) { module_ = module; };
   std::map<std::string, Value*> control_map_;
   std::shared_ptr<model::Module> module_; 
+  std::shared_ptr<ModuleData> data_;
 
 protected:
   // Creates a basic linear non-scaled control.
@@ -149,7 +149,6 @@ protected:
   Output* createPolyModControl2(AddControlInput input);
   // Output* createTempoSyncSwitch2(AddControlInput input);
 
-  std::shared_ptr<ModuleData> data_;
 
   JUCE_LEAK_DETECTOR(SynthModule)
 };

@@ -55,7 +55,6 @@ void ProducersModule::init() {
   for (int i = 0; i < kNumOscillators; ++i) {
     int index1 = getFirstModulationIndex(i);
     int index2 = getSecondModulationIndex(i);
-    std::cout << "osc " << i << " " << index1 << " " << index2 << std::endl;
     oscillators_[i]->oscillator()->setFirstOscillatorOutput(oscillators_[index1]->output(OscillatorModule::kRaw));
     oscillators_[i]->oscillator()->setSecondOscillatorOutput(oscillators_[index2]->output(OscillatorModule::kRaw));
     oscillators_[i]->oscillator()->setSampleOutput(sampler_->output(SampleModule::kRaw));

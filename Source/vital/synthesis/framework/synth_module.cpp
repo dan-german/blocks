@@ -349,8 +349,11 @@ Processor* SynthModule::getMonoModulationDestination(std::string name) {
 }
 
 Processor* SynthModule::getPolyModulationDestination(std::string name) {
-  if (data_->poly_mod_destinations.count(name))
-    return data_->poly_mod_destinations[name];
+  if (data_->poly_mod_destinations.count(name)) { 
+    auto pls = data_->poly_mod_destinations[name];
+    std::cout << "getting pls: " << pls << std::endl;
+    return pls;
+  }
 
   for (SynthModule* sub_module : data_->sub_modules) {
     Processor* destination = sub_module->getPolyModulationDestination(name);
@@ -610,6 +613,8 @@ Output* SynthModule::createBaseModControl2(AddControlInput input) {
     mono_total = new ModulationSum();
   else
     mono_total = new cr::VariableAdd();
+
+  // std::cout << "mono_total: " << mono_total << " base_val: " << base_val << std::endl;
 
   mono_total->plugNext(base_val);
   addMonoProcessor(mono_total, false);

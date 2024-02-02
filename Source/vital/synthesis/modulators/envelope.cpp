@@ -38,6 +38,7 @@ void Envelope::processControlRate(int num_samples) {
   poly_mask has_delay_mask = poly_float::notEqual(delay_time, 0.0f);
   poly_mask note_on_mask = poly_float::equal(trigger_value, kVoiceOn);
   trigger_value = utils::maskLoad(trigger_value, kVoiceIdle, has_delay_mask & note_on_mask);
+  // utils::print(trigger_value, "trigger_value", nullptr);
 
   poly_state_ = utils::maskLoad(poly_state_, trigger_value, trigger_mask);
   position_ = utils::maskLoad(position_, 0.0f, trigger_mask);

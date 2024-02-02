@@ -84,20 +84,15 @@ public:
   Distortion();
   virtual ~Distortion() { }
 
-  virtual Processor* clone() const override {
-    VITAL_ASSERT(false);
-    return nullptr;
-  }
+  virtual Processor* clone() const override { return new Distortion(); }
 
   virtual void process(int num_samples) override;
   virtual void processWithInput(const poly_float* audio_in, int num_samples) override;
 
   template<poly_float(*distort)(poly_float, poly_float), poly_float(*scale)(poly_float)>
-  void processTimeInvariant(int num_samples, const poly_float* audio_in, const poly_float* drive,
-    poly_float* audio_out);
+  void processTimeInvariant(int num_samples, const poly_float* audio_in, const poly_float* drive, poly_float* audio_out);
 
-  void processDownSample(int num_samples, const poly_float* audio_in, const poly_float* drive,
-    poly_float* audio_out);
+  void processDownSample(int num_samples, const poly_float* audio_in, const poly_float* drive, poly_float* audio_out);
 
 private:
   poly_float last_distorted_value_;
