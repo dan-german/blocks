@@ -16,6 +16,7 @@
 #include "reverb_module_new.h"
 #include "delay_module_new.h"
 #include "drive_module.h"
+#include "chorus_model.h"
 
 namespace model {
 ModulePool::~ModulePool() { }
@@ -36,6 +37,7 @@ ModulePool::ModulePool() {
   blocks.spawn({ "reverb" }, [](std::string type, int number) { return std::make_shared<model::ReverbModule>(number); });
   blocks.spawn({ "delay" }, [](std::string type, int number) { return std::make_shared<model::DelayModule>(number); });
   blocks.spawn({ "drive" }, [](std::string type, int number) { return std::make_shared<model::DriveModule>(number); });
+  blocks.spawn({ "chorus" }, [](std::string type, int number) { return std::make_shared<model::ChorusModule>(number); });
   modulators.spawn({ "lfo" }, [](std::string type, int number) { return std::make_shared<model::LFOModule>(number); });
   modulators.spawn({ "envelope" }, [](std::string type, int number) { return std::make_shared<model::ADSRModule>(number); });
 

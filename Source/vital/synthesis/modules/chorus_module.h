@@ -32,19 +32,30 @@ public:
   void init() override;
   void enable(bool enable) override;
 
-  void processWithInput(const poly_float* audio_in, int num_samples) override;
+  void process(int num_samples) override;
   void correctToTime(double seconds) override;
-  Processor* clone() const override { VITAL_ASSERT(false); return nullptr; }
+  Processor* clone() const override {
+    // std::cout << "ChorusModule::clone()" << std::endl;
+
+    auto newChorus = new ChorusModule(*this);
+    for (int i = 0; i < kMaxDelayPairs; ++i) {
+      MultiDelay* cloned = static_cast<MultiDelay*>(delays_[i]->clone());
+      newChorus->delays_[i] = cloned;
+      newChorus->addIdleProcessor(newChorus->delays_[i]);
+    }
+
+    return newChorus;
+  }
 
   int getNextNumVoicePairs();
-
+  MultiDelay* delays_[kMaxDelayPairs];
 protected:
   const Output* beats_per_second_;
   Value* voices_;
 
   int last_num_voices_;
-
-  cr::Output delay_status_outputs_[kMaxDelayPairs];
+  int max_samples;
+  // cr::Output delay_status_outputs_[kMaxDelayPairs];
 
   Output* frequency_;
   Output* delay_time_1_;
@@ -55,10 +66,10 @@ protected:
   poly_float wet_;
   poly_float dry_;
 
-  poly_float delay_input_buffer_[kMaxBufferSize];
+  // poly_float* delay_input_buffer_[kMaxBufferSize];
 
   cr::Value delay_frequencies_[kMaxDelayPairs];
-  MultiDelay* delays_[kMaxDelayPairs];
+  // MultiDelay* delays_[kMaxDelayPairs];
 
   JUCE_LEAK_DETECTOR(ChorusModule)
 };

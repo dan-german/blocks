@@ -29,32 +29,33 @@ ChorusModule::ChorusModule(const Output* beats_per_second):
   wet_ = 0.0f;
   dry_ = 0.0f;
   last_num_voices_ = 0;
-  int max_samples = kMaxChorusDelay * kMaxSampleRate + 1;
+  max_samples = kMaxChorusDelay * kMaxSampleRate + 1;
 
   for (int i = 0; i < kMaxDelayPairs; ++i) {
-    registerOutput(&delay_status_outputs_[i]);
+    // registerOutput(&delay_status_outputs_[i]);
     delays_[i] = new MultiDelay(max_samples);
+    // delay_frequencies_[i] = new cr::Value();
     addIdleProcessor(delays_[i]);
   }
-
 }
 
 void ChorusModule::init() {
+  // std::cout << "ChorusModule::init()" << std::endl;
   static const cr::Value kDelayStyle(MultiDelay::kMono);
 
-  voices_ = createBaseControl("chorus_voices");
-
-  Output* free_frequency = createMonoModControl("chorus_frequency");
+  voices_ = createBaseControl2({ .name = "voices", .min = 1.0f, .max = 4.0f, .default_value = 4.0f, .value_scale = ValueScale::kIndexed });
+  Output* free_frequency = createPolyModControl2({ .name = "frequency", .min = -6.0f, .max = 3.0f, .default_value = 6.0f,. value_scale = ValueScale::kExponential });
   frequency_ = createTempoSyncSwitch("chorus", free_frequency->owner, beats_per_second_, false);
-  Output* feedback = createMonoModControl("chorus_feedback");
-  wet_output_ = createMonoModControl("chorus_dry_wet");
-  Output* cutoff = createMonoModControl("chorus_cutoff");
-  Output* spread = createMonoModControl("chorus_spread");
-  mod_depth_ = createMonoModControl("chorus_mod_depth");
+  Output* feedback = createPolyModControl2({ .name = "feedback", .min = -0.95f, .max = 0.95f, .default_value = 0.4f });
+  wet_output_ = createPolyModControl2({ .name = "mix", .default_value = 0.5f });
+  mod_depth_ = createPolyModControl2({ .name = "depth", .default_value = 0.5f });
 
-  delay_time_1_ = createMonoModControl("chorus_delay_1");
-  delay_time_2_ = createMonoModControl("chorus_delay_2");
+  Output* cutoff = createMonoModControl2({ .name = "cutoff", .min = 8.0f, .max = 136.0f, .default_value = 60.0f });
+  Output* spread = createMonoModControl2({ .name = "spread", .default_value = 1.0f });
 
+  delay_time_1_ = createMonoModControl2({ .name = "delay_1", .min = -10.0f, .max = -5.64386, .default_value = -9.0f, .value_scale = ValueScale::kExponential });
+  delay_time_2_ = createMonoModControl2({ .name = "delay_2", .min = -10.0f, .max = -5.64386, .default_value = -9.0f, .value_scale = ValueScale::kExponential });
+  
   for (int i = 0; i < kMaxDelayPairs; ++i) {
     delays_[i]->plug(&delay_frequencies_[i], MultiDelay::kFrequency);
     delays_[i]->plug(feedback, MultiDelay::kFeedback);
@@ -89,17 +90,17 @@ int ChorusModule::getNextNumVoicePairs() {
   return num_voice_pairs;
 }
 
-
-void ChorusModule::processWithInput(const poly_float* audio_in, int num_samples) {
+void ChorusModule::process(int num_samples) {
   SynthModule::process(num_samples);
+  poly_float* audio_in = input()->source->buffer;
   poly_float frequency = frequency_->buffer[0];
   poly_float delta_phase = (frequency * num_samples) * (1.0f / getSampleRate());
   phase_ = utils::mod(phase_ + delta_phase);
 
   poly_float* audio_out = output()->buffer;
   for (int s = 0; s < num_samples; ++s) {
-    poly_float sample = audio_in[s] & constants::kFirstMask;
-    audio_out[s] = sample + utils::swapVoices(sample);
+    poly_float sample = audio_in[s];// & constants::kFirstMask;
+    audio_out[s] = sample;// + utils::swapVoices(sample);
   }
 
   int num_voices = getNextNumVoicePairs();
@@ -124,7 +125,7 @@ void ChorusModule::processWithInput(const poly_float* audio_in, int num_samples)
     delay_frequencies_[i].set(delay_frequency);
     delays_[i]->processWithInput(audio_out, num_samples);
 
-    delay_status_outputs_[i].buffer[0] = delay_frequency;
+    // delay_status_outputs_[i].buffer[0] = delay_frequency;
   }
 
   poly_float current_wet = wet_;
@@ -145,7 +146,7 @@ void ChorusModule::processWithInput(const poly_float* audio_in, int num_samples)
 
     for (int s = 0; s < num_samples; ++s) {
       poly_float sample_out = delay_out[s] * 0.5f;
-      audio_out[s] += sample_out + utils::swapVoices(sample_out);
+      audio_out[s] += sample_out;// + utils::swapVoices(sample_out);
     }
   }
 

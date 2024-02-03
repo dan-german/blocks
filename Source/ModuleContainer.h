@@ -13,7 +13,7 @@ struct ModuleContainer {
     for (const auto& type : types) {
       juce::Array<std::shared_ptr<M>> array;
 
-      for (int i = 1; i <= MAX_MODULES_PER_TYPE; i++) {
+      for (int i = 1; i <= model::MAX_MODULES_PER_TYPE; i++) {
         array.add(std::shared_ptr<M>(spawner(type, i)));
       }
 

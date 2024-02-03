@@ -23,7 +23,7 @@ struct LFOModule: public Module {
   LFOModule(int number): Module(Types::lfo, number) {
     category = Module::Category::modulator;
 
-    createChoiceParameter({ "wave", waveforms, 1 });
+    createChoiceParameter({ "wave", model::waveforms, 1 });
 
     auto sync = createChoiceParameter({ .name = "sync", .choices = { "hz", "tempo", "dotted", "triplets" }, .defaultIndex = 0 });
 

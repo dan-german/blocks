@@ -27,7 +27,7 @@ struct OscillatorModule: public Block {
   }
 
   void createParameters() {
-    createChoiceParameter({ "wave", waveforms, waveIndex });
+    createChoiceParameter({ "wave", model::waveforms, waveIndex });
 
     std::function<String(double)> textFromValueFunction = [](double value) {
       double percentage = std::round(value * 100 * 100) / 100;

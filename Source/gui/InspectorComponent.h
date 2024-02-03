@@ -22,7 +22,7 @@ public:
   struct Listener;
 
   int calculateWidth();
-  int sliderWidth = 90;
+  int sliderWidth = 80;
   Listener* delegate;
   Slider::Listener* listener;
 

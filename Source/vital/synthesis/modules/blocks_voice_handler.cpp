@@ -36,6 +36,8 @@
 #include "vital/synthesis/modules/reverb_module.h"
 #include "vital/synthesis/modules/delay_module.h"
 #include "vital/synthesis/modules/distortion_module.h"
+#include "vital/synthesis/modules/chorus_module.h"
+
 
 namespace vital {
 
@@ -183,6 +185,7 @@ void BlocksVoiceHandler::init() {
   createOscillators();
   createReverbs();
   createDistortions();
+  createChoruses();
   createDelays();
   createModulators();
   createFilters(note_from_reference_->output());
@@ -269,7 +272,7 @@ void BlocksVoiceHandler::prepareDestroy() {
 }
 
 void BlocksVoiceHandler::createFilters(Output* keytrack) {
-  for (int i = 0; i < 5; i++) {
+  for (int i = 0; i < model::MAX_MODULES_PER_TYPE; i++) {
     auto filter = std::make_shared<FilterModule>("filter");
     filter->plug(reset(), FilterModule::kReset);
     filter->plug(bent_midi_, FilterModule::kMidi);
@@ -281,18 +284,27 @@ void BlocksVoiceHandler::createFilters(Output* keytrack) {
 }
 
 void BlocksVoiceHandler::createDistortions() {
-  for (int i = 0; i < 1; i++) {
+  for (int i = 0; i < model::MAX_MODULES_PER_TYPE; i++) {
     auto distortion = std::make_shared<DistortionModule>();
-    // distortion->plug(reset(), DistortionModule::kReset);
-    // distortion->plug(bent_midi_, DistortionModule::kMidi);
+    distortion->plug(reset(), DistortionModule::kReset);
     addSubmodule(distortion.get());
     addProcessor(distortion.get());
     processor_pool_["drive"].push_back(distortion);
   }
 }
 
+void BlocksVoiceHandler::createChoruses() {
+  for (int i = 0; i < model::MAX_MODULES_PER_TYPE; i++) {
+    auto chorus = std::make_shared<ChorusModule>(beats_per_second_);
+    addSubmodule(chorus.get());
+    addProcessor(chorus.get());
+    processor_pool_["chorus"].push_back(chorus);
+  }
+}
+
+
 void BlocksVoiceHandler::createReverbs() {
-  for (int i = 0; i < 5; i++) {
+  for (int i = 0; i < model::MAX_MODULES_PER_TYPE; i++) {
     auto reverb = std::make_shared<ReverbModule>();
     addSubmodule(reverb.get());
     addProcessor(reverb.get());
@@ -303,7 +315,8 @@ void BlocksVoiceHandler::createReverbs() {
 }
 
 void BlocksVoiceHandler::createDelays() {
-  for (int i = 0; i < 5; i++) {
+  return;
+  for (int i = 0; i < model::MAX_MODULES_PER_TYPE; i++) {
     auto delay = std::make_shared<DelayModule>(beats_per_second_);
     delay->plug(reset(), DelayModule::kReset);
     addSubmodule(delay.get());
@@ -348,6 +361,30 @@ std::shared_ptr<SynthModule> BlocksVoiceHandler::createProcessor(std::shared_ptr
     module->parameter_map_["type"]->val = processor->control_map_["type"];
     module->parameter_map_["drive"]->val = processor->control_map_["drive"];
     module->parameter_map_["mix"]->val = processor->control_map_["mix"];
+  } else if (module->id.type == "chorus") {
+    module->parameter_map_["voices"]->val = processor->control_map_["voices"];
+    module->parameter_map_["depth"]->val = processor->control_map_["depth"];
+    module->parameter_map_["frequency"]->val = processor->control_map_["frequency"];
+    module->parameter_map_["feedback"]->val = processor->control_map_["feedback"];
+    module->parameter_map_["mix"]->val = processor->control_map_["mix"];
+    // voices_ = createBaseControl2({ .name = "chorus_voices" });
+    // Output* free_frequency = createPolyModControl2({ .name = "frequency", .min = -6.0f, .max = 3.0f, .default_value = 6.0f,. value_scale = ValueScale::kExponential });
+    // frequency_ = createTempoSyncSwitch("chorus", free_frequency->owner, beats_per_second_, false);
+    // Output* feedback = createPolyModControl2({ .name = "feedback", .min = -0.95f, .max = 0.95f, .default_value = 0.4f });
+    // wet_output_ = createPolyModControl2({ .name = "mix", .default_value = 0.5f });
+    // Output* cutoff = createMonoModControl("chorus_cutoff");
+    // Output* spread = createMonoModControl("chorus_spread");
+    // mod_depth_ = createPolyModControl2({ .name = "mod_depth", .default_value = 0.5f });
+
+    // delay_time_1_ = createMonoModControl("chorus_delay_1");
+    // delay_time_2_ = createMonoModControl("chorus_delay_2");
+
+
+    // add({ .name = "voices", .min = 1, .max = 4, .value_scale = ValueScale::kIndexed });
+    // add({ .name = "depth", .default_value = 0.5f });
+    // add({ .name = "frequency", .min = -6.0f, .max = 3.0f, .default_value = 6.0f, .value_scale = ValueScale::kExponential });
+    // add({ .name = "feedback", .min = -0.95f, .max = 0.95f, .default_value = 0.4f });
+    // add({ .name = "mix", .default_value = 0.5f });
   }
 
   auto index = module->index;
@@ -361,7 +398,7 @@ std::shared_ptr<SynthModule> BlocksVoiceHandler::createProcessor(std::shared_ptr
 
 void BlocksVoiceHandler::createOscillators() {
   std::string type = "osc";
-  for (int i = 0; i < 2; i++) {
+  for (int i = 0; i < model::MAX_MODULES_PER_TYPE; i++) {
     auto osc = std::make_shared<OscillatorModule>();
 
     osc->plug(reset(), OscillatorModule::kReset);
@@ -524,33 +561,11 @@ void BlocksVoiceHandler::createVoiceOutput() {
   amplitude->plug(voice_amplitude, 1);
   addProcessor(amplitude);
 
-  // default_amplitude_envelope_ = createEnvelope(true);
-  // std::cout << "address" << default_amplitude_envelope_ << std::endl;
-  // active_modulators_map_["default_env"] = default_amplitude_envelope_;
-
-  // Output* delay = createPolyModControl2({ .name = "delay", .max = 1.41421, .value_scale = ValueScale::kQuadratic });
-  // Output* attack = createPolyModControl2({ .name = "attack", .max = 2.37842, .default_value = 0.1495, .value_scale = ValueScale::kQuartic });
-  // Output* hold = createPolyModControl2({ .name = "hold", .max = 1.41421, .value_scale = ValueScale::kQuadratic });
-  // Output* decay = createPolyModControl2({ .name = "decay", .max = 2.37842, .default_value = 1.0, .value_scale = ValueScale::kQuartic });
-  // Output* sustain = createPolyModControl2({ .name = "sustain", .default_value = 1.0, });
-  // Output* release = createPolyModControl2({ .name = "release", .max = 2.37842, .default_value = 0.5476, .value_scale = ValueScale::kQuartic });
-  // Value* attack_power = createBaseControl2({ .name = "attack_power", .min = -20.0, .max = 20.0 });
-  // Value* decay_power = createBaseControl2({ .name = "decay_power", .min = -20.0, .max = 20.0, .default_value = -2.0 });
-  // Value* release_power = createBaseControl2({ .name = "release_power", .min = -20.0, .max = 20.0, .default_value = -2.0, .value_scale = ValueScale::kLinear });
-
   Value* val = new Value(0.5f);
   addProcessor(val);
 
-  // Processor* control_amplitude = new SmoothMultiply();
-  // control_amplitude->plug(val, SmoothMultiply::kAudioRate);
-  // control_amplitude->plug(amplitude, SmoothMultiply::kControlRate);
-  // control_amplitude->plug(reset(), SmoothMultiply::kReset);
-
   amplitude_ = new Square();
   amplitude_->plug(val);
-  // amplitude_->plug(control_amplitude);
-
-  // addProcessor(control_amplitude);
   addProcessor(amplitude_);
 }
 

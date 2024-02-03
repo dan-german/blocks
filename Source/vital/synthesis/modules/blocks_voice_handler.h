@@ -106,6 +106,7 @@ private:
   void createFilters(Output* keytrack);
   void createReverbs();
   void createDistortions();
+  void createChoruses();
   void createDelays();
   void setupPolyModulationReadouts();
 

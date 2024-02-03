@@ -12,10 +12,10 @@
 
 #include "model/Module.h"
 
-namespace Model {
+namespace model {
 const StringArray waveforms { "saw", "sine", "square", "triangle", "noise" };
 const StringArray modulators { "lfo", "envelope" };
-const StringArray effects { "filter", "reverb", "delay", "drive", "mixer" };
+const StringArray effects { "filter", "drive", "reverb", "delay", "chorus", "flanger", "phaser", "comp" };
 const StringArray tabs { "oscillator", "modulator", "effect" };
-constexpr int MAX_MODULES_PER_TYPE = 5;
+constexpr int MAX_MODULES_PER_TYPE = 1;
 }

@@ -27,11 +27,13 @@ MainComponent::MainComponent(juce::MidiKeyboardState& keyboard_state, Delegate* 
   note_logger_.listener = this;
   ThemeManager::shared()->set(UserSettings::shared()->getInt("theme", 0));
 
+  // "osc", "filter", "drive", "flanger", "comp", "reverb", "delay", "chorus", "phaser", "eq"
+
   auto osc_block = addBlock(0, { 0, 0 });
   spawnBlockComponent(osc_block);
 
-  auto drive_block = addBlock(8, { 1, 0 });
-  spawnBlockComponent(drive_block);
+  auto chorus_block = addBlock(7, { 1, 0 });
+  spawnBlockComponent(chorus_block);
 
   // auto osc_block_2 = addBlock(0, { 0, 1 });
   // spawnBlockComponent(osc_block_2);
@@ -40,7 +42,6 @@ MainComponent::MainComponent(juce::MidiKeyboardState& keyboard_state, Delegate* 
   // spawnBlockComponent(f);
 
   addModulator(Model::Types::adsr);
-  // ui_layer_.modulators_.setVisible(true);
   delegate->editorConnectedModulation(0, "osc_1", "level");
 }
 
@@ -322,36 +323,16 @@ void MainComponent::showPopupAt(ButtonGridPopup& popup, std::function<void(Index
 }
 
 std::shared_ptr<model::Block> MainComponent::addBlock(int code, Index index) {
+  std::cout << "code: " << code << std::endl;
   std::shared_ptr<model::Block> block = nullptr;
+  const StringArray one { "osc", "filter", "drive", "flanger", "comp" };
+  const StringArray two { "reverb", "delay", "chorus", "phaser", "eq" };
+  StringArray all;
+  all.addArray(one);
+  all.addArray(two);
+  return delegate->editorAddedBlock2(all[code].toStdString(), index);
 
-  switch (code) { // the first row's 5 codes are reserved for different wave types in the block selection menu popup
-  case 0:   // saw
-  case 1:   // sine
-  case 2:   // sqr
-  case 3: { // tri
-    block = delegate->editorAddedBlock2(Model::Types::osc, index);
-    // DBG(block->parameters_.size());
-
-    const float code_wavetable_frame =
-      code / 4.0 * (vital::kNumOscillatorWaveFrames - 1);
-    block->parameter_map_["wave"]->val->set(code_wavetable_frame);
-
-    // if (block == nullptr) return nullptr; // todo - grey out the button in the block selection popup if the block is not available
-    // auto range = block->parameters[0]->audioParameter->getNormalisableRange();
-    // block->parameters[0]->audioParameter->setValue(range.convertTo0to1(code));
-    break;
-  }
-        // case 4: // noise 
-  case 5: block = delegate->editorAddedBlock2(Model::Types::filter, index); break;
-    // case 5: block = delegate->editorAddedBlock(Model::Types::filter, index); break;
-  case 6: block = delegate->editorAddedBlock2(Model::Types::reverb, index); break;
-  case 7: block = delegate->editorAddedBlock2(Model::Types::delay, index); break;
-  case 8: block = delegate->editorAddedBlock2(Model::Types::drive, index); break;
-    // case 9: block = delegate->editorAddedBlock(Model::Types::mixer, index); break;
-  default: break;
-  }
-
-  return block;
+  // return block;
 }
 
 void MainComponent::setupInspector() {
@@ -746,10 +727,13 @@ void MainComponent::modulatorRemoved(ModulatorComponent* component) {
 
 void MainComponent::setupPopupMenus() {
   addChildComponent(blocks_popup_);
-  blocks_popup_.setModel({ waveforms, effects });
+
+  const StringArray one { "osc", "filter", "drive", "flanger", "comp" };
+  const StringArray two { "reverb", "delay", "chorus", "phaser", "eq" };
+  blocks_popup_.setModel({ one, two });
 
   addChildComponent(modualtors_popup_);
-  modualtors_popup_.setModel(modulators);
+  modualtors_popup_.setModel(model::modulators);
 
   addChildComponent(save_popup_);
 }
