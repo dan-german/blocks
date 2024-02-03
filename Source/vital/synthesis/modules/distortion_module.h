@@ -26,6 +26,12 @@ class DigitalSvf;
 
 class DistortionModule: public SynthModule {
 public:
+  enum { 
+    kAudio, 
+    kReset,
+    kNumInputs
+  };
+
   DistortionModule();
   virtual ~DistortionModule();
 

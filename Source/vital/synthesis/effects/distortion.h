@@ -32,6 +32,7 @@ public:
     kAudio,
     kType,
     kDrive,
+    kReset,
     kNumInputs
   };
 
@@ -92,9 +93,11 @@ public:
   template<poly_float(*distort)(poly_float, poly_float), poly_float(*scale)(poly_float)>
   void processTimeInvariant(int num_samples, const poly_float* audio_in, const poly_float* drive, poly_float* audio_out);
 
+  void reset(poly_mask reset_mask) override;
   void processDownSample(int num_samples, const poly_float* audio_in, const poly_float* drive, poly_float* audio_out);
 
 private:
+  poly_float drive_;
   poly_float last_distorted_value_;
   poly_float current_samples_;
   int type_;

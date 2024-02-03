@@ -22,36 +22,20 @@
 namespace vital {
 
 DistortionModule::DistortionModule():
-  SynthModule(1, 1), distortion_(new Distortion()), mix_(0.0f) { }
-
-DistortionModule::~DistortionModule() {
+  SynthModule(kNumInputs, 1), distortion_(new Distortion()), mix_(0.0f) {
+  addProcessor(distortion_);
 }
 
+DistortionModule::~DistortionModule() { }
+
 void DistortionModule::init() {
-  // distortion_ = new Distortion();
   distortion_->useOutput(output());
-  addProcessor(distortion_);
 
   Value* distortion_type = createBaseControl2({ .name = "type" });
-  Output* distortion_drive = createPolyModControl2({ .name = "drive", .audio_rate = true, .smooth_value = true });
+  Output* distortion_drive = createPolyModControl2({ .name = "drive", .audio_rate = true, .smooth_value = true, .reset = input(kReset) });
   distortion_mix_ = createPolyModControl2({ .name = "mix" });
-
   distortion_->plug(distortion_type, Distortion::kType);
   distortion_->plug(distortion_drive, Distortion::kDrive);
-
-  // filter_order_ = createBaseControl("distortion_filter_order");
-  // Output* midi_cutoff = createMonoModControl("distortion_filter_cutoff", true, true);
-  // Output* resonance = createMonoModControl("distortion_filter_resonance");
-  // Output* blend = createMonoModControl("distortion_filter_blend");
-
-  // filter_ = new DigitalSvf();
-  // filter_->useOutput(output());
-  // filter_->plug(midi_cutoff, DigitalSvf::kMidiCutoff);
-  // filter_->plug(resonance, DigitalSvf::kResonance);
-  // filter_->plug(blend, DigitalSvf::kPassBlend);
-  // filter_->setDriveCompensation(false);
-  // filter_->setBasic(true);
-  // addIdleProcessor(filter_);
 
   SynthModule::init();
 }
@@ -59,10 +43,10 @@ void DistortionModule::init() {
 void DistortionModule::setSampleRate(int sample_rate) {
   SynthModule::setSampleRate(sample_rate);
   distortion_->setSampleRate(sample_rate);
-  // filter_->setSampleRate(sample_rate);
 }
 
 void DistortionModule::process(int num_samples) {
+  SynthModule::process(num_samples);
   // bool on = on_ == nullptr || on_->value() > 0.5f;
   // if (on) {
   const poly_float* audio_in = input()->source->buffer;

@@ -134,8 +134,7 @@ void SynthLfo::processControlRate(int num_samples) {
   output(kOscFrequency)->buffer[0] = frequency;
 }
 
-poly_float SynthLfo::processAudioRateEnvelope(int num_samples, poly_float current_phase,
-  poly_float current_offset, poly_float delta_offset) {
+poly_float SynthLfo::processAudioRateEnvelope(int num_samples, poly_float current_phase, poly_float current_offset, poly_float delta_offset) {
   int lfo_resolution = source_->resolution();
   poly_float resolution = lfo_resolution;
   poly_int max_index = lfo_resolution - 1;

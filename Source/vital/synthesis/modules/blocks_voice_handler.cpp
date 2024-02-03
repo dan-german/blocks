@@ -283,8 +283,7 @@ void BlocksVoiceHandler::createFilters(Output* keytrack) {
 void BlocksVoiceHandler::createDistortions() {
   for (int i = 0; i < 1; i++) {
     auto distortion = std::make_shared<DistortionModule>();
-    // distortion->plug(reset(), DistortionModule::kReset);
-    // distortion->plug(bent_midi_, DistortionModule::kMidi);
+    distortion->plug(reset(), DistortionModule::kReset);
     addSubmodule(distortion.get());
     addProcessor(distortion.get());
     processor_pool_["drive"].push_back(distortion);
