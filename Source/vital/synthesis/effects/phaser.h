@@ -47,7 +47,7 @@ public:
   Phaser();
   virtual ~Phaser() { }
 
-  virtual Processor* clone() const override { VITAL_ASSERT(false); return nullptr; }
+  virtual Processor* clone() const override { return new Phaser(*this); }
   void process(int num_samples) override;
   void processWithInput(const poly_float* audio_in, int num_samples) override;
   void init() override;
@@ -55,11 +55,11 @@ public:
   void correctToTime(double seconds);
   void setOversampleAmount(int oversample) override {
     ProcessorRouter::setOversampleAmount(oversample);
-    cutoff_.ensureBufferSize(oversample * kMaxBufferSize);
+    cutoff_->ensureBufferSize(oversample * kMaxBufferSize);
   }
 
 private:
-  Output cutoff_;
+  Output* cutoff_;
   PhaserFilter* phaser_filter_;
   poly_float mix_;
   poly_float mod_depth_;

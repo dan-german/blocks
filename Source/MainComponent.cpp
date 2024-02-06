@@ -32,8 +32,8 @@ MainComponent::MainComponent(juce::MidiKeyboardState& keyboard_state, Delegate* 
   auto osc_block = addBlock(0, { 0, 0 });
   spawnBlockComponent(osc_block);
 
-  auto chorus_block = addBlock(7, { 1, 0 });
-  spawnBlockComponent(chorus_block);
+  // auto chorus_block = addBlock(3, { 1, 0 });
+  // spawnBlockComponent(chorus_block);
 
   // auto osc_block_2 = addBlock(0, { 0, 1 });
   // spawnBlockComponent(osc_block_2);

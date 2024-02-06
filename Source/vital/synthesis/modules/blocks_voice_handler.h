@@ -107,6 +107,8 @@ private:
   void createReverbs();
   void createDistortions();
   void createChoruses();
+  void createFlangers();
+  void createPhasers();
   void createDelays();
   void setupPolyModulationReadouts();
 

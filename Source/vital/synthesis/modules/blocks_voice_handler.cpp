@@ -37,7 +37,8 @@
 #include "vital/synthesis/modules/delay_module.h"
 #include "vital/synthesis/modules/distortion_module.h"
 #include "vital/synthesis/modules/chorus_module.h"
-
+#include "vital/synthesis/modules/flanger_module.h"
+#include "vital/synthesis/modules/phaser_module.h"
 
 namespace vital {
 
@@ -186,6 +187,8 @@ void BlocksVoiceHandler::init() {
   createReverbs();
   createDistortions();
   createChoruses();
+  createFlangers();
+  createPhasers();
   createDelays();
   createModulators();
   createFilters(note_from_reference_->output());
@@ -296,9 +299,29 @@ void BlocksVoiceHandler::createDistortions() {
 void BlocksVoiceHandler::createChoruses() {
   for (int i = 0; i < model::MAX_MODULES_PER_TYPE; i++) {
     auto chorus = std::make_shared<ChorusModule>(beats_per_second_);
+    chorus->plug(reset(), ChorusModule::kReset);
     addSubmodule(chorus.get());
     addProcessor(chorus.get());
     processor_pool_["chorus"].push_back(chorus);
+  }
+}
+
+void BlocksVoiceHandler::createPhasers() {
+  for (int i = 0; i < model::MAX_MODULES_PER_TYPE; i++) {
+    auto phaser = std::make_shared<PhaserModule>(beats_per_second_);
+    addSubmodule(phaser.get());
+    addProcessor(phaser.get());
+    processor_pool_["phaser"].push_back(phaser);
+  }
+}
+
+void BlocksVoiceHandler::createFlangers() {
+  for (int i = 0; i < model::MAX_MODULES_PER_TYPE; i++) {
+    auto flanger = std::make_shared<FlangerModule>(beats_per_second_);
+    // flanger->plug(reset(), FlangerModule::kReset);
+    addSubmodule(flanger.get());
+    addProcessor(flanger.get());
+    processor_pool_["flanger"].push_back(flanger);
   }
 }
 
@@ -367,24 +390,33 @@ std::shared_ptr<SynthModule> BlocksVoiceHandler::createProcessor(std::shared_ptr
     module->parameter_map_["frequency"]->val = processor->control_map_["frequency"];
     module->parameter_map_["feedback"]->val = processor->control_map_["feedback"];
     module->parameter_map_["mix"]->val = processor->control_map_["mix"];
-    // voices_ = createBaseControl2({ .name = "chorus_voices" });
-    // Output* free_frequency = createPolyModControl2({ .name = "frequency", .min = -6.0f, .max = 3.0f, .default_value = 6.0f,. value_scale = ValueScale::kExponential });
-    // frequency_ = createTempoSyncSwitch("chorus", free_frequency->owner, beats_per_second_, false);
-    // Output* feedback = createPolyModControl2({ .name = "feedback", .min = -0.95f, .max = 0.95f, .default_value = 0.4f });
-    // wet_output_ = createPolyModControl2({ .name = "mix", .default_value = 0.5f });
-    // Output* cutoff = createMonoModControl("chorus_cutoff");
-    // Output* spread = createMonoModControl("chorus_spread");
-    // mod_depth_ = createPolyModControl2({ .name = "mod_depth", .default_value = 0.5f });
+  } else if (module->id.type == "phaser") {
+    module->parameter_map_["mix"]->val = processor->control_map_["mix"];
+    module->parameter_map_["feedback"]->val = processor->control_map_["feedback"];
+    module->parameter_map_["frequency"]->val = processor->control_map_["frequency"];
+    module->parameter_map_["depth"]->val = processor->control_map_["depth"];
+    module->parameter_map_["offset"]->val = processor->control_map_["offset"];
+    module->parameter_map_["blend"]->val = processor->control_map_["blend"];
+    module->parameter_map_["center"]->val = processor->control_map_["center"];
+  } else if (module->id.type == "flanger") {
+    module->parameter_map_["mix"]->val = processor->control_map_["mix"];
+    module->parameter_map_["feedback"]->val = processor->control_map_["feedback"];
+    module->parameter_map_["frequency"]->val = processor->control_map_["frequency"];
+    module->parameter_map_["depth"]->val = processor->control_map_["depth"];
+    module->parameter_map_["offset"]->val = processor->control_map_["offset"];
+    // module->parameter_map_["blend"]->val = processor->control_map_["blend"];
+    module->parameter_map_["center"]->val = processor->control_map_["center"];
+    // add({ .name = "feedback", .min = -1, .default_value = 0.5 });
+    // add({ .name = "frequency", .min = -5, .max = 2, .value_scale = ValueScale::kExponential, .default_value = 2 });
+    // add({ .name = "depth", .default_value = 0.5 });
+    // add({ .name = "phase_offset", .default_value = 0.333333 });
+    // add({ .name = "center", .min = 8, .max = 136, .default_value = 64 });
+    // add({ .name = "feedback", .min = -1, .default_value = 0.5 });
+    // add({ .name = "frequency", .min = -5, .max = 2, .value_scale = ValueScale::kExponential, .default_value = 2 });
+    // add({ .name = "depth", .default_value = 0.5 });
+    // add({ .name = "phase_offset", .default_value = 0.333333 });
+    // add({ .name = "center", .min = 8, .max = 136, .default_value = 64 });
 
-    // delay_time_1_ = createMonoModControl("chorus_delay_1");
-    // delay_time_2_ = createMonoModControl("chorus_delay_2");
-
-
-    // add({ .name = "voices", .min = 1, .max = 4, .value_scale = ValueScale::kIndexed });
-    // add({ .name = "depth", .default_value = 0.5f });
-    // add({ .name = "frequency", .min = -6.0f, .max = 3.0f, .default_value = 6.0f, .value_scale = ValueScale::kExponential });
-    // add({ .name = "feedback", .min = -0.95f, .max = 0.95f, .default_value = 0.4f });
-    // add({ .name = "mix", .default_value = 0.5f });
   }
 
   auto index = module->index;

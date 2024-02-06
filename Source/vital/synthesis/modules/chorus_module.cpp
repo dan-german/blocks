@@ -23,7 +23,7 @@
 namespace vital {
 
 ChorusModule::ChorusModule(const Output* beats_per_second):
-  SynthModule(1, 1), beats_per_second_(beats_per_second),
+  SynthModule(kNumInputs, 1), beats_per_second_(beats_per_second),
   frequency_(nullptr), delay_time_1_(nullptr), delay_time_2_(nullptr),
   mod_depth_(nullptr), phase_(0.0f) {
   wet_ = 0.0f;
@@ -32,9 +32,7 @@ ChorusModule::ChorusModule(const Output* beats_per_second):
   max_samples = kMaxChorusDelay * kMaxSampleRate + 1;
 
   for (int i = 0; i < kMaxDelayPairs; ++i) {
-    // registerOutput(&delay_status_outputs_[i]);
     delays_[i] = new MultiDelay(max_samples);
-    // delay_frequencies_[i] = new cr::Value();
     addIdleProcessor(delays_[i]);
   }
 }
@@ -63,6 +61,7 @@ void ChorusModule::init() {
     delays_[i]->plug(cutoff, MultiDelay::kFilterCutoff);
     delays_[i]->plug(spread, MultiDelay::kFilterSpread);
     delays_[i]->plug(&kDelayStyle, MultiDelay::kStyle);
+    delays_[i]->plug(input(kReset)->source, MultiDelay::kReset);
   }
 
   SynthModule::init();
@@ -124,7 +123,6 @@ void ChorusModule::process(int num_samples) {
     vital::poly_float delay_frequency = poly_float(1.0f) / utils::max(0.00001f, delay);
     delay_frequencies_[i].set(delay_frequency);
     delays_[i]->processWithInput(audio_out, num_samples);
-
     // delay_status_outputs_[i].buffer[0] = delay_frequency;
   }
 

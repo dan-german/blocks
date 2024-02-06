@@ -40,7 +40,8 @@ public:
 
   void correctToTime(double seconds) override;
   void setSampleRate(int sample_rate) override;
-  void processWithInput(const poly_float* audio_in, int num_samples) override;
+  // void processWithInput(const poly_float* audio_in, int num_samples) override;
+  void process(int num_samples) override;
   Processor* clone() const override { return new PhaserModule(*this); }
 
 protected:

@@ -23,18 +23,18 @@
 
 namespace vital {
 
-Phaser::Phaser(): ProcessorRouter(kNumInputs, kNumOutputs), mix_(0.0f),
-mod_depth_(0.0f), phase_offset_(0.0f), phase_(0) {
+Phaser::Phaser(): ProcessorRouter(kNumInputs, kNumOutputs), mix_(0.0f), mod_depth_(0.0f), phase_offset_(0.0f), phase_(0) {
   phaser_filter_ = new PhaserFilter(true);
+  cutoff_ = new Output();
   addIdleProcessor(phaser_filter_);
 }
 
 void Phaser::init() {
   phaser_filter_->useInput(input(kFeedbackGain), PhaserFilter::kResonance);
   phaser_filter_->useInput(input(kBlend), PhaserFilter::kPassBlend);
-  phaser_filter_->plug(&cutoff_, PhaserFilter::kMidiCutoff);
+  phaser_filter_->plug(cutoff_, PhaserFilter::kMidiCutoff);
 
-  phaser_filter_->init();
+  // phaser_filter_->init();
   ProcessorRouter::init();
 }
 
@@ -75,7 +75,7 @@ void Phaser::processWithInput(const poly_float* audio_in, int num_samples) {
     poly_mask fold_mask = poly_int::greaterThan(shifted_phase, INT_MAX);
     poly_int folded_phase = utils::maskLoad(shifted_phase, -shifted_phase, fold_mask);
     poly_float modulation = utils::toFloat(folded_phase) * (2.0f / INT_MAX) - 1.0f;
-    cutoff_.buffer[i] = center_buffer[i] + modulation * current_mod_depth;
+    cutoff_->buffer[i] = center_buffer[i] + modulation * current_mod_depth;
   }
 
   phaser_filter_->processWithInput(audio_in, num_samples);
@@ -92,7 +92,7 @@ void Phaser::processWithInput(const poly_float* audio_in, int num_samples) {
     audio_out[i] = utils::interpolate(audio_in[i], phaser_out[i], current_mix);
   }
 
-  output(kCutoffOutput)->buffer[0] = cutoff_.buffer[num_samples - 1];
+  output(kCutoffOutput)->buffer[0] = cutoff_->buffer[num_samples - 1];
 }
 
 void Phaser::correctToTime(double seconds) {

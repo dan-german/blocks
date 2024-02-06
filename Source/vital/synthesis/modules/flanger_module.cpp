@@ -16,38 +16,38 @@
 
 #include "vital/synthesis/modules/flanger_module.h"
 
-#include "vital/synthesis/effects/delay.h"
 #include "vital/synthesis/lookups/memory.h"
 #include "vital/common/synth_constants.h"
 
 namespace vital {
 
 FlangerModule::FlangerModule(const Output* beats_per_second):
-  SynthModule(0, kNumOutputs), beats_per_second_(beats_per_second),
+  SynthModule(kNumInputs, kNumOutputs), beats_per_second_(beats_per_second),
   frequency_(nullptr), phase_offset_(nullptr), mod_depth_(nullptr),
   phase_(0.0f), delay_(nullptr) { }
 
 FlangerModule::~FlangerModule() { }
 
 void FlangerModule::init() {
-  static constexpr int kMaxSamples = 40000;
   static const cr::Value kDelayStyle(StereoDelay::kClampedUnfiltered);
+  delay_frequency_ = new cr::Value(0.0f);
 
-  delay_ = new StereoDelay(kMaxSamples);
+  delay_ = new MultiDelay(kMaxSamples);
   addIdleProcessor(delay_);
-  phase_ = 0.0f;
   delay_->useOutput(output(kAudioOutput));
 
-  Output* free_frequency = createMonoModControl("flanger_frequency");
+  phase_ = 0.0f;
+
+  free_frequency = createPolyModControl2({ .name = "frequency", .min = -5.0f, .max = 2.0f, .value_scale = ValueScale::kExponential, .default_value = 2.0f });
   frequency_ = createTempoSyncSwitch("flanger", free_frequency->owner, beats_per_second_, false);
-  center_ = createMonoModControl("flanger_center");
-  Output* feedback = createMonoModControl("flanger_feedback");
-  Output* wet = createMonoModControl("flanger_dry_wet");
-  mod_depth_ = createMonoModControl("flanger_mod_depth");
+  center_ = createPolyModControl2({ .name = "center", .min = 8.0f, .max = 136.0f, .default_value = 64.0f, .reset = input(kReset) });
+  feedback = createPolyModControl2({ .name = "feedback", .min = -1.0f, .default_value = 0.5f });
+  wet = createPolyModControl2({ .name = "mix", .min = 0.0f, .max = 0.5f, .default_value = 0.5f, .reset = input(kReset) });
+  mod_depth_ = createPolyModControl2({ .name = "depth", .default_value = 0.5f });
 
-  phase_offset_ = createMonoModControl("flanger_phase_offset");
+  phase_offset_ = createPolyModControl2({ .name = "offset", .default_value = 0.333333f });
 
-  delay_->plug(&delay_frequency_, StereoDelay::kFrequency);
+  delay_->plug(delay_frequency_, StereoDelay::kFrequency);
   delay_->plug(feedback, StereoDelay::kFeedback);
   delay_->plug(wet, StereoDelay::kWet);
   delay_->plug(&kDelayStyle, StereoDelay::kStyle);
@@ -55,17 +55,19 @@ void FlangerModule::init() {
   SynthModule::init();
 }
 
-void FlangerModule::processWithInput(const poly_float* audio_in, int num_samples) {
+void FlangerModule::process(int num_samples) {
+  // utils::print(audio_in[0], "audio_in", this);
   static constexpr float kMaxFrequency = 20000.0f;
 
   SynthModule::process(num_samples);
+  auto audio_in = input()->source->buffer;
   poly_float frequency = frequency_->buffer[0];
   poly_float delta_phase = (frequency * num_samples) / getSampleRate();
   phase_ = utils::mod(phase_ + delta_phase);
 
   poly_float phase_offset = phase_offset_->buffer[0];
-  poly_float right_offset = (phase_offset & constants::kRightMask);
-  poly_float phase_total = phase_ - phase_offset / 2.0f + right_offset;
+  // poly_float right_offset = (phase_offset);// & constants::kRightMask);
+  poly_float phase_total = phase_ - phase_offset / 2.0f + phase_offset;
 
   poly_float mod = mod_depth_->buffer[0] * (utils::triangleWave(phase_total) * 2.0f - 1.0f) + 1.0f;
   poly_float delay = poly_float(1.0f) / utils::midiNoteToFrequency(center_->buffer[0]);
@@ -73,8 +75,18 @@ void FlangerModule::processWithInput(const poly_float* audio_in, int num_samples
   poly_float delay_frequency = poly_float(1.0f) / utils::max(delay, 1.0f / kMaxFrequency);
 
   output(kFrequencyOutput)->buffer[0] = delay_frequency;
-  delay_frequency_.set(delay_frequency);
+  delay_frequency_->set(delay_frequency);
   delay_->processWithInput(audio_in, num_samples);
+
+  // auto audio_out = output()->buffer;
+  // auto delay_out = delay_->output()->buffer;
+  // utils::copyBuffer(audio_out, delay_out, num_samples);
+  // for (int s = 0; s < num_samples; ++s) {
+  //   // poly_float sample_out = ;
+  //   audio_out[s] += audio_in[s];// + utils::swapVoices(sample_out);
+  //   utils::copyBuffer(
+  // }
+  // utils::print(audio_out[0], "audio_out", this);
 }
 
 void FlangerModule::correctToTime(double seconds) {

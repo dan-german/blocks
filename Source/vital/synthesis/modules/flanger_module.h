@@ -34,11 +34,20 @@ public:
     kNumOutputs
   };
 
+  enum { 
+    kAudioIn,
+    kReset, 
+    kNumInputs
+  };
+
   FlangerModule(const Output* beats_per_second);
   virtual ~FlangerModule();
 
   void init() override;
   void hardReset() override { delay_->hardReset(); }
+
+  static constexpr int kMaxSamples = 40000;
+
   void enable(bool enable) override {
     SynthModule::enable(enable);
     process(1);
@@ -46,10 +55,16 @@ public:
       delay_->hardReset();
   }
 
-  void processWithInput(const poly_float* audio_in, int num_samples) override;
+  void process(int num_samples) override;
   void correctToTime(double seconds) override;
 
-  Processor* clone() const override { VITAL_ASSERT(false); return nullptr; }
+  Processor* clone() const override {
+    auto flanger = new FlangerModule(*this);
+    auto cloned = static_cast<MultiDelay*>(delay_->clone());
+    flanger->delay_ = cloned;
+    flanger->addIdleProcessor(cloned);
+    return flanger;
+  }
 
 protected:
   const Output* beats_per_second_;
@@ -58,9 +73,12 @@ protected:
   Output* center_;
   Output* mod_depth_;
   poly_float phase_;
+  Output* free_frequency;
+  Output* feedback;
+  Output* wet;
 
-  cr::Value delay_frequency_;
-  StereoDelay* delay_;
+  cr::Value* delay_frequency_;
+  MultiDelay* delay_;
 
   JUCE_LEAK_DETECTOR(FlangerModule)
 };

@@ -22,6 +22,12 @@
 namespace vital {
 class ChorusModule: public SynthModule {
 public:
+  enum { 
+    kAudio, 
+    kReset,
+    kNumInputs
+  };
+
   static constexpr mono_float kMaxChorusModulation = 0.03f;
   static constexpr mono_float kMaxChorusDelay = 0.08f;
   static constexpr int kMaxDelayPairs = 4;
@@ -36,14 +42,12 @@ public:
   void correctToTime(double seconds) override;
   Processor* clone() const override {
     // std::cout << "ChorusModule::clone()" << std::endl;
-
     auto newChorus = new ChorusModule(*this);
     for (int i = 0; i < kMaxDelayPairs; ++i) {
       MultiDelay* cloned = static_cast<MultiDelay*>(delays_[i]->clone());
       newChorus->delays_[i] = cloned;
       newChorus->addIdleProcessor(newChorus->delays_[i]);
     }
-
     return newChorus;
   }
 
