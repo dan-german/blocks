@@ -12,6 +12,7 @@
 #include "model/ModuleParameter.h"
 #include "module_new.h"
 #include "ui_utils.h"
+#include "vital/synth_strings.h"
 
 InspectorComponent::InspectorComponent() {}
 InspectorComponent::~InspectorComponent() { }
@@ -22,53 +23,40 @@ void InspectorComponent::sliderDragEnded(Slider* slider) { delegate->inspectorGe
 
 void InspectorComponent::setConfiguration(std::shared_ptr<model::Module> module) {
   resetInspector();
-  for (auto parameter : module->parameters_) spawnSlider(*parameter);
+  for (auto parameter : module->parameters_) spawnSlider(*parameter, module);
   updateSize();
 }
 
-void InspectorComponent::spawnSlider(vital::ValueDetails parameter) {
+void InspectorComponent::spawnSlider(vital::ValueDetails parameter, std::shared_ptr<model::Module> module) {
   if (parameter.hidden) return;
   auto slider = new InspectorSlider();
-  // auto audioParameter = parameter->audioParameter;
-
-  // auto range = audioParameter->getNormalisableRange();
   double interval = 0.0;
+
   if (parameter.value_scale == ValueScale::kIndexed) {
     interval = 1.0;
   }
 
   slider->slider.setRange(parameter.min, parameter.max, interval);
-
   slider->slider.addListener(this);
-  slider->titleLabel.setText(parameter.display_name, dontSendNotification);
   slider->slider.setNumDecimalPlacesToDisplay(parameter.decimal_places);
 
-  // slider->box_slider_.slider.textFromValueFunction = [parameter](double value) { return getSliderTextFromValue(value, *parameter); };
-  slider->slider.textFromValueFunction = [parameter](double value) { return UIUtils::getSliderTextFromValue(value, parameter); };
+  slider->slider.textFromValueFunction = [this, parameter, module, slider](double value) {
+    bool is_changing_sync = parameter.name == "sync";
+    if (is_changing_sync) {
+      auto frequency_slider = getSliders()[4];
+      bool is_seconds = int(value) == 0;
+      if (is_seconds) {
+        setSliderAsFrequency(module, frequency_slider);
+      } else {
+        setSliderAsTempo(module, frequency_slider);
+      }
+    }
+    return UIUtils::getSliderTextFromValue(value, parameter);
+  };
 
-  // slider->slider.setSkewFactor(parameter->skew, false);
-  // slider->slider.setTextValueSuffix(parameter->valueSuffix);
-
-  // if (dynamic_cast<AudioParameterInt*>(audioParameter)) 
-  //   slider->slider.setNumDecimalPlacesToDisplay(0);
-  // else if (dynamic_cast<AudioParameterFloat*>(audioParameter))
-  //   slider->slider.setNumDecimalPlacesToDisplay(2);
-
-  // auto choices = audioParameter->getAllValueStrings();
-
-  // if (parameter->textFromValueFunction)
-  // slider->slider.textFromValueFunction = [parameter](double value) { return std::to_string(value * parameter.display_multiply); };
-  // else if (choices.size() != 0) {
-  //   slider->setType(InspectorSlider::Type::thumb);
-  //   slider->slider.textFromValueFunction = [choices](double value) { return choices[value]; };
-  // }
-
-  // for (auto modulator : parameter->connections)
-  //   slider->addModulationIndicator(modulator->magnitudeParameter->getValue(), modulator->source->colour.colour, static_cast<bool>(modulator->bipolarParameter->getValue()), parameter->audioParameter->getValue());
-
+  slider->titleLabel.setText(parameter.display_name, dontSendNotification);
   parameterSliders.add(slider);
   addAndMakeVisible(slider);
-
   slider->slider.setValue(parameter.val->value(), dontSendNotification);
 }
 
@@ -105,4 +93,20 @@ void InspectorComponent::setModulationIndicatorValue(int parameterIndex, int mod
 
 void InspectorComponent::setModulationIndicatorPolarity(int parameterIndex, int modulatorIndex, bool bipolar) {
   getSliders()[parameterIndex]->setModulatorBipolar(modulatorIndex, bipolar);
+}
+
+void InspectorComponent::setSliderAsFrequency(std::shared_ptr<model::Module> module, InspectorSlider* slider) const {
+  slider->titleLabel.setText("seconds", dontSendNotification);
+  slider->slider.textFromValueFunction = [slider, module](double value) {
+    return UIUtils::getSliderTextFromValue(value, *(module->parameter_map_["frequency"]));
+  };
+  slider->slider.setRange(-2.0, 9.0);
+}
+
+void InspectorComponent::setSliderAsTempo(std::shared_ptr<model::Module> module, InspectorSlider* slider) const {
+  slider->titleLabel.setText("tempo", dontSendNotification);
+  slider->slider.textFromValueFunction = [slider, module](double value) {
+    return juce::String(strings::kSyncedFrequencyNames[int(value)]);
+  };
+  slider->slider.setRange(0.0, 12.0, 1.0);
 }

@@ -349,7 +349,7 @@ Processor* SynthModule::getMonoModulationDestination(std::string name) {
 }
 
 Processor* SynthModule::getPolyModulationDestination(std::string name) {
-  if (data_->poly_mod_destinations.count(name)) { 
+  if (data_->poly_mod_destinations.count(name)) {
     auto pls = data_->poly_mod_destinations[name];
     std::cout << "getting pls: " << pls << std::endl;
     return pls;
@@ -742,6 +742,49 @@ Output* SynthModule::createMonoModControl2(AddControlInput input) {
   }
 
   return control_rate_total;
+}
+
+Output* SynthModule::createTempoSyncSwitch2(AddControlInput input, Processor* frequency, const Output* beats_per_second, bool poly, Input* midi, std::string sync_name) {
+  auto name = input.name;
+  Output* tempo = nullptr;
+  if (poly)
+    tempo = createPolyModControl2(input);
+  else 
+    tempo = createMonoModControl2(input);
+
+  cr::Value* sync = new cr::Value(1.0f);
+  data_->controls[name + "_" + sync_name] = sync;
+  control_map_[sync_name] = sync;
+  addIdleProcessor(sync);
+
+  TempoChooser* tempo_chooser = new TempoChooser();
+  tempo_chooser->plug(sync, TempoChooser::kSync);
+  tempo_chooser->plug(tempo, TempoChooser::kTempoIndex);
+  tempo_chooser->plug(frequency, TempoChooser::kFrequency);
+  tempo_chooser->plug(beats_per_second, TempoChooser::kBeatsPerSecond);
+
+  if (midi) {
+    Output* keytrack_transpose = nullptr;
+    Output* keytrack_tune = nullptr;
+    if (poly) {
+      keytrack_transpose = createPolyModControl(name + "_keytrack_transpose");
+      keytrack_tune = createPolyModControl(name + "_keytrack_tune");
+    } else {
+      keytrack_transpose = createMonoModControl(name + "_keytrack_transpose");
+      keytrack_tune = createMonoModControl(name + "_keytrack_tune");
+    }
+
+    tempo_chooser->plug(keytrack_transpose, TempoChooser::kKeytrackTranspose);
+    tempo_chooser->plug(keytrack_tune, TempoChooser::kKeytrackTune);
+    tempo_chooser->useInput(midi, TempoChooser::kMidi);
+  }
+
+  if (poly)
+    addProcessor(tempo_chooser);
+  else
+    addMonoProcessor(tempo_chooser);
+
+  return tempo_chooser->output();
 }
 
 } // namespace vital

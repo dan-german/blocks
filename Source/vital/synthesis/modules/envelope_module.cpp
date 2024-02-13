@@ -54,7 +54,6 @@ void EnvelopeModule::init() {
 }
 
 void EnvelopeModule::setControlRate(bool control_rate) {
-  // std::string boolybool = control_rate ? "true" : "false";  
   if (!force_audio_rate_)
     envelope_->setControlRate(control_rate);
 }

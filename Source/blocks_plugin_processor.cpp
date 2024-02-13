@@ -30,7 +30,7 @@ PluginProcessor::PluginProcessor(): juce::AudioProcessor(BusesProperties().withO
   //   }
   // }
 
-  // please(); exit(1);
+  please(); exit(1);
 
   last_seconds_time_ = 0.0;
 
@@ -169,7 +169,21 @@ void PluginProcessor::processBlock(AudioSampleBuffer& buffer, MidiBuffer& midi_m
     }
   }
 
+  if (block_added_) {
+    getVoiceHandler()->unplugAll();
+    getVoiceHandler()->connectAll();
+
+    clearModulations();
+    auto connections = synth_->getModuleManager().getConnections();
+    for (auto c : connections) {
+      synth_->connectModulationFromModel(c);
+    }
+
+    block_added_ = false;
+  }
+
   processModulationChanges();
+  // processBlockChanges();
   if (total_samples)
     processKeyboardEvents(midi_messages, total_samples);
 
@@ -251,7 +265,7 @@ void PluginProcessor::editorAdjustedModulator(int parameter, int index, float va
       if (is_changing_seconds) {
         modulator->parameter_map_["frequency"]->val->set(value);
       } else {
-        modulator->parameter_map_["tempo"]->val->set(value);
+        modulator->parameter_map_["delay_tempo"]->val->set(value);
       }
     }
   }
@@ -260,11 +274,25 @@ void PluginProcessor::editorAdjustedModulator(int parameter, int index, float va
 }
 
 void PluginProcessor::editorAdjustedBlock(Index index, int parameter, float value) {
-  // DBG("value: " << value);
   auto block = synth_->getModuleManager().getBlock(index);
-  auto param = block->parameters_[parameter]->val;
-  param->set(value);
-  // synth_->GetBlock(index)->parameters_[parameter].val->set(value);
+
+  if (block->id.type == "delay") {
+    std::cout << parameter << std::endl;
+    if (parameter == 4) {
+      auto sync = block->parameter_map_["sync"]->val->value();
+      bool is_changing_seconds = block->parameter_map_["sync"]->val->value() == 0.0f;
+      if (is_changing_seconds) {
+        std::cout << "is changing freq: " << value << std::endl;
+        block->parameter_map_["frequency"]->val->set(value);
+      } else {
+        std::cout << "is changing tempo" << std::endl;
+        block->parameter_map_["tempo"]->val->set(value);
+      }
+      return;
+    }
+  }
+
+  block->parameters_[parameter]->val->set(value);
 }
 
 void PluginProcessor::editorChangedModulationMagnitude(int index, float magnitude) {
@@ -335,9 +363,10 @@ juce::Array<int> PluginProcessor::editorRequestsActiveColumns() {
 }
 
 void PluginProcessor::editorRepositionedBlock(Index from, Index to) {
-  // Analytics::shared()->countAction("Block Repositioned");
-  // repositionProcessor(oldIndex, newIndex);
+  // clearModulations();
   synth_->repositionBlock(from, to);
+  auto block = synth_->getModuleManager().getBlock(to);
+  block_added_ = true;
 }
 
 void PluginProcessor::editorConnectedModulation(int modulatorIndex, std::string target_name, std::string parameter) {
@@ -403,7 +432,7 @@ void PluginProcessor::removeModulator(int index) {
 
 void PluginProcessor::disconnect(std::shared_ptr<model::Connection>& connection) {
   bool disconnecting_osc_env = connection->source->id.type == "envelope" && connection->target->id.type == "osc" && connection->parameter_name_ == "level";
-  if (disconnecting_osc_env) { 
+  if (disconnecting_osc_env) {
     // createConnection("default_env", "osc_1", "amp_env_destination", 1.0f);
   }
   synth_->disconnectModulation(connection->vital_connection_);
@@ -436,6 +465,8 @@ void PluginProcessor::editorRemovedBlock(Index index) {
 
   // removeConnectionsFromTarget(block);
   // moduleManager.removeBlock(block);
+
+  block_added_ = true;
 }
 
 std::shared_ptr<Block> PluginProcessor::editorAddedBlock(Model::Type type, Index index) {
@@ -443,18 +474,30 @@ std::shared_ptr<Block> PluginProcessor::editorAddedBlock(Model::Type type, Index
 }
 
 std::shared_ptr<model::Block> PluginProcessor::editorAddedBlock2(Model::Type type, Index index) {
-  clearModulations();
+  // clearModulations();
   auto block = synth_->addBlock(type, index);
-  // reconnect all modulations
 
-  auto connections = synth_->getModuleManager().getConnections();
+  // auto connections = synth_->getModuleManager().getConnections();
 
-  for (auto c : connections) { 
-    synth_->connectModulationFromModel(c);
-  }
+  // for (auto c : connections) {
+  //   synth_->connectModulationFromModel(c);
+  // }
 
+  block_added_ = true;
   return block;
 }
+
+// std::shared_ptr<model::Block> PluginProcessor::editorAddedBlock3(Model::Type type, Index index) {
+//   vital::block_change change;
+//   change.index = index;
+//   change.type = BlockChangeType::kAdd;
+//   auto block = module_manager_.addBlock(type, index);
+
+
+//   block_change_queue_.enqueue(change);
+
+//   return block;
+// }
 
 void PluginProcessor::editorRepositionedTab(int oldColumn, int newColumn) {
   // Analytics::shared()->countAction("Tab Repositioned");
@@ -568,4 +611,7 @@ void PluginProcessor::editorParameterGestureChanged(String moduleName, int param
 
 std::vector<std::shared_ptr<model::Module>> PluginProcessor::getModulators2() {
   return synth_->getModuleManager().getModulators();
+}
+
+void PluginProcessor::processBlockChanges() {
 }

@@ -41,7 +41,6 @@ public:
   void processWithInput(const poly_float* audio_in, int num_samples) override;
   Processor* clone() const override;
 
-  // int i = 0;
   void process(int num_samples) override {
     auto buffer = input(0)->source->buffer;
     processWithInput(input(0)->source->buffer, num_samples);

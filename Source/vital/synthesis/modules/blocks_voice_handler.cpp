@@ -92,11 +92,11 @@ void BlocksVoiceHandler::addModulator(std::shared_ptr<model::Module> modulator) 
 }
 
 void BlocksVoiceHandler::repositionBlock(Index from, Index to) {
-  unplugAll();
+  // unplugAll();
   std::cout << "from: " << from.column << ", " << from.row << " | to: " << to.column << ", " << to.row << std::endl;
   processor_matrix_[to.column][to.row] = processor_matrix_[from.column][from.row];
   processor_matrix_[from.column][from.row] = nullptr;
-  connectAll();
+  // connectAll();
 }
 
 void BlocksVoiceHandler::removeBlock(Index index, std::shared_ptr<model::Block> block) {
@@ -105,7 +105,7 @@ void BlocksVoiceHandler::removeBlock(Index index, std::shared_ptr<model::Block> 
   // graphManager.removeNode(processor, index);
   // pool->retire(processor);
 
-  unplugAll();
+  // unplugAll();
   auto processor = processor_matrix_[index.column][index.row];
 
   if (processor->control_map_.count("on"))
@@ -120,16 +120,15 @@ void BlocksVoiceHandler::removeBlock(Index index, std::shared_ptr<model::Block> 
 
   processor_pool_[block->id.type].push_back(processor);
   processor_matrix_[index.column][index.row] = nullptr;
-  connectAll();
+  // connectAll();
 }
 
 int y = 0;
 
 void BlocksVoiceHandler::addBlock(std::shared_ptr<model::Block> block) {
-  createProcessor(block);
-  auto first_osc = oscillators_[0];
-  unplugAll();
-  connectAll();
+  createProcessor(block); // can be in message thread
+  // unplugAll(); // cannot 
+  // connectAll(); // cannot
 }
 
 void BlocksVoiceHandler::connectAll() {
@@ -177,19 +176,17 @@ void BlocksVoiceHandler::unplugAll() {
       }
     }
   }
-
-  // last_node_->hardReset();
 }
 
 void BlocksVoiceHandler::init() {
   createNoteArticulation();
   createOscillators();
-  createReverbs();
+  // createReverbs();
   createDistortions();
-  createChoruses();
-  createFlangers();
-  createPhasers();
-  createDelays();
+  // createChoruses();
+  // createFlangers();
+  // createPhasers();
+  // createDelays();
   createModulators();
   createFilters(note_from_reference_->output());
   createVoiceOutput();
@@ -233,6 +230,16 @@ void BlocksVoiceHandler::init() {
   }
 
   VoiceHandler::init();
+
+  // disable all processors
+  for (const auto& pair : processor_pool_) {
+    const std::string& key = pair.first;
+    const std::vector<std::shared_ptr<SynthModule>>& modules = pair.second;
+    for (const auto& modulePtr : modules) {
+      modulePtr->enable(false);
+    }
+  }
+
   setupPolyModulationReadouts();
 
   for (int i = 0; i < kNumMacros; ++i) {
@@ -303,6 +310,7 @@ void BlocksVoiceHandler::createChoruses() {
     addSubmodule(chorus.get());
     addProcessor(chorus.get());
     processor_pool_["chorus"].push_back(chorus);
+    // chorus->enable(false);
   }
 }
 
@@ -318,7 +326,6 @@ void BlocksVoiceHandler::createPhasers() {
 void BlocksVoiceHandler::createFlangers() {
   for (int i = 0; i < model::MAX_MODULES_PER_TYPE; i++) {
     auto flanger = std::make_shared<FlangerModule>(beats_per_second_);
-    // flanger->plug(reset(), FlangerModule::kReset);
     addSubmodule(flanger.get());
     addProcessor(flanger.get());
     processor_pool_["flanger"].push_back(flanger);
@@ -338,7 +345,6 @@ void BlocksVoiceHandler::createReverbs() {
 }
 
 void BlocksVoiceHandler::createDelays() {
-  return;
   for (int i = 0; i < model::MAX_MODULES_PER_TYPE; i++) {
     auto delay = std::make_shared<DelayModule>(beats_per_second_);
     delay->plug(reset(), DelayModule::kReset);
@@ -404,26 +410,24 @@ std::shared_ptr<SynthModule> BlocksVoiceHandler::createProcessor(std::shared_ptr
     module->parameter_map_["frequency"]->val = processor->control_map_["frequency"];
     module->parameter_map_["depth"]->val = processor->control_map_["depth"];
     module->parameter_map_["offset"]->val = processor->control_map_["offset"];
-    // module->parameter_map_["blend"]->val = processor->control_map_["blend"];
     module->parameter_map_["center"]->val = processor->control_map_["center"];
-    // add({ .name = "feedback", .min = -1, .default_value = 0.5 });
-    // add({ .name = "frequency", .min = -5, .max = 2, .value_scale = ValueScale::kExponential, .default_value = 2 });
-    // add({ .name = "depth", .default_value = 0.5 });
-    // add({ .name = "phase_offset", .default_value = 0.333333 });
-    // add({ .name = "center", .min = 8, .max = 136, .default_value = 64 });
-    // add({ .name = "feedback", .min = -1, .default_value = 0.5 });
-    // add({ .name = "frequency", .min = -5, .max = 2, .value_scale = ValueScale::kExponential, .default_value = 2 });
-    // add({ .name = "depth", .default_value = 0.5 });
-    // add({ .name = "phase_offset", .default_value = 0.333333 });
-    // add({ .name = "center", .min = 8, .max = 136, .default_value = 64 });
-
+  } else if (module->id.type == "delay") {
+    module->parameter_map_["mix"]->val = processor->control_map_["mix"];
+    module->parameter_map_["cutoff"]->val = processor->control_map_["cutoff"];
+    module->parameter_map_["feedback"]->val = processor->control_map_["feedback"];
+    module->parameter_map_["style"]->val = processor->control_map_["style"];
+    module->parameter_map_["frequency"]->val = processor->control_map_["frequency"];
+    module->parameter_map_["sync"]->val = processor->control_map_["sync"];
+    module->parameter_map_["tempo"]->val = processor->control_map_["tempo"];
+    module->parameter_map_["frequency 2"]->val = processor->control_map_["frequency 2"];
+    module->parameter_map_["sync 2"]->val = processor->control_map_["sync 2"];
+    module->parameter_map_["tempo 2"]->val = processor->control_map_["tempo 2"];
   }
 
   auto index = module->index;
   processor_matrix_[index.column][index.row] = processor;
   active_processor_map_[module->name] = processor;
   active_processors_.push_back(processor);
-  // processors_[module->id.type].push_back(processor);
   processor->setModule(module);
   return processor;
 }
@@ -437,6 +441,7 @@ void BlocksVoiceHandler::createOscillators() {
     osc->plug(retrigger(), OscillatorModule::kRetrigger);
     osc->plug(bent_midi_, OscillatorModule::kMidi);
     osc->plug(active_mask(), OscillatorModule::kActiveVoices);
+    osc->enable(false);
     addSubmodule(osc.get());
     addProcessor(osc.get());
 
@@ -466,6 +471,7 @@ void BlocksVoiceHandler::createModulators() {
     lfo_sources_[i].initTriangle();
     std::string prefix = std::string("lfo");
     auto lfo = std::make_shared<LfoModule>(prefix, &lfo_sources_[i], beats_per_second_);
+    lfo->enable(false);
     addSubmodule(lfo.get());
     addProcessor(lfo.get());
     lfos_.push_back(lfo);
@@ -521,6 +527,7 @@ void BlocksVoiceHandler::createModulators() {
 
 std::shared_ptr<EnvelopeModule> BlocksVoiceHandler::createEnvelope(bool audio_rate) {
   auto envelope = std::make_shared<EnvelopeModule>(audio_rate);
+  envelope->enable(false);
   envelope->plug(retrigger(), EnvelopeModule::kTrigger);
   addSubmodule(envelope.get());
   addProcessor(envelope.get());

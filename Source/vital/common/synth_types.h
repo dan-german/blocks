@@ -20,6 +20,7 @@
 #include "vital/common/synth_parameters.h"
 #include "vital/synthesis/framework/operators.h"
 #include "vital/synthesis/framework/value.h"
+#include "model/Index.h"
 
 #include <map>
 #include <string>
@@ -99,6 +100,18 @@ typedef struct {
   bool disconnecting;
   int num_audio_rate;
 } modulation_change;
+
+enum BlockChangeType {
+  kAdd,
+  kRemove,
+  kMove
+};
+
+typedef struct { 
+  Index index = Index(0, 0);
+  Index from = Index(0, 0);
+  BlockChangeType type;
+} block_change;
 
 typedef std::map<std::string, Value*> control_map;
 typedef std::pair<Value*, mono_float> control_change;

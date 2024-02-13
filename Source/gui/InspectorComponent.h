@@ -38,7 +38,9 @@ public:
 private:
   OwnedArray<InspectorSlider> parameterSliders;
 
-  void spawnSlider(vital::ValueDetails model);
+  void setSliderAsTempo(std::shared_ptr<model::Module> module, InspectorSlider* slider) const;
+  void setSliderAsFrequency(std::shared_ptr<model::Module> module, InspectorSlider* slider) const;
+  void spawnSlider(vital::ValueDetails parameter, std::shared_ptr<model::Module> module);
   void sliderValueChanged(Slider* slider) override;
   void updateSize();
   void resetInspector();

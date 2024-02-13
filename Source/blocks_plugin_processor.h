@@ -120,7 +120,9 @@ public:
   juce::Array<juce::MPENote> editorRequestsCurrentlyPlayingNotes() override;
   // *********************************************************
 private:
+  void processBlockChanges();
   bool editorReady = false;
+  bool block_added_ = false;
 
   ValueBridge* bypass_parameter_;
   double last_seconds_time_;

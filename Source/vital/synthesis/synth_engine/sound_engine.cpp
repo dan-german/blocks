@@ -63,8 +63,8 @@ void SoundEngine::init() {
 
   voice_handler_ = new BlocksVoiceHandler(beats_per_second_clamped->output());
   addSubmodule(voice_handler_);
-  // voice_handler_->setPolyphony(vital::kMaxPolyphony);
-  voice_handler_->setPolyphony(1);
+  voice_handler_->setPolyphony(vital::kMaxPolyphony);
+  // voice_handler_->setPolyphony(1);
   voice_handler_->plug(polyphony, VoiceHandler::kPolyphony);
   voice_handler_->plug(voice_priority, VoiceHandler::kVoicePriority);
   voice_handler_->plug(voice_override, VoiceHandler::kVoiceOverride);
@@ -141,10 +141,6 @@ void SoundEngine::init() {
 }
 
 void SoundEngine::connectModulation(const modulation_change& change) {
-  std::cout << "change source: " << change.source << std::endl;
-  std::cout << "change buffer: " << change.source->buffer << std::endl;
-  std::cout << "modulation processor" << change.modulation_processor << std::endl;
-
   change.modulation_processor->plug(change.source, ModulationConnectionProcessor::kModulationInput);
   change.modulation_processor->setDestinationScale(change.destination_scale);
   VITAL_ASSERT(vital::utils::isFinite(change.destination_scale));
@@ -156,7 +152,6 @@ void SoundEngine::connectModulation(const modulation_change& change) {
   
   if (polyphonic) {
     destination = change.poly_destination;
-    std::cout << "destination: " << destination << std::endl;
     voice_handler_->setActiveNonaccumulatedOutput(change.poly_destination->output());
   }
 

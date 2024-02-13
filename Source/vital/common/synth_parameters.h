@@ -56,7 +56,6 @@ struct ValueDetails {
   Value* val;
   int decimal_places = 2;
   bool hidden = false;
-  std::vector<std::string> choices; // equals to string_lookup basically... not the best design choice
 };
 
 class ValueDetailsLookup {

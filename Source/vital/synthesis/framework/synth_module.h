@@ -27,7 +27,7 @@ namespace vital {
 class ValueSwitch;
 class SynthModule;
 
-struct AddControlInput { 
+struct AddControlInput {
   std::string name;
   bool audio_rate = false;
   bool smooth_value = false;
@@ -38,12 +38,8 @@ struct AddControlInput {
   mono_float min = 0.0f;
   mono_float max = 1.0f;
   mono_float default_value = 0.0f;
-  // Processor* frequency = nullptr;
-  // const Output* beats_per_second = nullptr;
-  // Input* midi = nullptr;
 };
 
-// std::string name, Processor* frequency, const Output* beats_per_second, bool poly, Input* midi = nullptr
 class StatusOutput {
 public:
   static constexpr float kClearValue = INT_MIN;
@@ -126,7 +122,7 @@ public:
   void addSubmodule(SynthModule* module) { data_->sub_modules.push_back(module); }
   virtual void setModule(std::shared_ptr<model::Module> module) { module_ = module; };
   std::map<std::string, Value*> control_map_;
-  std::shared_ptr<model::Module> module_; 
+  std::shared_ptr<model::Module> module_;
   std::shared_ptr<ModuleData> data_;
 
 protected:
@@ -147,9 +143,7 @@ protected:
   Output* createBaseModControl2(AddControlInput input);
   Output* createMonoModControl2(AddControlInput input);
   Output* createPolyModControl2(AddControlInput input);
-  // Output* createTempoSyncSwitch2(AddControlInput input);
-
-
+  Output* createTempoSyncSwitch2(AddControlInput input, Processor* frequency, const Output* beats_per_second, bool poly, Input* midi = nullptr, std::string sync_name = "sync");
   JUCE_LEAK_DETECTOR(SynthModule)
 };
 } // namespace vital

@@ -28,12 +28,26 @@ MainComponent::MainComponent(juce::MidiKeyboardState& keyboard_state, Delegate* 
   ThemeManager::shared()->set(UserSettings::shared()->getInt("theme", 0));
 
   // "osc", "filter", "drive", "flanger", "comp", "reverb", "delay", "chorus", "phaser", "eq"
+  // add 2 envs, add one lfo, crash
+
+  addModulator(Model::Types::adsr);
 
   auto osc_block = addBlock(0, { 0, 0 });
   spawnBlockComponent(osc_block);
 
-  // auto chorus_block = addBlock(3, { 1, 0 });
-  // spawnBlockComponent(chorus_block);
+  // for (int i = 0; i < 2; i++) {
+    // auto osc_block = addBlock(0, { 0, i });
+    // spawnBlockComponent(osc_block);
+
+    // auto filter_block = addBlock(1, { 1, i });
+    // spawnBlockComponent(filter_block);
+
+    // auto effects_block = addBlock(6, { 2, i });
+    // spawnBlockComponent(effects_block);
+
+  //   auto name = "osc_" + std::to_string(i + 1);
+  //   delegate->editorConnectedModulation(0, name, "level");
+  // }
 
   // auto osc_block_2 = addBlock(0, { 0, 1 });
   // spawnBlockComponent(osc_block_2);
@@ -41,8 +55,6 @@ MainComponent::MainComponent(juce::MidiKeyboardState& keyboard_state, Delegate* 
   // auto f = addBlock(6, { 1, 0 });
   // spawnBlockComponent(f);
 
-  addModulator(Model::Types::adsr);
-  delegate->editorConnectedModulation(0, "osc_1", "level");
 }
 
 void MainComponent::updateDotPosition(const Point<int> position) {

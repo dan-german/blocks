@@ -108,8 +108,8 @@ VoiceHandler::VoiceHandler(int num_outputs, int polyphony, bool control_rate):
   pitch_wheel_percent_.owner = &voice_router_;
   local_pitch_bend_.owner = &voice_router_;
 
-  // setPolyphony(polyphony);
-  setPolyphony(1);
+  setPolyphony(polyphony);
+  // setPolyphony(1);
   voice_router_.router(this);
   global_router_.router(this);
 }
@@ -296,8 +296,8 @@ void VoiceHandler::process(int num_samples) {
   }
 
   int polyphony = static_cast<int>(std::roundf(input(kPolyphony)->at(0)[0]));
-  // setPolyphony(utils::iclamp(polyphony, 1, kMaxActivePolyphony));
-  setPolyphony(polyphony);
+  setPolyphony(utils::iclamp(polyphony, 1, kMaxActivePolyphony));
+  // setPolyphony(1);
 
   int priority = utils::roundToInt(input(kVoicePriority)->at(0))[0];
   voice_priority_ = static_cast<VoicePriority>(priority);
@@ -332,10 +332,10 @@ void VoiceHandler::process(int num_samples) {
 
     // Remove voice if the right processor has a full silent buffer.
     poly_mask alive_mask = constants::kFullMask;
-    if (voice_killer_) {
-      auto buffer = voice_killer_->buffer[0];
-      alive_mask = ~utils::getSilentMask(voice_killer_->buffer, num_samples);
-    }
+    // if (voice_killer_) {
+    //   auto buffer = voice_killer_->buffer[0];
+    //   alive_mask = ~utils::getSilentMask(voice_killer_->buffer, num_samples);
+    // }
 
     for (Voice* single_voice : aggregate_voice->voices) {
       bool released = single_voice->state().event == kVoiceOff || single_voice->state().event == kVoiceKill;

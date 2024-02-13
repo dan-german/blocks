@@ -40,13 +40,11 @@ void ReverbModule::init() {
   Output* reverb_low_shelf_gain = createPolyModControl2({ .name = "reverb_low_shelf_gain", .min = -6.0, .max = 0.0 });
   Output* reverb_high_shelf_cutoff = createPolyModControl2({ .name = "reverb_high_shelf_cutoff", .max = 128.0, .default_value = 90.0 });
   Output* reverb_high_shelf_gain = createPolyModControl2({ .name = "reverb_high_shelf_gain", .min = -6.0, .max = 0.0, .default_value = -1.0 });
-  Output* reverb_chorus_amount = createPolyModControl2({ .name = "reverb_chorus_amount", .default_value = 0.223607 ,.value_scale = ValueScale::kExponential });
+  Output* reverb_chorus_amount = createPolyModControl2({ .name = "reverb_chorus_amount", .default_value = 0.223607 ,.value_scale = ValueScale::kQuadratic });
   Output* reverb_chorus_frequency = createPolyModControl2({ .name = "reverb_chorus_frequency", .min = -8.0, .max = 3.0, .default_value = -2.0f, .value_scale = ValueScale::kExponential });
-  Output* reverb_size = createPolyModControl2({ .name = "reverb_size" });
+  Output* reverb_size = createPolyModControl2({ .name = "reverb_size", .min = 0.0, .max = 1.0});
   Output* reverb_delay = createPolyModControl2({ .name = "reverb_delay", .max = 0.3 });
   Output* reverb_wet = createPolyModControl2({ .name = "dry_wet" });
-    // { "reverb_chorus_amount", 0x000000, 0.0, 1.0, 0.223607, 0.0, 100.0,
-    // ValueDetails::kQuadratic, false, "%", "Reverb Chorus Amount", nullptr },
 
   reverb_->plug(reverb_decay_time, Reverb::kDecayTime);
   reverb_->plug(reverb_pre_low_cutoff, Reverb::kPreLowCutoff);

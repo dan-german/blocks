@@ -140,7 +140,7 @@ void ModulatorsListModel::setSliderAsFrequency(std::shared_ptr<model::Module> mo
     return UIUtils::getSliderTextFromValue(value, *(module->parameter_map_["frequency"]));
   };
 
-  slider->box_slider_.slider.setRange(-7.0, 9.0);
+  slider->box_slider_.slider.setRange(-2.0, 9.0);
   auto value = module->parameter_map_["frequency"]->val->value();
   slider->box_slider_.slider.setValue(value, dontSendNotification);
   slider->box_slider_.valueLabel.setText(slider->box_slider_.slider.getTextFromValue(value), dontSendNotification);

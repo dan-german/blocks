@@ -68,8 +68,7 @@ void Delay<MemoryType>::processWithInput(const poly_float* audio_in, int num_sam
   poly_float current_high_coefficient = high_coefficient_;
 
   auto reset_mask = getResetMask(kReset);
-  if (reset_mask.anyMask()) { 
-    // std::cout << this << " reset mask: " << reset_mask[0] << " " << reset_mask[1] << " " << reset_mask[2] << " " << reset_mask[3] << std::endl;
+  if (reset_mask.anyMask()) { // is this needed?
     current_wet = utils::maskLoad(current_wet, wet_, reset_mask);
     current_dry = utils::maskLoad(current_dry, dry_, reset_mask);
     current_feedback = utils::maskLoad(current_feedback, feedback_, reset_mask);
@@ -191,7 +190,6 @@ void Delay<MemoryType>::processUnfiltered(const poly_float* audio_in, int num_sa
     dest[i] = tickUnfiltered(audio_in[i], current_period, current_feedback, current_wet, current_dry);
     current_period += delta_period;
   }
-  // utils::print(dest[0], "dest", this);
 }
 
 template<class MemoryType>

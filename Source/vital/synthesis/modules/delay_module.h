@@ -27,8 +27,8 @@ class DelayModule: public SynthModule {
 public:
   static constexpr mono_float kMaxDelayTime = 4.0f;
 
-  enum { 
-    kAudioIn, 
+  enum {
+    kAudioIn,
     kReset
   };
 
@@ -52,7 +52,11 @@ public:
     processWithInput(input(0)->source->buffer, num_samples);
   }
 
-  virtual Processor* clone() const override { return new DelayModule(*this); }
+  virtual Processor* clone() const override {
+    std::cout << "cloning" << std::endl;
+    return new DelayModule(*this);
+  }
+
 protected:
   const Output* beats_per_second_;
   MultiDelay* delay_;
