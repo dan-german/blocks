@@ -17,8 +17,11 @@
 #include "reverb_module.h"
 
 #include "vital/synthesis/effects/reverb.h"
+#include <chrono>
 
 namespace vital {
+
+int counterino = 0;
 
 ReverbModule::ReverbModule(): SynthModule(2, 1), reverb_(nullptr) {
   // DBG("ReverbModule::ReverbModule()");
@@ -33,18 +36,18 @@ void ReverbModule::init() {
   reverb_->useOutput(output());
   reverb_->useInput(input(kReset), Reverb::kReset);
 
-  Output* reverb_decay_time = createPolyModControl2({ .name = "reverb_decay_time", .min = -6.0, .max = 6.0, .value_scale = ValueScale::kExponential });
-  Output* reverb_pre_low_cutoff = createPolyModControl2({ .name = "reverb_pre_low_cutoff", .max = 128.0 });
-  Output* reverb_pre_high_cutoff = createPolyModControl2({ .name = "reverb_pre_high_cutoff", .max = 128.0, .default_value = 110.0 });
-  Output* reverb_low_shelf_cutoff = createPolyModControl2({ .name = "reverb_low_shelf_cutoff", .max = 128.0 });
-  Output* reverb_low_shelf_gain = createPolyModControl2({ .name = "reverb_low_shelf_gain", .min = -6.0, .max = 0.0 });
-  Output* reverb_high_shelf_cutoff = createPolyModControl2({ .name = "reverb_high_shelf_cutoff", .max = 128.0, .default_value = 90.0 });
-  Output* reverb_high_shelf_gain = createPolyModControl2({ .name = "reverb_high_shelf_gain", .min = -6.0, .max = 0.0, .default_value = -1.0 });
-  Output* reverb_chorus_amount = createPolyModControl2({ .name = "reverb_chorus_amount", .default_value = 0.223607 ,.value_scale = ValueScale::kQuadratic });
-  Output* reverb_chorus_frequency = createPolyModControl2({ .name = "reverb_chorus_frequency", .min = -8.0, .max = 3.0, .default_value = -2.0f, .value_scale = ValueScale::kExponential });
-  Output* reverb_size = createPolyModControl2({ .name = "reverb_size", .min = 0.0, .max = 1.0});
-  Output* reverb_delay = createPolyModControl2({ .name = "reverb_delay", .max = 0.3 });
-  Output* reverb_wet = createPolyModControl2({ .name = "dry_wet" });
+  Output* reverb_decay_time = createMonoModControl2({ .name = "reverb_decay_time", .min = -6.0, .max = 6.0, .value_scale = ValueScale::kExponential });
+  Output* reverb_pre_low_cutoff = createMonoModControl2({ .name = "reverb_pre_low_cutoff", .max = 128.0 });
+  Output* reverb_pre_high_cutoff = createMonoModControl2({ .name = "reverb_pre_high_cutoff", .max = 128.0, .default_value = 110.0 });
+  Output* reverb_low_shelf_cutoff = createMonoModControl2({ .name = "reverb_low_shelf_cutoff", .max = 128.0 });
+  Output* reverb_low_shelf_gain = createMonoModControl2({ .name = "reverb_low_shelf_gain", .min = -6.0, .max = 0.0 });
+  Output* reverb_high_shelf_cutoff = createMonoModControl2({ .name = "reverb_high_shelf_cutoff", .max = 128.0, .default_value = 90.0 });
+  Output* reverb_high_shelf_gain = createMonoModControl2({ .name = "reverb_high_shelf_gain", .min = -6.0, .max = 0.0, .default_value = -1.0 });
+  Output* reverb_chorus_amount = createMonoModControl2({ .name = "reverb_chorus_amount", .default_value = 0.223607 ,.value_scale = ValueScale::kQuadratic });
+  Output* reverb_chorus_frequency = createMonoModControl2({ .name = "reverb_chorus_frequency", .min = -8.0, .max = 3.0, .default_value = -2.0f, .value_scale = ValueScale::kExponential });
+  Output* reverb_size = createMonoModControl2({ .name = "reverb_size", .min = 0.0, .max = 1.0 });
+  Output* reverb_delay = createMonoModControl2({ .name = "reverb_delay", .max = 0.3 });
+  Output* reverb_wet = createMonoModControl2({ .name = "dry_wet" });
 
   reverb_->plug(reverb_decay_time, Reverb::kDecayTime);
   reverb_->plug(reverb_pre_low_cutoff, Reverb::kPreLowCutoff);
@@ -78,8 +81,15 @@ void ReverbModule::setSampleRate(int sample_rate) {
   reverb_->setSampleRate(sample_rate);
 }
 
+
 void ReverbModule::processWithInput(const poly_float* audio_in, int num_samples) {
+  // auto now = std::chrono::high_resolution_clock::now();
   SynthModule::process(num_samples);
+  // auto end = std::chrono::high_resolution_clock::now();
+
+  // if (b++ % 20 == 0) {
+  //   std::cout << "reverb took: " << std::chrono::duration_cast<std::chrono::microseconds>(end - now).count() << " microseconds" << std::endl;
+  // }
   // reverb_->processWithInput(audio_in, num_samples);
 }
 

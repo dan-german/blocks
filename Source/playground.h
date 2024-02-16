@@ -11,5 +11,5 @@ using namespace vital;
 void please() {
   auto reverb = new vital::Reverb();
   poly_float* buffer = new poly_float[100];
-  reverb->processWithInput(buffer, 1);
+  reverb->processWithInput(buffer, 128);
 }

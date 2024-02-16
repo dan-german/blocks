@@ -108,21 +108,16 @@ void OscillatorModule::init() {
 
 void OscillatorModule::process(int num_samples) {
   bool on = on_->value();
-
-  auto destination = data_->poly_mod_destinations["amp_env_destination"];
-  // std::cout << "osc dest: " << destination << std::endl;
-  if (destination->numInputs() > 0) {
-    auto first_input = destination->input();
-    auto buffer = first_input->source->buffer;
-    // utils::print(buffer[0], "first_input_buffer", this);
-  }
-
   if (on)
     SynthModule::process(num_samples);
   else if (*was_on_) {
     output(kRaw)->clearBuffer();
     output(kLevelled)->clearBuffer();
   }
+
+  // add audio in to output
+  utils::addBuffers(output(kRaw)->buffer, output(kRaw)->buffer, input(kAudioIn)->source->buffer, num_samples);
+
 
   *was_on_ = on;
 }

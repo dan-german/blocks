@@ -27,6 +27,7 @@ class Wavetable;
 class OscillatorModule: public SynthModule {
 public:
   enum {
+    kAudioIn, 
     kReset,
     kRetrigger,
     kMidi,

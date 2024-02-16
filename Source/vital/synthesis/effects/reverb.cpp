@@ -19,6 +19,7 @@
 #include "vital/synthesis/framework/futils.h"
 #include "vital/synthesis/lookups/memory.h"
 #include "vital/common/synth_constants.h"
+#include <chrono>
 
 namespace vital {
 static constexpr float kMaxChorusDrift = 2500.0f;
@@ -253,7 +254,6 @@ void Reverb::processWithInput(const poly_float* audio_in, int num_samples) {
     poly_float feedback_read4 = readFeedback(feedback_lookups4, feedback_offset4);
 
     poly_float input = audio_in[i];// & constants::kFirstMask;
-    // input += utils::swapVoices(input);
 
     poly_float filtered_input = high_pre_filter_.tickBasic(input, current_high_pre_coefficient);
     filtered_input = low_pre_filter_.tickBasic(input, current_low_pre_coefficient) - filtered_input;
@@ -371,6 +371,8 @@ void Reverb::processWithInput(const poly_float* audio_in, int num_samples) {
     current_high_coefficient += delta_high_coefficient;
     current_high_amplitude += delta_high_amplitude;
   }
+  auto se = std::chrono::high_resolution_clock::now();
+  // std::cout << "Reverb::processWithInput() took " << std::chrono::duration_cast<std::chrono::microseconds>(se - as).count() << " microseconds" << std::endl;
 
   sample_delay_increment_ = current_delay_increment;
   sample_delay_ = current_sample_delay;
@@ -437,6 +439,7 @@ void Reverb::reset(poly_mask mask) {
 }
 
 Processor* Reverb::clone() const {
+  std::cout << "Reverb::clone()" << std::endl;
   auto new_reverb = new Reverb(*this);
   new_reverb->max_feedback_size_ = 0;
   new_reverb->memory_ = new StereoMemory(kMaxSampleRate); 

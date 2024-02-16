@@ -181,7 +181,7 @@ void BlocksVoiceHandler::unplugAll() {
 void BlocksVoiceHandler::init() {
   createNoteArticulation();
   createOscillators();
-  // createReverbs();
+  createReverbs();
   createDistortions();
   // createChoruses();
   // createFlangers();
@@ -632,13 +632,11 @@ void BlocksVoiceHandler::process(int num_samples) {
       poly_float* buffer = processor->output()->buffer;
       if (processor->isControlRate() || processor->isPolyphonicModulation()) {
         poly_float masked_value = buffer[0] & last_active_voice_mask_;
-        // utils::print_mask(last_active_voice_mask_, "mask  at handler", processor->output());
-        buffer[0] = masked_value;// + utils::swapVoices(masked_value);
-        // utils::print(buffer[0], "value at handler", this);
+        buffer[0] = masked_value;
       } else {
         for (int i = 0; i < num_samples; ++i) {
           poly_float masked_value = buffer[i] & last_active_voice_mask_;
-          buffer[i] = masked_value;// + utils::swapVoices(masked_value);
+          buffer[i] = masked_value;
         }
       }
     }
