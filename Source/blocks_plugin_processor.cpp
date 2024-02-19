@@ -199,7 +199,7 @@ void PluginProcessor::handleBlockChanges() {
       connectModulationFromModel(c);
     }
 
-    getVoiceHandler()->connectAllDefaultEnvs();
+    // getVoiceHandler()->connectAllDefaultEnvs();
 
     block_modified_ = false;
   }
@@ -270,7 +270,7 @@ void PluginProcessor::editorAdjustedModulator(int parameter, int index, float va
       if (is_changing_seconds) {
         modulator->parameter_map_["frequency"]->val->set(value);
       } else {
-        modulator->parameter_map_["delay_tempo"]->val->set(value);
+        modulator->parameter_map_["tempo"]->val->set(value);
       }
     }
   }

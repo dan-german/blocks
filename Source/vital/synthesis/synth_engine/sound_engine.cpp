@@ -138,6 +138,7 @@ void SoundEngine::init() {
   SynthModule::init();
   disableUnnecessaryModSources();
   setOversamplingAmount(kDefaultOversamplingAmount, kDefaultSampleRate);
+  voice_handler_->connectAllDefaultEnvs();
 }
 
 void SoundEngine::connectModulation(const modulation_change& change) {
