@@ -169,21 +169,9 @@ void PluginProcessor::processBlock(AudioSampleBuffer& buffer, MidiBuffer& midi_m
     }
   }
 
-  if (block_added_) {
-    getVoiceHandler()->unplugAll();
-    getVoiceHandler()->connectAll();
-
-    clearModulations();
-    auto connections = synth_->getModuleManager().getConnections();
-    for (auto c : connections) {
-      synth_->connectModulationFromModel(c);
-    }
-
-    block_added_ = false;
-  }
-
+  handleBlockChanges();
   processModulationChanges();
-  // processBlockChanges();
+
   if (total_samples)
     processKeyboardEvents(midi_messages, total_samples);
 
@@ -197,6 +185,23 @@ void PluginProcessor::processBlock(AudioSampleBuffer& buffer, MidiBuffer& midi_m
 
     last_seconds_time_ += num_samples * sample_time;
     sample_offset += num_samples;
+  }
+}
+
+void PluginProcessor::handleBlockChanges() {
+  if (block_modified_) {
+    getVoiceHandler()->unplugAll();
+    getVoiceHandler()->connectAll();
+
+    clearModulations();
+    auto connections = getModuleManager().getConnections();
+    for (auto c : connections) {
+      connectModulationFromModel(c);
+    }
+
+    getVoiceHandler()->connectAllDefaultEnvs();
+
+    block_modified_ = false;
   }
 }
 
@@ -366,7 +371,7 @@ void PluginProcessor::editorRepositionedBlock(Index from, Index to) {
   // clearModulations();
   synth_->repositionBlock(from, to);
   auto block = synth_->getModuleManager().getBlock(to);
-  block_added_ = true;
+  block_modified_ = true;
 }
 
 void PluginProcessor::editorConnectedModulation(int modulatorIndex, std::string target_name, std::string parameter) {
@@ -433,10 +438,10 @@ void PluginProcessor::removeModulator(int index) {
 void PluginProcessor::disconnect(std::shared_ptr<model::Connection>& connection) {
   bool disconnecting_osc_env = connection->source->id.type == "envelope" && connection->target->id.type == "osc" && connection->parameter_name_ == "level";
   if (disconnecting_osc_env) {
-    // createConnection("default_env", "osc_1", "amp_env_destination", 1.0f);
+    getVoiceHandler()->setDefaultAmpEnv(connection->target->name, true);
   }
   synth_->disconnectModulation(connection->vital_connection_);
-  synth_->getModuleManager().removeConnection(connection);
+  getModuleManager().removeConnection(connection);
 }
 
 #pragma warning(default:4716)
@@ -466,7 +471,7 @@ void PluginProcessor::editorRemovedBlock(Index index) {
   // removeConnectionsFromTarget(block);
   // moduleManager.removeBlock(block);
 
-  block_added_ = true;
+  block_modified_ = true;
 }
 
 std::shared_ptr<Block> PluginProcessor::editorAddedBlock(Model::Type type, Index index) {
@@ -474,16 +479,16 @@ std::shared_ptr<Block> PluginProcessor::editorAddedBlock(Model::Type type, Index
 }
 
 std::shared_ptr<model::Block> PluginProcessor::editorAddedBlock2(Model::Type type, Index index) {
-  // clearModulations();
   auto block = synth_->addBlock(type, index);
 
-  // auto connections = synth_->getModuleManager().getConnections();
-
-  // for (auto c : connections) {
-  //   synth_->connectModulationFromModel(c);
+  // if (block->id.type == "osc") {
+  //   float destination_scale = 1.0f;
+  //   std::string parameter_name = "amp_env_destination";
+  //   std::string modulator_name = "default_amp_env";
+  //   auto connection = createConnection(modulator_name, block->name, parameter_name, destination_scale);
   // }
 
-  block_added_ = true;
+  block_modified_ = true;
   return block;
 }
 
@@ -611,7 +616,4 @@ void PluginProcessor::editorParameterGestureChanged(String moduleName, int param
 
 std::vector<std::shared_ptr<model::Module>> PluginProcessor::getModulators2() {
   return synth_->getModuleManager().getModulators();
-}
-
-void PluginProcessor::processBlockChanges() {
 }

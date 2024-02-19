@@ -71,8 +71,9 @@ void FilterModule::init() {
   Output* blend = createPolyModControl2({ .name = "blend", .max = 2.0f, .reset = input(kReset) });
   Output* blend_transpose = createPolyModControl2({ .name = "blend_transpose", .min = 0.3f, .default_value = 0.85f, .reset = input(kReset) });
 
-  if (create_on_value_)
+  if (create_on_value_) {
     on_ = createBaseControl2({ .name = "on", .value_scale = ValueScale::kIndexed });
+  }
 
   Value* filter_style = createBaseControl2({ .name = "style", .max = 9.0f, .value_scale = ValueScale::kIndexed });
   filter_model_ = createBaseControl2({ .name = "model", .max = 7.0f, .value_scale = ValueScale::kIndexed });

@@ -57,7 +57,6 @@ ModulationConnectionBank::ModulationConnectionBank() {
 ModulationConnectionBank::~ModulationConnectionBank() { }
 
 ModulationConnection* ModulationConnectionBank::createConnection(const std::string& source, const std::string& target, const std::string& parameter) {
-  int index = 1;
   for (auto& connection : all_connections_) {
     std::string invalid_connection = "modulation_amount";
     if (target != invalid_connection && isConnectionAvailable(connection.get())) {

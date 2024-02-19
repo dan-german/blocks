@@ -30,7 +30,7 @@ MainComponent::MainComponent(juce::MidiKeyboardState& keyboard_state, Delegate* 
   // "osc", "filter", "drive", "flanger", "comp", "reverb", "delay", "chorus", "phaser", "eq"
   // add 2 envs, add one lfo, crash
 
-  addModulator(Model::Types::adsr);
+  // addModulator(Model::Types::adsr);
 
   auto osc_block = addBlock(0, { 0, 0 });
   spawnBlockComponent(osc_block);

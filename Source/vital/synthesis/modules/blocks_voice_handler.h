@@ -70,6 +70,7 @@ public:
   Output* getDirectOutput() { return getAccumulatedOutput(direct_output_->output()); }
 
   Output* note_retrigger() { return &note_retriggered_; }
+  void connectDefaultEnvs();
 
   Output* midi_offset_output() { return midi_offset_output_; }
 
@@ -89,7 +90,9 @@ public:
   std::shared_ptr<vital::Processor> findProcessorAbove(Index index);
   void setOSCAmplitudeEnvelope(std::shared_ptr<model::Module> adsr, std::shared_ptr<model::Module> target);
   void resetOSCAmplitudeEnvelope(std::shared_ptr<model::Module> target);
+  // void getModulationSource(std::string name) override;
   void clear();
+  void initializeDefaultAmpEnvs();
 
   std::map<std::string, std::vector<std::shared_ptr<SynthModule>>> processor_pool_;
   std::vector<std::shared_ptr<SynthModule>> active_modulators_;
@@ -97,7 +100,8 @@ public:
   std::vector<std::shared_ptr<SynthModule>> active_processors_;
   std::map<std::string, std::shared_ptr<SynthModule>> active_processor_map_;
 
-  std::shared_ptr<EnvelopeModule> default_amplitude_envelope_;
+  std::shared_ptr<EnvelopeModule> default_amp_env_;
+  void connectAllDefaultEnvs();
 private:
   void createNoteArticulation();
   void createOscillators();
@@ -112,7 +116,7 @@ private:
   void createDelays();
   void setupPolyModulationReadouts();
 
-  std::shared_ptr<SynthModule> createProcessor(std::shared_ptr<model::Block> module);
+  std::shared_ptr<SynthModule> createProcessorForBlock(std::shared_ptr<model::Block> module);
   std::shared_ptr<EnvelopeModule> createEnvelope(bool audio_rate = false);
   // std::shared_ptr<EnvelopeModule> amplitude_envelope_;
   std::vector<std::shared_ptr<EnvelopeModule>> amplitude_envs;
@@ -133,6 +137,10 @@ private:
 
   std::vector<std::vector<std::shared_ptr<SynthModule>>> processor_matrix_;
   std::vector<std::shared_ptr<OscillatorModule>> oscillators_;
+  std::vector<std::shared_ptr<OscillatorModule>> oscillators_with_default_envs_;
+public:
+  void setDefaultAmpEnv(std::string target_name, bool enable);
+  std::map<std::shared_ptr<SynthModule>, std::shared_ptr<ModulationConnectionProcessor>> osc_to_default_env_mod_processor_map_;
 
   std::vector<std::shared_ptr<SynthModule>> lfos_;
   std::vector<std::shared_ptr<SynthModule>> envelopes_;

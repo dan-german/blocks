@@ -45,6 +45,8 @@ public:
   void releaseResources() override;
   void processBlock(AudioSampleBuffer&, MidiBuffer&) override;
 
+  void handleBlockChanges();
+
   juce::AudioProcessorEditor* createEditor() override;
   bool hasEditor() const override;
 
@@ -120,9 +122,8 @@ public:
   juce::Array<juce::MPENote> editorRequestsCurrentlyPlayingNotes() override;
   // *********************************************************
 private:
-  void processBlockChanges();
   bool editorReady = false;
-  bool block_added_ = false;
+  bool block_modified_ = false;
 
   ValueBridge* bypass_parameter_;
   double last_seconds_time_;

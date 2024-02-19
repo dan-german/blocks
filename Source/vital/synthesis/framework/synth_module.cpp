@@ -350,9 +350,7 @@ Processor* SynthModule::getMonoModulationDestination(std::string name) {
 
 Processor* SynthModule::getPolyModulationDestination(std::string name) {
   if (data_->poly_mod_destinations.count(name)) {
-    auto pls = data_->poly_mod_destinations[name];
-    std::cout << "getting pls: " << pls << std::endl;
-    return pls;
+    return data_->poly_mod_destinations[name];
   }
 
   for (SynthModule* sub_module : data_->sub_modules) {

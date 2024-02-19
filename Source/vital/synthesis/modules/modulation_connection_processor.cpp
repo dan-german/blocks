@@ -37,7 +37,6 @@ ModulationConnectionProcessor::ModulationConnectionProcessor(int index):
 }
 
 void ModulationConnectionProcessor::init() {
-  // std::string amount_name = "modulation_amount";
   Output* modulation_amount = createPolyModControl2({ .name = "amount", .min = -1.0f });
   initializeBaseValue(control_map_["amount"]);
 

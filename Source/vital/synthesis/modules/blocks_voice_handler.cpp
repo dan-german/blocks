@@ -39,6 +39,7 @@
 #include "vital/synthesis/modules/chorus_module.h"
 #include "vital/synthesis/modules/flanger_module.h"
 #include "vital/synthesis/modules/phaser_module.h"
+#include "vital/synthesis/utilities/value_switch.h"
 
 namespace vital {
 
@@ -92,43 +93,24 @@ void BlocksVoiceHandler::addModulator(std::shared_ptr<model::Module> modulator) 
 }
 
 void BlocksVoiceHandler::repositionBlock(Index from, Index to) {
-  // unplugAll();
-  std::cout << "from: " << from.column << ", " << from.row << " | to: " << to.column << ", " << to.row << std::endl;
   processor_matrix_[to.column][to.row] = processor_matrix_[from.column][from.row];
   processor_matrix_[from.column][from.row] = nullptr;
-  // connectAll();
 }
 
 void BlocksVoiceHandler::removeBlock(Index index, std::shared_ptr<model::Block> block) {
-  // auto processor = graphManager.getModuleProcessor(index);
-  // listeners.removeFirstMatchingValue(processor.get());
-  // graphManager.removeNode(processor, index);
-  // pool->retire(processor);
-
-  // unplugAll();
   auto processor = processor_matrix_[index.column][index.row];
 
   if (processor->control_map_.count("on"))
     processor->control_map_["on"]->set(0.0f);
 
-  // if (block->id.type == "osc") {
-  // } else if (block->id.type == "filter") {
-    // auto filter = std::static_pointer_cast<FilterModule>(processor);
-    // filter->control_map_["on"]->set(0.0f); 
-    // processors_["filter"].push_back(filter);
-  // }
-
   processor_pool_[block->id.type].push_back(processor);
   processor_matrix_[index.column][index.row] = nullptr;
-  // connectAll();
 }
 
 int y = 0;
 
 void BlocksVoiceHandler::addBlock(std::shared_ptr<model::Block> block) {
-  createProcessor(block); // can be in message thread
-  // unplugAll(); // cannot 
-  // connectAll(); // cannot
+  createProcessorForBlock(block);
 }
 
 void BlocksVoiceHandler::connectAll() {
@@ -183,10 +165,10 @@ void BlocksVoiceHandler::init() {
   createOscillators();
   createReverbs();
   createDistortions();
-  // createChoruses();
-  // createFlangers();
-  // createPhasers();
-  // createDelays();
+  createChoruses();
+  createFlangers();
+  createPhasers();
+  createDelays();
   createModulators();
   createFilters(note_from_reference_->output());
   createVoiceOutput();
@@ -211,19 +193,14 @@ void BlocksVoiceHandler::init() {
 
   for (int i = 0; i < vital::kMaxModulationConnections; ++i) {
     ModulationConnectionProcessor* processor = modulation_bank_.atIndex(i)->modulation_processor.get();
-
     processor->plug(reset(), ModulationConnectionProcessor::kReset);
-
     std::string number = std::to_string(i + 1);
     std::string amount_name = "modulation_" + number + "_amount";
     Output* modulation_amount = createPolyModControl2({ .name = "amount", .min = -1.0f });
     processor->plug(modulation_amount, ModulationConnectionProcessor::kModulationAmount);
-
     processor->initializeBaseValue(data_->controls[amount_name]);
-
     Output* modulation_power = createPolyModControl2({ .name = "power", .min = -10.0f, .max = 10.0f });
     processor->plug(modulation_power, ModulationConnectionProcessor::kModulationPower);
-
     addProcessor(processor);
     addSubmodule(processor);
     processor->enable(false);
@@ -272,6 +249,39 @@ void BlocksVoiceHandler::init() {
     createStatusOutput(modulation_source_prefix + number, source_output);
     createStatusOutput(modulation_amount_prefix + number, pre_scale_output);
   }
+  initializeDefaultAmpEnvs();
+}
+
+void BlocksVoiceHandler::initializeDefaultAmpEnvs() {
+  for (auto osc : oscillators_with_default_envs_) {
+    auto source = default_amp_env_->output();
+    auto modulation_connection_processor = std::make_shared<ModulationConnectionProcessor>(1000);
+    addProcessor(modulation_connection_processor.get());
+    modulation_connection_processor->init();
+    osc_to_default_env_mod_processor_map_[osc] = modulation_connection_processor;
+  }
+}
+
+void BlocksVoiceHandler::setDefaultAmpEnv(std::string target_name, bool enable) {
+  auto osc = active_processor_map_[target_name];
+  osc_to_default_env_mod_processor_map_[osc]->enable(enable);
+}
+
+void BlocksVoiceHandler::connectAllDefaultEnvs() {
+  for (auto osc : oscillators_with_default_envs_) {
+    auto processor = osc_to_default_env_mod_processor_map_[osc];
+    auto destination = osc->getPolyModulationDestination("amp_env_destination");
+    processor->setDestinationScale(1.0f);
+    processor->plug(default_amp_env_->output(), ModulationConnectionProcessor::kModulationInput);
+    processor->setPolyphonicModulation(true);
+    processor->enable(true);
+    processor->control_map_["amount"]->set(1.0f);
+    destination->plugNext(processor.get());
+    processor->process(1);
+    destination->process(1);
+    osc->getPolyModulationSwitch("amp_env_destination")->set(1.0f);
+    setActiveNonaccumulatedOutput(destination->output());
+  }
 }
 
 void BlocksVoiceHandler::prepareDestroy() {
@@ -293,6 +303,30 @@ void BlocksVoiceHandler::createFilters(Output* keytrack) {
   }
 }
 
+void BlocksVoiceHandler::connectDefaultEnvs() {
+  // for (auto osc : oscillators_with_default_envs_) { 
+  //   auto destination = osc->getPolyModulationDestination("amp_env_destination");
+  //   auto source = default_amp_env_->output();
+
+  //   auto modulation_connection_processor = std::make_shared<ModulationConnectionProcessor>();
+  //   modulation_connection_processor->setDestinationScale(1.0f);
+  //   modulation_connection_processor->control_map_["amount"]->set(1.0f);
+  //   modulation_connection_processor->plug(source, ModulationConnectionProcessor::kModulationInput);
+  //   modulation_connection_processor->setPolyphonicModulation(true);
+  //   modulation_connection_processor->enable(true);
+  //   enableModulationConnection(modulation_connection_processor);
+
+  //   setActiveNonaccumulatedOutput(destination->output());
+
+  //   source->owner->enable(true);
+  //   destination->plugNext(modulation_connection_processor);
+  //   modulation_connection_processor->process(1);
+  //   destination->process(1);
+
+  //   osc->getPolyModulationSwitch("amp_env_destination")->set(1.0f);
+  // }
+}
+
 void BlocksVoiceHandler::createDistortions() {
   for (int i = 0; i < model::MAX_MODULES_PER_TYPE; i++) {
     auto distortion = std::make_shared<DistortionModule>();
@@ -310,7 +344,6 @@ void BlocksVoiceHandler::createChoruses() {
     addSubmodule(chorus.get());
     addProcessor(chorus.get());
     processor_pool_["chorus"].push_back(chorus);
-    // chorus->enable(false);
   }
 }
 
@@ -355,73 +388,16 @@ void BlocksVoiceHandler::createDelays() {
   }
 }
 
-std::shared_ptr<SynthModule> BlocksVoiceHandler::createProcessor(std::shared_ptr<model::Block> module) {
+std::shared_ptr<SynthModule> BlocksVoiceHandler::createProcessorForBlock(std::shared_ptr<model::Block> module) {
   std::shared_ptr<SynthModule> processor = processor_pool_[module->id.type][0];
   processor_pool_[module->id.type].erase(processor_pool_[module->id.type].begin());
   processor->enable(true);
+  if (processor->control_map_.count("on")) {
+    processor->control_map_["on"]->set(1.0f);
+  }
 
-  if (module->id.type == "osc") {
-    processor->control_map_["on"]->set(1.0f);
-    module->parameter_map_["wave"]->val = processor->control_map_["wave_frame"];
-    module->parameter_map_["transpose"]->val = processor->control_map_["transpose"];
-    module->parameter_map_["tune"]->val = processor->control_map_["tune"];
-    module->parameter_map_["unison_voices"]->val = processor->control_map_["unison_voices"];
-    module->parameter_map_["unison_detune"]->val = processor->control_map_["unison_detune"];
-    module->parameter_map_["level"]->val = processor->control_map_["level"];
-    module->parameter_map_["pan"]->val = processor->control_map_["pan"];
-  } else if (module->id.type == "filter") {
-    module->parameters_[0]->val = processor->control_map_["model"];
-    module->parameters_[1]->val = processor->control_map_["style"];
-    module->parameters_[2]->val = processor->control_map_["cutoff"];
-    module->parameters_[3]->val = processor->control_map_["resonance"];
-    module->parameters_[4]->val = processor->control_map_["blend"];
-    module->parameters_[5]->val = processor->control_map_["mix"];
-    processor->control_map_["on"]->set(1.0f);
-  } else if (module->id.type == "reverb") {
-    module->parameter_map_["mod rate"]->val = processor->control_map_["reverb_chorus_frequency"];
-    module->parameter_map_["mod amount"]->val = processor->control_map_["reverb_chorus_amount"];
-    module->parameter_map_["time"]->val = processor->control_map_["reverb_decay_time"];
-    module->parameter_map_["mix"]->val = processor->control_map_["dry_wet"];
-    module->parameter_map_["high cut"]->val = processor->control_map_["reverb_pre_high_cutoff"];
-    module->parameter_map_["low cut"]->val = processor->control_map_["reverb_pre_low_cutoff"];
-    module->parameter_map_["size"]->val = processor->control_map_["reverb_size"];
-    module->parameter_map_["delay"]->val = processor->control_map_["reverb_delay"];
-  } else if (module->id.type == "drive") {
-    module->parameter_map_["type"]->val = processor->control_map_["type"];
-    module->parameter_map_["drive"]->val = processor->control_map_["drive"];
-    module->parameter_map_["mix"]->val = processor->control_map_["mix"];
-  } else if (module->id.type == "chorus") {
-    module->parameter_map_["voices"]->val = processor->control_map_["voices"];
-    module->parameter_map_["depth"]->val = processor->control_map_["depth"];
-    module->parameter_map_["frequency"]->val = processor->control_map_["frequency"];
-    module->parameter_map_["feedback"]->val = processor->control_map_["feedback"];
-    module->parameter_map_["mix"]->val = processor->control_map_["mix"];
-  } else if (module->id.type == "phaser") {
-    module->parameter_map_["mix"]->val = processor->control_map_["mix"];
-    module->parameter_map_["feedback"]->val = processor->control_map_["feedback"];
-    module->parameter_map_["frequency"]->val = processor->control_map_["frequency"];
-    module->parameter_map_["depth"]->val = processor->control_map_["depth"];
-    module->parameter_map_["offset"]->val = processor->control_map_["offset"];
-    module->parameter_map_["blend"]->val = processor->control_map_["blend"];
-    module->parameter_map_["center"]->val = processor->control_map_["center"];
-  } else if (module->id.type == "flanger") {
-    module->parameter_map_["mix"]->val = processor->control_map_["mix"];
-    module->parameter_map_["feedback"]->val = processor->control_map_["feedback"];
-    module->parameter_map_["frequency"]->val = processor->control_map_["frequency"];
-    module->parameter_map_["depth"]->val = processor->control_map_["depth"];
-    module->parameter_map_["offset"]->val = processor->control_map_["offset"];
-    module->parameter_map_["center"]->val = processor->control_map_["center"];
-  } else if (module->id.type == "delay") {
-    module->parameter_map_["mix"]->val = processor->control_map_["mix"];
-    module->parameter_map_["cutoff"]->val = processor->control_map_["cutoff"];
-    module->parameter_map_["feedback"]->val = processor->control_map_["feedback"];
-    module->parameter_map_["style"]->val = processor->control_map_["style"];
-    module->parameter_map_["frequency"]->val = processor->control_map_["frequency"];
-    module->parameter_map_["sync"]->val = processor->control_map_["sync"];
-    module->parameter_map_["tempo"]->val = processor->control_map_["tempo"];
-    module->parameter_map_["frequency 2"]->val = processor->control_map_["frequency 2"];
-    module->parameter_map_["sync 2"]->val = processor->control_map_["sync 2"];
-    module->parameter_map_["tempo 2"]->val = processor->control_map_["tempo 2"];
+  for (auto& pair : module->parameter_map_) {
+    module->parameter_map_[pair.first]->val = processor->control_map_[pair.first];
   }
 
   auto index = module->index;
@@ -447,6 +423,7 @@ void BlocksVoiceHandler::createOscillators() {
 
     processor_pool_[type].push_back(osc);
     oscillators_.push_back(osc);
+    oscillators_with_default_envs_.push_back(osc);
   }
 }
 
@@ -460,7 +437,7 @@ void BlocksVoiceHandler::clear() {
   active_processor_map_.clear();
 
   active_modulators_.clear();
-  active_modulators_map_.clear(); // expect for default env 
+  active_modulators_map_.clear();
 
   unplugAll();
 }
@@ -487,8 +464,16 @@ void BlocksVoiceHandler::createModulators() {
   }
 
   for (int i = 0; i < kNumEnvelopes; ++i) {
-    createEnvelope();
+    auto envelope = createEnvelope();
+    envelopes_.push_back(envelope);
+    processor_pool_["envelope"].push_back(envelope);
+    createStatusOutput("env", envelope->output(EnvelopeModule::kValue));
+    createStatusOutput("env_phase", envelope->output(EnvelopeModule::kPhase));
+    data_->mod_sources["env"] = envelope->output();
   }
+
+  default_amp_env_ = createEnvelope();
+  default_amp_env_->enable(true);
 
   random_ = new TriggerRandom();
   random_->plug(retrigger());
@@ -531,12 +516,6 @@ std::shared_ptr<EnvelopeModule> BlocksVoiceHandler::createEnvelope(bool audio_ra
   envelope->plug(retrigger(), EnvelopeModule::kTrigger);
   addSubmodule(envelope.get());
   addProcessor(envelope.get());
-  envelopes_.push_back(envelope);
-  processor_pool_["envelope"].push_back(envelope);
-
-  createStatusOutput("env", envelope->output(EnvelopeModule::kValue));
-  createStatusOutput("env_phase", envelope->output(EnvelopeModule::kPhase));
-  data_->mod_sources["env"] = envelope->output();
   return envelope;
 }
 
@@ -657,11 +636,8 @@ void BlocksVoiceHandler::noteOff(int note, mono_float lift, int sample, int chan
 }
 
 bool BlocksVoiceHandler::shouldAccumulate(Output* output) {
-  for (auto envelope : envelopes_) {
-    if (output->owner == envelope.get())
-      std::cout << "yep" << std::endl;
-    return false;
-  }
+  // if (output->owner == amplitude_envelope_) // what is this for? 
+  //   return true;
 
   return VoiceHandler::shouldAccumulate(output);
 }

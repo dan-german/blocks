@@ -657,13 +657,20 @@ void SynthBase::processKeyboardEvents(MidiBuffer& buffer, int num_samples) {
   midi_manager_->replaceKeyboardMessages(buffer, num_samples);
 }
 
+// bool yoyo = true;
 void SynthBase::processModulationChanges() {
   vital::modulation_change change;
   while (getNextModulationChange(change)) {
     if (change.disconnecting)
       engine_->disconnectModulation(change);
-    else
+    else {
+      // if (yoyo) {
+      //   getVoiceHandler()->connectDefaultEnvs();
+      //   yoyo = false;
+      // }
+      // return;
       engine_->connectModulation(change);
+    }
   }
 }
 
@@ -837,13 +844,16 @@ void SynthBase::connectModulation(int modulator_index, std::string target_name, 
   bool is_env_to_osc_level = connection_model->source->id.type == "envelope" && connection_model->target->id.type == "osc" && connection_model->parameter_name_ == "level";
   parameter_name = is_env_to_osc_level ? "amp_env_destination" : parameter_name;
 
+  if (is_env_to_osc_level) {
+    getVoiceHandler()->setDefaultAmpEnv(connection_model->target->name, false);
+  }
+
   std::string modulator_name = connection_model->source->name;
   auto connection = createConnection(modulator_name, target_name, parameter_name, destination_scale);
   if (connection) connection_model->reset(connection);
 }
 
 vital::ModulationConnection* SynthBase::createConnection(std::string modulator_name, std::string target_name, std::string parameter_name, float destination_scale) {
-  std::cout << "create connection: " << modulator_name << " " << target_name << " " << parameter_name << std::endl;
   vital::ModulationConnection* connection = getConnection(modulator_name, parameter_name, parameter_name);
   bool create = connection == nullptr;
   if (create) {
@@ -857,6 +867,8 @@ vital::ModulationConnection* SynthBase::createConnection(std::string modulator_n
 vital::BlocksVoiceHandler* SynthBase::getVoiceHandler() {
   return getEngine()->voice_handler_;
 }
+
+// vital::BlocksVoiceHa
 
 std::shared_ptr<model::Block> SynthBase::addBlock(std::string type, Index index) {
   auto block = module_manager_.addBlock(type, index);

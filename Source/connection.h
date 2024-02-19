@@ -31,6 +31,7 @@ struct Connection {
   std::shared_ptr<Module> source;
   std::shared_ptr<Module> target;
   std::string parameter_name_;
+  bool hidden = false;
 
   bool isOscGainEnvelope();
 
