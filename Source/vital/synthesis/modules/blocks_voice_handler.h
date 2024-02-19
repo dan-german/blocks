@@ -70,7 +70,6 @@ public:
   Output* getDirectOutput() { return getAccumulatedOutput(direct_output_->output()); }
 
   Output* note_retrigger() { return &note_retriggered_; }
-  void connectDefaultEnvs();
 
   Output* midi_offset_output() { return midi_offset_output_; }
 

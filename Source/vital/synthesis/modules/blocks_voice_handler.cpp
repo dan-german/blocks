@@ -303,30 +303,6 @@ void BlocksVoiceHandler::createFilters(Output* keytrack) {
   }
 }
 
-void BlocksVoiceHandler::connectDefaultEnvs() {
-  // for (auto osc : oscillators_with_default_envs_) { 
-  //   auto destination = osc->getPolyModulationDestination("amp_env_destination");
-  //   auto source = default_amp_env_->output();
-
-  //   auto modulation_connection_processor = std::make_shared<ModulationConnectionProcessor>();
-  //   modulation_connection_processor->setDestinationScale(1.0f);
-  //   modulation_connection_processor->control_map_["amount"]->set(1.0f);
-  //   modulation_connection_processor->plug(source, ModulationConnectionProcessor::kModulationInput);
-  //   modulation_connection_processor->setPolyphonicModulation(true);
-  //   modulation_connection_processor->enable(true);
-  //   enableModulationConnection(modulation_connection_processor);
-
-  //   setActiveNonaccumulatedOutput(destination->output());
-
-  //   source->owner->enable(true);
-  //   destination->plugNext(modulation_connection_processor);
-  //   modulation_connection_processor->process(1);
-  //   destination->process(1);
-
-  //   osc->getPolyModulationSwitch("amp_env_destination")->set(1.0f);
-  // }
-}
-
 void BlocksVoiceHandler::createDistortions() {
   for (int i = 0; i < model::MAX_MODULES_PER_TYPE; i++) {
     auto distortion = std::make_shared<DistortionModule>();
