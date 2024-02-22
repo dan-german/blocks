@@ -197,11 +197,17 @@ void BlockComponent::themeChanged(Theme theme) {
     painter->waveColour = selectionColour;
 }
 
-void BlockComponent::setConfig(std::shared_ptr<model::Module> m) {
+void BlockComponent::setConfig(std::shared_ptr<model::Module> m, std::vector<std::shared_ptr<model::Connection>> connections) {
   indicators.reset();
 
-  std::unordered_set<std::shared_ptr<Module>> uniqueSources;
-  std::vector<std::shared_ptr<Module>> uniqueSourceVector;
+  std::unordered_set<std::shared_ptr<model::Module>> uniqueSources;
+  std::vector<std::shared_ptr<model::Module>> uniqueSourceVector;
+
+  for (const auto& connection : connections) { 
+    if (connection->target == m) {
+      uniqueSources.insert(connection->source);
+    }
+  }
 
   // for (const auto& param : m->parameters_)
   //   for (const auto& connection : param->connections)
@@ -225,7 +231,7 @@ void BlockComponent::animate() {
     setBounds(x, y, width, height);
   };
 
-  float scaleAtDrag = 0.93f;
+  const float scaleAtDrag = 0.93f;
 
   auto completion = [bounds, scaleAtDrag, this]() {
     auto factor = isDragging ? scaleAtDrag : 1.0f;

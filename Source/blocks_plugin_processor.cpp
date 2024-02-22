@@ -199,7 +199,8 @@ void PluginProcessor::handleBlockChanges() {
       connectModulationFromModel(c);
     }
 
-    // getVoiceHandler()->connectAllDefaultEnvs();
+    getVoiceHandler()->disconnectAllDefaultEnvs();
+    getVoiceHandler()->connectAllDefaultEnvs();
 
     block_modified_ = false;
   }
@@ -393,16 +394,20 @@ PresetInfo PluginProcessor::editorChangedPreset(int index) {
   }
 }
 
-void PluginProcessor::clear()
-{
+void PluginProcessor::clear() {
+  clearModulations();
+
   auto num_modulators = synth_->getModuleManager().getModulators().size();
   for (int i = num_modulators - 1; i >= 0; i--) {
     removeModulator(i);
   }
 
+  auto blocks = synth_->getModuleManager().getBlocks();
+  for (int i = blocks.size() - 1; i >= 0; i--) {
+    removeBlock(blocks[i]->index);
+  }
+
   getModuleManager().clear();
-
-
   getVoiceHandler()->clear();
 }
 
@@ -455,6 +460,10 @@ std::shared_ptr<model::Module> PluginProcessor::editorAddedModulator2(Model::Typ
 
 void PluginProcessor::editorRemovedBlock(Index index) {
   // Analytics::shared()->countAction("Block Removed");
+  removeBlock(index);
+}
+
+void PluginProcessor::removeBlock(const Index& index) {
   auto block = synth_->getModuleManager().getBlock(index);
 
   for (auto connection : synth_->getModuleManager().getConnectionsOfSource(block)) {
@@ -463,13 +472,6 @@ void PluginProcessor::editorRemovedBlock(Index index) {
 
   getVoiceHandler()->removeBlock(index, block);
   synth_->getModuleManager().removeBlock(block);
-
-  // for (auto* voice : blockVoices)
-  //   for (int i = 0; i < block->length; i++)
-  //     voice->removeBlock(block->index.toTheRight(i));
-
-  // removeConnectionsFromTarget(block);
-  // moduleManager.removeBlock(block);
 
   block_modified_ = true;
 }
@@ -600,6 +602,10 @@ juce::StringArray PluginProcessor::editorRequestsPresetNames() {
   //   result.add(preset.name);
 
   return {};
+}
+
+const vital::StatusOutput* PluginProcessor::editorRequestsStatusOutput(std::string name) {
+  return getStatusOutput(name);
 }
 
 // MainComponent::Delegate end 

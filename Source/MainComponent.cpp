@@ -30,10 +30,23 @@ MainComponent::MainComponent(juce::MidiKeyboardState& keyboard_state, Delegate* 
   // "osc", "filter", "drive", "flanger", "comp", "reverb", "delay", "chorus", "phaser", "eq"
   // add 2 envs, add one lfo, crash
 
-  // addModulator(Model::Types::adsr);
+  // for (int i = 0; i < 1000; i++) {
+  //   addModulator(Model::Types::lfo);
+  //   auto osc_block = addBlock(0, { 0, 0 });
+  //   spawnBlockComponent(osc_block);
+  //   delegate->editorConnectedModulation(0, "osc_1", "tune");
+  //   delegate->editorChangedPreset(-1);
+  //   clear();
+  // }
 
+  addModulator(Model::Types::lfo);
   auto osc_block = addBlock(0, { 0, 0 });
   spawnBlockComponent(osc_block);
+  delegate->editorConnectedModulation(0, "osc_1", "tune");
+  ui_layer_.setConnections(delegate->getModulations());
+  // auto osc_block2 = addBlock(0, { 0, 0 });
+  // spawnBlockComponent(osc_block2);
+
 
   // for (int i = 0; i < 2; i++) {
     // auto osc_block = addBlock(0, { 0, i });
@@ -335,7 +348,6 @@ void MainComponent::showPopupAt(ButtonGridPopup& popup, std::function<void(Index
 }
 
 std::shared_ptr<model::Block> MainComponent::addBlock(int code, Index index) {
-  std::cout << "code: " << code << std::endl;
   std::shared_ptr<model::Block> block = nullptr;
   const StringArray one { "osc", "filter", "drive", "flanger", "comp" };
   const StringArray two { "reverb", "delay", "chorus", "phaser", "eq" };
@@ -343,8 +355,6 @@ std::shared_ptr<model::Block> MainComponent::addBlock(int code, Index index) {
   all.addArray(one);
   all.addArray(two);
   return delegate->editorAddedBlock2(all[code].toStdString(), index);
-
-  // return block;
 }
 
 void MainComponent::setupInspector() {
@@ -470,7 +480,7 @@ void MainComponent::spawnBlockComponent(std::shared_ptr<model::Block> block) {
   addAndMakeVisible(blockComponent, 1000);
   cursor.setAlwaysOnTop(true);
   if (block->length > 1) block_grid_.setItemLength(blockComponent, block->length);
-  // blockComponent->setConfig(block);
+  blockComponent->setConfig(block, delegate->getModulations());
   // ResetDownFlowingDots();
 }
 
@@ -486,26 +496,31 @@ void MainComponent::spawnTabComponent(std::shared_ptr<Tab> tab) {
 }
 
 void MainComponent::graphicsTimerCallback(const float secondsSincelastUpdate) {
-  return;
-  auto currently_playing_notes = delegate->editorRequestsCurrentlyPlayingNotes();
-  note_logger_.log(currently_playing_notes);
+  // auto statusOutput = delegate->editorRequestsStatusOutput("osc 1");
+  // return;
+  // auto currently_playing_notes = delegate->editorRequestsCurrentlyPlayingNotes();
+  // note_logger_.log(currently_playing_notes);
 
   if (ui_layer_.connections.isVisible()) {
     auto modulationConnections = delegate->getModulations();
 
+    // modulation_source_
     for (int i = 0; i < modulationConnections.size(); i++) {
       if (auto mc = dynamic_cast<ConnectionComponent*>(ui_layer_.connections.listBox.getComponentForRowNumber(i))) {
-        auto value = delegate->editorRequestsModulatorValue(i);
-        mc->indicator.setMagnitude(value.second, false);
-        mc->indicator.setCurrentValue(value.first);
+        // auto value = delegate->editorRequestsModulatorValue(i);
+        auto source = delegate->editorRequestsStatusOutput("modulation_amount_" + std::to_string(i + 1));
+        // std::cout << source->value()[0] << std::endl;
+        // a
+        // mc->indicator.setMagnitude(value.second, false);
+        mc->indicator.setCurrentValue(source->value()[0]);
         mc->indicator.repaint();
       }
     }
   }
 
-  if (focused_grid_item_ != nullptr) {
-    updateInspectorModulationIndicators(); // todo - fix
-  }
+  // if (focused_grid_item_ != nullptr) {
+  //   updateInspectorModulationIndicators(); // todo - fix
+  // }
 }
 
 void MainComponent::mouseMove(const MouseEvent& event) {
@@ -591,7 +606,7 @@ void MainComponent::connectionDeleted(ConnectionComponent* component) {
   ui_layer_.setConnections(delegate->getModulations());
 
   if (inspector_.isVisible()) inspector_.setConfiguration(delegate->getBlock2(focused_grid_item_->index));
-  for (auto block : blocks) block->setConfig(delegate->getBlock2(block->index));
+  for (auto block : blocks) block->setConfig(delegate->getBlock2(block->index), delegate->getModulations());
 }
 
 void MainComponent::sliderValueChanged(Slider* slider) {
@@ -693,7 +708,7 @@ void MainComponent::modulatorEndedDrag(ModulatorComponent* modulator_component, 
     // auto modulator = delegate->getModulator(modulatorIndex);
     auto focused_block = block_matrix_[focused_grid_item_->index.row][focused_grid_item_->index.column];
 
-    // focusedBlock->setConfig(focusedModule);
+    focused_block->setConfig(focused_module, delegate->getModulations());
   }
 }
 
@@ -734,7 +749,7 @@ void MainComponent::modulatorRemoved(ModulatorComponent* component) {
   ui_layer_.setConnections(delegate->getModulations());
 
   // if (inspector.isVisible()) inspector.setConfiguration(delegate->getBlock(focusedGridItem->index));
-  for (auto block : blocks) block->setConfig(delegate->getBlock2(block->index));
+  for (auto block : blocks) block->setConfig(delegate->getBlock2(block->index), delegate->getModulations());
 }
 
 void MainComponent::setupPopupMenus() {

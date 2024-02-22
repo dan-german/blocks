@@ -439,7 +439,6 @@ void Reverb::reset(poly_mask mask) {
 }
 
 Processor* Reverb::clone() const {
-  std::cout << "Reverb::clone()" << std::endl;
   auto new_reverb = new Reverb(*this);
   new_reverb->max_feedback_size_ = 0;
   new_reverb->memory_ = new StereoMemory(kMaxSampleRate); 

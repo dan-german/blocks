@@ -19,6 +19,7 @@
 #include "model/NoteLogger.h"
 #include "module_new.h"
 #include "connection.h"
+#include "vital/synthesis/framework/synth_module.h"
 
 using Modulation = Model::Modulation;
 using Block = Model::Block;
@@ -191,6 +192,7 @@ struct MainComponent::Delegate {
   virtual std::vector<std::shared_ptr<model::Module>> getModulators2() = 0;
   virtual std::vector<std::shared_ptr<model::Connection>> getModulations() = 0;
   virtual Array<std::shared_ptr<Modulation>> getConnectionsOfSource(std::shared_ptr<Module> source) = 0;
+  virtual const vital::StatusOutput* editorRequestsStatusOutput(std::string name) = 0;
 
   virtual ~Delegate() = default;
 };

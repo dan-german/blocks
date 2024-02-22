@@ -20,6 +20,7 @@
 #include "gui/CircleIndicatorList.h"
 #include "gui/CircleIndicators.h"
 #include "module_new.h"
+#include "connection.h"
 
 class BlockComponent;
 using Block = Model::Block;
@@ -52,7 +53,8 @@ public:
   EnvelopePath* getEnvelopePath() { return this->envelopePath.get(); }
 
   static BlockComponent* create(std::shared_ptr<model::Block> block);
-  void setConfig(std::shared_ptr<model::Module> m);
+  // void setConfig(std::shared_ptr<model::Module> m);
+  void setConfig(std::shared_ptr<model::Module> m, std::vector<std::shared_ptr<model::Connection>> connections);
   void animate();
 protected:
   void paint(Graphics& g) override;
