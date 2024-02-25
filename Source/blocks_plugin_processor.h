@@ -109,9 +109,9 @@ public:
   std::shared_ptr<model::Module> editorAddedModulator2(Model::Type code) override;
   std::shared_ptr<Module> getModulator(int index) override;
   std::shared_ptr<Module> editorAddedModulator(Model::Type code) override;
-  PresetInfo editorChangedPreset(int index) override;
+  Preset editorChangedPreset(int index) override;
   void clear();
-  PresetInfo getStateRepresentation() override;
+  Preset getStateRepresentation() override;
   juce::Array<std::shared_ptr<Module>> getModulators() override;
   std::vector<std::shared_ptr<model::Module>> getModulators2() override;
   juce::Array<std::shared_ptr<Modulation>> getConnectionsOfSource(std::shared_ptr<Module> source) override;
@@ -132,6 +132,8 @@ private:
   double last_seconds_time_;
   MidiKeyboardState keyboard_state_;
   MainComponent* mainComponent;
+  PresetManager preset_manager_;
+  void loadPreset(Preset preset);
 
   juce::AudioPlayHead::CurrentPositionInfo position_info_;
 

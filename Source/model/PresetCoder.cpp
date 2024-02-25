@@ -10,7 +10,7 @@
 
 #include "PresetCoder.h"
 
-std::string PresetCoder::encode(PresetInfo presetData) {
+std::string PresetCoder::encode(Preset presetData) {
   json jsonPreset;
 
   jsonPreset["name"] = presetData.name.toStdString();
@@ -23,7 +23,7 @@ std::string PresetCoder::encode(PresetInfo presetData) {
   return jsonPreset.dump(2);
 }
 
-json PresetCoder::encodeModulators(std::vector<PresetInfo::Modulator> modulators) {
+json PresetCoder::encodeModulators(std::vector<Preset::Modulator> modulators) {
   json array = json::array();
 
   for (auto module : modulators) {
@@ -35,7 +35,7 @@ json PresetCoder::encodeModulators(std::vector<PresetInfo::Modulator> modulators
   return array;
 }
 
-json PresetCoder::encodeTabs(std::vector<PresetInfo::Tab> modules) {
+json PresetCoder::encodeTabs(std::vector<Preset::Tab> modules) {
   json array = json::array();
 
   for (auto module : modules) {
@@ -48,7 +48,7 @@ json PresetCoder::encodeTabs(std::vector<PresetInfo::Tab> modules) {
   return array;
 }
 
-json PresetCoder::encodeBlocks(std::vector<PresetInfo::Block> blocks) {
+json PresetCoder::encodeBlocks(std::vector<Preset::Block> blocks) {
   json array = json::array();
 
   for (auto block : blocks) {
@@ -61,7 +61,7 @@ json PresetCoder::encodeBlocks(std::vector<PresetInfo::Block> blocks) {
   return array;
 }
 
-json PresetCoder::encodeModulations(std::vector<PresetInfo::Connection> modulationConnections) {
+json PresetCoder::encodeModulations(std::vector<Preset::Connection> modulationConnections) {
   json array = json::array();
 
   for (auto modulationConnection : modulationConnections) {
@@ -80,7 +80,7 @@ json PresetCoder::encodeModulations(std::vector<PresetInfo::Connection> modulati
   return array;
 }
 
-std::optional<PresetInfo> PresetCoder::decode(std::string jsonString) {
+std::optional<Preset> PresetCoder::decode(std::string jsonString) {
   json presetInJson = json::parse(jsonString);
 
   int version;
@@ -90,12 +90,12 @@ std::optional<PresetInfo> PresetCoder::decode(std::string jsonString) {
     return { };
   }
 
-  PresetInfo preset = PresetInfo();
+  Preset preset = Preset();
 
   preset.name = std::string(presetInJson.at("name"));
 
   for (json& jsonTab : presetInJson.at("tabs")) {
-    PresetInfo::Tab presetTab {};
+    Preset::Tab presetTab {};
     decodeModule(jsonTab, presetTab);
     presetTab.length = jsonTab.at("length");
     presetTab.column = jsonTab.at("column");
@@ -103,7 +103,7 @@ std::optional<PresetInfo> PresetCoder::decode(std::string jsonString) {
   }
 
   for (json& jsonBlock : presetInJson.at("blocks")) {
-    PresetInfo::Block presetBlock {};
+    Preset::Block presetBlock {};
     decodeModule(jsonBlock, presetBlock);
 
     presetBlock.length = jsonBlock.at("length");
@@ -112,14 +112,14 @@ std::optional<PresetInfo> PresetCoder::decode(std::string jsonString) {
   }
 
   for (json& modulator : presetInJson.at("modulators")) {
-    PresetInfo::Modulator module {};
+    Preset::Modulator module {};
     decodeModule(modulator, module);
     module.colour = modulator.at("color");
     preset.modulators.push_back(module);
   }
 
   for (json& jsonModulation : presetInJson.at("modulations")) {
-    PresetInfo::Connection modulation;
+    Preset::Connection modulation;
     modulation.target = jsonModulation.at("target");
     modulation.source = jsonModulation.at("source");
     modulation.amount = jsonModulation.at("amount");
@@ -133,7 +133,7 @@ std::optional<PresetInfo> PresetCoder::decode(std::string jsonString) {
   return preset;
 }
 
-void PresetCoder::decodeModule(json& moduleJson, PresetInfo::Module& module) {
+void PresetCoder::decodeModule(json& moduleJson, Preset::Module& module) {
   auto name = moduleJson.at("name").get<std::string>();
 
   auto spaceIndex = name.find(' ');
@@ -144,7 +144,7 @@ void PresetCoder::decodeModule(json& moduleJson, PresetInfo::Module& module) {
     module.parameters[key] = value;
 }
 
-json PresetCoder::encodeModule(PresetInfo::Module module) {
+json PresetCoder::encodeModule(Preset::Module module) {
   json moduleJson;
   moduleJson["name"] = module.id.type + " " + std::to_string(module.id.number);
 

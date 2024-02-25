@@ -11,7 +11,7 @@
 #pragma once
 
 struct Index {
-  int row, column;
+  int column, row;
   Index(int row, int column): row(row), column(column) { }
   ~Index() { }
   inline Index toTheRight(int times) { return Index { row, column + times }; }

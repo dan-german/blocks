@@ -25,10 +25,10 @@ private:
   File presetsDirectory;
   PresetCoder* coder;
 public:
-  Array<PresetInfo> presets;
+  std::vector<Preset> presets;
   PresetManager();
 
-  void save(PresetInfo presetData);
+  void save(Preset presetData);
 
   void loadPresetsDirectory();
   void setPresetsDirectory();
@@ -36,6 +36,6 @@ public:
   void createAndSavePresetFile(String& name, const std::string& presetJson) const;
   void removePreset(String& name);
 
-  std::string presetToString(PresetInfo preset);
-  std::optional<PresetInfo> stringToPreset(std::string preset);
+  std::string presetToString(Preset preset);
+  std::optional<Preset> stringToPreset(std::string preset);
 };

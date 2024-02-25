@@ -41,7 +41,7 @@ public:
 
   BlocksLookAndFeel blocks_laf_;
   UILayer ui_layer_;
-  void loadState(PresetInfo preset);
+  void loadState(Preset preset);
   void visibilityChanged() override;
 protected:
   void paint(juce::Graphics&) override;
@@ -174,8 +174,8 @@ struct MainComponent::Delegate {
 
   virtual Array<MPENote> editorRequestsCurrentlyPlayingNotes() = 0;
   virtual StringArray editorRequestsPresetNames() = 0;
-  virtual PresetInfo editorChangedPreset(int index) = 0;
-  virtual PresetInfo getStateRepresentation() = 0;
+  virtual Preset editorChangedPreset(int index) = 0;
+  virtual Preset getStateRepresentation() = 0;
 
   virtual std::pair<float, float> editorRequestsModulatorValue(Index moduleIndex, int parameterIndex, int modulatorIndex) = 0;
   virtual std::pair<float, float> editorRequestsModulatorValue(int modulationConnectionIndex) = 0;

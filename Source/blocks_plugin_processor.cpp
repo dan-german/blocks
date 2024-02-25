@@ -387,11 +387,63 @@ void PluginProcessor::editorDisconnectedModulation(int index) {
   // Analytics::shared()->countAction("Modulation Disconnected");
 }
 
-PresetInfo PluginProcessor::editorChangedPreset(int index) {
-  if (index == -1) {
-    clear();
-    return PresetInfo();
+Preset PluginProcessor::editorChangedPreset(int index) {
+  // if (index == -1) {
+  //   clear();
+  //   return Preset();
+  // }
+
+  auto preset = preset_manager_.presets[0];
+  loadPreset(preset);
+  return preset;
+}
+
+void PluginProcessor::loadPreset(Preset preset) {
+  clear();
+  // for (auto presetTab : preset.tabs) {
+  //   auto tab = moduleManager.addTab(presetTab.id.type, presetTab.column, presetTab.id.number);
+  //   tab->length = presetTab.length;
+
+  //   for (auto const& [key, val] : presetTab.parameters)
+  //     tab->parameterMap[key]->audioParameter->setValue(val);
+  // }
+
+  for (auto presetBlock : preset.blocks) {
+    Index index = { presetBlock.index.first, presetBlock.index.second };
+    auto block = addBlock(presetBlock.id.type, index, presetBlock.id.number);
+    // auto block = addBlock(
+
+    for (auto const& [key, val] : presetBlock.parameters) {
+      // block->parameterMap[key]->audioParameter->setValue(val);
+      // block->parameter_map_[key]->val->set(val);
+    }
+
+    if (presetBlock.length > 1) {
+      // expand(block->index, presetBlock.length - 1, true);
+    }
   }
+
+  // for (auto presetModulator : preset.modulators) {
+  //   auto modulator = addModulator(presetModulator.id.type, presetModulator.id.number, presetModulator.colour);
+  //   for (auto const& [key, val] : presetModulator.parameters)
+  //     modulator->parameterMap[key]->audioParameter->setValue(val);
+  // }
+
+  // for (auto presetConnection : preset.connections_) {
+  //   auto modulator = moduleManager.getModule(presetConnection.source);
+
+  //   int modulatorIndex = moduleManager.modulators.indexOf(modulator);
+
+  //   auto target = moduleManager.getModule(presetConnection.target);
+  //   auto parameterName = presetConnection.parameter;
+  //   auto parameter = target->parameterMap[parameterName];
+  //   auto parameterIndex = target->parameters.indexOf(parameter);
+  //   auto modulation = connect(modulatorIndex, presetConnection.target, parameterIndex, presetConnection.number);
+
+  //   modulation->magnitudeParameter->setValue(presetConnection.amount);
+  //   modulation->setPolarity(presetConnection.bipolar);
+  // }
+  block_modified_ = true;
 }
 
 void PluginProcessor::clear() {
@@ -485,14 +537,6 @@ std::shared_ptr<Block> PluginProcessor::editorAddedBlock(Model::Type type, Index
 
 std::shared_ptr<model::Block> PluginProcessor::editorAddedBlock2(Model::Type type, Index index) {
   auto block = synth_->addBlock(type, index);
-
-  // if (block->id.type == "osc") {
-  //   float destination_scale = 1.0f;
-  //   std::string parameter_name = "amp_env_destination";
-  //   std::string modulator_name = "default_amp_env";
-  //   auto connection = createConnection(modulator_name, block->name, parameter_name, destination_scale);
-  // }
-
   block_modified_ = true;
   return block;
 }
@@ -548,8 +592,9 @@ juce::Array<std::shared_ptr<Module>> PluginProcessor::getModulators() {
 
 void PluginProcessor::editorSavedPreset(String name) {
   // Analytics::shared()->countAction("Preset Saved");
-  auto info = PresetInfo::create(name, getModuleManager().getBlocks(), getModuleManager().getModulators(), getModuleManager().getConnections());
+  auto info = Preset::create(name, getModuleManager().getBlocks(), getModuleManager().getModulators(), getModuleManager().getConnections());
   std::cout << "yay" << std::endl;
+  preset_manager_.save(info);
   // per
   // presetManager.save(info);
 }
@@ -579,7 +624,7 @@ std::pair<float, float> PluginProcessor::editorRequestsModulatorValue(int modula
 }
 
 #pragma warning(default:4716)
-PresetInfo PluginProcessor::getStateRepresentation() {
+Preset PluginProcessor::getStateRepresentation() {
   // auto currentState = PresetInfo();
 
   // for (auto block : moduleManager.getBlocks()) {

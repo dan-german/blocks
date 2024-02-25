@@ -31,7 +31,7 @@ void Synth::editorDisconnectedModulation(int index) {
   disconnect(index);
 }
 
-PresetInfo Synth::editorChangedPreset(int index) {
+Preset Synth::editorChangedPreset(int index) {
   return changePreset(index);
 }
 
@@ -130,11 +130,11 @@ std::pair<float, float> Synth::editorRequestsModulatorValue(int modulationConnec
   return { 0.0f, 0.0f };
 }
 
-PresetInfo Synth::getStateRepresentation() {
-  auto currentState = PresetInfo();
+Preset Synth::getStateRepresentation() {
+  auto currentState = Preset();
 
   for (auto block : moduleManager.getBlocks()) {
-    auto presetBlock = PresetInfo::Block();
+    auto presetBlock = Preset::Block();
     presetBlock.index = { block->index.row, block->index.column }; ;
     presetBlock.id = block->id;
     presetBlock.length = block->length;
@@ -142,7 +142,7 @@ PresetInfo Synth::getStateRepresentation() {
   }
 
   for (auto tab : moduleManager.getTabs()) {
-    auto presetTab = PresetInfo::Tab();
+    auto presetTab = Preset::Tab();
     presetTab.column = tab->column;
     presetTab.id = tab->id;
     // currentState.tabs.add(presetTab);
@@ -424,11 +424,11 @@ void Synth::removeConnectionsFromTarget(std::shared_ptr<Module> module) {
     disconnect(connection);
 }
 
-PresetInfo Synth::changePreset(int index) {
+Preset Synth::changePreset(int index) {
   if (index == -1) {
     Analytics::shared()->countAction("Preset Initialized");
     clear();
-    return PresetInfo();
+    return Preset();
   }
 
   Analytics::shared()->countAction("Preset Changed");
@@ -437,16 +437,16 @@ PresetInfo Synth::changePreset(int index) {
   return preset;
 }
 
-void Synth::loadPreset(PresetInfo preset) {
+void Synth::loadPreset(Preset preset) {
   clear();
 
-  for (auto presetTab : preset.tabs) {
-    auto tab = moduleManager.addTab(presetTab.id.type, presetTab.column, presetTab.id.number);
-    tab->length = presetTab.length;
+  // for (auto presetTab : preset.tabs) {
+  //   auto tab = moduleManager.addTab(presetTab.id.type, presetTab.column, presetTab.id.number);
+  //   tab->length = presetTab.length;
 
-    for (auto const& [key, val] : presetTab.parameters)
-      tab->parameterMap[key]->audioParameter->setValue(val);
-  }
+  //   for (auto const& [key, val] : presetTab.parameters)
+  //     tab->parameterMap[key]->audioParameter->setValue(val);
+  // }
 
   for (auto presetBlock : preset.blocks) {
     Index index = { presetBlock.index.first, presetBlock.index.second };

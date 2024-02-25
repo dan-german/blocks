@@ -171,8 +171,13 @@ void MainComponent::setupListeners() {
 
   ui_layer_.newPresetButton->on_click_ = [this]() {
     // DBG("changed preset");
-    delegate->editorChangedPreset(-1);
+    // delegate->editorChangedPreset(-1);
+    // clear();
+
     clear();
+    auto preset = delegate->editorChangedPreset(0);
+    loadState(preset);
+    dark_background_.setVisible(false);
   };
 
   ui_layer_.saveButton->on_click_ = [this]() {
@@ -598,9 +603,9 @@ void MainComponent::sliderValueChanged(Slider* slider) {
   }
 }
 
-void MainComponent::loadState(PresetInfo preset) {
+void MainComponent::loadState(Preset preset) {
   for (auto presetBlock : preset.blocks) {
-    auto block = delegate->getBlock(Index { presetBlock.index.first, presetBlock.index.second });
+    auto block = delegate->getBlock2(Index { presetBlock.index.first, presetBlock.index.second });
     // spawnBlockComponent(block);
   }
 

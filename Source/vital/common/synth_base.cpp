@@ -870,8 +870,8 @@ vital::BlocksVoiceHandler* SynthBase::getVoiceHandler() {
 
 // vital::BlocksVoiceHa
 
-std::shared_ptr<model::Block> SynthBase::addBlock(std::string type, Index index) {
-  auto block = module_manager_.addBlock(type, index);
+std::shared_ptr<model::Block> SynthBase::addBlock(std::string type, Index index, int number) {
+  auto block = module_manager_.addBlock(type, index, number);
   getVoiceHandler()->addBlock(block);
 
   // bool is_osc = type == "osc";

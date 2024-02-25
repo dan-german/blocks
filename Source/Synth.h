@@ -48,7 +48,7 @@ public:
   Array<Voice*> blockVoices;
   ModuleManager moduleManager;
   PresetManager presetManager;
-  std::optional<PresetInfo> presetToLoadOnInit;
+  std::optional<Preset> presetToLoadOnInit;
 
   Synth();
 
@@ -75,8 +75,8 @@ public:
   std::shared_ptr<Block> addBlock(Model::Type type, Index index, int number = -1);
   std::shared_ptr<Module> addModulator(Model::Type tpye, int number = -1, int colourId = -1);
   void removeConnectionsFromTarget(std::shared_ptr<Module> module);
-  PresetInfo changePreset(int index);
-  void loadPreset(PresetInfo preset);
+  Preset changePreset(int index);
+  void loadPreset(Preset preset);
   std::string getState();
   void correctToTime(int64 timeInSamples);
 
@@ -108,8 +108,8 @@ public:
   std::shared_ptr<Block> editorAddedBlock(Model::Type code, Index index) override;
   std::shared_ptr<Module> getModulator(int index) override;
   std::shared_ptr<Module> editorAddedModulator(Model::Type code) override;
-  PresetInfo editorChangedPreset(int index) override;
-  PresetInfo getStateRepresentation() override;
+  Preset editorChangedPreset(int index) override;
+  Preset getStateRepresentation() override;
   Array<std::shared_ptr<Module>> getModulators() override;
   Array<std::shared_ptr<Modulation>> getConnectionsOfSource(std::shared_ptr<Module> source) override;
   std::vector<std::shared_ptr<model::Connection>> getModulations() override;

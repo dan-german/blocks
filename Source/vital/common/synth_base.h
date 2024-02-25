@@ -90,7 +90,7 @@ public:
   bool isSourceConnected(const std::string& source);
   std::vector<vital::ModulationConnection*> getDestinationConnections(const std::string& destination);
 
-  std::shared_ptr<model::Block> addBlock(std::string type, Index index);
+  std::shared_ptr<model::Block> addBlock(std::string type, Index index, int number = -1);
   std::shared_ptr<model::Module> addModulator(Model::Type tpye, int number = -1, int colour_id = -1);
   void repositionBlock(Index from, Index to);
 
