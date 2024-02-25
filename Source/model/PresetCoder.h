@@ -32,8 +32,8 @@ public:
 private:
   void decodeModule(json& moduleJson, PresetInfo::Module& module);
   json encodeModule(PresetInfo::Module module);
-  json encodeBlocks(Array<PresetInfo::Block> blocks);
-  json encodeModulations(Array<PresetInfo::Modulation> modulationConnections);
-  json encodeModulators(Array<PresetInfo::Modulator> modulators);
-  json encodeTabs(Array<PresetInfo::Tab> modules);
+  json encodeBlocks(std::vector<PresetInfo::Block> blocks);
+  json encodeModulations(std::vector<PresetInfo::Connection> modulationConnections);
+  json encodeModulators(std::vector<PresetInfo::Modulator> modulators);
+  json encodeTabs(std::vector<PresetInfo::Tab> modules);
 };

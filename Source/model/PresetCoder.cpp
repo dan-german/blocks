@@ -17,13 +17,13 @@ std::string PresetCoder::encode(PresetInfo presetData) {
   jsonPreset["tabs"] = encodeTabs(presetData.tabs);
   jsonPreset["blocks"] = encodeBlocks(presetData.blocks);
   jsonPreset["modulators"] = encodeModulators(presetData.modulators);
-  jsonPreset["modulations"] = encodeModulations(presetData.modulations);
+  jsonPreset["modulations"] = encodeModulations(presetData.connections_);
   jsonPreset["format_version"] = 0;
 
   return jsonPreset.dump(2);
 }
 
-json PresetCoder::encodeModulators(Array<PresetInfo::Modulator> modulators) {
+json PresetCoder::encodeModulators(std::vector<PresetInfo::Modulator> modulators) {
   json array = json::array();
 
   for (auto module : modulators) {
@@ -35,7 +35,7 @@ json PresetCoder::encodeModulators(Array<PresetInfo::Modulator> modulators) {
   return array;
 }
 
-json PresetCoder::encodeTabs(Array<PresetInfo::Tab> modules) {
+json PresetCoder::encodeTabs(std::vector<PresetInfo::Tab> modules) {
   json array = json::array();
 
   for (auto module : modules) {
@@ -48,7 +48,7 @@ json PresetCoder::encodeTabs(Array<PresetInfo::Tab> modules) {
   return array;
 }
 
-json PresetCoder::encodeBlocks(Array<PresetInfo::Block> blocks) {
+json PresetCoder::encodeBlocks(std::vector<PresetInfo::Block> blocks) {
   json array = json::array();
 
   for (auto block : blocks) {
@@ -61,7 +61,7 @@ json PresetCoder::encodeBlocks(Array<PresetInfo::Block> blocks) {
   return array;
 }
 
-json PresetCoder::encodeModulations(Array<PresetInfo::Modulation> modulationConnections) {
+json PresetCoder::encodeModulations(std::vector<PresetInfo::Connection> modulationConnections) {
   json array = json::array();
 
   for (auto modulationConnection : modulationConnections) {
@@ -69,7 +69,7 @@ json PresetCoder::encodeModulations(Array<PresetInfo::Modulation> modulationConn
 
     modulation["source"] = modulationConnection.source;
     modulation["target"] = modulationConnection.target;
-    modulation["magnitude"] = modulationConnection.magnitude;
+    modulation["amount"] = modulationConnection.amount;
     modulation["bipolar"] = modulationConnection.bipolar;
     modulation["parameter"] = modulationConnection.parameter;
     modulation["number"] = modulationConnection.number;
@@ -99,7 +99,7 @@ std::optional<PresetInfo> PresetCoder::decode(std::string jsonString) {
     decodeModule(jsonTab, presetTab);
     presetTab.length = jsonTab.at("length");
     presetTab.column = jsonTab.at("column");
-    preset.tabs.add(presetTab);
+    preset.tabs.push_back(presetTab);
   }
 
   for (json& jsonBlock : presetInJson.at("blocks")) {
@@ -108,26 +108,26 @@ std::optional<PresetInfo> PresetCoder::decode(std::string jsonString) {
 
     presetBlock.length = jsonBlock.at("length");
     presetBlock.index = jsonBlock.at("index");
-    preset.blocks.add(presetBlock);
+    preset.blocks.push_back(presetBlock);
   }
 
   for (json& modulator : presetInJson.at("modulators")) {
     PresetInfo::Modulator module {};
     decodeModule(modulator, module);
     module.colour = modulator.at("color");
-    preset.modulators.add(module);
+    preset.modulators.push_back(module);
   }
 
   for (json& jsonModulation : presetInJson.at("modulations")) {
-    PresetInfo::Modulation modulation;
+    PresetInfo::Connection modulation;
     modulation.target = jsonModulation.at("target");
     modulation.source = jsonModulation.at("source");
-    modulation.magnitude = jsonModulation.at("magnitude");
+    modulation.amount = jsonModulation.at("amount");
     modulation.bipolar = bool(jsonModulation.at("bipolar"));
     modulation.parameter = jsonModulation.at("parameter");
     modulation.number = jsonModulation.at("number");
 
-    preset.modulations.add(modulation);
+    preset.connections_.push_back(modulation);
   }
 
   return preset;

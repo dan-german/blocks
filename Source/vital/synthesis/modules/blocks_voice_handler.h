@@ -100,6 +100,7 @@ public:
   std::map<std::string, std::shared_ptr<SynthModule>> active_processor_map_;
 
   std::shared_ptr<EnvelopeModule> default_amp_env_;
+  void disconnectAllDefaultEnvs();
   void connectAllDefaultEnvs();
 private:
   void createNoteArticulation();

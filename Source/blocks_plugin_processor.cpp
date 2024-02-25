@@ -199,7 +199,8 @@ void PluginProcessor::handleBlockChanges() {
       connectModulationFromModel(c);
     }
 
-    // getVoiceHandler()->connectAllDefaultEnvs();
+    getVoiceHandler()->disconnectAllDefaultEnvs();
+    getVoiceHandler()->connectAllDefaultEnvs();
 
     block_modified_ = false;
   }
@@ -301,7 +302,7 @@ void PluginProcessor::editorAdjustedBlock(Index index, int parameter, float valu
 }
 
 void PluginProcessor::editorChangedModulationMagnitude(int index, float magnitude) {
-  synth_->getModuleManager().getConnection(index)->magnitude_parameter_->val->set(magnitude);
+  synth_->getModuleManager().getConnection(index)->amount_parameter_->val->set(magnitude);
 }
 
 void PluginProcessor::editorChangedModulationPolarity(int index, bool bipolar) {
@@ -393,17 +394,24 @@ PresetInfo PluginProcessor::editorChangedPreset(int index) {
   }
 }
 
-void PluginProcessor::clear()
-{
+void PluginProcessor::clear() {
+  // pauseProcessing(true);
+  // initEngine();
+  clearModulations();
+
   auto num_modulators = synth_->getModuleManager().getModulators().size();
   for (int i = num_modulators - 1; i >= 0; i--) {
     removeModulator(i);
   }
 
+  auto blocks = synth_->getModuleManager().getBlocks();
+  for (int i = blocks.size() - 1; i >= 0; i--) {
+    removeBlock(blocks[i]->index);
+  }
+
   getModuleManager().clear();
-
-
   getVoiceHandler()->clear();
+  // pauseProcessing(false);
 }
 
 void PluginProcessor::editorRemovedTab(int column) {
@@ -455,6 +463,10 @@ std::shared_ptr<model::Module> PluginProcessor::editorAddedModulator2(Model::Typ
 
 void PluginProcessor::editorRemovedBlock(Index index) {
   // Analytics::shared()->countAction("Block Removed");
+  removeBlock(index);
+}
+
+void PluginProcessor::removeBlock(const Index& index) {
   auto block = synth_->getModuleManager().getBlock(index);
 
   for (auto connection : synth_->getModuleManager().getConnectionsOfSource(block)) {
@@ -463,13 +475,6 @@ void PluginProcessor::editorRemovedBlock(Index index) {
 
   getVoiceHandler()->removeBlock(index, block);
   synth_->getModuleManager().removeBlock(block);
-
-  // for (auto* voice : blockVoices)
-  //   for (int i = 0; i < block->length; i++)
-  //     voice->removeBlock(block->index.toTheRight(i));
-
-  // removeConnectionsFromTarget(block);
-  // moduleManager.removeBlock(block);
 
   block_modified_ = true;
 }
@@ -543,7 +548,9 @@ juce::Array<std::shared_ptr<Module>> PluginProcessor::getModulators() {
 
 void PluginProcessor::editorSavedPreset(String name) {
   // Analytics::shared()->countAction("Preset Saved");
-  // auto info = PresetInfo::create(name, moduleManager.getTabs(), moduleManager.getBlocks(), moduleManager.getModulators(), moduleManager.getConnections());
+  auto info = PresetInfo::create(name, getModuleManager().getBlocks(), getModuleManager().getModulators(), getModuleManager().getConnections());
+  std::cout << "yay" << std::endl;
+  // per
   // presetManager.save(info);
 }
 
@@ -602,8 +609,14 @@ juce::StringArray PluginProcessor::editorRequestsPresetNames() {
   return {};
 }
 
+const vital::StatusOutput* PluginProcessor::editorRequestsStatusOutput(std::string name) {
+  return getStatusOutput(name);
+}
+
 // MainComponent::Delegate end 
 void PluginProcessor::editorParameterGestureChanged(String moduleName, int parameterIndex, bool started) {
+  std::cout << moduleName.toStdString() << " is changing " << std::endl;
+
   if (JUCE_STANDALONE_APPLICATION) return;
 
   if (started) {

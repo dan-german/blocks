@@ -17,5 +17,5 @@ const StringArray waveforms { "saw", "sine", "square", "triangle", "noise" };
 const StringArray modulators { "lfo", "envelope" };
 const StringArray effects { "filter", "drive", "reverb", "delay", "chorus", "flanger", "phaser", "comp" };
 const StringArray tabs { "oscillator", "modulator", "effect" };
-constexpr int MAX_MODULES_PER_TYPE = 2;
+constexpr int MAX_MODULES_PER_TYPE = 1;
 }

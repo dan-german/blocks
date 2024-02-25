@@ -257,6 +257,7 @@ void BlocksVoiceHandler::initializeDefaultAmpEnvs() {
     auto source = default_amp_env_->output();
     auto modulation_connection_processor = std::make_shared<ModulationConnectionProcessor>(1000);
     addProcessor(modulation_connection_processor.get());
+    modulation_connection_processor->plug(default_amp_env_->output(), ModulationConnectionProcessor::kModulationInput);
     modulation_connection_processor->init();
     osc_to_default_env_mod_processor_map_[osc] = modulation_connection_processor;
   }
@@ -267,12 +268,23 @@ void BlocksVoiceHandler::setDefaultAmpEnv(std::string target_name, bool enable) 
   osc_to_default_env_mod_processor_map_[osc]->enable(enable);
 }
 
+void BlocksVoiceHandler::disconnectAllDefaultEnvs() {
+  for (auto osc : oscillators_with_default_envs_) {
+    auto processor = osc_to_default_env_mod_processor_map_[osc];
+    auto destination = osc->getPolyModulationDestination("amp_env_destination");
+    destination->unplug(processor.get());
+    osc->getPolyModulationSwitch("amp_env_destination")->set(0.0f);
+    processor->enable(false);
+    setInactiveNonaccumulatedOutput(destination->output());
+    disableModulationConnection(processor.get());
+  }
+}
+
 void BlocksVoiceHandler::connectAllDefaultEnvs() {
   for (auto osc : oscillators_with_default_envs_) {
     auto processor = osc_to_default_env_mod_processor_map_[osc];
     auto destination = osc->getPolyModulationDestination("amp_env_destination");
     processor->setDestinationScale(1.0f);
-    processor->plug(default_amp_env_->output(), ModulationConnectionProcessor::kModulationInput);
     processor->setPolyphonicModulation(true);
     processor->enable(true);
     processor->control_map_["amount"]->set(1.0f);
@@ -281,6 +293,7 @@ void BlocksVoiceHandler::connectAllDefaultEnvs() {
     destination->process(1);
     osc->getPolyModulationSwitch("amp_env_destination")->set(1.0f);
     setActiveNonaccumulatedOutput(destination->output());
+    enableModulationConnection(processor.get());
   }
 }
 
@@ -366,6 +379,7 @@ void BlocksVoiceHandler::createDelays() {
 
 std::shared_ptr<SynthModule> BlocksVoiceHandler::createProcessorForBlock(std::shared_ptr<model::Block> module) {
   std::shared_ptr<SynthModule> processor = processor_pool_[module->id.type][0];
+  std::cout << "proc: " << processor << std::endl;
   processor_pool_[module->id.type].erase(processor_pool_[module->id.type].begin());
   processor->enable(true);
   if (processor->control_map_.count("on")) {
@@ -404,8 +418,12 @@ void BlocksVoiceHandler::createOscillators() {
 }
 
 void BlocksVoiceHandler::clear() {
+  unplugAll();
+
+
   for (auto processor : active_processors_) {
     processor_pool_[processor->module_->id.type].push_back(processor);
+    // processor->hardReset();
     processor->enable(false);
   }
 
@@ -414,8 +432,6 @@ void BlocksVoiceHandler::clear() {
 
   active_modulators_.clear();
   active_modulators_map_.clear();
-
-  unplugAll();
 }
 
 void BlocksVoiceHandler::createModulators() {

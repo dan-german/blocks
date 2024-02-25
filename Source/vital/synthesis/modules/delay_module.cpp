@@ -78,10 +78,10 @@ void DelayModule::processWithInput(const poly_float* audio_in, int num_samples) 
   SynthModule::process(num_samples);
   // delay_->processWithInput(audio_in, num_samples);
 
-  // if (i % 100 == 0) {
+  // if (i++ % 100 == 0) {
   //   utils::print(audio_in[0], "de: ", this);
   // }
-
+// 
   // i++;
 }
 } // namespace vital

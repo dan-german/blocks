@@ -11,6 +11,9 @@
 #pragma once
 #include "model/Block.h"
 #include "gui/Tab.h"
+#include "connection.h"
+
+// #include "
 
 class PresetInfo {
 public:
@@ -26,11 +29,11 @@ public:
 
   struct Modulator: public PresetInfo::Module { int colour; };
 
-  struct Modulation {
+  struct Connection {
     std::string source;
     std::string target;
     std::string parameter;
-    float magnitude;
+    float amount;
     bool bipolar;
     int number;
   };
@@ -41,17 +44,17 @@ public:
   };
 
   String name = "";
-  Array<Tab> tabs;
-  Array<Block> blocks;
-  Array<Modulator> modulators;
-  Array<Modulation> modulations;
+  std::vector<Tab> tabs;
+  std::vector<Block> blocks;
+  std::vector<Modulator> modulators;
+  std::vector<Connection> connections_;
 
   static PresetInfo create(String name,
-    Array<std::shared_ptr<Model::Tab>> tabs,
-    Array<std::shared_ptr<Model::Block>> blocks,
-    Array<std::shared_ptr<Model::Module>> modulators,
-    Array<std::shared_ptr<Model::Modulation>> modulations);
+    // std::vector<std::shared_ptr<model::Tab>> tabs,
+    std::vector<std::shared_ptr<model::Block>> blocks,
+    std::vector<std::shared_ptr<model::Module>> modulators,
+    std::vector<std::shared_ptr<model::Connection>> modulations);
 private:
-  static void prepareModule(std::shared_ptr<Model::Module> module, Module& moduleInfo);
+  static void prepareModule(std::shared_ptr<model::Module> module, Module& moduleInfo);
 };
 

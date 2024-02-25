@@ -31,7 +31,7 @@ Component* ModulationsListBoxModel::refreshComponentForRow(int rowNumber, bool i
   if (envelopeToOscGain) {
     component->handleOscGainEnvelope();
   } else {
-    auto magnitude_parameter = connection->magnitude_parameter_;
+    auto magnitude_parameter = connection->amount_parameter_;
     component->slider.setRange(magnitude_parameter->min, magnitude_parameter->max);
     component->slider.setValue(magnitude_parameter->val->value(), dontSendNotification);
     component->source.setText(connection->source->display_name, dontSendNotification);

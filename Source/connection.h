@@ -21,7 +21,7 @@ struct Connection {
   Connection(Module* target, Module* modulator, int parameterIndex, float magnitude, int number, bool bipolar = false);
   Connection(int number);
   ~Connection();
-  std::shared_ptr<vital::ValueDetails> magnitude_parameter_;
+  std::shared_ptr<vital::ValueDetails> amount_parameter_;
   std::shared_ptr<vital::ValueDetails> bipolar_parameter_;
   vital::ModulationConnection* vital_connection_;
 

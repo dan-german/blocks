@@ -35,6 +35,7 @@ force_inline poly_float saturateLarge(poly_float value) {
 
 template<class MemoryType>
 void Delay<MemoryType>::hardReset() {
+  std::cout << "clearing delay" << std::endl;
   memory_->clearAll();
 
   filter_gain_ = 0.0f;

@@ -104,8 +104,8 @@ Array<std::shared_ptr<Module>> Synth::getModulators() {
 
 void Synth::editorSavedPreset(String name) {
   Analytics::shared()->countAction("Preset Saved");
-  auto info = PresetInfo::create(name, moduleManager.getTabs(), moduleManager.getBlocks(), moduleManager.getModulators(), moduleManager.getConnections());
-  presetManager.save(info);
+  // auto info = PresetInfo::create(name, moduleManager.getTabs(), moduleManager.getBlocks(), moduleManager.getModulators(), moduleManager.getConnections());
+  // presetManager.save(info);
 }
 
 std::pair<float, float> Synth::editorRequestsModulatorValue(Index moduleIndex, int parameterIndex, int modulatorIndex) {
@@ -138,14 +138,14 @@ PresetInfo Synth::getStateRepresentation() {
     presetBlock.index = { block->index.row, block->index.column }; ;
     presetBlock.id = block->id;
     presetBlock.length = block->length;
-    currentState.blocks.add(presetBlock);
+    // currentState.blocks.add(presetBlock);
   }
 
   for (auto tab : moduleManager.getTabs()) {
     auto presetTab = PresetInfo::Tab();
     presetTab.column = tab->column;
     presetTab.id = tab->id;
-    currentState.tabs.add(presetTab);
+    // currentState.tabs.add(presetTab);
   }
 
   return currentState;
@@ -467,7 +467,7 @@ void Synth::loadPreset(PresetInfo preset) {
       modulator->parameterMap[key]->audioParameter->setValue(val);
   }
 
-  for (auto presetConnection : preset.modulations) {
+  for (auto presetConnection : preset.connections_) {
     auto modulator = moduleManager.getModule(presetConnection.source);
 
     int modulatorIndex = moduleManager.modulators.indexOf(modulator);
@@ -478,7 +478,7 @@ void Synth::loadPreset(PresetInfo preset) {
     auto parameterIndex = target->parameters.indexOf(parameter);
     auto modulation = connect(modulatorIndex, presetConnection.target, parameterIndex, presetConnection.number);
 
-    modulation->magnitudeParameter->setValue(presetConnection.magnitude);
+    modulation->magnitudeParameter->setValue(presetConnection.amount);
     modulation->setPolarity(presetConnection.bipolar);
   }
 }
@@ -486,8 +486,8 @@ void Synth::loadPreset(PresetInfo preset) {
 void Synth::noteStopped(bool allowTailOff) {}
 
 std::string Synth::getState() {
-  auto info = PresetInfo::create(name, moduleManager.getTabs(), moduleManager.getBlocks(), moduleManager.getModulators(), moduleManager.getConnections());
-  return presetManager.presetToString(info);
+  // auto info = PresetInfo::create(name, moduleManager.getTabs(), moduleManager.getBlocks(), moduleManager.getModulators(), moduleManager.getConnections());
+  // return presetManager.presetToString(info);
 }
 
 void Synth::noteStarted(Voice* voice, float frequencyInHertz) {

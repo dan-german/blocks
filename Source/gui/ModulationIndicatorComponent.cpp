@@ -48,7 +48,7 @@ void ModulationIndicatorComponent::resizeCurrentValuePoint() { // this should be
     float x;
 
     if (bipolar)
-      x = (getWidth() / 2) + (rawCurrentValue * magnitude * (getWidth() / 4.0f));
+      x = (getWidth() / 2) + (rawCurrentValue * 2.0f * magnitude * (getWidth() / 4.0f));
     else
       x = (getWidth() / 2 - pointSize) + (getHeight() - pointSize) + addition;
 
@@ -62,7 +62,7 @@ void ModulationIndicatorComponent::resizeCurrentValuePoint() { // this should be
 void ModulationIndicatorComponent::setCurrentValue(float value) {
   if (std::isnan(value)) value = 0.0f;
 
-  currentValueY = jmap(value, -1.0f, 1.0f, 0.0f, 1.0f);
+  currentValueY = value;
   rawCurrentValue = value;
 
   resizeCurrentValuePoint();

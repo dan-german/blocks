@@ -24,6 +24,7 @@
 #include "vital/common/synth_gui_interface.h"
 #include "module_new.h"
 #include "connection.h"
+#include "model/PresetManager.h"
 
 class ValueBridge;
 
@@ -83,6 +84,7 @@ public:
 
   void editorRemovedTab(int column) override;
   void editorRemovedBlock(Index index) override;
+  void removeBlock(const Index& index);
   void editorRepositionedBlock(Index from, Index to) override;
   void editorAdjustedBlock(Index index, int parameter, float value) override;
   void editorAdjustedTab(int column, int parameter, float value) override;
@@ -120,6 +122,7 @@ public:
   std::pair<float, float> editorRequestsModulatorValue(int modulationConnectionIndex) override;
   juce::StringArray editorRequestsPresetNames() override;
   juce::Array<juce::MPENote> editorRequestsCurrentlyPlayingNotes() override;
+  const vital::StatusOutput* editorRequestsStatusOutput(std::string name) override;
   // *********************************************************
 private:
   bool editorReady = false;

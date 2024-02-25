@@ -53,7 +53,6 @@ public:
   }
 
   virtual Processor* clone() const override {
-    std::cout << "cloning" << std::endl;
     return new DelayModule(*this);
   }
 
