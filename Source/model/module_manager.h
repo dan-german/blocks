@@ -16,7 +16,7 @@
 namespace model {
 class ModuleManager {
 private:
-  std::shared_ptr<model::Block> blockMatrix[Constants::rows][Constants::columns];
+  std::shared_ptr<model::Block> blockMatrix[Constants::columns][Constants::rows];
   std::map<std::string, std::shared_ptr<model::Module>> nameToModuleMap;
   std::vector<std::shared_ptr<model::Connection>> connections;
   std::vector<std::shared_ptr<model::Block>> blocks;
@@ -36,7 +36,7 @@ public:
   // Array<int> getActiveColumns();
 
   std::shared_ptr<model::Block> addBlock(std::string type, Index index, int number = -1);
-  std::shared_ptr<model::Block> getBlock(Index index) { return blockMatrix[index.row][index.column]; }
+  std::shared_ptr<model::Block> getBlock(Index index) { return blockMatrix[index.column][index.row]; }
   std::vector<std::shared_ptr<model::Block>> getBlocks() { return blocks; }
   void removeBlock(std::shared_ptr<model::Block> block);
   void repositionBlock(Index oldIndex, Index newIndex);

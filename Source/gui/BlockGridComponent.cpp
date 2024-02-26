@@ -71,15 +71,15 @@ void BlockGridComponent::setDownFlowingHighlight(int column, bool active) {
 void BlockGridComponent::spawnDots() {
   int size = Constants::gridDotSize;
 
-  for (int row = 0; row <= config.rows; row++) {
+  for (int column = 0; column <= config.columns; column++) {
     dot_matrix_.add(new OwnedArray<DotComponent>());
     positions.add(Array<Point<int>>());
-    for (int column = 0; column <= config.columns; column++) {
+    for (int row = 0; row <= config.rows; row++) {
       auto dot = new DotComponent();
-      dot_matrix_[row]->add(dot);
+      dot_matrix_[column]->add(dot);
       addAndMakeVisible(dot);
 
-      auto point = pointForIndex(Index(row, column));
+      auto point = pointForIndex(Index(column, row));
 
       int x = point.getX() - config.edgeSpacing;
       int y = point.getY() - config.edgeSpacing;
@@ -114,9 +114,9 @@ void BlockGridComponent::ResetDotsVisibility() {
       }
     }
 
-    for (int row = 0; row <= 1; row++) {
-      for (int column = 1; column < item->length; column++) {
-        auto dot = dot_matrix_.getUnchecked(item->index.row + row)->getUnchecked(item->index.column + column);
+    for (int column = 1; column < item->length; column++) {
+      for (int row = 0; row <= 1; row++) {
+        auto dot = dot_matrix_.getUnchecked(item->index.column + column)->getUnchecked(item->index.row + row);
         dot->setVisible(false);
       }
     }
@@ -131,10 +131,10 @@ void BlockGridComponent::snapItem(GridItemComponent* item, Index index, bool res
 }
 
 void BlockGridComponent::resizeDots() {
-  for (int row = 0; row <= config.rows; row++) {
-    for (int column = 0; column <= config.columns; column++) {
-      auto dot = dot_matrix_.getUnchecked(row)->getUnchecked(column);
-      auto point = pointForIndex(Index(row, column));
+  for (int column = 0; column <= config.columns; column++) {
+    for (int row = 0; row <= config.rows; row++) {
+      auto dot = dot_matrix_.getUnchecked(column)->getUnchecked(row);
+      auto point = pointForIndex(Index(column, row));
 
       int x = point.getX() - config.edgeSpacing;
       int y = point.getY() - config.edgeSpacing;
@@ -152,14 +152,15 @@ void BlockGridComponent::hideDotsAroundIndex(GridItemComponent* blockComponent, 
   if (previousPlaceholderIndex.has_value() && !isIndexInside(*previousPlaceholderIndex)) return;
   for (int column = index.column; column < index.column + 1 + length; column++)
     for (int row = 0; row <= 1; row++)
-      dot_matrix_.getUnchecked(index.row + row)->getUnchecked(column)->setVisible(visible);
+      dot_matrix_.getUnchecked(index.column + column)->getUnchecked(row)->setVisible(visible);
 
   for (auto block : items) {
     if (block->length <= 1 || block == blockComponent) continue;
 
     for (int column = 1; column < block->length; column++) {
       for (int row = 0; row <= 1; row++) {
-        auto dot = dot_matrix_.getUnchecked(block->index.row + row)->getUnchecked(block->index.column + column);
+        // auto dot = dot_matrix_.getUnchecked(block->index.row + row)->getUnchecked(block->index.column + column);
+        auto dot = dot_matrix_.getUnchecked(block->index.column + column)->getUnchecked(block->index.row + row);
         dot->setVisible(false);
       }
     }

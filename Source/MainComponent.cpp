@@ -299,6 +299,7 @@ void MainComponent::ShowBlocksPopup(Index index) {
   block_grid_.reset();
 
   auto blockSelectionCompletion = [this, index](Index selectedIndex) {
+    std::cout << "column " << index.column << " row " << index.row << std::endl; 
     int code = selectedIndex.column == 0 ? selectedIndex.row : selectedIndex.row + 5;
     auto module = addBlock(code, index);
     if (module == nullptr) return;
@@ -458,7 +459,7 @@ void MainComponent::spawnBlockComponent(std::shared_ptr<model::Block> block) {
 
   blocks.add(blockComponent);
   block_grid_.addItem(blockComponent, block->index, true);
-  block_matrix_[block->index.row][block->index.column] = blockComponent;
+  block_matrix_[block->index.column][block->index.row] = blockComponent;
   addAndMakeVisible(blockComponent, 1000);
   cursor.setAlwaysOnTop(true);
   if (block->length > 1) block_grid_.setItemLength(blockComponent, block->length);
@@ -688,7 +689,7 @@ void MainComponent::modulatorEndedDrag(ModulatorComponent* modulator_component, 
     refreshInspector();
 
     // auto modulator = delegate->getModulator(modulatorIndex);
-    auto focused_block = block_matrix_[focused_grid_item_->index.row][focused_grid_item_->index.column];
+    auto focused_block = block_matrix_[focused_grid_item_->index.column][focused_grid_item_->index.row];
 
     focused_block->setConfig(focused_module, delegate->getModulations());
   }
@@ -790,8 +791,8 @@ void MainComponent::gridItemRemoved(GridComponent* grid, GridItemComponent* item
 
 void MainComponent::gridItemRepositioned(GridComponent* grid, GridItemComponent* item, Index oldIndex) {
   if (grid == &block_grid_) {
-    block_matrix_[oldIndex.row][oldIndex.column] = nullptr;
-    block_matrix_[item->index.row][item->index.column] = static_cast<BlockComponent*>(item);
+    block_matrix_[oldIndex.column][oldIndex.row] = nullptr;
+    block_matrix_[item->index.column][item->index.row] = static_cast<BlockComponent*>(item);
     delegate->editorRepositionedBlock(oldIndex, item->index);
     // ResetDownFlowingDots();
   } else if (grid == &tab_grid_) {

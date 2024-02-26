@@ -63,7 +63,7 @@ private:
   GridItemComponent* focused_grid_item_ = nullptr;
   Point<int> current_mouse_position_;
 
-  BlockComponent* block_matrix_[Constants::rows][Constants::columns];
+  BlockComponent* block_matrix_[Constants::columns][Constants::rows];
   Cursor cursor;
   std::optional<int> previous_slider_under_mouse_ = {};
   BlockPlaceholder block_placeholder_;

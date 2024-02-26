@@ -7,7 +7,7 @@
 #endif
 
 Rectangle<int> GridComponent::getModuleBounds() const { return Rectangle<int>(config.itemWidth, config.itemHeight); }
-GridItemComponent* GridComponent::getModuleComponent(Index index) { return itemMatrix[index.row][index.column]; }
+GridItemComponent* GridComponent::getModuleComponent(Index index) { return itemMatrix[index.column][index.row]; }
 void GridComponent::paint(Graphics&) {}
 void GridComponent::resnapBlock(GridItemComponent* moduleComponent) { snapItem(moduleComponent, moduleComponent->index, true); }
 void GridComponent::show() { Desktop::getInstance().getAnimator().animateComponent(this, getBounds(), 1, 140, false, 1, 1); }
@@ -17,14 +17,14 @@ void GridComponent::setConfig(Config config) { this->config = config; }
 GridComponent::GridComponent(Config config) {
   this->config = config;
 
-  for (int row = 0; row < config.rows; row++) {
+  for (int column = 0; column < config.columns; column++) {
     itemMatrix.push_back(std::vector<GridItemComponent*>());
-    for (int column = 0; column < config.columns; column++)
-      itemMatrix[row].push_back(nullptr);
+    for (int row = 0; row < config.rows; row++) {
+      itemMatrix[column].push_back(nullptr);
+    }
   }
 
   addAndMakeVisible(add_button_);
-
   setInterceptsMouseClicks(true, true);
 }
 
@@ -34,13 +34,13 @@ void GridComponent::snapItem(GridItemComponent* item, Index index, bool resetBou
   auto bounds = boundsForItem(item, resetBounds);
   item->setBounds(bounds);
   setItemLength(item, item->length);
-  itemMatrix[index.row][index.column] = item;
+  itemMatrix[index.column][index.row] = item;
 }
 
 Rectangle<int> GridComponent::boundsForItem(GridItemComponent* item, bool resetBounds) {
   bool childOfAnotherComponent = item->getParentComponent() != this; // TODO: can this be done better?
 
-  const auto localPoint = pointForIndex(Index(item->index.row, item->index.column));
+  const auto localPoint = pointForIndex(Index(item->index.column, item->index.row));
   const auto globalPoint = Point<int>(localPoint.getX() + getX(), localPoint.getY() + getY());
   const auto finalPoint = childOfAnotherComponent ? globalPoint : localPoint;
 
@@ -61,7 +61,7 @@ Index GridComponent::indexForPoint(const Point<int> point) const {
   const auto moduleRect = getModuleBounds();
   float column = float(point.getX()) / (moduleRect.getWidth() + config.spacing * 1.5f);
   float row = float(point.getY()) / (moduleRect.getHeight() + config.spacing * 1.5f);
-  return { static_cast<int>(std::floor(row)), static_cast<int>(std::floor(column)) };
+  return { static_cast<int>(std::floor(column)), static_cast<int>(std::floor(row)) };
 }
 
 Point<int> GridComponent::pointForIndex(Index index) const {
@@ -82,7 +82,7 @@ void GridComponent::mouseMove(const MouseEvent& event) {
 }
 
 void GridComponent::showAddButton(Index index) {
-  if (itemMatrix[index.row][index.column] != nullptr) { return; }
+  if (itemMatrix[index.column][index.row] != nullptr) { return; }
   auto point = pointForIndex(index);
   auto moduleBounds = getModuleBounds();
   int size = 10;
@@ -98,8 +98,8 @@ void GridComponent::mouseExit(const MouseEvent& event) {
 }
 
 void GridComponent::detachModule(Index index, bool shouldRemove) {
-  auto item = itemMatrix[index.row][index.column];
-  itemMatrix[index.row][index.column] = {};
+  auto item = itemMatrix[index.column][index.row];
+  itemMatrix[index.column][index.row] = {};
 
   if (shouldRemove) items.remove(items.indexOf(item));
 }
@@ -116,7 +116,7 @@ bool GridComponent::isIndexValid(Index currentIndex, Index targetIndex, int leng
   if (length + targetIndex.column > config.columns) return false;
 
   for (int i = 1; i < length; i++) {
-    auto module = getModuleComponent(Index(targetIndex.row, targetIndex.column + i));
+    auto module = getModuleComponent(Index(targetIndex.column, targetIndex.row + i));
     if (module && module->index != currentIndex)
       return false;
   }
@@ -163,7 +163,7 @@ void GridComponent::addItem(GridItemComponent* item, Index index, bool resetBoun
   item->listener = this;
   item->grid = this;
   items.add(item);
-  itemMatrix[index.row][index.column] = item;
+  itemMatrix[index.column][index.row] = item;
   snapItem(item, index, resetBounds);
 }
 
