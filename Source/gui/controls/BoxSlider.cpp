@@ -13,12 +13,13 @@ BoxSlider::~BoxSlider() {
 BoxSlider::BoxSlider() {
   slider.setLookAndFeel(&lnf);
   slider.setTextBoxStyle(Slider::NoTextBox, false, 0, 0);
-
   addAndMakeVisible(slider);
   slider.addListener(this);
   slider.setName("modulatorSlider");
   setupLabel();
   ThemeManager::shared()->addListener(this);
+  // slider.setInterceptsMouseClicks(true, true);  
+  slider.addMouseListener(this, false);
 }
 
 void BoxSlider::resized() {
@@ -37,4 +38,11 @@ void BoxSlider::setupLabel() {
 
 void BoxSlider::themeChanged(Theme theme) {
   valueLabel.setColour(Label::ColourIds::textColourId, theme.two.brighter(0.3f));
+}
+
+void BoxSlider::mouseDown(const MouseEvent& event) {
+  auto isRightClick = event.mods.isRightButtonDown();
+  if (isRightClick) { 
+    slider.setValue(default_value_, dontSendNotification);
+  }
 }

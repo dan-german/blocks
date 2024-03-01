@@ -30,16 +30,16 @@ void BlockComponent::resizePainter() {
   painter->setBounds(x, y, width, height);
 }
 
-BlockComponent::BlockComponent(Index index): GridItemComponent({ index, Constants::moduleWidth }) {
+BlockComponent::BlockComponent(Index index): GridItemComponent({ index, Constants::blockWidth }) {
   isSelected = false;
   isStretching = false;
   isDragging = false;
   listener = nullptr;
 
   setupTitleLabel();
-  setBounds(0, 0, Constants::moduleWidth, Constants::moduleHeight);
+  setBounds(0, 0, Constants::blockWidth, Constants::blockHeight);
 
-  initialWidth = Constants::moduleWidth;
+  initialWidth = Constants::blockWidth;
   darkener.toFront(false);
   darkener.setInterceptsMouseClicks(false, false);
 

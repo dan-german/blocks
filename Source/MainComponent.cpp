@@ -23,7 +23,8 @@ MainComponent::MainComponent(juce::MidiKeyboardState& keyboard_state, Delegate* 
   setupTabGrid();
   setupBlockGrid();
   setupDarkBackground(&dark_background_, -1);
-
+  addAndMakeVisible(column_controls_);
+  column_controls_.listener = this;
   note_logger_.listener = this;
   ThemeManager::shared()->set(UserSettings::shared()->getInt("theme", 0));
 
@@ -208,6 +209,7 @@ void MainComponent::addModulator(Model::Type code) {
 void MainComponent::resized() {
   ui_layer_.setBounds(getLocalBounds());
   resizeGrid();
+  resizeColumnControls();
   ResizeInspector();
   resizeTabContainer();
   dark_background_.path.addRectangle(getLocalBounds());
@@ -220,6 +222,11 @@ void MainComponent::resized() {
     bounds.removeFromTop(20);
     glowIndicator->setBounds(bounds);
   }
+}
+
+void MainComponent::resizeColumnControls() {
+  auto bounds = block_grid_.getBounds().withHeight(38).withY(block_grid_.getY() + block_grid_.getHeight() + 19);
+  column_controls_.setBounds(bounds);
 }
 
 void MainComponent::resizeTabContainer() {
@@ -283,8 +290,8 @@ void MainComponent::clickOnGrid(Index& index) {
 
 void MainComponent::resizeGrid() {
   using namespace Constants;
-  const float gridWidth = columns * moduleWidth + (columns - 1) * moduleSpacing + gridEdgeSpacing * 2;
-  const float gridHeight = rows * moduleHeight + (rows - 1) * (moduleSpacing)+gridEdgeSpacing * 2;
+  const float gridWidth = columns * blockWidth + (columns - 1) * moduleSpacing + gridEdgeSpacing * 2;
+  const float gridHeight = rows * blockHeight + (rows - 1) * (moduleSpacing)+gridEdgeSpacing * 2;
   const float x = (getLocalBounds().getWidth() - gridWidth) / 2;
 
   int gridTopOffset = 135;
@@ -299,7 +306,7 @@ void MainComponent::ShowBlocksPopup(Index index) {
   block_grid_.reset();
 
   auto blockSelectionCompletion = [this, index](Index selectedIndex) {
-    std::cout << "column " << index.column << " row " << index.row << std::endl; 
+    std::cout << "column " << index.column << " row " << index.row << std::endl;
     int code = selectedIndex.column == 0 ? selectedIndex.row : selectedIndex.row + 5;
     auto module = addBlock(code, index);
     if (module == nullptr) return;
@@ -595,14 +602,18 @@ void MainComponent::connectionDeleted(ConnectionComponent* component) {
 void MainComponent::sliderValueChanged(Slider* slider) {
   bool isModulatorSlider = slider->getName() == "modulatorSlider";
   if (isModulatorSlider) {
-    auto listItemComponent = slider->getParentComponent()->getParentComponent()->getParentComponent()->getParentComponent()->getParentComponent();
-    auto index = ui_layer_.modulators_.listBox.getRowNumberOfComponent(listItemComponent);
-    delegate->editorAdjustedModulator(index, 1, static_cast<float>(slider->getValue()));
+    // auto listItemComponent = slider->getParentComponent()->getParentComponent()->getParentComponent()->getParentComponent()->getParentComponent();
+    // auto index = ui_layer_.modulators_.listBox.getRowNumberOfComponent(listItemComponent);
+    // delegate->editorAdjustedModulator(index, 1, static_cast<float>(slider->getValue()));
   } else {
     auto index = ui_layer_.connections.indexOfModulationConnection(slider->getParentComponent()->getParentComponent());
+    auto value = static_cast<float>(slider->getValue());
+    std::cout << "mag val: " << value << std::endl;
     delegate->editorChangedModulationMagnitude(index, static_cast<float>(slider->getValue()));
   }
 }
+
+// void MainComponent::sliderValueChanged
 
 void MainComponent::loadState(Preset preset) {
   for (auto presetBlock : preset.blocks) {
@@ -879,4 +890,15 @@ void MainComponent::resetDownFlowingDots() {
   for (auto column : columns_with_blocks) {
     block_grid_.setDownFlowingHighlight(column, true);
   }
+}
+void MainComponent::columnControlAdjusted(ColumnControlsContainer::ControlType control, int column, float value) {
+  std::cout << "column control adjusted" << column << " " << value << std::endl;
+}
+
+void MainComponent::columnControlStartedAdjusting(ColumnControlsContainer::ControlType control, int column) {
+  
+}
+
+void MainComponent::columnControlEndedAdjusting(ColumnControlsContainer::ControlType control, int column) {
+
 }

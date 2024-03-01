@@ -21,7 +21,9 @@ public:
   juce::StringArray choices;
   Slider slider;
   Label valueLabel;
+  float default_value_ = 0.0f;
 private:
+  void mouseDown(const MouseEvent& event) override;
   BoxSliderLooksAndFeel lnf;
   void setupLabel();
   void sliderValueChanged(Slider* slider) override;

@@ -30,7 +30,6 @@ GridComponent::GridComponent(Config config) {
 
 void GridComponent::snapItem(GridItemComponent* item, Index index, bool resetBounds) {
   item->index = index;
-
   auto bounds = boundsForItem(item, resetBounds);
   item->setBounds(bounds);
   setItemLength(item, item->length);
@@ -65,11 +64,7 @@ Index GridComponent::indexForPoint(const Point<int> point) const {
 }
 
 Point<int> GridComponent::pointForIndex(Index index) const {
-  int row = index.row;
-  int column = index.column;
-  const int x = config.edgeSpacing + config.itemWidth * column + column * config.spacing;
-  const int y = config.edgeSpacing + config.itemHeight * row + row * config.spacing;
-  return Point<int>(x, y);
+  return Point<int>(xForColumn(index.column, config), yForRow(index.row, config));
 }
 
 void GridComponent::mouseMove(const MouseEvent& event) {

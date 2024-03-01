@@ -23,5 +23,7 @@ public:
     float maxSliderPos,
     const juce::Slider::SliderStyle style,
     juce::Slider& slider) override;
+  void drawCenter(juce::Graphics& g, float sliderPos, int x, int width, juce::Slider& slider);
+  void drawNormal(juce::Graphics& g, juce::Slider& slider, float sliderPos);
   juce::Slider::SliderLayout getSliderLayout(juce::Slider& slider) override;
 };

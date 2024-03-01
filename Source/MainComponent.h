@@ -20,6 +20,7 @@
 #include "module_new.h"
 #include "connection.h"
 #include "vital/synthesis/framework/synth_module.h"
+#include "gui/column_controls_container.h"
 
 using Modulation = Model::Modulation;
 using Block = Model::Block;
@@ -31,7 +32,8 @@ class MainComponent final: public Component,
   ConnectionComponent::Listener,
   ModulatorComponent::Listener,
   GridComponent::Listener,
-  NoteLogger::Listener {
+  NoteLogger::Listener,
+  ColumnControlsContainer::Listener {
 public:
   struct Delegate;
   Delegate* delegate;
@@ -46,6 +48,7 @@ public:
 protected:
   void paint(juce::Graphics&) override;
   void resized() override;
+  void resizeColumnControls();
 
   // MouseListener
   void mouseDown(const MouseEvent& event) override;
@@ -58,6 +61,7 @@ private:
   InspectorComponent inspector_;
   SavePopup save_popup_;
   GraphicsTimer timer_;
+  ColumnControlsContainer column_controls_;
 
   Array<BlockComponent*> blocks;
   GridItemComponent* focused_grid_item_ = nullptr;
@@ -123,7 +127,6 @@ private:
   void handleModuleLandedOnInspector(BlockComponent* moduleComponent, const Point<int>& inspectorRelativePosition);
   void refreshInspector();
   void setupUI();
-  void sliderValueChanged(Slider* slider) override;
   void setupBlockGrid();
   void setupTabGrid();
   void updateModuleComponentVisuals(int sliderIndex, float value, std::shared_ptr<model::Module> block);
@@ -147,6 +150,14 @@ private:
   void modulatorRemoved(ModulatorComponent* component) override;
   void setupPresetMenu();
   void presetButtonClicked();
+
+  void sliderValueChanged(Slider* slider) override;
+  // void sliderDragStarted(Slider* slider) override;
+  // void sliderDragEnded(Slider* slider) override;
+
+  void columnControlAdjusted(ColumnControlsContainer::ControlType control, int column, float value) override;
+  void columnControlStartedAdjusting(ColumnControlsContainer::ControlType control, int column) override;
+  void columnControlEndedAdjusting(ColumnControlsContainer::ControlType control, int column) override;
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MainComponent)
 };
