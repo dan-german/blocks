@@ -151,15 +151,14 @@ void BlockGridComponent::resized() {
 void BlockGridComponent::hideDotsAroundIndex(GridItemComponent* blockComponent, Index index, int length, bool visible) {
   if (previousPlaceholderIndex.has_value() && !isIndexInside(*previousPlaceholderIndex)) return;
   for (int column = index.column; column < index.column + 1 + length; column++)
-    for (int row = 0; row <= 1; row++)
-      dot_matrix_.getUnchecked(index.column + column)->getUnchecked(row)->setVisible(visible);
+    for (int row = index.row; row <= index.row + 1; row++)
+      dot_matrix_.getUnchecked(column)->getUnchecked(row)->setVisible(visible);
 
   for (auto block : items) {
     if (block->length <= 1 || block == blockComponent) continue;
 
     for (int column = 1; column < block->length; column++) {
       for (int row = 0; row <= 1; row++) {
-        // auto dot = dot_matrix_.getUnchecked(block->index.row + row)->getUnchecked(block->index.column + column);
         auto dot = dot_matrix_.getUnchecked(block->index.column + column)->getUnchecked(block->index.row + row);
         dot->setVisible(false);
       }

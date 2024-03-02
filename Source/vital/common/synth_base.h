@@ -215,7 +215,6 @@ protected:
   vital::CircularQueue<vital::ModulationConnection*> mod_connections_;
   moodycamel::ConcurrentQueue<vital::control_change> value_change_queue_;
   moodycamel::ConcurrentQueue<vital::modulation_change> modulation_change_queue_;
-  moodycamel::ConcurrentQueue<vital::block_change> block_change_queue_;
   Tuning tuning_;
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SynthBase)

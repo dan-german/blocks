@@ -44,7 +44,7 @@ public:
     parameter_map_[short_name] = shared_ptr;
   }
 
-  // virtual void applyProcessor(std::shared_ptr<SynthModule> processor);
+  virtual void reset() {}
 };
 
 class Block: public Module {
@@ -53,9 +53,9 @@ public:
   Block(std::string prefix, int number): Module(prefix, number) {
     // category = Category::source;
   };
-  // void reset() {
-  //   Module::reset();
-  //   index = { -1, -1 };
-  // };
+  void reset() override {
+    Module::reset();
+    index = { -1, -1 };
+  };
 };
 } // namespace model

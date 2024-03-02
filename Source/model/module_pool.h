@@ -16,6 +16,7 @@
 #include "ModuleContainer.h"
 #include "module_new.h"
 #include "connection.h"
+#include "column_control_model.h"
 
 // using namespace Model;
 namespace model {
@@ -25,6 +26,7 @@ public:
 
   ModuleContainer<model::Block> blocks;
   ModuleContainer<model::Module> modulators;
+  std::vector<std::shared_ptr<model::ColumnControl>> column_controls_;
   // ModuleContainer<Tab> tabs;
 
   std::vector<std::shared_ptr<model::Module>> allModules;

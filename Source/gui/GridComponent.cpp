@@ -121,7 +121,7 @@ bool GridComponent::isIndexValid(Index currentIndex, Index targetIndex, int leng
 
 GridItemComponent* GridComponent::isSlotTaken(Index index, GridItemComponent* candidate) {
   for (int i = index.column; i >= 0; i--) {
-    auto candidateIndex = Index(index.row, i);
+    auto candidateIndex = Index(i, index.row);
     auto module = getModuleComponent(candidateIndex);
 
     if (module && module != candidate) {

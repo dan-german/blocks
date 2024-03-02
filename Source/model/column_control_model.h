@@ -1,3 +1,4 @@
+#pragma once
 namespace model {
 class ColumnControl: public Module {
 public:

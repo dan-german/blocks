@@ -19,8 +19,10 @@
 #include "chorus_model.h"
 #include "flanger_model.h"  
 #include "phaser_model.h"  
+#include "column_control_model.h"
 
 namespace model {
+// Module
 ModulePool::~ModulePool() { }
 
 // std::shared_ptr<Tab> ModulePool::getTab(Type type, int number) { return tabs.get({ type, number }); }
@@ -47,10 +49,11 @@ ModulePool::ModulePool() {
   modulators.spawn({ "envelope" }, [](std::string type, int number) { return std::make_shared<model::ADSRModule>(number); });
 
   for (int i = 1; i <= 40; i++) connections.push_back(std::make_shared<Connection>(i));
+  for (int i = 1; i <= Constants::columns; i++) column_controls_.push_back(std::make_shared<ColumnControl>(i));
 
   allModules.insert(allModules.end(), blocks.all.begin(), blocks.all.end());
   allModules.insert(allModules.end(), modulators.all.begin(), modulators.all.end());
-  // allModules.insert(allModules.end(), tabs.all.begin(), tabs.all.end());
+  allModules.insert(allModules.end(), column_controls_.begin(), column_controls_.end());
 }
 
 void ModulePool::retire(std::shared_ptr<model::Connection> modulationConnection) {

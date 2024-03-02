@@ -6,7 +6,6 @@
 #include "settings/Constants.h"
 #include "module_new.h"
 #include "connection.h"
-#include "model/column_control_model.h"
 
 namespace model {
 class ModuleManager {
@@ -20,9 +19,7 @@ public:
   ModulePool pool;
   std::vector<std::shared_ptr<model::Module>> modulators;
   // Array<std::shared_ptr<model::Tab>> tabs;
-  std::vector<std::shared_ptr<model::ColumnControl>> column_controls_;
 
-  ModuleManager();
   ~ModuleManager();
 
   // std::shared_ptr<Tab> addTab(Model::Type type, int column, int number = 1);
@@ -32,7 +29,7 @@ public:
   // void triggerNoteInTabs(Voice* voice);
   // Array<int> getActiveColumns();
 
-  std::shared_ptr<model::ColumnControl> getColumnControl(int index) { return column_controls_[index]; }
+  std::shared_ptr<model::ColumnControl> getColumnControl(int index) { return pool.column_controls_[index]; }
 
   std::shared_ptr<model::Block> addBlock(std::string type, Index index, int number = -1);
   std::shared_ptr<model::Block> getBlock(Index index) { return blockMatrix[index.column][index.row]; }

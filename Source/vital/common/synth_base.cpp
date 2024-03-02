@@ -81,17 +81,17 @@ void SynthBase::valueChangedThroughMidi(const std::string& name, vital::mono_flo
   controls_[name]->set(value);
   ValueChangedCallback* callback = new ValueChangedCallback(self_reference_, name, value);
   setValueNotifyHost(name, value);
-  callback->post();
+  // callback->post();
 }
 
 void SynthBase::pitchWheelMidiChanged(vital::mono_float value) {
   ValueChangedCallback* callback = new ValueChangedCallback(self_reference_, "pitch_wheel", value);
-  callback->post();
+  // callback->post();
 }
 
 void SynthBase::modWheelMidiChanged(vital::mono_float value) {
   ValueChangedCallback* callback = new ValueChangedCallback(self_reference_, "mod_wheel", value);
-  callback->post();
+  // callback->post();
 }
 
 void SynthBase::pitchWheelGuiChanged(vital::mono_float value) {
@@ -111,14 +111,14 @@ void SynthBase::presetChangedThroughMidi(File preset) {
 }
 
 void SynthBase::valueChangedExternal(const std::string& name, vital::mono_float value) {
-  valueChanged(name, value);
+  // valueChanged(name, value); (controls_[name]->set(value))
   if (name == "mod_wheel")
     engine_->setModWheelAllChannels(value);
   else if (name == "pitch_wheel")
     engine_->setZonedPitchWheel(value, 0, vital::kNumMidiChannels - 1);
 
-  ValueChangedCallback* callback = new ValueChangedCallback(self_reference_, name, value);
-  callback->post();
+  // ValueChangedCallback* callback = new ValueChangedCallback(self_reference_, name, value);
+  // callback->post();
 }
 
 vital::ModulationConnection* SynthBase::getConnection(const std::string& source, const std::string& destination, const std::string& parameter) {

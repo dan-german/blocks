@@ -101,18 +101,6 @@ typedef struct {
   int num_audio_rate;
 } modulation_change;
 
-enum BlockChangeType {
-  kAdd,
-  kRemove,
-  kMove
-};
-
-typedef struct { 
-  Index index = Index(0, 0);
-  Index from = Index(0, 0);
-  BlockChangeType type;
-} block_change;
-
 typedef std::map<std::string, Value*> control_map;
 typedef std::pair<Value*, mono_float> control_change;
 typedef std::map<std::string, Processor*> input_map;

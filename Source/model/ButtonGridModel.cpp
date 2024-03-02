@@ -14,7 +14,7 @@ Component* ButtonGridModel::refreshComponentForRow(int rowNumber, bool isRowSele
   }
 
   component->text.setText(texts[rowNumber], dontSendNotification);
-  component->on_click_ = [this, rowNumber]() { onClick({ rowNumber, this->column }); };
+  component->on_click_ = [this, rowNumber]() { onClick({ this->column, rowNumber }); };
 
   return component;
 }

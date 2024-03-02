@@ -56,8 +56,7 @@ public:
   void notifyModulationValueChanged(int index);
   void connectModulation(std::string source, std::string destination);
   void connectModulation(vital::ModulationConnection* connection);
-  void setModulationValues(const std::string& source, const std::string& destination,
-    vital::mono_float amount, bool bipolar, bool stereo, bool bypass);
+  void setModulationValues(const std::string& source, const std::string& destination, vital::mono_float amount, bool bipolar, bool stereo, bool bypass);
   void initModulationValues(const std::string& source, const std::string& destination);
   void disconnectModulation(std::string source, std::string destination);
   void disconnectModulation(vital::ModulationConnection* connection);

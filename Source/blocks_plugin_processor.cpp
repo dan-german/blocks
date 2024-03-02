@@ -25,7 +25,7 @@
 PluginProcessor::PluginProcessor(): juce::AudioProcessor(BusesProperties().withOutput("Output", AudioChannelSet::stereo(), true)), SynthGuiInterface(this, false) {
 
   // for getVoiceHandler()->column_nodes_
-  for (auto column_control : synth_->getModuleManager().column_controls_) {
+  for (auto column_control : synth_->getModuleManager().pool.column_controls_) {
     auto processor = getVoiceHandler()->column_nodes_[column_control->id.number - 1];
     for (auto& pair : column_control->parameter_map_) {
       column_control->parameter_map_[pair.first]->val = processor->control_map_[pair.first];

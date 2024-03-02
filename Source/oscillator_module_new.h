@@ -8,7 +8,6 @@ using Osc = vital::SynthOscillator;
 namespace model {
 class OscillatorModule: public Block {
 public:
-
   OscillatorModule(int number): Block("osc", number) {
     add({ .name = "wave", .min = 0.0, .max = 3.0, .value_scale = ValueScale::kIndexed, .string_lookup = strings::waves });
     add({ .name = "transpose", .min = -48.0, .max = 48.0, .value_scale = ValueScale::kIndexed });
