@@ -175,6 +175,10 @@ struct MainComponent::Delegate {
   virtual void editorAdjustedModulator(int modulatorIndex, int parameterIndex, float value) = 0;
   virtual void editorConnectedModulation(int modulator_index, std::string target_name, std::string parameter) = 0;
 
+  virtual void editorStartedAdjustingColumn(std::string control, int column) = 0;
+  virtual void editorEndedAdjustingColumn(std::string control, int column) = 0;
+  virtual void editorAdjustedColumn(std::string contorl, int column, float value) = 0;
+
   virtual void editorChangedModulationMagnitude(int modulationConnectionIndex, float magnitude) = 0;
   virtual void editorChangedModulationPolarity(int index, bool bipolar) = 0;
   virtual void editorDisconnectedModulation(int index) = 0;

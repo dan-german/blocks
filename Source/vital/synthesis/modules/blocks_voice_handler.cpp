@@ -129,7 +129,7 @@ void BlocksVoiceHandler::connectAll() {
     }
 
     if (current) {
-      last_node_->plug(current, column);
+      column_nodes_[column]->plug(current);
     }
     current = nullptr;
   }
@@ -150,7 +150,7 @@ void BlocksVoiceHandler::unplugAll() {
     for (int row = 0; row < processor_matrix_[column].size(); row++) {
       auto processor = processor_matrix_[column][row];
       if (processor != nullptr) {
-        last_node_->unplug(processor.get());
+        column_nodes_[column]->unplug(processor.get());
 
         if (auto processor_above = findProcessorAbove({ row, column })) {
           processor->unplug(processor_above.get());
@@ -173,10 +173,10 @@ void BlocksVoiceHandler::init() {
   createFilters(note_from_reference_->output());
   createVoiceOutput();
 
-  last_node_ = new VariableAdd(5);
-  addProcessor(last_node_);
+  master_node_ = new VariableAdd(5);
+  addProcessor(master_node_);
   // voice_sum_ = new Add();
-  output_->plug(last_node_, 0);
+  output_->plug(master_node_, 0);
   output_->plug(amplitude_, 1);
 
   direct_output_->plug(amplitude_, 1);
@@ -189,7 +189,7 @@ void BlocksVoiceHandler::init() {
   for (int i = 0; i < kNumMacros; ++i)
     macros[i] = createMonoModControl("macro_control_" + std::to_string(i + 1));
 
-  setVoiceKiller(last_node_->output());
+  setVoiceKiller(master_node_->output());
 
   for (int i = 0; i < vital::kMaxModulationConnections; ++i) {
     ModulationConnectionProcessor* processor = modulation_bank_.atIndex(i)->modulation_processor.get();
@@ -207,6 +207,12 @@ void BlocksVoiceHandler::init() {
   }
 
   VoiceHandler::init();
+
+  for (auto node : column_nodes_) {
+    // node->init();
+    master_node_->plugNext(node.get());
+    // addProcessor(node.get());
+  }
 
   // disable all processors
   for (const auto& pair : processor_pool_) {
@@ -379,7 +385,6 @@ void BlocksVoiceHandler::createDelays() {
 
 std::shared_ptr<SynthModule> BlocksVoiceHandler::createProcessorForBlock(std::shared_ptr<model::Block> module) {
   std::shared_ptr<SynthModule> processor = processor_pool_[module->id.type][0];
-  std::cout << "proc: " << processor << std::endl;
   processor_pool_[module->id.type].erase(processor_pool_[module->id.type].begin());
   processor->enable(true);
   if (processor->control_map_.count("on")) {
@@ -577,6 +582,12 @@ void BlocksVoiceHandler::createVoiceOutput() {
   amplitude_ = new Square();
   amplitude_->plug(val);
   addProcessor(amplitude_);
+
+  for (int i = 0; i < Constants::columns; i++) {
+    auto shared = std::make_shared<ColumnMasterModule>();
+    column_nodes_.push_back(shared);
+    addProcessor(column_nodes_[i].get());
+  }
 }
 
 int please = 0;

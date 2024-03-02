@@ -1,6 +1,11 @@
 #include "model/module_manager.h"
 
 namespace model {
+ModuleManager::ModuleManager() {
+  for (int i = 0; i < Constants::columns; i++)
+    column_controls_.push_back(std::make_shared<ColumnControl>(i + 1));
+}
+
 ModuleManager::~ModuleManager() {
   clear();
 }

@@ -891,14 +891,27 @@ void MainComponent::resetDownFlowingDots() {
     block_grid_.setDownFlowingHighlight(column, true);
   }
 }
+
 void MainComponent::columnControlAdjusted(ColumnControlsContainer::ControlType control, int column, float value) {
-  std::cout << "column control adjusted" << column << " " << value << std::endl;
+  if (control == ColumnControlsContainer::ControlType::level) {
+    delegate->editorAdjustedColumn("level", column, value);
+  } else if (control == ColumnControlsContainer::ControlType::pan) {
+    delegate->editorAdjustedColumn("pan", column, value);
+  }
 }
 
 void MainComponent::columnControlStartedAdjusting(ColumnControlsContainer::ControlType control, int column) {
-  
+  if (control == ColumnControlsContainer::ControlType::level) {
+    delegate->editorStartedAdjustingColumn("level", column);
+  } else if (control == ColumnControlsContainer::ControlType::pan) {
+    delegate->editorStartedAdjustingColumn("pan", column);
+  }
 }
 
 void MainComponent::columnControlEndedAdjusting(ColumnControlsContainer::ControlType control, int column) {
-
+  if (control == ColumnControlsContainer::ControlType::level) {
+    delegate->editorEndedAdjustingColumn("level", column);
+  } else if (control == ColumnControlsContainer::ControlType::pan) {
+    delegate->editorEndedAdjustingColumn("pan", column);
+  }
 }

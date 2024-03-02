@@ -7,7 +7,8 @@
 ColumnControlsContainer::ColumnControlsContainer() {
   for (int i = 0; i < Constants::columns; i++) {
     auto slider = createSlider("level", i);
-    slider->default_value_ = 0.5f;
+    slider->default_value_ = 1.0f;
+    slider->slider.setValue(1.0f);
     slider->slider.setRange(0.0f, 1.0f);
     level_sliders_.push_back(std::move(slider));
   }
@@ -17,6 +18,7 @@ ColumnControlsContainer::ColumnControlsContainer() {
     slider->slider.getProperties().set("isCenter", true);
     slider->slider.setRange(-1.0f, 1.0f);
     slider->default_value_ = 0.0f;
+    slider->slider.setValue(0.0f);
     pan_sliders_.push_back(std::move(slider));
   }
 

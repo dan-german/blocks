@@ -33,6 +33,7 @@
 #include "vital/synthesis/modules/oscillator_module.h"
 #include "model/module_manager.h"
 #include "model/id.h"
+#include "vital/synthesis/modules/column_master_module.h"
 
 namespace vital {
 class AudioRateEnvelope;
@@ -133,12 +134,13 @@ private:
   Processor* amplitude_;
   Processor* pitch_wheel_;
   Processor* voice_sum_;
-  VariableAdd* last_node_;
+  VariableAdd* master_node_;
 
   std::vector<std::vector<std::shared_ptr<SynthModule>>> processor_matrix_;
   std::vector<std::shared_ptr<OscillatorModule>> oscillators_;
   std::vector<std::shared_ptr<OscillatorModule>> oscillators_with_default_envs_;
 public:
+  std::vector<std::shared_ptr<ColumnMasterModule>> column_nodes_;
   void setDefaultAmpEnv(std::string target_name, bool enable);
   std::map<std::shared_ptr<SynthModule>, std::shared_ptr<ModulationConnectionProcessor>> osc_to_default_env_mod_processor_map_;
 
