@@ -118,8 +118,8 @@ void SynthBase::valueChangedExternal(const std::string& name, vital::mono_float 
   else if (name == "pitch_wheel")
     engine_->setZonedPitchWheel(value, 0, vital::kNumMidiChannels - 1);
 
-  // ValueChangedCallback* callback = new ValueChangedCallback(self_reference_, name, value);
-  // callback->post();
+  ValueChangedCallback* callback = new ValueChangedCallback(self_reference_, name, value);
+  callback->post();
 }
 
 vital::ModulationConnection* SynthBase::getConnection(const std::string& source, const std::string& destination, const std::string& parameter) {
@@ -807,15 +807,11 @@ void SynthBase::ValueChangedCallback::messageCallback() {
     SynthGuiInterface* gui_interface = (*synth_base)->getGuiInterface();
     if (gui_interface) {
       gui_interface->updateGuiControl(control_name, value);
-      if (control_name != "pitch_wheel")
-        gui_interface->notifyChange();
+      // if (control_name != "pitch_wheel")
+      //   gui_interface->notifyChange();
     }
   }
 }
-
-// if (is_env_to_osc_level) {
-//   disconnectModulation("default_env", target_name, "amp_env_destination");
-// }
 
 void SynthBase::connectModulationFromModel(std::shared_ptr<model::Connection> connection_model) {
   auto parameter = connection_model->target->parameter_map_[connection_model->parameter_name_];

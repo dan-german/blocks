@@ -494,16 +494,13 @@ void MainComponent::graphicsTimerCallback(const float secondsSincelastUpdate) {
   if (ui_layer_.connections.isVisible()) {
     auto modulationConnections = delegate->getModulations();
 
-    // modulation_source_
     for (int i = 0; i < modulationConnections.size(); i++) {
       if (auto mc = dynamic_cast<ConnectionComponent*>(ui_layer_.connections.listBox.getComponentForRowNumber(i))) {
-        // auto value = delegate->editorRequestsModulatorValue(i);
         auto source = delegate->editorRequestsStatusOutput("modulation_amount_" + std::to_string(i + 1));
-        // std::cout << source->value()[0] << std::endl;
-        // a
-        // mc->indicator.setMagnitude(value.second, false);
+        // auto amount = delegate->editorRequestsStatusOutput("modulation_amount_" + std::to_string(i + 1));
+        // auto source = delegate->editorRequestsStatusOutput("modulation_amount_" + std::to_string(i + 1));
         mc->indicator.setCurrentValue(source->value()[0]);
-        mc->indicator.repaint();
+        // mc->indicator.repaint();
       }
     }
   }
@@ -918,4 +915,10 @@ void MainComponent::columnControlEndedAdjusting(ColumnControlsContainer::Control
 
 void MainComponent::modulatorGestureChanged(ModulatorComponent* modulatorComponent, std::string parameter_name, bool started) { 
   std::cout << "modulator gesture changed: " << parameter_name << std::endl;
+  // auto 
+  // delegate->editorParameterGestureChanged(parameter_name, started);k
+  // delegate->
+  // rGestureChanged(delegate->getModulator(modulatorComponent->row)->name, index, true);
+  auto modulator = delegate->getModulator2(modulatorComponent->row);  
+  delegate->editorParameterGestureChanged(modulator->name, parameter_name, started);
 }

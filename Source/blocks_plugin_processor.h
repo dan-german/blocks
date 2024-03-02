@@ -112,6 +112,7 @@ public:
   std::shared_ptr<model::Block> editorAddedBlock2(Model::Type code, Index index) override;
   std::shared_ptr<model::Module> editorAddedModulator2(Model::Type code) override;
   std::shared_ptr<Module> getModulator(int index) override;
+  std::shared_ptr<model::Module> getModulator2(int index) override;
   std::shared_ptr<Module> editorAddedModulator(Model::Type code) override;
   Preset editorChangedPreset(int index) override;
   void clear();

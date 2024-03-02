@@ -183,7 +183,7 @@ struct MainComponent::Delegate {
   virtual void editorChangedModulationMagnitude(int modulationConnectionIndex, float magnitude) = 0;
   virtual void editorChangedModulationPolarity(int index, bool bipolar) = 0;
   virtual void editorDisconnectedModulation(int index) = 0;
-  virtual void editorParameterGestureChanged(std::string module_name, std::string parameter_index, bool started) = 0;
+  virtual void editorParameterGestureChanged(std::string module_name, std::string paramter_name, bool started) = 0;
   virtual void editorRemovedModulator(int index) = 0;
   virtual void editorChangedBlockLength(Index index, int times) = 0;
   virtual void editorSavedPreset(String name) = 0;
@@ -197,6 +197,7 @@ struct MainComponent::Delegate {
   virtual std::pair<float, float> editorRequestsModulatorValue(int modulationConnectionIndex) = 0;
   virtual std::shared_ptr<Tab> getTab(int column) = 0;
   virtual std::shared_ptr<Module> getModulator(int index) = 0;
+  virtual std::shared_ptr<model::Module> getModulator2(int index) = 0;
   virtual std::shared_ptr<Module> editorAddedModulator(Model::Type code) = 0;
   virtual std::shared_ptr<model::Module> editorAddedModulator2(Model::Type code) = 0;
   virtual std::shared_ptr<Block> getBlock(Index index) = 0;

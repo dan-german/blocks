@@ -31,7 +31,7 @@ public:
   inline bool isEnvelope() { return id.type == "envelope"; }
   inline bool isOscillator() { return id.type == "osc"; }
 
-  Module(std::string prefix, int number): name(prefix + "_" + std::to_string(number)) {
+  Module(std::string prefix, int number): name(prefix + " " + std::to_string(number)) {
     id = { prefix, number };
     display_name = prefix + " " + std::to_string(number);
   }

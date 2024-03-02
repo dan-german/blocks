@@ -37,7 +37,7 @@ PluginProcessor::PluginProcessor(): juce::AudioProcessor(BusesProperties().withO
       ValueBridge* bridge = new ValueBridge(*(parameter.get()));
       // bridge->
       bridge->setListener(this);
-      auto key = module->id.type + "_" + std::to_string(module->id.number) + "_" + parameter->name;
+      auto key = module->name + " " + parameter->name;
       bridge_lookup_[key] = bridge;
       // parameter->bridge = bridge;
       addParameter(bridge);
@@ -78,6 +78,7 @@ PluginProcessor::~PluginProcessor() {
 }
 
 SynthGuiInterface* PluginProcessor::getGuiInterface() {
+
   // AudioProcessorEditor* editor = getActiveEditor();
   // if (editor)
   //   return dynamic_cast<SynthGuiInterface*>(editor);
@@ -338,6 +339,10 @@ void PluginProcessor::editorAdjustedTab(int column, int parameter, float value) 
 #pragma warning(default:4716)
 std::shared_ptr<Module> PluginProcessor::getModulator(int index) {
   // return moduleManager.getModulator(index);
+}
+
+std::shared_ptr<model::Module> PluginProcessor::getModulator2(int index) {
+  return getModuleManager().getModulator(index);
 }
 
 juce::Array<std::shared_ptr<Modulation>> PluginProcessor::getConnectionsOfSource(std::shared_ptr<Module> source) {
@@ -635,6 +640,7 @@ std::pair<float, float> PluginProcessor::editorRequestsModulatorValue(Index modu
 
 #pragma warning(default:4716)
 std::pair<float, float> PluginProcessor::editorRequestsModulatorValue(int modulationConnectionIndex) {
+  auto connection = getModuleManager().getConnection(modulationConnectionIndex);
   // auto connection = moduleManager.getConnection(modulationConnectionIndex);
   // auto currentVoice = blockVoices[getCurrentVoiceIndex()];
 
@@ -681,16 +687,12 @@ const vital::StatusOutput* PluginProcessor::editorRequestsStatusOutput(std::stri
 
 // MainComponent::Delegate end 
 void PluginProcessor::editorParameterGestureChanged(std::string module_name, std::string parameter_name, bool started) {
-  std::cout << module_name << " is changing " << parameter_name << std::endl;
-  // auto module = 
-
   if (JUCE_STANDALONE_APPLICATION) return;
-
+  auto key = module_name + " " + parameter_name;
   if (started) {
-    // synth_->BeginParameterChangeGesture(moduleName, parameterIndex);
-  // moduleManager.getModule(moduleName)->parameter(parameterIndex)->audioParameter->beginChangeGesture();
+    bridge_lookup_[key]->beginChangeGesture();
   } else {
-    // moduleManager.getModule(moduleName)->parameter(parameterIndex)->audioParameter->endChangeGesture();
+    bridge_lookup_[key]->endChangeGesture();
   }
 }
 
