@@ -29,7 +29,7 @@ public:
   std::vector<std::shared_ptr<model::ColumnControl>> column_controls_;
   // ModuleContainer<Tab> tabs;
 
-  std::vector<std::shared_ptr<model::Module>> allModules;
+  std::vector<std::shared_ptr<model::Module>> all_modules_;
   std::vector<std::shared_ptr<model::Module>> parameterToModuleMap;
   std::vector<std::shared_ptr<model::Connection>> connections;
 

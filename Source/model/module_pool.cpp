@@ -51,9 +51,9 @@ ModulePool::ModulePool() {
   for (int i = 1; i <= 40; i++) connections.push_back(std::make_shared<Connection>(i));
   for (int i = 1; i <= Constants::columns; i++) column_controls_.push_back(std::make_shared<ColumnControl>(i));
 
-  allModules.insert(allModules.end(), blocks.all.begin(), blocks.all.end());
-  allModules.insert(allModules.end(), modulators.all.begin(), modulators.all.end());
-  allModules.insert(allModules.end(), column_controls_.begin(), column_controls_.end());
+  all_modules_.insert(all_modules_.end(), blocks.all.begin(), blocks.all.end());
+  all_modules_.insert(all_modules_.end(), modulators.all.begin(), modulators.all.end());
+  all_modules_.insert(all_modules_.end(), column_controls_.begin(), column_controls_.end());
 }
 
 void ModulePool::retire(std::shared_ptr<model::Connection> modulationConnection) {

@@ -32,10 +32,22 @@ PluginProcessor::PluginProcessor(): juce::AudioProcessor(BusesProperties().withO
     }
   }
 
+  for (auto module : getModuleManager().pool.all_modules_) { 
+    for (auto parameter : module->parameters_) {
+      auto pointer = parameter.get();
+      // auto toRef = *pointer;
+      ValueBridge* bridge = new ValueBridge(*pointer);
+      bridge->setListener(this);
+      bridge_lookup_[parameter->name] = bridge;
+      addParameter(bridge);
+    }
+  }
+
   // for (auto module : synth.moduleManager.pool.allModules) {
   //   for (auto parameter : module->parameters) {
-  //     addParameter(parameter->audioParameter);
-  //     parameter->audioParameter->addListener(this);
+      // parameter>val
+      // addParameter(parameter->audioParameter);
+      // parameter->audioParameter->addListener(this);
   //   }
   // }
 
@@ -43,17 +55,18 @@ PluginProcessor::PluginProcessor(): juce::AudioProcessor(BusesProperties().withO
 
   last_seconds_time_ = 0.0;
 
-  int num_params = vital::Parameters::getNumParameters();
-  for (int i = 0; i < num_params; ++i) {
-    const vital::ValueDetails* details = vital::Parameters::getDetails(i);
-    if (controls_.count(details->name) == 0)
-      continue;
 
-    ValueBridge* bridge = new ValueBridge(details->name, controls_[details->name]);
-    bridge->setListener(this);
-    bridge_lookup_[details->name] = bridge;
+  // int num_params = vital::Parameters::getNumParameters();
+  // for (int i = 0; i < num_params; ++i) {
+  //   const vital::ValueDetails* details = vital::Parameters::getDetails(i);
+  //   if (controls_.count(details->name) == 0)
+  //     continue;
+
+  //   ValueBridge* bridge = new ValueBridge(details);
+  //   bridge->setListener(this);
+  //   bridge_lookup_[details->name] = bridge;
     // addParameter(bridge);
-  }
+  // }
 
   bypass_parameter_ = bridge_lookup_["bypass"];
 }
@@ -161,10 +174,10 @@ void PluginProcessor::processBlock(AudioSampleBuffer& buffer, MidiBuffer& midi_m
 
   static constexpr double kSecondsPerMinute = 60.0f;
 
-  if (bypass_parameter_->getValue()) {
-    processBlockBypassed(buffer, midi_messages);
-    return;
-  }
+  // if (bypass_parameter_->getValue()) {
+  //   processBlockBypassed(buffer, midi_messages);
+  //   return;
+  // }
 
   int total_samples = buffer.getNumSamples();
   int num_channels = getTotalNumOutputChannels();
@@ -686,7 +699,7 @@ std::vector<std::shared_ptr<model::Module>> PluginProcessor::getModulators2() {
 }
 
 void PluginProcessor::editorStartedAdjustingColumn(std::string control, int column) {
-  
+
 }
 
 void PluginProcessor::editorEndedAdjustingColumn(std::string control, int column) {

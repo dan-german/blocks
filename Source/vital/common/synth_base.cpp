@@ -69,7 +69,8 @@ SynthBase::SynthBase(): expired_(false) {
 SynthBase::~SynthBase() { }
 
 void SynthBase::valueChanged(const std::string& name, vital::mono_float value) {
-  controls_[name]->set(value);
+  // controls_[name]->set(value);
+  // getM
 }
 
 void SynthBase::valueChangedInternal(const std::string& name, vital::mono_float value) {
@@ -214,18 +215,18 @@ void SynthBase::connectModulation(vital::ModulationConnection* connection) {
 //   return create;
 // }
 
-void SynthBase::initModulationValues(const std::string& source, const std::string& destination) {
-  int connection_index = getConnectionIndex(source, destination);
-  if (connection_index < 0)
-    return;
+// void SynthBase::initModulationValues(const std::string& source, const std::string& destination) {
+//   int connection_index = getConnectionIndex(source, destination);
+//   if (connection_index < 0)
+//     return;
 
-  vital::ModulationConnection* connection = getModulationBank().atIndex(connection_index);
-  LineGenerator* map_generator = connection->modulation_processor->lineMapGenerator();
-  map_generator->initLinear();
+//   vital::ModulationConnection* connection = getModulationBank().atIndex(connection_index);
+//   LineGenerator* map_generator = connection->modulation_processor->lineMapGenerator();
+//   map_generator->initLinear();
 
-  std::string power_name = "modulation_" + std::to_string(connection_index + 1) + "_power";
-  valueChanged(power_name, 0.0f);
-}
+//   std::string power_name = "modulation_" + std::to_string(connection_index + 1) + "_power";
+//   valueChanged(power_name, 0.0f);
+// }
 
 void SynthBase::disconnectModulation(vital::ModulationConnection* connection) {
   if (mod_connections_.count(connection) == 0)
