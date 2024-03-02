@@ -60,15 +60,15 @@ void MainComponent::modulatorEndedAdjusting(ModulatorComponent* modulatorCompone
   // delegate->editorParameterGestureChanged(delegate->getModulator(modulatorComponent->row)->name, index, false);
 }
 
-void MainComponent::modulatorIsAdjusting(ModulatorComponent* component, int parameter, float value) {
-  delegate->editorAdjustedModulator(parameter, component->row, value);
+void MainComponent::modulatorIsAdjusting(ModulatorComponent* component, std::string parameter_name, float value) {
+  delegate->editorAdjustedModulator(parameter_name, component->row, value);
 }
 
 void MainComponent::paint(juce::Graphics& g) {
   g.fillAll(ThemeManager::shared()->getCurrent().background);
 }
 
-void MainComponent::inspectorGestureChanged(int index, bool started) {
+void MainComponent::inspectorGestureChanged(std::string parameter_name, bool started) {
   std::shared_ptr<model::Module> focusedModule = delegate->getBlock2(focused_grid_item_->index);
 
   // auto isTab = tabGrid.containsItem(focusedGridItem);
@@ -78,7 +78,7 @@ void MainComponent::inspectorGestureChanged(int index, bool started) {
   //   focusedModule = delegate->getBlock(focusedGridItem->index);
   // }
 
-  delegate->editorParameterGestureChanged(focusedModule->name, index, started);
+  delegate->editorParameterGestureChanged(focusedModule->name, parameter_name, started);
 }
 
 void MainComponent::changeModulePainter(int value) {
@@ -914,4 +914,8 @@ void MainComponent::columnControlEndedAdjusting(ColumnControlsContainer::Control
   } else if (control == ColumnControlsContainer::ControlType::pan) {
     delegate->editorEndedAdjustingColumn("pan", column);
   }
+}
+
+void MainComponent::modulatorGestureChanged(ModulatorComponent* modulatorComponent, std::string parameter_name, bool started) { 
+  std::cout << "modulator gesture changed: " << parameter_name << std::endl;
 }

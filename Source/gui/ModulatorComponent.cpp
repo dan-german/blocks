@@ -11,8 +11,7 @@
 #include "gui/ModulatorComponent.h"
 
 void ModulatorComponent::sliderDragEnded(Slider* slider) {
-  delegate_->modulatorEndedAdjusting(this, currentSliderIndex);
-  ThemeManager::shared()->addListener(this);
+  delegate_->modulatorGestureChanged(this, slider_parameter_name_map_[slider], false);
 }
 
 ModulatorComponent::~ModulatorComponent() {
@@ -36,6 +35,8 @@ ModulatorComponent::ModulatorComponent() {
   setupRemoveButton();
   setupSliders();
   setupTitle();
+
+  ThemeManager::shared()->addListener(this);
 }
 
 void ModulatorComponent::setupRemoveButton() {
@@ -176,6 +177,7 @@ void ModulatorComponent::mouseDown(const MouseEvent& event) {
   if (event.eventComponent->getName() == ModulatorComponent::dragComponentIdentifier) {
     modulatorDragComponent.setMouseCursor(MouseCursor::NoCursor);
     delegate_->modulatorStartedDrag(this, event);
+    // deleg
   }
 }
 
@@ -214,19 +216,14 @@ void ModulatorComponent::setColour(Colour colour) {
 }
 
 void ModulatorComponent::sliderDragStarted(Slider* slider) {
-  for (int i = 0; i < sliders.size(); i++)
-    if (&sliders[i]->box_slider_.slider == slider) {
-      currentSliderIndex = i;
-      break;
-    }
-
-  delegate_->modulatorStartedAdjusting(this, currentSliderIndex);
+  delegate_->modulatorGestureChanged(this, slider_parameter_name_map_[slider], true);
 }
 
 void ModulatorComponent::sliderValueChanged(Slider* slider) {
   float value = static_cast<float>(slider->getValue());
-  if (onSliderValueChange) onSliderValueChange(currentSliderIndex, value);
-  delegate_->modulatorIsAdjusting(this, currentSliderIndex, value);
+  // if (onSliderValueChange) onSliderValueChange(currentSliderIndex, value);
+  auto name = slider_parameter_name_map_[slider];
+  delegate_->modulatorIsAdjusting(this, name, value);
 }
 
 void ModulatorComponent::themeChanged(Theme theme) {

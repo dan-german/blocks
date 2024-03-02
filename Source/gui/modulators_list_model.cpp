@@ -40,8 +40,6 @@ Component* ModulatorsListModel::refreshComponentForRow(int rowNumber, bool isRow
 
 void ModulatorsListModel::setupModulatorComponent(std::shared_ptr<model::Module> model, ModulatorComponent& component) const {
   component.title.setText(model->display_name, dontSendNotification);
-
-
   component.delegate_ = modulator_listener;
   component.setColour(model->colour.colour);
 
@@ -74,6 +72,7 @@ void ModulatorsListModel::setupModulatorComponent(std::shared_ptr<model::Module>
     auto parameter = model->parameters_[i];
     if (parameter->hidden) continue;
     auto slider = component.sliders[i];
+    component.slider_parameter_name_map_[&slider->box_slider_.slider] = parameter->name;
 
     auto value = parameter->val->value();
     slider->label.setText(parameter->display_name, dontSendNotification);

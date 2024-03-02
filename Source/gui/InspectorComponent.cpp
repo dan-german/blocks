@@ -18,8 +18,8 @@ InspectorComponent::InspectorComponent() {}
 InspectorComponent::~InspectorComponent() { }
 void InspectorComponent::resized() { updateSize(); }
 int InspectorComponent::calculateWidth() { return sliderWidth * (parameterSliders.size()); }
-void InspectorComponent::sliderDragStarted(Slider* slider) { delegate->inspectorGestureChanged(getIndexOfSlider(slider), true); }
-void InspectorComponent::sliderDragEnded(Slider* slider) { delegate->inspectorGestureChanged(getIndexOfSlider(slider), false); }
+void InspectorComponent::sliderDragStarted(Slider* slider) { delegate->inspectorGestureChanged(slider_to_parameter_name_map_[slider], true); }
+void InspectorComponent::sliderDragEnded(Slider* slider) { delegate->inspectorGestureChanged(slider_to_parameter_name_map_[slider], false); }
 
 void InspectorComponent::setConfiguration(std::shared_ptr<model::Module> module) {
   resetInspector();
@@ -56,6 +56,7 @@ void InspectorComponent::spawnSlider(vital::ValueDetails parameter, std::shared_
 
   slider->titleLabel.setText(parameter.display_name, dontSendNotification);
   parameterSliders.add(slider);
+  slider_to_parameter_name_map_[&slider->slider] = parameter.name;
   addAndMakeVisible(slider);
   slider->slider.setValue(parameter.val->value(), dontSendNotification);
 }

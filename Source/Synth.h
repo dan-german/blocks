@@ -94,13 +94,13 @@ public:
   void editorAdjustedBlock(Index index, int parameter, float value) override;
   void editorAdjustedTab(int column, int parameter, float value) override;
   void editorChangedModulationMagnitude(int connectionIndex, float magnitude) override;
-  void editorParameterGestureChanged(String moduleName, int parameterIndex, bool started) override;
+  void editorParameterGestureChanged(std::string module_name, std::string parameter_name, bool started) override;
   void editorChangedModulationPolarity(int index, bool bipolar) override;
   void editorDisconnectedModulation(int index) override;
   void editorSavedPreset(String name) override;
   void editorConnectedModulation(int modulatorIndex, std::string targetName, std::string parameter) override;
   void editorChangedBlockLength(Index index, int length) override;
-  void editorAdjustedModulator(int parameter, int modulator, float value) override;
+  void editorAdjustedModulator(std::string parameter_name, int modulator, float value) override;
   void editorRemovedModulator(int index) override;
 
   std::shared_ptr<Block> getBlock(Index index) override;

@@ -32,13 +32,14 @@ PluginProcessor::PluginProcessor(): juce::AudioProcessor(BusesProperties().withO
     }
   }
 
-  for (auto module : getModuleManager().pool.all_modules_) { 
+  for (auto module : getModuleManager().pool.all_modules_) {
     for (auto parameter : module->parameters_) {
-      auto pointer = parameter.get();
-      // auto toRef = *pointer;
-      ValueBridge* bridge = new ValueBridge(*pointer);
+      ValueBridge* bridge = new ValueBridge(*(parameter.get()));
+      // bridge->
       bridge->setListener(this);
-      bridge_lookup_[parameter->name] = bridge;
+      auto key = module->id.type + "_" + std::to_string(module->id.number) + "_" + parameter->name;
+      bridge_lookup_[key] = bridge;
+      // parameter->bridge = bridge;
       addParameter(bridge);
     }
   }
@@ -84,20 +85,18 @@ SynthGuiInterface* PluginProcessor::getGuiInterface() {
 }
 
 void PluginProcessor::beginChangeGesture(const std::string& name) {
-  if (bridge_lookup_.count(name))
-    bridge_lookup_[name]->beginChangeGesture();
+  if (bridge_lookup_.count(name)) bridge_lookup_[name]->beginChangeGesture();
 }
 
 void PluginProcessor::endChangeGesture(const std::string& name) {
-  if (bridge_lookup_.count(name))
-    bridge_lookup_[name]->endChangeGesture();
+  if (bridge_lookup_.count(name)) bridge_lookup_[name]->endChangeGesture();
 }
 
 void PluginProcessor::setValueNotifyHost(const std::string& name, vital::mono_float value) {
-  if (bridge_lookup_.count(name)) {
-    vital::mono_float plugin_value = bridge_lookup_[name]->convertToPluginValue(value);
-    bridge_lookup_[name]->setValueNotifyHost(plugin_value);
-  }
+  // if (bridge_lookup_.count(name)) {
+  //   vital::mono_float plugin_value = bridge_lookup_[name]->convertToPluginValue(value);
+  //   bridge_lookup_[name]->setValueNotifyHost(plugin_value);
+  // }
 }
 
 const juce::CriticalSection& PluginProcessor::getCriticalSection() {
@@ -284,11 +283,11 @@ juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter() {
 }
 
 // MainComponent::Delegate
-void PluginProcessor::editorAdjustedModulator(int parameter, int index, float value) {
+void PluginProcessor::editorAdjustedModulator(std::string parameter_name, int index, float value) {
   auto modulator = synth_->getModuleManager().getModulator(index);
 
   if (modulator->id.type == "lfo") {
-    if (parameter == 1) {
+    if (parameter_name == "tempo") {
       bool is_changing_seconds = modulator->parameter_map_["sync"]->val->value() == 0.0f;
       if (is_changing_seconds) {
         modulator->parameter_map_["frequency"]->val->set(value);
@@ -298,7 +297,7 @@ void PluginProcessor::editorAdjustedModulator(int parameter, int index, float va
     }
   }
 
-  modulator->parameters_[parameter]->val->set(value);
+  modulator->parameter_map_[parameter_name]->val->set(value);
 }
 
 void PluginProcessor::editorAdjustedBlock(Index index, int parameter, float value) {
@@ -681,8 +680,9 @@ const vital::StatusOutput* PluginProcessor::editorRequestsStatusOutput(std::stri
 }
 
 // MainComponent::Delegate end 
-void PluginProcessor::editorParameterGestureChanged(String moduleName, int parameterIndex, bool started) {
-  std::cout << moduleName.toStdString() << " is changing " << std::endl;
+void PluginProcessor::editorParameterGestureChanged(std::string module_name, std::string parameter_name, bool started) {
+  std::cout << module_name << " is changing " << parameter_name << std::endl;
+  // auto module = 
 
   if (JUCE_STANDALONE_APPLICATION) return;
 
@@ -708,4 +708,13 @@ void PluginProcessor::editorEndedAdjustingColumn(std::string control, int column
 
 void PluginProcessor::editorAdjustedColumn(std::string control, int column, float value) {
   getModuleManager().getColumnControl(column)->parameter_map_[control]->val->set(value);
+}
+
+void PluginProcessor::setValue(std::string module_id, std::string parameter_name, float value) {
+  auto m = synth_->getModuleManager().getModule(module_id);
+  auto p = m->parameter_map_[parameter_name];
+  p->val->set(value);
+  // p->paramter_map_[parameter_name]->val->set(value);
+  // parameter->b
+  // parameter->bridge->set
 }

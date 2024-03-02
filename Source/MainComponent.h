@@ -114,7 +114,7 @@ private:
 
   // InspectorComponent::Listener
   void inspectorChangedParameter(int sliderIndex, float value) override;
-  void inspectorGestureChanged(int index, bool started) override;
+  void inspectorGestureChanged(std::string parameter_name, bool started) override;
 
   void DismissPopup(ButtonGridPopup& popup);
   void spawnBlockComponent(std::shared_ptr<model::Block> block);
@@ -138,7 +138,8 @@ private:
   void modulatorStartedDrag(ModulatorComponent* component, const MouseEvent& event) override;
   void modulatorStartedAdjusting(ModulatorComponent* modulatorComponent, int index) override;
   void modulatorEndedAdjusting(ModulatorComponent* modulatorComponent, int index) override;
-  void modulatorIsAdjusting(ModulatorComponent* component, int parameter, float value) override;
+  void modulatorIsAdjusting(ModulatorComponent* component, std::string parameter_name, float value) override;
+  void modulatorGestureChanged(ModulatorComponent* modulatorComponent, std::string parameter_name, bool started) override;
 
   void presentModulationOptionsMenu(int modulatorIndex, Index& indexUnderMouse, BlockComponent* block);
   void updateDotPosition(const Point<int> position);
@@ -172,7 +173,7 @@ struct MainComponent::Delegate {
   virtual void editorRemovedBlock(Index index) = 0;
   virtual void editorAdjustedBlock(Index moduleIndex, int parameterIndex, float value) = 0;
   virtual void editorAdjustedTab(int column, int parameterIndex, float value) = 0;
-  virtual void editorAdjustedModulator(int modulatorIndex, int parameterIndex, float value) = 0;
+  virtual void editorAdjustedModulator(std::string parameter_name, int index, float value) = 0;
   virtual void editorConnectedModulation(int modulator_index, std::string target_name, std::string parameter) = 0;
 
   virtual void editorStartedAdjustingColumn(std::string control, int column) = 0;
@@ -182,7 +183,7 @@ struct MainComponent::Delegate {
   virtual void editorChangedModulationMagnitude(int modulationConnectionIndex, float magnitude) = 0;
   virtual void editorChangedModulationPolarity(int index, bool bipolar) = 0;
   virtual void editorDisconnectedModulation(int index) = 0;
-  virtual void editorParameterGestureChanged(String moduleName, int parameterIndex, bool started) = 0;
+  virtual void editorParameterGestureChanged(std::string module_name, std::string parameter_index, bool started) = 0;
   virtual void editorRemovedModulator(int index) = 0;
   virtual void editorChangedBlockLength(Index index, int times) = 0;
   virtual void editorSavedPreset(String name) = 0;

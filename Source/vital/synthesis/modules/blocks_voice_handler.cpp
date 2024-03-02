@@ -277,9 +277,9 @@ void BlocksVoiceHandler::setDefaultAmpEnv(std::string target_name, bool enable) 
 void BlocksVoiceHandler::disconnectAllDefaultEnvs() {
   for (auto osc : oscillators_with_default_envs_) {
     auto processor = osc_to_default_env_mod_processor_map_[osc];
-    auto destination = osc->getPolyModulationDestination("amp_env_destination");
+    auto destination = osc->getPolyModulationDestination("amp env destination");
     destination->unplug(processor.get());
-    osc->getPolyModulationSwitch("amp_env_destination")->set(0.0f);
+    osc->getPolyModulationSwitch("amp env destination")->set(0.0f);
     processor->enable(false);
     setInactiveNonaccumulatedOutput(destination->output());
     disableModulationConnection(processor.get());
@@ -289,7 +289,7 @@ void BlocksVoiceHandler::disconnectAllDefaultEnvs() {
 void BlocksVoiceHandler::connectAllDefaultEnvs() {
   for (auto osc : oscillators_with_default_envs_) {
     auto processor = osc_to_default_env_mod_processor_map_[osc];
-    auto destination = osc->getPolyModulationDestination("amp_env_destination");
+    auto destination = osc->getPolyModulationDestination("amp env destination");
     processor->setDestinationScale(1.0f);
     processor->setPolyphonicModulation(true);
     processor->enable(true);
@@ -297,7 +297,7 @@ void BlocksVoiceHandler::connectAllDefaultEnvs() {
     destination->plugNext(processor.get());
     processor->process(1);
     destination->process(1);
-    osc->getPolyModulationSwitch("amp_env_destination")->set(1.0f);
+    osc->getPolyModulationSwitch("amp env destination")->set(1.0f);
     setActiveNonaccumulatedOutput(destination->output());
     enableModulationConnection(processor.get());
   }

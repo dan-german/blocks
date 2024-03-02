@@ -37,6 +37,7 @@ public:
   OwnedArray<InspectorSlider>& getSliders();
 private:
   OwnedArray<InspectorSlider> parameterSliders;
+  std::map<Slider*, std::string> slider_to_parameter_name_map_;
 
   void setSliderAsTempo(std::shared_ptr<model::Module> module, InspectorSlider* slider) const;
   void setSliderAsFrequency(std::shared_ptr<model::Module> module, InspectorSlider* slider) const;
@@ -54,6 +55,6 @@ private:
 
 struct InspectorComponent::Listener {
   virtual void inspectorChangedParameter(int index, float value) = 0;
-  virtual void inspectorGestureChanged(int index, bool started) = 0;
+  virtual void inspectorGestureChanged(std::string parameter_name, bool started) = 0;
   virtual ~Listener() = default;
 };

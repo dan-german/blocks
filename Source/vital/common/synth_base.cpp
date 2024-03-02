@@ -74,14 +74,14 @@ void SynthBase::valueChanged(const std::string& name, vital::mono_float value) {
 }
 
 void SynthBase::valueChangedInternal(const std::string& name, vital::mono_float value) {
-  valueChanged(name, value);
-  setValueNotifyHost(name, value);
+  // valueChanged(name, value);
+  // setValueNotifyHost(name, value);
 }
 
 void SynthBase::valueChangedThroughMidi(const std::string& name, vital::mono_float value) {
   controls_[name]->set(value);
   ValueChangedCallback* callback = new ValueChangedCallback(self_reference_, name, value);
-  setValueNotifyHost(name, value);
+  // setValueNotifyHost(name, value);
   // callback->post();
 }
 

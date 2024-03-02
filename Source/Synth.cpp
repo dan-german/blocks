@@ -1,7 +1,8 @@
 #include "Synth.h"
 #include "util/Analytics.h"
 
-void Synth::editorAdjustedModulator(int parameter, int modulator, float value) { moduleManager.getModulator(modulator)->parameter(parameter)->setValue(value); }
+void Synth::editorAdjustedModulator(std::string parameter_name, int modulator, float value) { /* moduleManager.getModulator(modulator)->parameter(parameter)->setValue(value);*/ }
+
 void Synth::editorAdjustedBlock(Index index, int parameter, float value) { moduleManager.getBlock(index)->parameter(parameter)->setValue(value); }
 void Synth::editorChangedModulationMagnitude(int index, float magnitude) { moduleManager.getConnection(index)->setMagnitude(magnitude); }
 void Synth::editorChangedModulationPolarity(int index, bool bipolar) { moduleManager.getConnection(index)->setPolarity(bipolar); }
@@ -367,13 +368,13 @@ void Synth::clear() {
   }
 }
 
-void Synth::editorParameterGestureChanged(String moduleName, int parameterIndex, bool started) {
+void Synth::editorParameterGestureChanged(std::string module_name, std::string parameter_name, bool started) {
   if (JUCE_STANDALONE_APPLICATION) return;
 
   if (started) {
-    moduleManager.getModule(moduleName)->parameter(parameterIndex)->audioParameter->beginChangeGesture();
+    // moduleManager.getModule(module_name)->parameter(parameterIndex)->audioParameter->beginChangeGesture();
   } else {
-    moduleManager.getModule(moduleName)->parameter(parameterIndex)->audioParameter->endChangeGesture();
+    // moduleManager.getModule(moduleName)->parameter(parameterIndex)->audioParameter->endChangeGesture();
   }
 }
 

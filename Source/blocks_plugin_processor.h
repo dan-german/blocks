@@ -89,13 +89,13 @@ public:
   void editorAdjustedBlock(Index index, int parameter, float value) override;
   void editorAdjustedTab(int column, int parameter, float value) override;
   void editorChangedModulationMagnitude(int connectionIndex, float magnitude) override;
-  void editorParameterGestureChanged(String moduleName, int parameterIndex, bool started) override;
+  void editorParameterGestureChanged(std::string module_name, std::string paramter_name, bool started) override;
   void editorChangedModulationPolarity(int index, bool bipolar) override;
   void editorDisconnectedModulation(int index) override;
   void editorSavedPreset(String name) override;
   void editorConnectedModulation(int modulatorIndex, std::string target_name, std::string parameter) override;
   void editorChangedBlockLength(Index index, int length) override;
-  void editorAdjustedModulator(int parameter, int modulator, float value) override;
+  void editorAdjustedModulator(std::string parameter_name, int modulator, float value) override;
   void editorRemovedModulator(int index) override;
   void removeModulator(int index);
 
@@ -138,6 +138,7 @@ private:
   MainComponent* mainComponent;
   PresetManager preset_manager_;
   void loadPreset(Preset preset);
+  void setValue(std::string module_id, std::string parameter, float value);
 
   juce::AudioPlayHead::CurrentPositionInfo position_info_;
 

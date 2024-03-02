@@ -19,6 +19,7 @@
 #include <juce_audio_processors/juce_audio_processors.h>
 #include "vital/synthesis/framework/value.h"
 #include "vital/common/synth_parameters.h"
+using String = juce::String;
 
 class ValueBridge: public juce::AudioProcessorParameter {
 public:
