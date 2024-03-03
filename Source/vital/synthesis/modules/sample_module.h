@@ -46,6 +46,9 @@ public:
   force_inline Output* getPhaseOutput() const { return sampler_->getPhaseOutput(); }
 
 protected:
+  Output* amp_env_destination;
+  SmoothMultiply2* amp_env_multiply_ = new SmoothMultiply2();
+
   std::shared_ptr<bool> was_on_;
   SampleSource* sampler_;
   Value* on_;

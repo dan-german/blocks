@@ -40,6 +40,7 @@
 #include "vital/synthesis/modules/flanger_module.h"
 #include "vital/synthesis/modules/phaser_module.h"
 #include "vital/synthesis/utilities/value_switch.h"
+#include "vital/synthesis/modules/sample_module.h"
 
 namespace vital {
 
@@ -167,6 +168,7 @@ void BlocksVoiceHandler::init() {
   createDistortions();
   createChoruses();
   createFlangers();
+  createNoises();
   createPhasers();
   createDelays();
   createModulators();
@@ -357,6 +359,19 @@ void BlocksVoiceHandler::createFlangers() {
     addSubmodule(flanger.get());
     addProcessor(flanger.get());
     processor_pool_["flanger"].push_back(flanger);
+  }
+}
+
+void BlocksVoiceHandler::createNoises() {
+  for (int i = 0; i < model::MAX_MODULES_PER_TYPE; i++) {
+    auto noise = std::make_shared<SampleModule>();
+    addSubmodule(noise.get());
+    addProcessor(noise.get());
+    noise->plug(reset(), SampleModule::kReset);
+    noise->plug(note_count(), SampleModule::kNoteCount);
+    noise->plug(bent_midi_, SampleModule::kMidi);
+    processor_pool_["noise"].push_back(noise);
+    oscillators_with_default_envs_.push_back(noise);
   }
 }
 
@@ -688,18 +703,6 @@ void BlocksVoiceHandler::setupPolyModulationReadouts() {
 
 output_map& BlocksVoiceHandler::getPolyModulations() {
   return poly_readouts_;
-}
-
-void BlocksVoiceHandler::setOSCAmplitudeEnvelope(std::shared_ptr<model::Module> adsr, std::shared_ptr<model::Module> target) {
-  auto osc = dynamic_cast<OscillatorModule*>(active_processor_map_[target->name].get());
-  auto env = dynamic_cast<EnvelopeModule*>(active_modulators_map_[adsr->name].get());
-  osc->switchLevelEnvelope(env);
-  // osc->amplitude_envelope_->followModule(adsr);
-}
-
-void BlocksVoiceHandler::resetOSCAmplitudeEnvelope(std::shared_ptr<model::Module> target) {
-  auto osc = dynamic_cast<OscillatorModule*>(active_processor_map_[target->name].get());
-  osc->resetAmpADSR();
 }
 
 } // namespace vital

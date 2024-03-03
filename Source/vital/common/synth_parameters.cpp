@@ -174,6 +174,7 @@ const ValueDetails ValueDetailsLookup::parameter_list[] = {
     ValueDetails::kLinear, false, "%", "Sub Pan", nullptr },
   { "sub_waveform", 0x000000, 0.0, PredefinedWaveFrames::kNumShapes - 1, 2.0, 0.0, 1.0,
     ValueDetails::kIndexed, false, "", "Sub Osc Waveform", nullptr },
+
   { "sample_on", 0x000000, 0.0, 1.0, 0.0, 0.0, 1.0,
     ValueDetails::kIndexed, false, "", "Sample Switch", strings::kOffOnNames },
   { "sample_random_phase", 0x000000, 0.0, 1.0, 0.0, 0.0, 1.0,
@@ -195,6 +196,7 @@ const ValueDetails ValueDetailsLookup::parameter_list[] = {
   { "sample_destination", 0x000500, 0.0, constants::kNumSourceDestinations + constants::kNumEffects, 3.0, 0.0, 1.0,
     ValueDetails::kIndexed, false, "", "Sample Destination", strings::kDestinationNames },
   { "sample_pan", 0x000000, -1.0, 1.0, 0.0, 0.0, 100.0,
+
     ValueDetails::kLinear, false, "%", "Sample Pan", nullptr },
   { "velocity_track", 0x000000, -1.0, 1.0, 0.0, 0.0, 100.0,
     ValueDetails::kLinear, false, "%", "Velocity Track", nullptr },

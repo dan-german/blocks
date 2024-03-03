@@ -59,17 +59,6 @@ public:
     return static_cast<SynthOscillator::DistortionType>(val);
   }
 
-  std::shared_ptr<model::ADSRModule> default_envelope_module_;
-  std::shared_ptr<EnvelopeModule> amplitude_envelope_;
-
-  void resetAmpADSR() {
-    amplitude_envelope_->setModule(default_envelope_module_);
-  }
-
-  void switchLevelEnvelope(EnvelopeModule* envelope) {
-    // amp_env_multiply_->plug(envelope->output(), 0);
-  }
-
   Value* on_;
   SynthOscillator* oscillator_;
 protected:
@@ -81,7 +70,6 @@ protected:
   Value* distortion_type_;
 
   SmoothMultiply2* amp_env_multiply_ = new SmoothMultiply2();
-  // Multiply* amp_env_multiply_ = new Multiply();
 
   JUCE_LEAK_DETECTOR(OscillatorModule)
 };

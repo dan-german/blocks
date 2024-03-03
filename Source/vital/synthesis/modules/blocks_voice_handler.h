@@ -88,8 +88,6 @@ public:
   void removeModulator(int index, std::string type, std::string name);
   void repositionBlock(Index from, Index to);
   std::shared_ptr<vital::Processor> findProcessorAbove(Index index);
-  void setOSCAmplitudeEnvelope(std::shared_ptr<model::Module> adsr, std::shared_ptr<model::Module> target);
-  void resetOSCAmplitudeEnvelope(std::shared_ptr<model::Module> target);
   // void getModulationSource(std::string name) override;
   void clear();
   void initializeDefaultAmpEnvs();
@@ -113,6 +111,7 @@ private:
   void createDistortions();
   void createChoruses();
   void createFlangers();
+  void createNoises();
   void createPhasers();
   void createDelays();
   void setupPolyModulationReadouts();
@@ -138,7 +137,7 @@ private:
 
   std::vector<std::vector<std::shared_ptr<SynthModule>>> processor_matrix_;
   std::vector<std::shared_ptr<OscillatorModule>> oscillators_;
-  std::vector<std::shared_ptr<OscillatorModule>> oscillators_with_default_envs_;
+  std::vector<std::shared_ptr<SynthModule>> oscillators_with_default_envs_;
 public:
   std::vector<std::shared_ptr<ColumnMasterModule>> column_nodes_;
   void setDefaultAmpEnv(std::string target_name, bool enable);

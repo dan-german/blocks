@@ -5,10 +5,8 @@
 #include "model/Index.h"
 #include "vital/synthesis/utilities/smooth_value.h"
 #include "vital/value_bridge.h"
-// #include "vital/synthesis/framework/synth_module.h"
 
 using ValueScale = vital::ValueDetails::ValueScale;
-// class SynthModule;
 
 namespace model {
 class Module {

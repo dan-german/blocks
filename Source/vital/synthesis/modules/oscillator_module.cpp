@@ -25,7 +25,6 @@ OscillatorModule::OscillatorModule():
   SynthModule(kNumInputs, kNumOutputs), prefix_(std::move("osc")), on_(nullptr), distortion_type_(nullptr) {
   wavetable_ = std::make_shared<Wavetable>(kNumOscillatorWaveFrames);
   was_on_ = std::make_shared<bool>(true);
-  default_envelope_module_ = std::make_shared<model::ADSRModule>(0);
 }
 
 void OscillatorModule::init() {

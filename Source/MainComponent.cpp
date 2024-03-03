@@ -339,11 +339,9 @@ void MainComponent::showPopupAt(ButtonGridPopup& popup, std::function<void(Index
 
 std::shared_ptr<model::Block> MainComponent::addBlock(int code, Index index) {
   std::shared_ptr<model::Block> block = nullptr;
-  const StringArray one { "osc", "filter", "drive", "flanger", "comp" };
-  const StringArray two { "reverb", "delay", "chorus", "phaser", "eq" };
   StringArray all;
-  all.addArray(one);
-  all.addArray(two);
+  all.addArray(model::block_popup_row_one);
+  all.addArray(model::block_popup_row_one);
   return delegate->editorAddedBlock2(all[code].toStdString(), index);
 }
 
@@ -746,9 +744,7 @@ void MainComponent::modulatorRemoved(ModulatorComponent* component) {
 void MainComponent::setupPopupMenus() {
   addChildComponent(blocks_popup_);
 
-  const StringArray one { "osc", "filter", "drive", "flanger", "comp" };
-  const StringArray two { "reverb", "delay", "chorus", "phaser", "eq" };
-  blocks_popup_.setModel({ one, two });
+  blocks_popup_.setModel({ model::block_popup_row_one, model::block_popup_row_two });
 
   addChildComponent(modualtors_popup_);
   modualtors_popup_.setModel(model::modulators);

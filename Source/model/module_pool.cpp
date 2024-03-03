@@ -20,6 +20,7 @@
 #include "flanger_model.h"  
 #include "phaser_model.h"  
 #include "column_control_model.h"
+#include "noise_model.h"
 
 namespace model {
 // Module
@@ -44,6 +45,7 @@ ModulePool::ModulePool() {
   blocks.spawn({ "chorus" }, [](std::string type, int number) { return std::make_shared<model::ChorusModule>(number); });
   blocks.spawn({ "flanger" }, [](std::string type, int number) { return std::make_shared<model::FlangerModule>(number); });
   blocks.spawn({ "phaser" }, [](std::string type, int number) { return std::make_shared<model::PhaserModule>(number); });
+  blocks.spawn({ "noise" }, [](std::string type, int number) { return std::make_shared<model::NoiseModel>(number); });
 
   modulators.spawn({ "lfo" }, [](std::string type, int number) { return std::make_shared<model::LFOModule>(number); });
   modulators.spawn({ "envelope" }, [](std::string type, int number) { return std::make_shared<model::ADSRModule>(number); });
