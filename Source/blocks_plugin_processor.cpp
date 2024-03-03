@@ -524,8 +524,11 @@ void PluginProcessor::removeModulator(int index) {
 void PluginProcessor::disconnect(std::shared_ptr<model::Connection>& connection) {
   bool disconnecting_osc_env = connection->source->id.type == "envelope" && connection->target->id.type == "osc" && connection->parameter_name_ == "level";
   if (disconnecting_osc_env) {
-    getVoiceHandler()->setDefaultAmpEnv(connection->target->name, true);
+    getVoiceHandler()->setDefaultAmpEnvState(connection->target->name, true);
   }
+
+  std::cout << "disconnecting " << connection->source->name << " from " << connection->target->name << " " << connection->parameter_name_ << std::endl;
+
   synth_->disconnectModulation(connection->vital_connection_);
   getModuleManager().removeConnection(connection);
 }

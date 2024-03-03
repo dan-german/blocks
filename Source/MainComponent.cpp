@@ -603,7 +603,6 @@ void MainComponent::sliderValueChanged(Slider* slider) {
   } else {
     auto index = ui_layer_.connections.indexOfModulationConnection(slider->getParentComponent()->getParentComponent());
     auto value = static_cast<float>(slider->getValue());
-    std::cout << "mag val: " << value << std::endl;
     delegate->editorChangedModulationMagnitude(index, static_cast<float>(slider->getValue()));
   }
 }

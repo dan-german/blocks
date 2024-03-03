@@ -193,6 +193,7 @@ public:
   }
 
   virtual void setControlRate(bool control_rate) {
+    std::cout << "setting control rate " << control_rate << std::endl;
     state_->control_rate = control_rate;
   }
 

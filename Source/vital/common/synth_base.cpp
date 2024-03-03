@@ -172,13 +172,18 @@ vital::modulation_change SynthBase::createModulationChange(vital::ModulationConn
 
   int num_audio_rate = 0;
   vital::ModulationConnectionBank& modulation_bank = getModulationBank();
-  for (int i = 0; i < vital::kMaxModulationConnections; ++i) {
+  for (int i = 0; i < 2; ++i) {
+    auto current = modulation_bank.atIndex(i);
+    auto mod_back_dest = current->destination_name + " " + current->parameter_name;
+    auto connection_dest = connection->destination_name + " " + connection->parameter_name;
+
     if (modulation_bank.atIndex(i)->source_name == connection->source_name &&
-      modulation_bank.atIndex(i)->destination_name != connection->destination_name &&
+      mod_back_dest != connection_dest &&
       !modulation_bank.atIndex(i)->modulation_processor->isControlRate()) {
       num_audio_rate++;
     }
   }
+  std::cout << "NUM AUDIO RATE " << num_audio_rate << std::endl;
   change.num_audio_rate = num_audio_rate;
   // printModulationChange(change);
   return change;
@@ -665,11 +670,6 @@ void SynthBase::processModulationChanges() {
     if (change.disconnecting)
       engine_->disconnectModulation(change);
     else {
-      // if (yoyo) {
-      //   getVoiceHandler()->connectDefaultEnvs();
-      //   yoyo = false;
-      // }
-      // return;
       engine_->connectModulation(change);
     }
   }
@@ -834,6 +834,7 @@ std::shared_ptr<model::Connection> SynthBase::createConnectionModel(int modulato
 void SynthBase::connectModulation(int modulator_index, std::string target_name, std::string parameter_name) {
   auto connection_model = createConnectionModel(modulator_index, target_name, parameter_name);
   if (!connection_model) return;
+  std::cout << "connecting " << connection_model->source->name << " to " << connection_model->target->name << " " << connection_model->parameter_name_ << std::endl;
 
   auto parameter = connection_model->target->parameter_map_[parameter_name];
   auto destination_scale = parameter->max - parameter->min;
@@ -842,7 +843,7 @@ void SynthBase::connectModulation(int modulator_index, std::string target_name, 
   parameter_name = is_env_to_osc_level ? "amp_env_destination" : parameter_name;
 
   if (is_env_to_osc_level) {
-    getVoiceHandler()->setDefaultAmpEnv(connection_model->target->name, false);
+    getVoiceHandler()->setDefaultAmpEnvState(connection_model->target->name, false);
   }
 
   std::string modulator_name = connection_model->source->name;
@@ -855,8 +856,11 @@ vital::ModulationConnection* SynthBase::createConnection(std::string modulator_n
   bool create = connection == nullptr;
   if (create) {
     connection = getModulationBank().createConnection(modulator_name, target_name, parameter_name);
+    std::cout << "created connection " << connection->modulation_processor << std::endl;
     connection->destination_scale = destination_scale;
     connectModulation(connection);
+  } else { 
+    std::cout << "got connection " << connection->modulation_processor  << std::endl;
   }
   return connection;
 }

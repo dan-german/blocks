@@ -61,7 +61,7 @@ BlocksVoiceHandler::BlocksVoiceHandler(Output* beats_per_second):
   note_from_reference_ = new cr::Add();
   midi_offset_output_ = registerControlRateOutput(note_from_reference_->output(), true);
 
-  enabled_modulation_processors_.ensureCapacity(kMaxModulationConnections);
+  enabled_modulation_processors_.ensureCapacity(kMaxModulationConnections * 2); // * 2 for the default envelope modultion processors. todo - at least calculate the exact amount
   lfos_.reserve(kNumLfos);
   envelopes_.reserve(kNumEnvelopes);
 
@@ -271,7 +271,7 @@ void BlocksVoiceHandler::initializeDefaultAmpEnvs() {
   }
 }
 
-void BlocksVoiceHandler::setDefaultAmpEnv(std::string target_name, bool enable) {
+void BlocksVoiceHandler::setDefaultAmpEnvState(std::string target_name, bool enable) {
   auto osc = active_processor_map_[target_name];
   osc_to_default_env_mod_processor_map_[osc]->enable(enable);
 }

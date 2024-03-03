@@ -196,8 +196,8 @@ const ValueDetails ValueDetailsLookup::parameter_list[] = {
   { "sample_destination", 0x000500, 0.0, constants::kNumSourceDestinations + constants::kNumEffects, 3.0, 0.0, 1.0,
     ValueDetails::kIndexed, false, "", "Sample Destination", strings::kDestinationNames },
   { "sample_pan", 0x000000, -1.0, 1.0, 0.0, 0.0, 100.0,
-
     ValueDetails::kLinear, false, "%", "Sample Pan", nullptr },
+
   { "velocity_track", 0x000000, -1.0, 1.0, 0.0, 0.0, 100.0,
     ValueDetails::kLinear, false, "%", "Velocity Track", nullptr },
   { "volume", 0x000000, 0.0, 7399.4404, 5473.0404, -80, 1.0,

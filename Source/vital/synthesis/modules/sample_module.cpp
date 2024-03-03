@@ -34,8 +34,8 @@ void SampleModule::init() {
   Value* transpose_quantize = createBaseControl2({ .name = "transpose quantize" });
   Output* transpose = createPolyModControl2({ .name = "transpose" });
   Output* tune = createPolyModControl2({ .name = "tune" });
-  Output* level = createPolyModControl2({ .name = "level", .audio_rate = true, .smooth_value = true });
-  Output* pan = createPolyModControl2({ .name = "pan", .value_scale = ValueDetails::kQuadratic });
+  Output* level = createPolyModControl2({ .name = "level", .default_value = 1.0, .audio_rate = true, .smooth_value = true, .value_scale = ValueDetails::kQuadratic });
+  Output* pan = createPolyModControl2({ .name = "pan", .min = -1.0f });
 
   sampler_->useInput(input(kReset), SampleSource::kReset);
   sampler_->useInput(input(kMidi), SampleSource::kMidi);
@@ -56,10 +56,10 @@ void SampleModule::init() {
   amp_env_destination = createPolyModControl2({ .name = "amp env destination", .reset = input(kReset) });
   addProcessor(amp_env_multiply_);
   amp_env_multiply_->plug(amp_env_destination, 1);
-  amp_env_multiply_->plug(sampler_, 0);
+  amp_env_multiply_->plug(sampler_->output(kLevelled), 0);
   amp_env_multiply_->useInput(input(kReset), SmoothMultiply2::kReset);
   amp_env_multiply_->useOutput(output(kRaw), 0);
-
+ 
   SynthModule::init();
 }
 
