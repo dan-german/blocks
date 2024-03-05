@@ -341,7 +341,7 @@ std::shared_ptr<model::Block> MainComponent::addBlock(int code, Index index) {
   std::shared_ptr<model::Block> block = nullptr;
   StringArray all;
   all.addArray(model::block_popup_row_one);
-  all.addArray(model::block_popup_row_one);
+  all.addArray(model::block_popup_row_two);
   return delegate->editorAddedBlock2(all[code].toStdString(), index);
 }
 

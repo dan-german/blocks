@@ -163,17 +163,19 @@ std::shared_ptr<vital::Processor> BlocksVoiceHandler::findProcessorAbove(Index i
 
 void BlocksVoiceHandler::unplugAll() {
 
-  // for (auto processor : active_processors_) {
-  //   // processor->unplugIndex(0);
-  //   if (processor->numInputs())
-  //     processor->unplug(processor->input()->source->owner);
-  // }
+  for (auto processor : active_processors_) {
+    processor->unplug(processor->input()->source);
+    // processor->unplugIndex(0);
+    // if (processor->numInputs())
+    //   processor->unplug(processor->input()->source->owner);
+  }
 
-  // for (auto node : column_nodes_) { 
-  //   node->unplug(node->input()->source->owner);
-  // }
+  for (auto node : column_nodes_) { 
+    node->unplug(node->input()->source);
+  }
+  return;
 
-  for (int column = 0; column < processor_matrix_.size(); column++) {
+  for (int column = 1; column < processor_matrix_.size(); column++) {
 
     // column_nodes_[column]->unplugIndex(0);
 

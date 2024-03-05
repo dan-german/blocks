@@ -64,7 +64,7 @@ void SoundEngine::init() {
   voice_handler_ = new BlocksVoiceHandler(beats_per_second_clamped->output());
   addSubmodule(voice_handler_);
   // voice_handler_->setPolyphony(vital::kMaxPolyphony);
-  voice_handler_->setPolyphony(3);
+  voice_handler_->setPolyphony(8);
   voice_handler_->plug(polyphony, VoiceHandler::kPolyphony);
   voice_handler_->plug(voice_priority, VoiceHandler::kVoicePriority);
   voice_handler_->plug(voice_override, VoiceHandler::kVoiceOverride);

@@ -221,8 +221,8 @@ void PluginProcessor::handleBlockChanges() {
       connectModulationFromModel(c);
     }
 
-    // getVoiceHandler()->disconnectAllDefaultEnvs();
-    // getVoiceHandler()->connectAllDefaultEnvs();
+    getVoiceHandler()->disconnectAllDefaultEnvs();
+    getVoiceHandler()->connectAllDefaultEnvs();
 
     block_modified_ = false;
   }
