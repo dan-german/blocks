@@ -45,6 +45,7 @@ void ModulatorsListModel::setupModulatorComponent(std::shared_ptr<model::Module>
 
   if (model->id.type == Model::Types::lfo) {
     component.oscillatorPainter.setVisible(true);
+    component.envelopePath.setVisible(false);
   } else {
     component.oscillatorPainter.setVisible(false);
     component.envelopePath.setVisible(true);

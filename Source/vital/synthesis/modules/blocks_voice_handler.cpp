@@ -119,10 +119,9 @@ void BlocksVoiceHandler::connectAll() {
   Processor* target = nullptr;
   for (int column = 0; column < processor_matrix_.size(); column++) {
     for (int row = 0; row < processor_matrix_[column].size(); row++) {
-      auto processor = processor_matrix_[column][row];
-      if (processor != nullptr) {
+      if (auto processor = processor_matrix_[column][row]) {
         if (current) {
-          processor->plug(current, 0);
+          processor->plug(current);
         }
 
         current = processor.get();
@@ -130,6 +129,7 @@ void BlocksVoiceHandler::connectAll() {
     }
 
     if (current) {
+      std::cout << "blugging" << std::endl;
       column_nodes_[column]->plug(current);
     }
     current = nullptr;
@@ -146,18 +146,51 @@ std::shared_ptr<vital::Processor> BlocksVoiceHandler::findProcessorAbove(Index i
   return nullptr;
 }
 
-void BlocksVoiceHandler::unplugAll() {
-  for (int column = 0; column < processor_matrix_.size(); column++) {
-    for (int row = 0; row < processor_matrix_[column].size(); row++) {
-      auto processor = processor_matrix_[column][row];
-      if (processor != nullptr) {
-        column_nodes_[column]->unplug(processor.get());
+// void BlocksVoiceHandler::unplugAll() {
+//   for (int column = 0; column < processor_matrix_.size(); column++) {
+//     for (int row = 0; row < processor_matrix_[column].size(); row++) {
+//       auto processor = processor_matrix_[column][row];
+//       if (processor != nullptr) {
+//         column_nodes_[column]->unplug(processor.get());
 
-        if (auto processor_above = findProcessorAbove({ row, column })) {
+//         if (auto processor_above = findProcessorAbove({ row, column })) {
+//           processor->unplug(processor_above.get());
+//         }
+//       }
+//     }
+//   }
+// }
+
+void BlocksVoiceHandler::unplugAll() {
+
+  // for (auto processor : active_processors_) {
+  //   // processor->unplugIndex(0);
+  //   if (processor->numInputs())
+  //     processor->unplug(processor->input()->source->owner);
+  // }
+
+  // for (auto node : column_nodes_) { 
+  //   node->unplug(node->input()->source->owner);
+  // }
+
+  for (int column = 0; column < processor_matrix_.size(); column++) {
+
+    // column_nodes_[column]->unplugIndex(0);
+
+    Processor* last = nullptr;
+    for (int row = 0; row < processor_matrix_[column].size(); row++) {
+      if (auto processor = processor_matrix_[column][row]) {
+        // processor->unplugIndex(0);
+        std::cout << processor.get() << " unplugin column " << column << std::endl;
+
+        if (auto processor_above = findProcessorAbove({ column, row })) {
           processor->unplug(processor_above.get());
         }
+        last = processor.get();
       }
     }
+    if (last)
+      column_nodes_[column]->unplug(last);
   }
 }
 
@@ -210,11 +243,6 @@ void BlocksVoiceHandler::init() {
 
   VoiceHandler::init();
 
-  for (auto node : column_nodes_) {
-    // node->init();
-    master_node_->plugNext(node.get());
-    // addProcessor(node.get());
-  }
 
   // disable all processors
   for (const auto& pair : processor_pool_) {
@@ -258,6 +286,10 @@ void BlocksVoiceHandler::init() {
     createStatusOutput(modulation_amount_prefix + number, pre_scale_output);
   }
   initializeDefaultAmpEnvs();
+
+  for (auto node : column_nodes_) {
+    master_node_->plugNext(node.get());
+  }
 }
 
 void BlocksVoiceHandler::initializeDefaultAmpEnvs() {
@@ -440,10 +472,8 @@ void BlocksVoiceHandler::createOscillators() {
 void BlocksVoiceHandler::clear() {
   unplugAll();
 
-
   for (auto processor : active_processors_) {
     processor_pool_[processor->module_->id.type].push_back(processor);
-    // processor->hardReset();
     processor->enable(false);
   }
 

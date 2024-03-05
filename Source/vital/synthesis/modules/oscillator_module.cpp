@@ -115,7 +115,6 @@ void OscillatorModule::process(int num_samples) {
     output(kLevelled)->clearBuffer();
   }
 
-  // add audio in to output
   utils::addBuffers(output(kRaw)->buffer, output(kRaw)->buffer, input(kAudioIn)->source->buffer, num_samples);
 
   *was_on_ = on;

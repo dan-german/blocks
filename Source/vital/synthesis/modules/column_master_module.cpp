@@ -2,13 +2,9 @@
 
 namespace vital {
 
-ColumnMasterModule::ColumnMasterModule(): SynthModule(kNumInputs, 1) {
+ColumnMasterModule::ColumnMasterModule(): SynthModule(kNumInputs, 1) {}
 
-}
-
-ColumnMasterModule::~ColumnMasterModule() {
-
-}
+ColumnMasterModule::~ColumnMasterModule() {}
 
 void ColumnMasterModule::init() {
   Output* pan = createPolyModControl2({ .name = "pan", .min = -1.0 });

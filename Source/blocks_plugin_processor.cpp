@@ -221,8 +221,8 @@ void PluginProcessor::handleBlockChanges() {
       connectModulationFromModel(c);
     }
 
-    getVoiceHandler()->disconnectAllDefaultEnvs();
-    getVoiceHandler()->connectAllDefaultEnvs();
+    // getVoiceHandler()->disconnectAllDefaultEnvs();
+    // getVoiceHandler()->connectAllDefaultEnvs();
 
     block_modified_ = false;
   }
@@ -622,7 +622,6 @@ juce::Array<std::shared_ptr<Module>> PluginProcessor::getModulators() {
 void PluginProcessor::editorSavedPreset(String name) {
   // Analytics::shared()->countAction("Preset Saved");
   auto info = Preset::create(name, getModuleManager().getBlocks(), getModuleManager().getModulators(), getModuleManager().getConnections());
-  std::cout << "yay" << std::endl;
   preset_manager_.save(info);
   // per
   // presetManager.save(info);

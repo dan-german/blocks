@@ -23,6 +23,7 @@ namespace vital {
 class SampleModule: public SynthModule {
 public:
   enum {
+    kAudioIn,
     kReset,
     kMidi,
     kNoteCount,

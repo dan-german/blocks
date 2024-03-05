@@ -59,13 +59,12 @@ void SampleModule::init() {
   amp_env_multiply_->plug(sampler_->output(kLevelled), 0);
   amp_env_multiply_->useInput(input(kReset), SmoothMultiply2::kReset);
   amp_env_multiply_->useOutput(output(kRaw), 0);
- 
+
   SynthModule::init();
 }
 
 void SampleModule::process(int num_samples) {
   bool on = on_->value();
-
   if (on)
     SynthModule::process(num_samples);
   else if (*was_on_) {
@@ -73,7 +72,7 @@ void SampleModule::process(int num_samples) {
     output(kLevelled)->clearBuffer();
     getPhaseOutput()->buffer[0] = 0.0f;
   }
-
+  utils::addBuffers(output(kRaw)->buffer, output(kRaw)->buffer, input(kAudioIn)->source->buffer, num_samples);
   *was_on_ = on;
 }
 } // namespace vital
