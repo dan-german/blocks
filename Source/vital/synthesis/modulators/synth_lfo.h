@@ -35,6 +35,7 @@ public:
     kStereoPhase,
     kDelay,
     kNoteCount,
+    kWaveIndex,
     kNumInputs
   };
 
@@ -132,6 +133,7 @@ protected:
   poly_int trigger_sample_;
   poly_float trigger_delay_;
   LineGenerator* source_;
+  int current_wave_index;
 
   std::shared_ptr<double> sync_seconds_;
 

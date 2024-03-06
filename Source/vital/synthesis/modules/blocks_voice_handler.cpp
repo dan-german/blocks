@@ -489,7 +489,7 @@ void BlocksVoiceHandler::clear() {
 void BlocksVoiceHandler::createModulators() {
   for (int i = 0; i < kNumLfos; ++i) {
     lfo_sources_[i].setLoop(false);
-    lfo_sources_[i].initTriangle();
+    lfo_sources_[i].initSawDown();
     std::string prefix = std::string("lfo");
     auto lfo = std::make_shared<LfoModule>(prefix, &lfo_sources_[i], beats_per_second_);
     lfo->enable(false);

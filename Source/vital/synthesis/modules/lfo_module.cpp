@@ -30,14 +30,15 @@ LfoModule::LfoModule(const std::string& prefix, LineGenerator* line_generator, c
 }
 
 void LfoModule::init() {
+  Value* wave = createBaseControl2({ .name = "wave", .max = 4.0 });
   Output* free_frequency = createPolyModControl2({ .name = "frequency", .min = -7.0f, .max = 9.0f, .value_scale = ValueDetails::kExponential, .default_value = 1.0f });
   Output* phase = createPolyModControl2({ .name = "phase" });
-  Output* fade = createPolyModControl2({ .name = "fade_time", .max = 8.0f });
-  Output* delay = createPolyModControl2({ .name = "delay_time", .max = 4.0f });
+  Output* fade = createPolyModControl2({ .name = "fade time", .max = 8.0f });
+  Output* delay = createPolyModControl2({ .name = "delay time", .max = 4.0f });
   Output* stereo_phase = createPolyModControl2({ .name = "stereo", .min = -0.5f, .max = 0.5f });
-  Value* sync_type = createBaseControl2({ .name = "sync_type", .max = 5.0f, .value_scale = ValueDetails::kIndexed });
-  Value* smooth_mode = createBaseControl2({ .name = "smooth_mode", .value_scale = ValueDetails::kIndexed, .default_value = 1.0f });
-  Output* smooth_time = createPolyModControl2({ .name = "smooth_time", .min = -10.0f, .max = 4.0f, .value_scale = ValueDetails::kExponential, .default_value = -7.5f });
+  Value* sync_type = createBaseControl2({ .name = "sync type", .max = 5.0f, .value_scale = ValueDetails::kIndexed });
+  Value* smooth_mode = createBaseControl2({ .name = "smooth mode", .value_scale = ValueDetails::kIndexed, .default_value = 1.0f });
+  Output* smooth_time = createPolyModControl2({ .name = "smooth time", .min = -10.0f, .max = 4.0f, .value_scale = ValueDetails::kExponential, .default_value = -7.5f });
   Output* frequency = createTempoSyncSwitch(prefix_, free_frequency->owner, beats_per_second_, true, input(kMidi));
   lfo_->useInput(input(kNoteTrigger), SynthLfo::kNoteTrigger);
   lfo_->useInput(input(kNoteCount), SynthLfo::kNoteCount);
@@ -53,6 +54,7 @@ void LfoModule::init() {
   lfo_->plug(fade, SynthLfo::kFade);
   lfo_->plug(smooth_time, SynthLfo::kSmoothTime);
   lfo_->plug(delay, SynthLfo::kDelay);
+  lfo_->plug(wave, SynthLfo::kWaveIndex);
 }
 
 void LfoModule::correctToTime(double seconds) {
@@ -66,7 +68,7 @@ void LfoModule::setModule(std::shared_ptr<model::Module> module) {
   module->parameter_map_["tempo"]->val = control_map_["tempo"];
   module->parameter_map_["frequency"]->val = control_map_["frequency"];
   module->parameter_map_["sync"]->val = control_map_["sync"];
-  module->parameter_map_["mode"]->val = control_map_["sync_type"];
+  module->parameter_map_["mode"]->val = control_map_["sync type"];
 }
 
 void LfoModule::setControlRate(bool control_rate) {

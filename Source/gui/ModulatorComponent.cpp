@@ -221,7 +221,7 @@ void ModulatorComponent::sliderDragStarted(Slider* slider) {
 
 void ModulatorComponent::sliderValueChanged(Slider* slider) {
   float value = static_cast<float>(slider->getValue());
-  // if (onSliderValueChange) onSliderValueChange(currentSliderIndex, value);
+  if (onSliderValueChange) onSliderValueChange(currentSliderIndex, value);
   auto name = slider_parameter_name_map_[slider];
   delegate_->modulatorIsAdjusting(this, name, value);
 }
