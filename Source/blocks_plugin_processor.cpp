@@ -287,15 +287,11 @@ juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter() {
 void PluginProcessor::editorAdjustedModulator(std::string parameter_name, int index, float value) {
   auto modulator = synth_->getModuleManager().getModulator(index);
 
-  if (modulator->id.type == "lfo") {
-    if (parameter_name == "tempo") {
-      bool is_changing_seconds = modulator->parameter_map_["sync"]->val->value() == 0.0f;
-      if (is_changing_seconds) {
-        modulator->parameter_map_["frequency"]->val->set(value);
-      } else {
-        modulator->parameter_map_["tempo"]->val->set(value);
-      }
-    }
+  if (modulator->id.type == "lfo" && parameter_name == "tempo") {
+    bool is_changing_seconds = modulator->parameter_map_["sync"]->val->value() == 0.0f;
+    parameter_name = is_changing_seconds ? "frequency" : "tempo";
+    modulator->parameter_map_[parameter_name]->val->set(value);
+    return;
   }
 
   modulator->parameter_map_[parameter_name]->val->set(value);
@@ -305,7 +301,6 @@ void PluginProcessor::editorAdjustedBlock(Index index, int parameter, float valu
   auto block = synth_->getModuleManager().getBlock(index);
 
   if (block->id.type == "delay") {
-    std::cout << parameter << std::endl;
     if (parameter == 4) {
       auto sync = block->parameter_map_["sync"]->val->value();
       bool is_changing_seconds = block->parameter_map_["sync"]->val->value() == 0.0f;

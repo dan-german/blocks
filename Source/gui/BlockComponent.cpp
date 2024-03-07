@@ -176,13 +176,12 @@ BlockComponent* BlockComponent::create(std::shared_ptr<model::Block> block) {
     painter->setWaveformType(static_cast<OscillatorPainter::WaveformType>(waveformInt));
     painter->thickness = 2.0f;
     component->setPainter(painter);
-  } else if (block->id.type == Model::Types::adsr) {
-    component->setEnvelopePath(component->colour);
-    // component->getEnvelopePath()->setAttack(block->parameters[0]->audioParameter->getValue());
-    // component->getEnvelopePath()->setDecay(block->parameters[1]->audioParameter->getValue());
-    // component->getEnvelopePath()->setSustain(block->parameters[2]->audioParameter->getValue());
-    // component->getEnvelopePath()->setRelease(block->parameters[3]->audioParameter->getValue());
-  }
+  } else if (block->id.type == Model::Types::noise) {
+    auto painter = new OscillatorPainter();
+    painter->setWaveformType(OscillatorPainter::WaveformType::noise);
+    painter->thickness = 2.0f;
+    component->setPainter(painter);
+  } 
 
   component->themeChanged(ThemeManager::shared()->getCurrent());
   return component;

@@ -94,7 +94,6 @@ void ModulatorsListModel::setupModulatorComponent(std::shared_ptr<model::Module>
       slider->box_slider_.slider.textFromValueFunction = [parameter](double value) { return juce::String(parameter->string_lookup[(int)value]); };
     } else {
       slider->box_slider_.slider.textFromValueFunction = [parameter](double value) { return UIUtils::getSliderTextFromValue(value, *parameter ); };
-      // slider->box_slider_.slider.textFromValueFunction = {};
     }
 
     slider->box_slider_.slider.setValue(value, dontSendNotification);
@@ -113,16 +112,19 @@ void ModulatorsListModel::setModulators(std::vector<std::shared_ptr<model::Modul
 
 void ModulatorsListModel::onLFOParameterChange(std::shared_ptr<model::Module> module, ModulatorComponent& component, int index, float value) const {
   std::cout << "on lfo " << index << " " << value << std::endl;
+  bool is_changing_wave = index == 0;
   bool is_changing_sync = index == 2;
   if (is_changing_sync) {
     LabeledSlider* rate_slider = component.sliders[1];
-    std::cout << "value " << value << std::endl;
     bool is_seconds = int(value) == 0;
     if (is_seconds) {
       setSliderAsFrequency(module, rate_slider);
     } else {
       setSliderAsTempo(module, rate_slider);
     }
+  } else if (is_changing_wave) { 
+    auto wave = int(value);
+    component.oscillatorPainter.waveformType = static_cast<OscillatorPainter::WaveformType>(wave);
   }
 
   bool is_changing_tempo = index == 1;
@@ -136,7 +138,6 @@ void ModulatorsListModel::onLFOParameterChange(std::shared_ptr<model::Module> mo
 }
 
 void ModulatorsListModel::setSliderAsFrequency(std::shared_ptr<model::Module> module, LabeledSlider* slider) const {
-  std::cout << "pls" << std::endl;
   slider->label.setText("seconds", dontSendNotification);
 
   slider->box_slider_.slider.textFromValueFunction = [slider, module](double value) {

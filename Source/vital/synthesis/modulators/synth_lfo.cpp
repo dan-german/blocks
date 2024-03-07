@@ -53,6 +53,7 @@ force_inline void SynthLfo::processTrigger() {
 
   if (reset_mask.anyMask()) {
     poly_float frequency = input(kFrequency)->at(0);
+    std::cout << "frequency: " << frequency[0] << std::endl;
 
     if (sync_type == kSync) {
       poly_float sync_phase = utils::getCycleOffsetFromSeconds(*sync_seconds_, frequency);
@@ -424,19 +425,19 @@ void SynthLfo::processAudioRate(int num_samples) {
 }
 
 void SynthLfo::process(int num_samples) {
-  // auto wave_index = input(kWaveIndex)->at(0)[0];
-  // auto ind = static_cast<int>(wave_index);
-  // auto current_wave_index = static_cast<int>(wave_index);
+  auto wave_index = input(kWaveIndex)->at(0)[0];
+  auto int_wave_index = static_cast<int>(wave_index);
 
-  // if (ind != current_wave_index) {
-  //   switch (static_cast<int>(wave_index)) {
-  //   case 0: source_->initSawDown(); break;
-  //   case 1: source_->initSawUp(); break;
-  //   case 2: source_->initSin(); break;
-  //   case 3: source_->initSin(); break;
-  //   }
-  //   current_wave_index = ind;
-  // }
+  if (int_wave_index != current_wave_index_) {
+    switch (static_cast<int>(wave_index)) {
+    case 0: source_->initSin(); break;
+    case 1: source_->initSawDown(); break;
+    case 2: source_->initSawUp(); break;
+    case 3: source_->initSquare(); break;
+    case 4: source_->initTriangle(); break;
+    }
+    current_wave_index_ = int_wave_index;
+  }
 
   bool control_rate = isControlRate();
   if (was_control_rate_ && !control_rate)

@@ -48,6 +48,7 @@ public:
   void setControlRate(bool control_rate) override;
   void setModule(std::shared_ptr<model::Module> module) override;
 
+  LineGenerator* line_generator_;
 protected:
   std::string prefix_;
   SynthLfo* lfo_;

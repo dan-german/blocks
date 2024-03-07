@@ -418,6 +418,13 @@ void MainComponent::inspectorChangedParameter(int sliderIndex, float value) {
 
 void MainComponent::updateModuleComponentVisuals(int sliderIndex, float value, std::shared_ptr<model::Module> module) {
   if (module->id.type == Model::Types::osc) {
+    if (module->parameters_[sliderIndex]->name == "wave") {
+      int adjusted_value = (int)value > 0 ? (int)value + 1 : 0;   
+      std::cout << "adjusted_value " << adjusted_value << std::endl;
+      changeModulePainter(adjusted_value);
+    }
+    return;
+
     switch (OscillatorModule::Parameters(sliderIndex)) {
     case OscillatorModule::pWave:
       changeModulePainter((int)value);

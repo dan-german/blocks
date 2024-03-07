@@ -26,6 +26,7 @@ Value::Value(poly_float value, bool control_rate): Processor(kNumInputs, 1, cont
 }
 
 void Value::set(poly_float value) {
+  std::cout << "setting value " << value[0] << " for: " << this << std::endl;
   value_ = value;
   for (int i = 0; i < output()->buffer_size; ++i)
     output()->buffer[i] = value;

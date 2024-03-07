@@ -170,29 +170,8 @@ void BlocksVoiceHandler::unplugAll() {
     //   processor->unplug(processor->input()->source->owner);
   }
 
-  for (auto node : column_nodes_) { 
+  for (auto node : column_nodes_) {
     node->unplug(node->input()->source);
-  }
-  return;
-
-  for (int column = 1; column < processor_matrix_.size(); column++) {
-
-    // column_nodes_[column]->unplugIndex(0);
-
-    Processor* last = nullptr;
-    for (int row = 0; row < processor_matrix_[column].size(); row++) {
-      if (auto processor = processor_matrix_[column][row]) {
-        // processor->unplugIndex(0);
-        std::cout << processor.get() << " unplugin column " << column << std::endl;
-
-        if (auto processor_above = findProcessorAbove({ column, row })) {
-          processor->unplug(processor_above.get());
-        }
-        last = processor.get();
-      }
-    }
-    if (last)
-      column_nodes_[column]->unplug(last);
   }
 }
 
@@ -489,7 +468,7 @@ void BlocksVoiceHandler::clear() {
 void BlocksVoiceHandler::createModulators() {
   for (int i = 0; i < kNumLfos; ++i) {
     lfo_sources_[i].setLoop(false);
-    lfo_sources_[i].initSawDown();
+    lfo_sources_[i].initSin();
     std::string prefix = std::string("lfo");
     auto lfo = std::make_shared<LfoModule>(prefix, &lfo_sources_[i], beats_per_second_);
     lfo->enable(false);

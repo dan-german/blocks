@@ -216,6 +216,12 @@ void ModulatorComponent::setColour(Colour colour) {
 }
 
 void ModulatorComponent::sliderDragStarted(Slider* slider) {
+  for (int i = 0; i < sliders.size(); i++)
+    if (&sliders[i]->box_slider_.slider == slider) {
+      currentSliderIndex = i;
+      break;
+    }
+
   delegate_->modulatorGestureChanged(this, slider_parameter_name_map_[slider], true);
 }
 

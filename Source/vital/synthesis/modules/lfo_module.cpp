@@ -22,7 +22,7 @@
 namespace vital {
 
 LfoModule::LfoModule(const std::string& prefix, LineGenerator* line_generator, const Output* beats_per_second):
-  SynthModule(kNumInputs, kNumOutputs), prefix_(prefix), beats_per_second_(beats_per_second) {
+  SynthModule(kNumInputs, kNumOutputs), prefix_(prefix), beats_per_second_(beats_per_second), line_generator_(line_generator) {
   lfo_ = new SynthLfo(line_generator);
   addProcessor(lfo_);
 
@@ -64,7 +64,7 @@ void LfoModule::correctToTime(double seconds) {
 void LfoModule::setModule(std::shared_ptr<model::Module> module) {
   SynthModule::setModule(module);
 
-  module->parameter_map_["wave"]->val = control_map_["tempo"];
+  module->parameter_map_["wave"]->val = control_map_["wave"];
   module->parameter_map_["tempo"]->val = control_map_["tempo"];
   module->parameter_map_["frequency"]->val = control_map_["frequency"];
   module->parameter_map_["sync"]->val = control_map_["sync"];

@@ -13,7 +13,7 @@
 #include "model/Module.h"
 
 namespace model {
-const StringArray waveforms { "saw", "sine", "square", "triangle", "noise" };
+const StringArray waveforms { "sine", "was", "saw", "square", "triangle" };
 const StringArray modulators { "lfo", "envelope" };
 const StringArray effects { "filter", "drive", "reverb", "delay", "chorus", "flanger", "phaser", "comp" };
 const StringArray tabs { "oscillator", "modulator", "effect" };
