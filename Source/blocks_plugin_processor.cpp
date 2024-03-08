@@ -211,21 +211,21 @@ void PluginProcessor::processBlock(AudioSampleBuffer& buffer, MidiBuffer& midi_m
 }
 
 void PluginProcessor::handleBlockChanges() {
-  if (block_modified_) {
-    getVoiceHandler()->unplugAll();
-    getVoiceHandler()->connectAll();
+  if (!block_modified_) return;
 
-    clearModulations();
-    auto connections = getModuleManager().getConnections();
-    for (auto c : connections) {
-      connectModulationFromModel(c);
-    }
+  getVoiceHandler()->unplugAll();
+  getVoiceHandler()->connectAll();
 
-    getVoiceHandler()->disconnectAllDefaultEnvs();
-    getVoiceHandler()->connectAllDefaultEnvs();
-
-    block_modified_ = false;
+  clearModulations();
+  auto connections = getModuleManager().getConnections();
+  for (auto c : connections) {
+    connectModulationFromModel(c);
   }
+
+  getVoiceHandler()->disconnectAllDefaultEnvs();
+  getVoiceHandler()->connectAllDefaultEnvs();
+
+  block_modified_ = false;
 }
 
 bool PluginProcessor::hasEditor() const {

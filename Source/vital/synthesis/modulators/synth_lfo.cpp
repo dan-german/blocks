@@ -53,7 +53,6 @@ force_inline void SynthLfo::processTrigger() {
 
   if (reset_mask.anyMask()) {
     poly_float frequency = input(kFrequency)->at(0);
-    std::cout << "frequency: " << frequency[0] << std::endl;
 
     if (sync_type == kSync) {
       poly_float sync_phase = utils::getCycleOffsetFromSeconds(*sync_seconds_, frequency);

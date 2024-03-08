@@ -171,13 +171,8 @@ void MainComponent::setupListeners() {
   };
 
   ui_layer_.newPresetButton->on_click_ = [this]() {
-    // DBG("changed preset");
-    // delegate->editorChangedPreset(-1);
-    // clear();
-
+    delegate->editorChangedPreset(-1);
     clear();
-    auto preset = delegate->editorChangedPreset(0);
-    loadState(preset);
     dark_background_.setVisible(false);
   };
 

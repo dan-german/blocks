@@ -162,12 +162,8 @@ std::shared_ptr<vital::Processor> BlocksVoiceHandler::findProcessorAbove(Index i
 // }
 
 void BlocksVoiceHandler::unplugAll() {
-
   for (auto processor : active_processors_) {
     processor->unplug(processor->input()->source);
-    // processor->unplugIndex(0);
-    // if (processor->numInputs())
-    //   processor->unplug(processor->input()->source->owner);
   }
 
   for (auto node : column_nodes_) {
@@ -274,40 +270,41 @@ void BlocksVoiceHandler::init() {
 }
 
 void BlocksVoiceHandler::initializeDefaultAmpEnvs() {
-  for (auto osc : oscillators_with_default_envs_) {
+  for (auto processor : processors_with_default_env) {
     auto source = default_amp_env_->output();
     auto modulation_connection_processor = std::make_shared<ModulationConnectionProcessor>(1000);
     addProcessor(modulation_connection_processor.get());
     modulation_connection_processor->plug(default_amp_env_->output(), ModulationConnectionProcessor::kModulationInput);
     modulation_connection_processor->init();
-    osc_to_default_env_mod_processor_map_[osc] = modulation_connection_processor;
+    processor_default_env_mp_map_[processor] = modulation_connection_processor;
   }
 }
 
 void BlocksVoiceHandler::setDefaultAmpEnvState(std::string target_name, bool enable) {
   auto osc = active_processor_map_[target_name];
-  osc_to_default_env_mod_processor_map_[osc]->enable(enable);
+  processor_default_env_mp_map_[osc]->enable(enable);
 }
 
 void BlocksVoiceHandler::disconnectAllDefaultEnvs() {
-  for (auto osc : oscillators_with_default_envs_) {
-    auto processor = osc_to_default_env_mod_processor_map_[osc];
+  for (auto osc : processors_with_default_env) {
+    auto processor = processor_default_env_mp_map_[osc];
     auto destination = osc->getPolyModulationDestination("amp env destination");
     destination->unplug(processor.get());
     osc->getPolyModulationSwitch("amp env destination")->set(0.0f);
-    processor->enable(false);
+    // processor->enable(false);
     setInactiveNonaccumulatedOutput(destination->output());
     disableModulationConnection(processor.get());
   }
 }
 
 void BlocksVoiceHandler::connectAllDefaultEnvs() {
-  for (auto osc : oscillators_with_default_envs_) {
-    auto processor = osc_to_default_env_mod_processor_map_[osc];
+  for (auto osc : processors_with_default_env) {
+    std::cout << "connecting default dev" << std::endl;
+    auto processor = processor_default_env_mp_map_[osc];
     auto destination = osc->getPolyModulationDestination("amp env destination");
     processor->setDestinationScale(1.0f);
     processor->setPolyphonicModulation(true);
-    processor->enable(true);
+    // processor->enable(true);
     processor->control_map_["amount"]->set(1.0f);
     destination->plugNext(processor.get());
     processor->process(1);
@@ -384,7 +381,7 @@ void BlocksVoiceHandler::createNoises() {
     noise->plug(note_count(), SampleModule::kNoteCount);
     noise->plug(bent_midi_, SampleModule::kMidi);
     processor_pool_["noise"].push_back(noise);
-    oscillators_with_default_envs_.push_back(noise);
+    processors_with_default_env.push_back(noise);
   }
 }
 
@@ -446,7 +443,7 @@ void BlocksVoiceHandler::createOscillators() {
 
     processor_pool_[type].push_back(osc);
     oscillators_.push_back(osc);
-    oscillators_with_default_envs_.push_back(osc);
+    processors_with_default_env.push_back(osc);
   }
 }
 

@@ -137,11 +137,11 @@ private:
 
   std::vector<std::vector<std::shared_ptr<SynthModule>>> processor_matrix_;
   std::vector<std::shared_ptr<OscillatorModule>> oscillators_;
-  std::vector<std::shared_ptr<SynthModule>> oscillators_with_default_envs_;
+  std::vector<std::shared_ptr<SynthModule>> processors_with_default_env;
 public:
   std::vector<std::shared_ptr<ColumnMasterModule>> column_nodes_;
   void setDefaultAmpEnvState(std::string target_name, bool enable);
-  std::map<std::shared_ptr<SynthModule>, std::shared_ptr<ModulationConnectionProcessor>> osc_to_default_env_mod_processor_map_;
+  std::map<std::shared_ptr<SynthModule>, std::shared_ptr<ModulationConnectionProcessor>> processor_default_env_mp_map_;
 
   std::vector<std::shared_ptr<SynthModule>> lfos_;
   std::vector<std::shared_ptr<SynthModule>> envelopes_;
