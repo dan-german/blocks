@@ -290,11 +290,11 @@ void PluginProcessor::editorAdjustedModulator(std::string parameter_name, int in
   if (modulator->id.type == "lfo" && parameter_name == "tempo") {
     bool is_changing_seconds = modulator->parameter_map_["sync"]->value_processor->value() == 0.0f;
     parameter_name = is_changing_seconds ? "frequency" : "tempo";
-    modulator->parameter_map_[parameter_name]->value_processor->set(value);
+    modulator->parameter_map_[parameter_name]->set(value);
     return;
   }
 
-  modulator->parameter_map_[parameter_name]->value_processor->set(value);
+  modulator->parameter_map_[parameter_name]->set(value);
 }
 
 void PluginProcessor::editorAdjustedBlock(Index index, int parameter, float value) {
@@ -319,11 +319,11 @@ void PluginProcessor::editorAdjustedBlock(Index index, int parameter, float valu
 }
 
 void PluginProcessor::editorChangedModulationMagnitude(int index, float magnitude) {
-  synth_->getModuleManager().getConnection(index)->amount_parameter_->value_processor->set(magnitude);
+  synth_->getModuleManager().getConnection(index)->amount_parameter_->set(magnitude);
 }
 
 void PluginProcessor::editorChangedModulationPolarity(int index, bool bipolar) {
-  synth_->getModuleManager().getConnection(index)->bipolar_parameter_->value_processor->set(bipolar);
+  synth_->getModuleManager().getConnection(index)->bipolar_parameter_->set(bipolar);
   // moduleManager.getConnection(index)->setPolarity(bipolar);
 }
 

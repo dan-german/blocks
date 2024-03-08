@@ -54,9 +54,14 @@ struct ValueDetails {
   bool internal_modulation = false;
   bool reset = false;
   Value* value_processor;
-  float value;
+  mono_float value;
   int decimal_places = 2;
   bool hidden = false;
+  void set(mono_float value) { 
+    std::cout << "value: " << value << std::endl;
+    this->value = value;
+    this->value_processor->set(value);
+  }
 };
 
 class ValueDetailsLookup {
