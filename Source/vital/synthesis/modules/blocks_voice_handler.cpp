@@ -599,7 +599,7 @@ void BlocksVoiceHandler::createVoiceOutput() {
   amplitude->plug(voice_amplitude, 1);
   addProcessor(amplitude);
 
-  Value* val = new Value(0.5f);
+  Value* val = new Value(0.9f);
   addProcessor(val);
 
   amplitude_ = new Square();

@@ -897,6 +897,7 @@ void SynthOscillator::levelOutput(poly_float* audio_out, const poly_float* raw_o
   poly_float delta_pan_amplitude = (pan_amplitude_ - current_pan_amplitude) * (1.0f / num_samples);
 
   const poly_float* amplitude = input(kAmplitude)->source->buffer;
+  // std::cout << "amplitude: " << amplitude[0][0] << std::endl;
   poly_float zero = 0.0f;
   for (int i = 0; i < num_samples; ++i) {
     poly_float amp = utils::max(amplitude[i], zero);
