@@ -53,7 +53,8 @@ struct ValueDetails {
   bool smooth_value = false;
   bool internal_modulation = false;
   bool reset = false;
-  Value* val;
+  Value* value_processor;
+  float value;
   int decimal_places = 2;
   bool hidden = false;
 };

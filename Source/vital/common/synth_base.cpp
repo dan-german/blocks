@@ -856,11 +856,10 @@ vital::ModulationConnection* SynthBase::createConnection(std::string modulator_n
   bool create = connection == nullptr;
   if (create) {
     connection = getModulationBank().createConnection(modulator_name, target_name, parameter_name);
-    std::cout << "created connection " << connection->modulation_processor << std::endl;
     connection->destination_scale = destination_scale;
     connectModulation(connection);
-  } else { 
-    std::cout << "got connection " << connection->modulation_processor  << std::endl;
+  } else {
+    std::cout << "got connection " << connection->modulation_processor << std::endl;
   }
   return connection;
 }

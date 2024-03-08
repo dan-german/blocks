@@ -31,7 +31,7 @@ public:
 
   ValueBridge() = delete;
 
-  ValueBridge(vital::ValueDetails& details): juce::AudioProcessorParameter(1), details_(details), name_(details.name), value_(details.val), listener_(nullptr), source_changed_(false) {
+  ValueBridge(vital::ValueDetails& details): juce::AudioProcessorParameter(1), details_(details), name_(details.name), value_(details.value_processor), listener_(nullptr), source_changed_(false) {
     span_ = details_.max - details_.min;
     if (details_.value_scale == vital::ValueDetails::kIndexed)
       span_ = std::round(span_);

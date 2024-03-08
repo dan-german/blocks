@@ -26,6 +26,7 @@ Connection::Connection(Module* target,
   name = "modulation " + std::to_string(number);
   amount_parameter_ = std::make_shared<vital::ValueDetails>();
   amount_parameter_->min = -1.0f;
+  amount_parameter_->value = 1.0f;
   bipolar_parameter_ = std::make_shared<vital::ValueDetails>();
 }
 
@@ -33,6 +34,7 @@ Connection::Connection(int number): number(number) {
   name = "modulation " + std::to_string(number);
   amount_parameter_ = std::make_shared<vital::ValueDetails>();
   amount_parameter_->min = -1.0f;
+  amount_parameter_->value = 1.0f;
   bipolar_parameter_ = std::make_shared<vital::ValueDetails>();
 };
 
@@ -64,9 +66,9 @@ bool Connection::isOscGainEnvelope() {
 }
 
 void Connection::reset(vital::ModulationConnection* vital_connection) {
-  amount_parameter_->val = vital_connection->modulation_processor->control_map_["amount"];
-  amount_parameter_->val->set(1.0f);
-  bipolar_parameter_->val = vital_connection->modulation_processor->control_map_["bipolar"];
+  amount_parameter_->value_processor = vital_connection->modulation_processor->control_map_["amount"];
+  amount_parameter_->value_processor->set(amount_parameter_->value);
+  bipolar_parameter_->value_processor = vital_connection->modulation_processor->control_map_["bipolar"];
   vital_connection_ = vital_connection;
 }
 }

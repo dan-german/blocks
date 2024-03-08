@@ -51,12 +51,12 @@ Preset Preset::create(String name,
   for (auto connection : connections) {
     Connection modulationInfo;
 
-    modulationInfo.parameter = connection->target->parameter_map_[connection->parameter_name_]->val->value();
+    modulationInfo.parameter = connection->target->parameter_map_[connection->parameter_name_]->value_processor->value();
     modulationInfo.source = connection->source->name;
     modulationInfo.target = connection->target->name;
     modulationInfo.number = connection->number;
-    modulationInfo.bipolar = static_cast<bool>(connection->bipolar_parameter_->val->value());
-    modulationInfo.amount = connection->amount_parameter_->val->value();
+    modulationInfo.bipolar = static_cast<bool>(connection->bipolar_parameter_->value_processor->value());
+    modulationInfo.amount = connection->amount_parameter_->value_processor->value();
 
     info.connections_.push_back(modulationInfo);
   }
@@ -71,5 +71,5 @@ void Preset::setParamsAndID(std::shared_ptr<model::Module> module, Module& modul
   };
 
   for (auto parameter : module->parameters_)
-    moduleInfo.parameters[parameter->name] = parameter->val->value();
+    moduleInfo.parameters[parameter->name] = parameter->value_processor->value();
 }

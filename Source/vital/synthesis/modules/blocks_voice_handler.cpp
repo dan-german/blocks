@@ -417,7 +417,7 @@ std::shared_ptr<SynthModule> BlocksVoiceHandler::createProcessorForBlock(std::sh
   }
 
   for (auto& pair : module->parameter_map_) {
-    module->parameter_map_[pair.first]->val = processor->control_map_[pair.first];
+    module->parameter_map_[pair.first]->value_processor = processor->control_map_[pair.first];
   }
 
   auto index = module->index;

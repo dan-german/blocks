@@ -58,7 +58,7 @@ void InspectorComponent::spawnSlider(vital::ValueDetails parameter, std::shared_
   parameterSliders.add(slider);
   slider_to_parameter_name_map_[&slider->slider] = parameter.name;
   addAndMakeVisible(slider);
-  slider->slider.setValue(parameter.val->value(), dontSendNotification);
+  slider->slider.setValue(parameter.value_processor->value(), dontSendNotification);
 }
 
 void InspectorComponent::resetInspector() {

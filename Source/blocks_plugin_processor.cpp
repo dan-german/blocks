@@ -28,7 +28,7 @@ PluginProcessor::PluginProcessor(): juce::AudioProcessor(BusesProperties().withO
   for (auto column_control : synth_->getModuleManager().pool.column_controls_) {
     auto processor = getVoiceHandler()->column_nodes_[column_control->id.number - 1];
     for (auto& pair : column_control->parameter_map_) {
-      column_control->parameter_map_[pair.first]->val = processor->control_map_[pair.first];
+      column_control->parameter_map_[pair.first]->value_processor = processor->control_map_[pair.first];
     }
   }
 
@@ -288,13 +288,13 @@ void PluginProcessor::editorAdjustedModulator(std::string parameter_name, int in
   auto modulator = synth_->getModuleManager().getModulator(index);
 
   if (modulator->id.type == "lfo" && parameter_name == "tempo") {
-    bool is_changing_seconds = modulator->parameter_map_["sync"]->val->value() == 0.0f;
+    bool is_changing_seconds = modulator->parameter_map_["sync"]->value_processor->value() == 0.0f;
     parameter_name = is_changing_seconds ? "frequency" : "tempo";
-    modulator->parameter_map_[parameter_name]->val->set(value);
+    modulator->parameter_map_[parameter_name]->value_processor->set(value);
     return;
   }
 
-  modulator->parameter_map_[parameter_name]->val->set(value);
+  modulator->parameter_map_[parameter_name]->value_processor->set(value);
 }
 
 void PluginProcessor::editorAdjustedBlock(Index index, int parameter, float value) {
@@ -302,28 +302,28 @@ void PluginProcessor::editorAdjustedBlock(Index index, int parameter, float valu
 
   if (block->id.type == "delay") {
     if (parameter == 4) {
-      auto sync = block->parameter_map_["sync"]->val->value();
-      bool is_changing_seconds = block->parameter_map_["sync"]->val->value() == 0.0f;
+      auto sync = block->parameter_map_["sync"]->value_processor->value();
+      bool is_changing_seconds = block->parameter_map_["sync"]->value_processor->value() == 0.0f;
       if (is_changing_seconds) {
         std::cout << "is changing freq: " << value << std::endl;
-        block->parameter_map_["frequency"]->val->set(value);
+        block->parameter_map_["frequency"]->value_processor->set(value);
       } else {
         std::cout << "is changing tempo" << std::endl;
-        block->parameter_map_["tempo"]->val->set(value);
+        block->parameter_map_["tempo"]->value_processor->set(value);
       }
       return;
     }
   }
 
-  block->parameters_[parameter]->val->set(value);
+  block->parameters_[parameter]->value_processor->set(value);
 }
 
 void PluginProcessor::editorChangedModulationMagnitude(int index, float magnitude) {
-  synth_->getModuleManager().getConnection(index)->amount_parameter_->val->set(magnitude);
+  synth_->getModuleManager().getConnection(index)->amount_parameter_->value_processor->set(magnitude);
 }
 
 void PluginProcessor::editorChangedModulationPolarity(int index, bool bipolar) {
-  synth_->getModuleManager().getConnection(index)->bipolar_parameter_->val->set(bipolar);
+  synth_->getModuleManager().getConnection(index)->bipolar_parameter_->value_processor->set(bipolar);
   // moduleManager.getConnection(index)->setPolarity(bipolar);
 }
 
@@ -706,13 +706,13 @@ void PluginProcessor::editorEndedAdjustingColumn(std::string control, int column
 }
 
 void PluginProcessor::editorAdjustedColumn(std::string control, int column, float value) {
-  getModuleManager().getColumnControl(column)->parameter_map_[control]->val->set(value);
+  getModuleManager().getColumnControl(column)->parameter_map_[control]->value_processor->set(value);
 }
 
 void PluginProcessor::setValue(std::string module_id, std::string parameter_name, float value) {
   auto m = synth_->getModuleManager().getModule(module_id);
   auto p = m->parameter_map_[parameter_name];
-  p->val->set(value);
+  p->value_processor->set(value);
   // p->paramter_map_[parameter_name]->val->set(value);
   // parameter->b
   // parameter->bridge->set

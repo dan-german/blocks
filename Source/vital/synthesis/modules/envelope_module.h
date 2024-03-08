@@ -51,10 +51,10 @@ public:
     // control_map_["sustain"] = module->parameter_map_["sustain"]->val;
     // control_map_["release"] = module->parameter_map_["release"]->val;
 
-    module->parameter_map_["attack"]->val = control_map_["attack"];
-    module->parameter_map_["decay"]->val = control_map_["decay"];
-    module->parameter_map_["sustain"]->val = control_map_["sustain"];
-    module->parameter_map_["release"]->val = control_map_["release"];
+    module->parameter_map_["attack"]->value_processor = control_map_["attack"];
+    module->parameter_map_["decay"]->value_processor = control_map_["decay"];
+    module->parameter_map_["sustain"]->value_processor = control_map_["sustain"];
+    module->parameter_map_["release"]->value_processor = control_map_["release"];
 
     // for (auto parameter : module->parameters_) { 
     //   parameter->val->set(parameter->default_value);
@@ -64,10 +64,10 @@ public:
   };
 
   void followModule(std::shared_ptr<model::Module> module) {
-    control_map_["attack"] = module->parameter_map_["attack"]->val;
-    control_map_["decay"] = module->parameter_map_["decay"]->val;
-    control_map_["sustain"] = module->parameter_map_["sustain"]->val;
-    control_map_["release"] = module->parameter_map_["release"]->val;
+    control_map_["attack"] = module->parameter_map_["attack"]->value_processor;
+    control_map_["decay"] = module->parameter_map_["decay"]->value_processor;
+    control_map_["sustain"] = module->parameter_map_["sustain"]->value_processor;
+    control_map_["release"] = module->parameter_map_["release"]->value_processor;
     auto a = control_map_["attack"];
     // a.
   }

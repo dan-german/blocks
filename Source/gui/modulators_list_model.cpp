@@ -75,7 +75,7 @@ void ModulatorsListModel::setupModulatorComponent(std::shared_ptr<model::Module>
     auto slider = component.sliders[i];
     component.slider_parameter_name_map_[&slider->box_slider_.slider] = parameter->name;
 
-    auto value = parameter->val->value();
+    auto value = parameter->value_processor->value();
     slider->label.setText(parameter->display_name, dontSendNotification);
 
     double interval = 0.0;
@@ -145,7 +145,7 @@ void ModulatorsListModel::setSliderAsFrequency(std::shared_ptr<model::Module> mo
   };
 
   slider->box_slider_.slider.setRange(-2.0, 9.0);
-  auto value = module->parameter_map_["frequency"]->val->value();
+  auto value = module->parameter_map_["frequency"]->value_processor->value();
   slider->box_slider_.slider.setValue(value, dontSendNotification);
   slider->box_slider_.valueLabel.setText(slider->box_slider_.slider.getTextFromValue(value), dontSendNotification);
 }
@@ -154,7 +154,7 @@ void ModulatorsListModel::setSliderAsTempo(std::shared_ptr<model::Module> module
   slider->label.setText("tempo", dontSendNotification);
   slider->box_slider_.slider.textFromValueFunction = [](double value) { return strings::kSyncedFrequencyNames[int(value)]; };
   slider->box_slider_.slider.setRange(0.0, 12.0, 1.0);
-  auto value = module->parameter_map_["tempo"]->val->value();
+  auto value = module->parameter_map_["tempo"]->value_processor->value();
   slider->box_slider_.slider.setValue(value, dontSendNotification);
   slider->box_slider_.valueLabel.setText(slider->box_slider_.slider.getTextFromValue(value), dontSendNotification);
 }
