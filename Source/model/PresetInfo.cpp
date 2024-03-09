@@ -51,7 +51,7 @@ Preset Preset::create(String name,
   for (auto connection : connections) {
     Connection modulationInfo;
 
-    modulationInfo.parameter = connection->target->parameter_map_[connection->parameter_name_]->value_processor->value();
+    modulationInfo.parameter = connection->parameter_name_;
     modulationInfo.source = connection->source->name;
     modulationInfo.target = connection->target->name;
     modulationInfo.number = connection->number;

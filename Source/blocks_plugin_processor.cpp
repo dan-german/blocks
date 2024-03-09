@@ -305,10 +305,8 @@ void PluginProcessor::editorAdjustedBlock(Index index, int parameter, float valu
       auto sync = block->parameter_map_["sync"]->value_processor->value();
       bool is_changing_seconds = block->parameter_map_["sync"]->value_processor->value() == 0.0f;
       if (is_changing_seconds) {
-        std::cout << "is changing freq: " << value << std::endl;
         block->parameter_map_["frequency"]->value_processor->set(value);
       } else {
-        std::cout << "is changing tempo" << std::endl;
         block->parameter_map_["tempo"]->value_processor->set(value);
       }
       return;
@@ -370,7 +368,7 @@ std::vector<std::shared_ptr<model::Connection>> PluginProcessor::getModulations(
 std::shared_ptr<Block> PluginProcessor::getBlock(Index index) {
 }
 
-std::shared_ptr<model::Module> PluginProcessor::getBlock2(Index index) {
+std::shared_ptr<model::Block> PluginProcessor::getBlock2(Index index) {
   return (index.row == -1 || index.column == -1) ? nullptr : synth_->getModuleManager().getBlock(index);
 }
 
@@ -409,12 +407,12 @@ void PluginProcessor::editorDisconnectedModulation(int index) {
 }
 
 Preset PluginProcessor::editorChangedPreset(int index) {
-  // if (index == -1) {
-  //   clear();
-  //   return Preset();
-  // }
+  if (index == -1) {
+    clear();
+    return Preset();
+  }
 
-  auto preset = preset_manager_.presets[0];
+  auto preset = preset_manager_.presets[index];
   loadPreset(preset);
   return preset;
 }
@@ -432,38 +430,33 @@ void PluginProcessor::loadPreset(Preset preset) {
   for (auto presetBlock : preset.blocks) {
     Index index = { presetBlock.index.first, presetBlock.index.second };
     auto block = addBlock(presetBlock.id.type, index, presetBlock.id.number);
-    // auto block = addBlock(
 
     for (auto const& [key, val] : presetBlock.parameters) {
-      // block->parameterMap[key]->audioParameter->setValue(val);
-      // block->parameter_map_[key]->val->set(val);
+      block->parameter_map_[key]->set(val);
     }
 
-    if (presetBlock.length > 1) {
+    // if (presetBlock.length > 1) {
       // expand(block->index, presetBlock.length - 1, true);
-    }
+    // }
   }
 
-  // for (auto presetModulator : preset.modulators) {
-  //   auto modulator = addModulator(presetModulator.id.type, presetModulator.id.number, presetModulator.colour);
-  //   for (auto const& [key, val] : presetModulator.parameters)
-  //     modulator->parameterMap[key]->audioParameter->setValue(val);
-  // }
+  for (auto presetModulator : preset.modulators) {
+    auto modulator = addModulator(presetModulator.id.type, presetModulator.id.number, presetModulator.colour);
+    for (auto const& [key, val] : presetModulator.parameters)
+      modulator->parameter_map_[key]->set(val);
+  }
 
-  // for (auto presetConnection : preset.connections_) {
-  //   auto modulator = moduleManager.getModule(presetConnection.source);
+  for (auto presetConnection : preset.connections_) {
+    auto modulator = synth_->getModuleManager().getModule(presetConnection.source);
 
-  //   int modulatorIndex = moduleManager.modulators.indexOf(modulator);
+    auto target = synth_->getModuleManager().getModule(presetConnection.target);
+    auto model = synth_->getModuleManager().addConnection(modulator, target, presetConnection.parameter, presetConnection.number);
+    model->parameter_name_ = presetConnection.parameter;
 
-  //   auto target = moduleManager.getModule(presetConnection.target);
-  //   auto parameterName = presetConnection.parameter;
-  //   auto parameter = target->parameterMap[parameterName];
-  //   auto parameterIndex = target->parameters.indexOf(parameter);
-  //   auto modulation = connect(modulatorIndex, presetConnection.target, parameterIndex, presetConnection.number);
-
-  //   modulation->magnitudeParameter->setValue(presetConnection.amount);
-  //   modulation->setPolarity(presetConnection.bipolar);
-  // }
+    model->amount_parameter_->value = presetConnection.amount;
+    model->bipolar_parameter_->value = presetConnection.bipolar;
+    connectModulationFromModel(model);
+  }
   block_modified_ = true;
 }
 
@@ -670,12 +663,12 @@ Preset PluginProcessor::getStateRepresentation() {
 }
 
 juce::StringArray PluginProcessor::editorRequestsPresetNames() {
-  // StringArray result;
+  StringArray result;
 
-  // for (auto preset : presetManager.presets)
-  //   result.add(preset.name);
+  for (auto preset : preset_manager_.presets)
+    result.add(preset.name);
 
-  return {};
+  return result;
 }
 
 const vital::StatusOutput* PluginProcessor::editorRequestsStatusOutput(std::string name) {

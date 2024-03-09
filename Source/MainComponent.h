@@ -201,7 +201,7 @@ struct MainComponent::Delegate {
   virtual std::shared_ptr<Module> editorAddedModulator(Model::Type code) = 0;
   virtual std::shared_ptr<model::Module> editorAddedModulator2(Model::Type code) = 0;
   virtual std::shared_ptr<Block> getBlock(Index index) = 0;
-  virtual std::shared_ptr<model::Module> getBlock2(Index index) = 0;
+  virtual std::shared_ptr<model::Block> getBlock2(Index index) = 0;
   virtual std::shared_ptr<model::Block> editorAddedBlock2(Model::Type code, Index index) = 0;
   virtual std::shared_ptr<Block> editorAddedBlock(Model::Type code, Index index) = 0;
   virtual Array<int> editorRequestsActiveColumns() = 0;

@@ -83,7 +83,7 @@ void MainComponent::inspectorGestureChanged(std::string parameter_name, bool sta
 
 void MainComponent::changeModulePainter(int value) {
   auto cast_block = static_cast<BlockComponent*>(focused_grid_item_);
-  cast_block->getPainter()->setWaveformType(static_cast<OscillatorPainter::WaveformType>(value));
+  cast_block->getPainter()->setWaveformType(BlockComponent::getWaveformType(value));
 }
 
 MainComponent::~MainComponent() {
@@ -406,7 +406,6 @@ void MainComponent::inspectorChangedParameter(int sliderIndex, float value) {
   } else {
     auto module = delegate->getBlock2(moduleIndex);
     delegate->editorAdjustedBlock(moduleIndex, sliderIndex, value);
-    // auto cast = 
     updateModuleComponentVisuals(sliderIndex, value, module);
   }
 }
@@ -415,7 +414,6 @@ void MainComponent::updateModuleComponentVisuals(int sliderIndex, float value, s
   if (module->id.type == Model::Types::osc) {
     if (module->parameters_[sliderIndex]->name == "wave") {
       int adjusted_value = (int)value > 0 ? (int)value + 1 : 0;   
-      std::cout << "adjusted_value " << adjusted_value << std::endl;
       changeModulePainter(adjusted_value);
     }
     return;
@@ -450,13 +448,13 @@ void MainComponent::refreshInspector() {
   ResizeInspector();
 }
 
-PopupMenu MainComponent::spawnModulationMenu(Module& victim) {
+PopupMenu MainComponent::spawnModulationMenu(Module& target) {
   PopupMenu modulateMenu;
 
   modulateMenu.setLookAndFeel(&blocks_laf_);
 
-  for (int i = 0; i < victim.parameters.size(); i++)
-    modulateMenu.addItem(i + 1, victim.parameters[i]->id);
+  for (int i = 0; i < target.parameters.size(); i++)
+    modulateMenu.addItem(i + 1, target.parameters[i]->id);
 
   return modulateMenu;
 }
@@ -614,7 +612,7 @@ void MainComponent::sliderValueChanged(Slider* slider) {
 void MainComponent::loadState(Preset preset) {
   for (auto presetBlock : preset.blocks) {
     auto block = delegate->getBlock2(Index { presetBlock.index.first, presetBlock.index.second });
-    // spawnBlockComponent(block);
+    spawnBlockComponent(block);
   }
 
   for (auto presetTab : preset.tabs) {
@@ -623,7 +621,7 @@ void MainComponent::loadState(Preset preset) {
   }
 
   ui_layer_.setConnections(delegate->getModulations());
-  // uiLayer.setModulators(delegate->getModulators());
+  ui_layer_.setModulators(delegate->getModulators2());
   ui_layer_.preset_button_.content.label.setText(preset.name, dontSendNotification);
 
   for (auto block : blocks) block->animate();
@@ -646,9 +644,9 @@ void MainComponent::modulatorIsDragging(ModulatorComponent* modulatorComponent, 
 
     previous_slider_under_mouse_ = sliderIndexUnderMouse;
 
-    auto victim = getFocusedModule();
+    auto target = getFocusedModule();
 
-    // if (victim->parameters[sliderIndexUnderMouse]->isModulatable) {
+    // if (target->parameters[sliderIndexUnderMouse]->isModulatable) {
     auto slider = inspector_.getSliders()[sliderIndexUnderMouse];
     slider->setHighlighted(true, modulatorComponent->getColour());
     // }

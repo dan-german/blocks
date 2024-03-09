@@ -150,7 +150,7 @@ json PresetCoder::encodeModule(Preset::Module module) {
 
   json parameters;
   for (auto const& [key, value] : module.parameters)
-    parameters[key.toStdString()] = value;
+    parameters[key] = value;
 
   moduleJson["parameters"] = parameters;
   return moduleJson;

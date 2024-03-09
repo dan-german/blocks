@@ -173,7 +173,7 @@ BlockComponent* BlockComponent::create(std::shared_ptr<model::Block> block) {
     float waveformFloat = block->parameters_[0]->value_processor->value();  
     int waveformInt = static_cast<int>(waveformFloat);
     auto painter = new OscillatorPainter();
-    painter->setWaveformType(static_cast<OscillatorPainter::WaveformType>(waveformInt));
+    painter->setWaveformType(getWaveformType(waveformInt));
     painter->thickness = 2.0f;
     component->setPainter(painter);
   } else if (block->id.type == Model::Types::noise) {

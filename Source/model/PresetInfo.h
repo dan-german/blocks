@@ -19,7 +19,7 @@ class Preset {
 public:
   struct Module {
     ID id;
-    std::map<String, float> parameters;
+    std::map<std::string, float> parameters;
   };
 
   struct Block: public Preset::Module {
