@@ -47,7 +47,11 @@ public:
   Phaser();
   virtual ~Phaser() { }
 
-  virtual Processor* clone() const override { return new Phaser(*this); }
+  virtual Processor* clone() const override {
+    std::cout << "cloning phaser " << std::endl;
+    return new Phaser(*this);
+  }
+
   void process(int num_samples) override;
   void processWithInput(const poly_float* audio_in, int num_samples) override;
   void init() override;

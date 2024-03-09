@@ -14,3 +14,6 @@ public:
   }
 };
 }
+
+// { "frequency", 0x000000, -7.0, 9.0, 1.0, 0.0, 1.0,
+// ValueDetails::kExponential, true, " secs", "Frequency", nullptr },

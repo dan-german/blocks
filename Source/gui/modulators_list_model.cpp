@@ -140,12 +140,13 @@ void ModulatorsListModel::onLFOParameterChange(std::shared_ptr<model::Module> mo
 void ModulatorsListModel::setSliderAsFrequency(std::shared_ptr<model::Module> module, LabeledSlider* slider) const {
   slider->label.setText("seconds", dontSendNotification);
 
-  slider->box_slider_.slider.textFromValueFunction = [slider, module](double value) {
-    return UIUtils::getSliderTextFromValue(value, *(module->parameter_map_["frequency"]));
+  auto frequency_parameter = module->parameter_map_["frequency"];
+  slider->box_slider_.slider.textFromValueFunction = [frequency_parameter, module](double value) {
+    return UIUtils::getSliderTextFromValue(value, *frequency_parameter);
   };
 
-  slider->box_slider_.slider.setRange(-2.0, 9.0);
-  auto value = module->parameter_map_["frequency"]->value_processor->value();
+  slider->box_slider_.slider.setRange(frequency_parameter->min, frequency_parameter->max);
+  auto value = frequency_parameter->value_processor->value();
   slider->box_slider_.slider.setValue(value, dontSendNotification);
   slider->box_slider_.valueLabel.setText(slider->box_slider_.slider.getTextFromValue(value), dontSendNotification);
 }

@@ -29,44 +29,17 @@ PhaserModule::~PhaserModule() {
 }
 
 void PhaserModule::init() {
-  // phaser_ = new Phaser();
   phaser_->useOutput(output(kAudioOutput), Phaser::kAudioOutput);
   phaser_->useOutput(output(kCutoffOutput), Phaser::kCutoffOutput);
   addIdleProcessor(phaser_);
 
-  // Output* phaser_free_frequency = createMonoModControl("phaser_frequency");
   Output* phaser_free_frequency = createPolyModControl2({ .name = "frequency", .min = -5.0f, .max = 2.0f, .default_value = -3.0f,. value_scale = ValueScale::kExponential });
-
-  // phaser: [
-  // { name: 'dry_wet', default_value: 1 },
-  // { name: 'feedback', default_value: 0.5 },
-  // {
-  //   name: 'frequency',
-  //   min: -5,
-  //   max: 2,
-  //   value_scale: 6,
-  //   default_value: -3
-  // },
-  // { name: 'mod_depth', max: 48, default_value: 24 },
-  // { name: 'on', value_scale: 0, default_value: 1 },
-  // { name: 'phase_offset', default_value: 0.333333 },
-  // { name: 'sync', max: 3, value_scale: 0, default_value: 1 },
-  // { name: 'tempo', max: 10, value_scale: 0, default_value: 3 },
-  // { 
-
-    // add({ .name = "blend", .max = 2, .default_value = 1 });
-// Output* phaser_free_frequency = createMonoModControl("phaser_frequency");
-
   Output* phaser_frequency = createTempoSyncSwitch("phaser", phaser_free_frequency->owner, beats_per_second_, false);
   Output* phaser_feedback = createPolyModControl2({ .name = "feedback", .default_value = 0.5 });
-  Output* phaser_wet = createPolyModControl2({ .name = "mix" });
-  // Output* phaser_center = createMonoModControl("phaser_center", true, true);
+  Output* phaser_wet = createPolyModControl2({ .name = "mix", .default_value = 1.0f });
   Output* phaser_center = createPolyModControl2({ .name = "center", .min = 8.0f, .max = 136.0f, .default_value = 80.0f, .audio_rate = true, .smooth_value = true });
-  // Output* phaser_mod_depth = createMonoModControl("phaser_mod_depth");
   Output* phaser_mod_depth = createPolyModControl2({ .name = "depth", .max = 48.0f, .default_value = 24.0f });
-  // Output* phaser_phase_offset = createMonoModControl("phaser_phase_offset");
   Output* phaser_phase_offset = createPolyModControl2({ .name = "offset", .default_value = 0.333333f });
-  // Output* phaser_blend = createMonoModControl("phaser_blend");
   Output* phaser_blend = createPolyModControl2({ .name = "blend", .max = 2.0f, .default_value = 1.0f });
 
   phaser_->plug(phaser_frequency, Phaser::kRate);
@@ -78,7 +51,6 @@ void PhaserModule::init() {
   phaser_->plug(phaser_blend, Phaser::kBlend);
   phaser_->init();
   enable(true);
-  // phaser->enable(true); 
 
   SynthModule::init();
 }
@@ -108,5 +80,9 @@ void PhaserModule::process(int num_samples) {
   SynthModule::process(num_samples);
   poly_float* audio_in = input()->source->buffer;
   phaser_->processWithInput(audio_in, num_samples);
+}
+
+Processor* PhaserModule::clone() const {
+  return new PhaserModule(*this);
 }
 } // namespace vital

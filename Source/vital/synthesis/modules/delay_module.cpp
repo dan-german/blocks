@@ -34,7 +34,6 @@ void DelayModule::init() {
   delay_->useOutput(output());
   delay_->useInput(input(kReset), MultiDelay::kReset);
 
-  // { "delay_tempo", 0x000000, 4.0, 12.0, 9.0, 0.0, 1.0, ValueDetails::kIndexed, false, "", "Delay Tempo", strings::kSyncedFrequencyNames },
   AddControlInput tempo_input = { .name = "tempo", .min = -2.0f, .max = 9.0f, .default_value = 9.0f, .value_scale = ValueScale::kIndexed };
   Output* free_frequency = createPolyModControl2({ .name = "frequency", .min = -2.0f, .max = 9.0f, .value_scale = ValueScale::kExponential, .default_value = 1.4f });
   Output* frequency = createTempoSyncSwitch2(tempo_input, free_frequency->owner, beats_per_second_, true);
@@ -76,12 +75,5 @@ int i = 0;
 
 void DelayModule::processWithInput(const poly_float* audio_in, int num_samples) {
   SynthModule::process(num_samples);
-  // delay_->processWithInput(audio_in, num_samples);
-
-  // if (i++ % 100 == 0) {
-  //   utils::print(audio_in[0], "de: ", this);
-  // }
-// 
-  // i++;
 }
 } // namespace vital

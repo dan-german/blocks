@@ -300,7 +300,7 @@ void PluginProcessor::editorAdjustedModulator(std::string parameter_name, int in
 void PluginProcessor::editorAdjustedBlock(Index index, int parameter, float value) {
   auto block = synth_->getModuleManager().getBlock(index);
 
-  if (block->id.type == "delay") {
+  if (block->id.type == "delay" || block->id.type == "phaser") {
     if (parameter == 4) {
       auto sync = block->parameter_map_["sync"]->value_processor->value();
       bool is_changing_seconds = block->parameter_map_["sync"]->value_processor->value() == 0.0f;
@@ -315,7 +315,7 @@ void PluginProcessor::editorAdjustedBlock(Index index, int parameter, float valu
     }
   }
 
-  block->parameters_[parameter]->value_processor->set(value);
+  block->parameters_[parameter]->set(value);
 }
 
 void PluginProcessor::editorChangedModulationMagnitude(int index, float magnitude) {

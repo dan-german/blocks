@@ -69,7 +69,7 @@ void Connection::reset(vital::ModulationConnection* vital_connection) {
   amount_parameter_->value_processor = vital_connection->modulation_processor->control_map_["amount"];
   amount_parameter_->set(amount_parameter_->value);
   bipolar_parameter_->value_processor = vital_connection->modulation_processor->control_map_["bipolar"];
-  bipolar_parameter_->set(amount_parameter_->value);
+  bipolar_parameter_->set(bipolar_parameter_->value);
   vital_connection_ = vital_connection;
 }
 }

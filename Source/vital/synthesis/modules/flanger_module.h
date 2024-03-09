@@ -65,7 +65,6 @@ public:
     flanger->addIdleProcessor(cloned);
     return flanger;
   }
-
 protected:
   const Output* beats_per_second_;
   Output* frequency_;
