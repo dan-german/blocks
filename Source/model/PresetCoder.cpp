@@ -18,6 +18,7 @@ std::string PresetCoder::encode(Preset presetData) {
   jsonPreset["blocks"] = encodeBlocks(presetData.blocks);
   jsonPreset["modulators"] = encodeModulators(presetData.modulators);
   jsonPreset["modulations"] = encodeModulations(presetData.connections_);
+  jsonPreset["columns"] = encodeColumns(presetData.column_controls);
   jsonPreset["format_version"] = 0;
 
   return jsonPreset.dump(2);
@@ -56,6 +57,16 @@ json PresetCoder::encodeBlocks(std::vector<Preset::Block> blocks) {
     jsonModule["length"] = block.length;
     jsonModule["index"] = block.index;
     array.push_back(jsonModule);
+  }
+
+  return array;
+}
+
+json PresetCoder::encodeColumns(std::vector<Preset::Module> columns) {
+  json array = json::array();
+
+  for (auto column : columns) {
+    array.push_back(encodeModule(column));
   }
 
   return array;
@@ -118,6 +129,12 @@ std::optional<Preset> PresetCoder::decode(std::string jsonString) {
     preset.modulators.push_back(module);
   }
 
+  for (json& jsonColumn : presetInJson.at("columns")) {
+    Preset::Module column {};
+    decodeModule(jsonColumn, column);
+    preset.column_controls.push_back(column);
+  }
+
   for (json& jsonModulation : presetInJson.at("modulations")) {
     Preset::Connection modulation;
     modulation.target = jsonModulation.at("target");
@@ -136,9 +153,11 @@ std::optional<Preset> PresetCoder::decode(std::string jsonString) {
 void PresetCoder::decodeModule(json& moduleJson, Preset::Module& module) {
   auto name = moduleJson.at("name").get<std::string>();
 
-  auto spaceIndex = name.find(' ');
-  module.id.type = name.substr(0, spaceIndex);
-  module.id.number = std::stoi(name.substr(spaceIndex + 1));
+  auto last_space_index = name.find_last_of(' ');
+  module.id.type = name.substr(0, last_space_index);
+
+  auto number = name.substr(last_space_index + 1); 
+  module.id.number = std::stoi(number);
 
   for (auto& [key, value] : moduleJson.at("parameters").items())
     module.parameters[key] = value;

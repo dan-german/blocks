@@ -12,8 +12,7 @@
 #include "model/Block.h"
 #include "gui/Tab.h"
 #include "connection.h"
-
-// #include "
+#include "model/column_control_model.h"
 
 class Preset {
 public:
@@ -28,6 +27,11 @@ public:
   };
 
   struct Modulator: public Preset::Module { int colour; };
+
+  // struct Column: Module { 
+  //   float pan;
+  //   float level;
+  // };
 
   struct Connection {
     std::string source;
@@ -48,12 +52,14 @@ public:
   std::vector<Block> blocks;
   std::vector<Modulator> modulators;
   std::vector<Connection> connections_;
+  std::vector<Module> column_controls;
 
   static Preset create(String name,
     // std::vector<std::shared_ptr<model::Tab>> tabs,
     std::vector<std::shared_ptr<model::Block>> blocks,
     std::vector<std::shared_ptr<model::Module>> modulators,
-    std::vector<std::shared_ptr<model::Connection>> modulations);
+    std::vector<std::shared_ptr<model::Connection>> modulations, 
+    std::vector<std::shared_ptr<model::ColumnControl>> column_controls);
 private:
   static void setParamsAndID(std::shared_ptr<model::Module> module, Module& moduleInfo);
 };

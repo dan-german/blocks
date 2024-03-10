@@ -248,13 +248,13 @@ void PluginProcessor::parameterChanged(std::string name, vital::mono_float value
 }
 
 void PluginProcessor::getStateInformation(MemoryBlock& dest_data) {
-  json data = LoadSave::stateToJson(this, getCallbackLock());
-  data["tuning"] = getTuning()->stateToJson();
+  // json data = LoadSave::stateToJson(this, getCallbackLock());
+  // data["tuning"] = getTuning()->stateToJson();
 
-  String data_string = data.dump();
-  MemoryOutputStream stream;
-  stream.writeString(data_string);
-  dest_data.append(stream.getData(), stream.getDataSize());
+  // String data_string = data.dump();
+  // MemoryOutputStream stream;
+  // stream.writeString(data_string);
+  // dest_data.append(stream.getData(), stream.getDataSize());
 }
 
 void PluginProcessor::setStateInformation(const void* data, int size_in_bytes) {
@@ -457,6 +457,14 @@ void PluginProcessor::loadPreset(Preset preset) {
     model->bipolar_parameter_->value = presetConnection.bipolar;
     connectModulationFromModel(model);
   }
+
+  for (auto column_control : preset.column_controls) {
+    auto index = column_control.id.number - 1; 
+    for (auto const& [key, val] : column_control.parameters) {
+      getModuleManager().pool.column_controls_[index]->parameter_map_[key]->set(val);
+    }
+  }
+
   block_modified_ = true;
 }
 
@@ -608,8 +616,8 @@ juce::Array<std::shared_ptr<Module>> PluginProcessor::getModulators() {
 }
 
 void PluginProcessor::editorSavedPreset(String name) {
-  // Analytics::shared()->countAction("Preset Saved");
-  auto info = Preset::create(name, getModuleManager().getBlocks(), getModuleManager().getModulators(), getModuleManager().getConnections());
+  auto columns = getModuleManager().pool.column_controls_;
+  auto info = Preset::create(name, getModuleManager().getBlocks(), getModuleManager().getModulators(), getModuleManager().getConnections(), columns);
   preset_manager_.save(info);
   // per
   // presetManager.save(info);

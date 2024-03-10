@@ -18,7 +18,8 @@ Preset Preset::create(String name,
   // std::vector<std::shared_ptr<model::Tab>> tabs,
   std::vector<std::shared_ptr<model::Block>> blocks,
   std::vector<std::shared_ptr<model::Module>> modulators,
-  std::vector<std::shared_ptr<model::Connection>> connections) {
+  std::vector<std::shared_ptr<model::Connection>> connections,
+  std::vector<std::shared_ptr<model::ColumnControl>> column_controls) {
   Preset info;
 
   info.name = name;
@@ -59,6 +60,13 @@ Preset Preset::create(String name,
     modulationInfo.amount = connection->amount_parameter_->value_processor->value();
 
     info.connections_.push_back(modulationInfo);
+  }
+
+
+  for (auto column : column_controls) {
+    Module columnInfo;
+    setParamsAndID(column, columnInfo);
+    info.column_controls.push_back(columnInfo);
   }
 
   return info;

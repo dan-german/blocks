@@ -36,4 +36,5 @@ private:
   json encodeModulations(std::vector<Preset::Connection> modulationConnections);
   json encodeModulators(std::vector<Preset::Modulator> modulators);
   json encodeTabs(std::vector<Preset::Tab> modules);
+  json encodeColumns(std::vector<Preset::Module> columns);
 };

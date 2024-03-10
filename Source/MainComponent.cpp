@@ -118,7 +118,7 @@ void MainComponent::darkBackgroundClicked(Component* component) {
 
 void MainComponent::setupTabGrid() {
   tab_grid_.listener = this;
-  addAndMakeVisible(tab_grid_, 2);
+  // addAndMakeVisible(tab_grid_, 2);
 
   for (auto glow_indicator_ : tab_grid_.glowIndicators) {
     addChildComponent(glow_indicator_);
@@ -618,6 +618,12 @@ void MainComponent::loadState(Preset preset) {
   for (auto presetTab : preset.tabs) {
     auto tab = delegate->getTab(presetTab.column);
     spawnTabComponent(tab);
+  }
+
+  for (auto column_control : preset.column_controls) {
+    int index = column_control.id.number - 1;
+    column_controls_.pan_sliders_[index]->slider.setValue(column_control.parameters["pan"]);
+    column_controls_.level_sliders_[index]->slider.setValue(column_control.parameters["level"]);
   }
 
   ui_layer_.setConnections(delegate->getModulations());
