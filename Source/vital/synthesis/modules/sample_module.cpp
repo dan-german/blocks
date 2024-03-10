@@ -26,16 +26,16 @@ SampleModule::SampleModule(): SynthModule(kNumInputs, kNumOutputs), on_(nullptr)
 }
 
 void SampleModule::init() {
-  on_ = createBaseControl("sample_on");
-  Value* random_phase = createBaseControl("sample_random_phase");
-  Value* loop = createBaseControl("sample_loop");
-  Value* bounce = createBaseControl("sample_bounce");
-  Value* keytrack = createBaseControl("sample_keytrack");
-  Value* transpose_quantize = createBaseControl("sample_transpose_quantize");
-  Output* transpose = createPolyModControl("sample_transpose");
-  Output* tune = createPolyModControl("sample_tune");
-  Output* level = createPolyModControl("sample_level", true, true);
-  Output* pan = createPolyModControl("sample_pan");
+  on_ = createBaseControl2({ .name = "on", .default_value = 1.0 });
+  Value* random_phase = createBaseControl2({ .name = "random phase", .default_value = 1.0 });
+  Value* loop = createBaseControl2({ .name = "loop", .default_value = 1.0 });
+  Value* bounce = createBaseControl2({ .name = "bounce", .default_value = 1.0 });
+  Value* keytrack = createBaseControl2({ .name = "keytrack", .default_value = 0.0 });
+  Value* transpose_quantize = createBaseControl2({ .name = "transpose quantize" });
+  Output* transpose = createPolyModControl2({ .name = "transpose" });
+  Output* tune = createPolyModControl2({ .name = "tune" });
+  Output* level = createPolyModControl2({ .name = "level", .default_value = 1.0, .audio_rate = true, .smooth_value = true, .value_scale = ValueDetails::kQuadratic });
+  Output* pan = createPolyModControl2({ .name = "pan", .min = -1.0f });
 
   sampler_->useInput(input(kReset), SampleSource::kReset);
   sampler_->useInput(input(kMidi), SampleSource::kMidi);
@@ -49,16 +49,22 @@ void SampleModule::init() {
   sampler_->plug(tune, SampleSource::kTune);
   sampler_->plug(level, SampleSource::kLevel);
   sampler_->plug(pan, SampleSource::kPan);
-  sampler_->useOutput(output(kRaw), SampleSource::kRaw);
-  sampler_->useOutput(output(kLevelled), SampleSource::kLevelled);
+  // sampler_->useOutput(output(kRaw), SampleSource::kRaw);
+  // sampler_->useOutput(output(kLevelled), SampleSource::kLevelled);
 
   addProcessor(sampler_);
+  amp_env_destination = createPolyModControl2({ .name = "amp env destination", .reset = input(kReset) });
+  addProcessor(amp_env_multiply_);
+  amp_env_multiply_->plug(amp_env_destination, 1);
+  amp_env_multiply_->plug(sampler_->output(kLevelled), 0);
+  amp_env_multiply_->useInput(input(kReset), SmoothMultiply2::kReset);
+  amp_env_multiply_->useOutput(output(kRaw), 0);
+
   SynthModule::init();
 }
 
 void SampleModule::process(int num_samples) {
   bool on = on_->value();
-
   if (on)
     SynthModule::process(num_samples);
   else if (*was_on_) {
@@ -66,7 +72,7 @@ void SampleModule::process(int num_samples) {
     output(kLevelled)->clearBuffer();
     getPhaseOutput()->buffer[0] = 0.0f;
   }
-
+  utils::addBuffers(output(kRaw)->buffer, output(kRaw)->buffer, input(kAudioIn)->source->buffer, num_samples);
   *was_on_ = on;
 }
 } // namespace vital

@@ -170,7 +170,6 @@ void SynthVoiceHandler::createModulators() {
   }
 
   for (int i = 0; i < kNumEnvelopes; ++i) {
-    
     // std::string prefix = std::string("env_") + std::to_string(i + 1);
     // EnvelopeModule* envelope = new EnvelopeModule(prefix, i == 0);
     // envelope->plug(retrigger(), EnvelopeModule::kTrigger);

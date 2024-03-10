@@ -4,10 +4,9 @@
 #include "gui/ModuleColour.h"
 #include "model/Index.h"
 #include "vital/synthesis/utilities/smooth_value.h"
-// #include "vital/synthesis/framework/synth_module.h"
+#include "vital/value_bridge.h"
 
 using ValueScale = vital::ValueDetails::ValueScale;
-// class SynthModule;
 
 namespace model {
 class Module {
@@ -30,7 +29,7 @@ public:
   inline bool isEnvelope() { return id.type == "envelope"; }
   inline bool isOscillator() { return id.type == "osc"; }
 
-  Module(std::string prefix, int number): name(prefix + "_" + std::to_string(number)) {
+  Module(std::string prefix, int number): name(prefix + " " + std::to_string(number)) {
     id = { prefix, number };
     display_name = prefix + " " + std::to_string(number);
   }
@@ -44,7 +43,7 @@ public:
     parameter_map_[short_name] = shared_ptr;
   }
 
-  // virtual void applyProcessor(std::shared_ptr<SynthModule> processor);
+  virtual void reset() {}
 };
 
 class Block: public Module {
@@ -53,9 +52,9 @@ public:
   Block(std::string prefix, int number): Module(prefix, number) {
     // category = Category::source;
   };
-  // void reset() {
-  //   Module::reset();
-  //   index = { -1, -1 };
-  // };
+  void reset() override {
+    Module::reset();
+    index = { -1, -1 };
+  };
 };
 } // namespace model

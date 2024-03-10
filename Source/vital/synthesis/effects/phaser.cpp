@@ -27,6 +27,7 @@ Phaser::Phaser(): ProcessorRouter(kNumInputs, kNumOutputs), mix_(0.0f), mod_dept
   phaser_filter_ = new PhaserFilter(true);
   cutoff_ = new Output();
   addIdleProcessor(phaser_filter_);
+  std::cout << "phaser constructor" << std::endl;
 }
 
 void Phaser::init() {
@@ -34,7 +35,7 @@ void Phaser::init() {
   phaser_filter_->useInput(input(kBlend), PhaserFilter::kPassBlend);
   phaser_filter_->plug(cutoff_, PhaserFilter::kMidiCutoff);
 
-  // phaser_filter_->init();
+  phaser_filter_->init();
   ProcessorRouter::init();
 }
 

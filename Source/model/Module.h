@@ -26,6 +26,7 @@ inline const Type lfo = "lfo";
 inline const Type adsr = "envelope";
 
 inline const Type osc = "osc";
+inline const Type noise = "noise";
 inline const Type filter = "filter";
 inline const Type reverb = "reverb";
 inline const Type delay = "delay";

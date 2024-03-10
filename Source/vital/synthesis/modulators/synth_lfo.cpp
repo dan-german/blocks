@@ -424,6 +424,20 @@ void SynthLfo::processAudioRate(int num_samples) {
 }
 
 void SynthLfo::process(int num_samples) {
+  auto wave_index = input(kWaveIndex)->at(0)[0];
+  auto int_wave_index = static_cast<int>(wave_index);
+
+  if (int_wave_index != current_wave_index_) {
+    switch (static_cast<int>(wave_index)) {
+    case 0: source_->initSin(); break;
+    case 1: source_->initSawDown(); break;
+    case 2: source_->initSawUp(); break;
+    case 3: source_->initSquare(); break;
+    case 4: source_->initTriangle(); break;
+    }
+    current_wave_index_ = int_wave_index;
+  }
+
   bool control_rate = isControlRate();
   if (was_control_rate_ && !control_rate)
     audio_rate_state_ = control_rate_state_;

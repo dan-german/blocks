@@ -66,6 +66,7 @@ void ModulationIndicatorComponent::setCurrentValue(float value) {
   rawCurrentValue = value;
 
   resizeCurrentValuePoint();
+  repaint();
 }
 
 void ModulationIndicatorComponent::setColour(Colour colour) {

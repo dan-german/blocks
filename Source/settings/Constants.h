@@ -13,8 +13,8 @@
 using namespace juce;
 
 namespace Constants {
-constexpr int moduleWidth = 68;
-constexpr int moduleHeight = 35;
+constexpr int blockWidth = 68;
+constexpr int blockHeight = 35;
 constexpr int gridDotSize = 4;
 constexpr int rows = 7;
 constexpr int columns = 5;
@@ -26,7 +26,7 @@ constexpr float moduleGridSnapThreshold = 0.25f;
 
 namespace Constants {
 struct Functions {
-  static float gridWidth() { return columns * moduleWidth + (columns - 1) * moduleSpacing + gridEdgeSpacing * 2; }
+  static float gridWidth() { return columns * blockWidth + (columns - 1) * moduleSpacing + gridEdgeSpacing * 2; }
   static int tabWidth() { return int(gridWidth() + 1) / float(columns); }
 };
 }

@@ -23,10 +23,32 @@
 #include "playground.h"
 
 PluginProcessor::PluginProcessor(): juce::AudioProcessor(BusesProperties().withOutput("Output", AudioChannelSet::stereo(), true)), SynthGuiInterface(this, false) {
+
+  // for getVoiceHandler()->column_nodes_
+  for (auto column_control : synth_->getModuleManager().pool.column_controls_) {
+    auto processor = getVoiceHandler()->column_nodes_[column_control->id.number - 1];
+    for (auto& pair : column_control->parameter_map_) {
+      column_control->parameter_map_[pair.first]->value_processor = processor->control_map_[pair.first];
+    }
+  }
+
+  for (auto module : getModuleManager().pool.all_modules_) {
+    for (auto parameter : module->parameters_) {
+      ValueBridge* bridge = new ValueBridge(*(parameter.get()));
+      // bridge->
+      bridge->setListener(this);
+      auto key = module->name + " " + parameter->name;
+      bridge_lookup_[key] = bridge;
+      // parameter->bridge = bridge;
+      addParameter(bridge);
+    }
+  }
+
   // for (auto module : synth.moduleManager.pool.allModules) {
   //   for (auto parameter : module->parameters) {
-  //     addParameter(parameter->audioParameter);
-  //     parameter->audioParameter->addListener(this);
+      // parameter>val
+      // addParameter(parameter->audioParameter);
+      // parameter->audioParameter->addListener(this);
   //   }
   // }
 
@@ -34,17 +56,18 @@ PluginProcessor::PluginProcessor(): juce::AudioProcessor(BusesProperties().withO
 
   last_seconds_time_ = 0.0;
 
-  int num_params = vital::Parameters::getNumParameters();
-  for (int i = 0; i < num_params; ++i) {
-    const vital::ValueDetails* details = vital::Parameters::getDetails(i);
-    if (controls_.count(details->name) == 0)
-      continue;
 
-    ValueBridge* bridge = new ValueBridge(details->name, controls_[details->name]);
-    bridge->setListener(this);
-    bridge_lookup_[details->name] = bridge;
+  // int num_params = vital::Parameters::getNumParameters();
+  // for (int i = 0; i < num_params; ++i) {
+  //   const vital::ValueDetails* details = vital::Parameters::getDetails(i);
+  //   if (controls_.count(details->name) == 0)
+  //     continue;
+
+  //   ValueBridge* bridge = new ValueBridge(details);
+  //   bridge->setListener(this);
+  //   bridge_lookup_[details->name] = bridge;
     // addParameter(bridge);
-  }
+  // }
 
   bypass_parameter_ = bridge_lookup_["bypass"];
 }
@@ -55,6 +78,7 @@ PluginProcessor::~PluginProcessor() {
 }
 
 SynthGuiInterface* PluginProcessor::getGuiInterface() {
+
   // AudioProcessorEditor* editor = getActiveEditor();
   // if (editor)
   //   return dynamic_cast<SynthGuiInterface*>(editor);
@@ -62,20 +86,18 @@ SynthGuiInterface* PluginProcessor::getGuiInterface() {
 }
 
 void PluginProcessor::beginChangeGesture(const std::string& name) {
-  if (bridge_lookup_.count(name))
-    bridge_lookup_[name]->beginChangeGesture();
+  if (bridge_lookup_.count(name)) bridge_lookup_[name]->beginChangeGesture();
 }
 
 void PluginProcessor::endChangeGesture(const std::string& name) {
-  if (bridge_lookup_.count(name))
-    bridge_lookup_[name]->endChangeGesture();
+  if (bridge_lookup_.count(name)) bridge_lookup_[name]->endChangeGesture();
 }
 
 void PluginProcessor::setValueNotifyHost(const std::string& name, vital::mono_float value) {
-  if (bridge_lookup_.count(name)) {
-    vital::mono_float plugin_value = bridge_lookup_[name]->convertToPluginValue(value);
-    bridge_lookup_[name]->setValueNotifyHost(plugin_value);
-  }
+  // if (bridge_lookup_.count(name)) {
+  //   vital::mono_float plugin_value = bridge_lookup_[name]->convertToPluginValue(value);
+  //   bridge_lookup_[name]->setValueNotifyHost(plugin_value);
+  // }
 }
 
 const juce::CriticalSection& PluginProcessor::getCriticalSection() {
@@ -152,10 +174,10 @@ void PluginProcessor::processBlock(AudioSampleBuffer& buffer, MidiBuffer& midi_m
 
   static constexpr double kSecondsPerMinute = 60.0f;
 
-  if (bypass_parameter_->getValue()) {
-    processBlockBypassed(buffer, midi_messages);
-    return;
-  }
+  // if (bypass_parameter_->getValue()) {
+  //   processBlockBypassed(buffer, midi_messages);
+  //   return;
+  // }
 
   int total_samples = buffer.getNumSamples();
   int num_channels = getTotalNumOutputChannels();
@@ -189,21 +211,21 @@ void PluginProcessor::processBlock(AudioSampleBuffer& buffer, MidiBuffer& midi_m
 }
 
 void PluginProcessor::handleBlockChanges() {
-  if (block_modified_) {
-    getVoiceHandler()->unplugAll();
-    getVoiceHandler()->connectAll();
+  if (!block_modified_) return;
 
-    clearModulations();
-    auto connections = getModuleManager().getConnections();
-    for (auto c : connections) {
-      connectModulationFromModel(c);
-    }
+  getVoiceHandler()->unplugAll();
+  getVoiceHandler()->connectAll();
 
-    getVoiceHandler()->disconnectAllDefaultEnvs();
-    getVoiceHandler()->connectAllDefaultEnvs();
-
-    block_modified_ = false;
+  clearModulations();
+  auto connections = getModuleManager().getConnections();
+  for (auto c : connections) {
+    connectModulationFromModel(c);
   }
+
+  getVoiceHandler()->disconnectAllDefaultEnvs();
+  getVoiceHandler()->connectAllDefaultEnvs();
+
+  block_modified_ = false;
 }
 
 bool PluginProcessor::hasEditor() const {
@@ -226,13 +248,13 @@ void PluginProcessor::parameterChanged(std::string name, vital::mono_float value
 }
 
 void PluginProcessor::getStateInformation(MemoryBlock& dest_data) {
-  json data = LoadSave::stateToJson(this, getCallbackLock());
-  data["tuning"] = getTuning()->stateToJson();
+  // json data = LoadSave::stateToJson(this, getCallbackLock());
+  // data["tuning"] = getTuning()->stateToJson();
 
-  String data_string = data.dump();
-  MemoryOutputStream stream;
-  stream.writeString(data_string);
-  dest_data.append(stream.getData(), stream.getDataSize());
+  // String data_string = data.dump();
+  // MemoryOutputStream stream;
+  // stream.writeString(data_string);
+  // dest_data.append(stream.getData(), stream.getDataSize());
 }
 
 void PluginProcessor::setStateInformation(const void* data, int size_in_bytes) {
@@ -262,51 +284,44 @@ juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter() {
 }
 
 // MainComponent::Delegate
-void PluginProcessor::editorAdjustedModulator(int parameter, int index, float value) {
+void PluginProcessor::editorAdjustedModulator(std::string parameter_name, int index, float value) {
   auto modulator = synth_->getModuleManager().getModulator(index);
 
-  if (modulator->id.type == "lfo") {
-    if (parameter == 1) {
-      bool is_changing_seconds = modulator->parameter_map_["sync"]->val->value() == 0.0f;
-      if (is_changing_seconds) {
-        modulator->parameter_map_["frequency"]->val->set(value);
-      } else {
-        modulator->parameter_map_["tempo"]->val->set(value);
-      }
-    }
+  if (modulator->id.type == "lfo" && parameter_name == "tempo") {
+    bool is_changing_seconds = modulator->parameter_map_["sync"]->value_processor->value() == 0.0f;
+    parameter_name = is_changing_seconds ? "frequency" : "tempo";
+    modulator->parameter_map_[parameter_name]->set(value);
+    return;
   }
 
-  modulator->parameters_[parameter]->val->set(value);
+  modulator->parameter_map_[parameter_name]->set(value);
 }
 
 void PluginProcessor::editorAdjustedBlock(Index index, int parameter, float value) {
   auto block = synth_->getModuleManager().getBlock(index);
 
-  if (block->id.type == "delay") {
-    std::cout << parameter << std::endl;
+  if (block->id.type == "delay" || block->id.type == "phaser") {
     if (parameter == 4) {
-      auto sync = block->parameter_map_["sync"]->val->value();
-      bool is_changing_seconds = block->parameter_map_["sync"]->val->value() == 0.0f;
+      auto sync = block->parameter_map_["sync"]->value_processor->value();
+      bool is_changing_seconds = block->parameter_map_["sync"]->value_processor->value() == 0.0f;
       if (is_changing_seconds) {
-        std::cout << "is changing freq: " << value << std::endl;
-        block->parameter_map_["frequency"]->val->set(value);
+        block->parameter_map_["frequency"]->value_processor->set(value);
       } else {
-        std::cout << "is changing tempo" << std::endl;
-        block->parameter_map_["tempo"]->val->set(value);
+        block->parameter_map_["tempo"]->value_processor->set(value);
       }
       return;
     }
   }
 
-  block->parameters_[parameter]->val->set(value);
+  block->parameters_[parameter]->set(value);
 }
 
 void PluginProcessor::editorChangedModulationMagnitude(int index, float magnitude) {
-  synth_->getModuleManager().getConnection(index)->amount_parameter_->val->set(magnitude);
+  synth_->getModuleManager().getConnection(index)->amount_parameter_->set(magnitude);
 }
 
 void PluginProcessor::editorChangedModulationPolarity(int index, bool bipolar) {
-  synth_->getModuleManager().getConnection(index)->bipolar_parameter_->val->set(bipolar);
+  synth_->getModuleManager().getConnection(index)->bipolar_parameter_->set(bipolar);
   // moduleManager.getConnection(index)->setPolarity(bipolar);
 }
 
@@ -317,6 +332,10 @@ void PluginProcessor::editorAdjustedTab(int column, int parameter, float value) 
 #pragma warning(default:4716)
 std::shared_ptr<Module> PluginProcessor::getModulator(int index) {
   // return moduleManager.getModulator(index);
+}
+
+std::shared_ptr<model::Module> PluginProcessor::getModulator2(int index) {
+  return getModuleManager().getModulator(index);
 }
 
 juce::Array<std::shared_ptr<Modulation>> PluginProcessor::getConnectionsOfSource(std::shared_ptr<Module> source) {
@@ -349,7 +368,7 @@ std::vector<std::shared_ptr<model::Connection>> PluginProcessor::getModulations(
 std::shared_ptr<Block> PluginProcessor::getBlock(Index index) {
 }
 
-std::shared_ptr<model::Module> PluginProcessor::getBlock2(Index index) {
+std::shared_ptr<model::Block> PluginProcessor::getBlock2(Index index) {
   return (index.row == -1 || index.column == -1) ? nullptr : synth_->getModuleManager().getBlock(index);
 }
 
@@ -387,11 +406,66 @@ void PluginProcessor::editorDisconnectedModulation(int index) {
   // Analytics::shared()->countAction("Modulation Disconnected");
 }
 
-PresetInfo PluginProcessor::editorChangedPreset(int index) {
+Preset PluginProcessor::editorChangedPreset(int index) {
   if (index == -1) {
     clear();
-    return PresetInfo();
+    return Preset();
   }
+
+  auto preset = preset_manager_.presets[index];
+  loadPreset(preset);
+  return preset;
+}
+
+void PluginProcessor::loadPreset(Preset preset) {
+  clear();
+  // for (auto presetTab : preset.tabs) {
+  //   auto tab = moduleManager.addTab(presetTab.id.type, presetTab.column, presetTab.id.number);
+  //   tab->length = presetTab.length;
+
+  //   for (auto const& [key, val] : presetTab.parameters)
+  //     tab->parameterMap[key]->audioParameter->setValue(val);
+  // }
+
+  for (auto presetBlock : preset.blocks) {
+    Index index = { presetBlock.index.first, presetBlock.index.second };
+    auto block = addBlock(presetBlock.id.type, index, presetBlock.id.number);
+
+    for (auto const& [key, val] : presetBlock.parameters) {
+      block->parameter_map_[key]->set(val);
+    }
+
+    // if (presetBlock.length > 1) {
+      // expand(block->index, presetBlock.length - 1, true);
+    // }
+  }
+
+  for (auto presetModulator : preset.modulators) {
+    auto modulator = addModulator(presetModulator.id.type, presetModulator.id.number, presetModulator.colour);
+    for (auto const& [key, val] : presetModulator.parameters)
+      modulator->parameter_map_[key]->set(val);
+  }
+
+  for (auto presetConnection : preset.connections_) {
+    auto modulator = synth_->getModuleManager().getModule(presetConnection.source);
+
+    auto target = synth_->getModuleManager().getModule(presetConnection.target);
+    auto model = synth_->getModuleManager().addConnection(modulator, target, presetConnection.parameter, presetConnection.number);
+    model->parameter_name_ = presetConnection.parameter;
+
+    model->amount_parameter_->value = presetConnection.amount;
+    model->bipolar_parameter_->value = presetConnection.bipolar;
+    connectModulationFromModel(model);
+  }
+
+  for (auto column_control : preset.column_controls) {
+    auto index = column_control.id.number - 1; 
+    for (auto const& [key, val] : column_control.parameters) {
+      getModuleManager().pool.column_controls_[index]->parameter_map_[key]->set(val);
+    }
+  }
+
+  block_modified_ = true;
 }
 
 void PluginProcessor::clear() {
@@ -446,8 +520,11 @@ void PluginProcessor::removeModulator(int index) {
 void PluginProcessor::disconnect(std::shared_ptr<model::Connection>& connection) {
   bool disconnecting_osc_env = connection->source->id.type == "envelope" && connection->target->id.type == "osc" && connection->parameter_name_ == "level";
   if (disconnecting_osc_env) {
-    getVoiceHandler()->setDefaultAmpEnv(connection->target->name, true);
+    getVoiceHandler()->setDefaultAmpEnvState(connection->target->name, true);
   }
+
+  std::cout << "disconnecting " << connection->source->name << " from " << connection->target->name << " " << connection->parameter_name_ << std::endl;
+
   synth_->disconnectModulation(connection->vital_connection_);
   getModuleManager().removeConnection(connection);
 }
@@ -485,14 +562,6 @@ std::shared_ptr<Block> PluginProcessor::editorAddedBlock(Model::Type type, Index
 
 std::shared_ptr<model::Block> PluginProcessor::editorAddedBlock2(Model::Type type, Index index) {
   auto block = synth_->addBlock(type, index);
-
-  // if (block->id.type == "osc") {
-  //   float destination_scale = 1.0f;
-  //   std::string parameter_name = "amp_env_destination";
-  //   std::string modulator_name = "default_amp_env";
-  //   auto connection = createConnection(modulator_name, block->name, parameter_name, destination_scale);
-  // }
-
   block_modified_ = true;
   return block;
 }
@@ -547,9 +616,9 @@ juce::Array<std::shared_ptr<Module>> PluginProcessor::getModulators() {
 }
 
 void PluginProcessor::editorSavedPreset(String name) {
-  // Analytics::shared()->countAction("Preset Saved");
-  auto info = PresetInfo::create(name, getModuleManager().getBlocks(), getModuleManager().getModulators(), getModuleManager().getConnections());
-  std::cout << "yay" << std::endl;
+  auto columns = getModuleManager().pool.column_controls_;
+  auto info = Preset::create(name, getModuleManager().getBlocks(), getModuleManager().getModulators(), getModuleManager().getConnections(), columns);
+  preset_manager_.save(info);
   // per
   // presetManager.save(info);
 }
@@ -569,6 +638,7 @@ std::pair<float, float> PluginProcessor::editorRequestsModulatorValue(Index modu
 
 #pragma warning(default:4716)
 std::pair<float, float> PluginProcessor::editorRequestsModulatorValue(int modulationConnectionIndex) {
+  auto connection = getModuleManager().getConnection(modulationConnectionIndex);
   // auto connection = moduleManager.getConnection(modulationConnectionIndex);
   // auto currentVoice = blockVoices[getCurrentVoiceIndex()];
 
@@ -579,7 +649,7 @@ std::pair<float, float> PluginProcessor::editorRequestsModulatorValue(int modula
 }
 
 #pragma warning(default:4716)
-PresetInfo PluginProcessor::getStateRepresentation() {
+Preset PluginProcessor::getStateRepresentation() {
   // auto currentState = PresetInfo();
 
   // for (auto block : moduleManager.getBlocks()) {
@@ -601,12 +671,12 @@ PresetInfo PluginProcessor::getStateRepresentation() {
 }
 
 juce::StringArray PluginProcessor::editorRequestsPresetNames() {
-  // StringArray result;
+  StringArray result;
 
-  // for (auto preset : presetManager.presets)
-  //   result.add(preset.name);
+  for (auto preset : preset_manager_.presets)
+    result.add(preset.name);
 
-  return {};
+  return result;
 }
 
 const vital::StatusOutput* PluginProcessor::editorRequestsStatusOutput(std::string name) {
@@ -614,19 +684,37 @@ const vital::StatusOutput* PluginProcessor::editorRequestsStatusOutput(std::stri
 }
 
 // MainComponent::Delegate end 
-void PluginProcessor::editorParameterGestureChanged(String moduleName, int parameterIndex, bool started) {
-  std::cout << moduleName.toStdString() << " is changing " << std::endl;
-
+void PluginProcessor::editorParameterGestureChanged(std::string module_name, std::string parameter_name, bool started) {
   if (JUCE_STANDALONE_APPLICATION) return;
-
+  auto key = module_name + " " + parameter_name;
   if (started) {
-    // synth_->BeginParameterChangeGesture(moduleName, parameterIndex);
-  // moduleManager.getModule(moduleName)->parameter(parameterIndex)->audioParameter->beginChangeGesture();
+    bridge_lookup_[key]->beginChangeGesture();
   } else {
-    // moduleManager.getModule(moduleName)->parameter(parameterIndex)->audioParameter->endChangeGesture();
+    bridge_lookup_[key]->endChangeGesture();
   }
 }
 
 std::vector<std::shared_ptr<model::Module>> PluginProcessor::getModulators2() {
   return synth_->getModuleManager().getModulators();
+}
+
+void PluginProcessor::editorStartedAdjustingColumn(std::string control, int column) {
+
+}
+
+void PluginProcessor::editorEndedAdjustingColumn(std::string control, int column) {
+
+}
+
+void PluginProcessor::editorAdjustedColumn(std::string control, int column, float value) {
+  getModuleManager().getColumnControl(column)->parameter_map_[control]->value_processor->set(value);
+}
+
+void PluginProcessor::setValue(std::string module_id, std::string parameter_name, float value) {
+  auto m = synth_->getModuleManager().getModule(module_id);
+  auto p = m->parameter_map_[parameter_name];
+  p->value_processor->set(value);
+  // p->paramter_map_[parameter_name]->val->set(value);
+  // parameter->b
+  // parameter->bridge->set
 }

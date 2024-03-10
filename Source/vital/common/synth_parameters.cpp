@@ -174,6 +174,7 @@ const ValueDetails ValueDetailsLookup::parameter_list[] = {
     ValueDetails::kLinear, false, "%", "Sub Pan", nullptr },
   { "sub_waveform", 0x000000, 0.0, PredefinedWaveFrames::kNumShapes - 1, 2.0, 0.0, 1.0,
     ValueDetails::kIndexed, false, "", "Sub Osc Waveform", nullptr },
+
   { "sample_on", 0x000000, 0.0, 1.0, 0.0, 0.0, 1.0,
     ValueDetails::kIndexed, false, "", "Sample Switch", strings::kOffOnNames },
   { "sample_random_phase", 0x000000, 0.0, 1.0, 0.0, 0.0, 1.0,
@@ -196,6 +197,7 @@ const ValueDetails ValueDetailsLookup::parameter_list[] = {
     ValueDetails::kIndexed, false, "", "Sample Destination", strings::kDestinationNames },
   { "sample_pan", 0x000000, -1.0, 1.0, 0.0, 0.0, 100.0,
     ValueDetails::kLinear, false, "%", "Sample Pan", nullptr },
+
   { "velocity_track", 0x000000, -1.0, 1.0, 0.0, 0.0, 100.0,
     ValueDetails::kLinear, false, "%", "Velocity Track", nullptr },
   { "volume", 0x000000, 0.0, 7399.4404, 5473.0404, -80, 1.0,
@@ -577,33 +579,8 @@ ValueDetailsLookup::ValueDetailsLookup() {
   for (int modulation = 0; modulation < 1; ++modulation) {
     addParameterGroupNumberBased(mod_parameter_list, num_mod_parameters, modulation, kModulationIdPrefix, kModulationNamePrefix);
   }
-  // for (int modulation = kOldMaxModulations; modulation < 1; ++modulation) {
-  //   addParameterGroup(mod_parameter_list, num_mod_parameters, modulation, kModulationIdPrefix, kModulationNamePrefix, kNewModulationVersion);
-  // }
-
-  // details_lookup_["osc_1_on"].default_value = 1.0f;
-  // details_lookup_["osc_1_pan"].default_value = -1.0f;
-  // details_lookup_["osc_2_pan"].default_value = 1.0f;
-  // details_lookup_["osc_1_pan"].default_value = 1.0f;
-  // details_lookup_["osc_1_transpose"].default_value = -24.0f;
-  // details_lookup_["osc_2_destination"].default_value = 1.0f;
-  // details_lookup_["osc_3_destination"].default_value = 3.0f;
-
-  // details_lookup_["filter_1_osc1_input"].default_value = 1.0f;
-  // details_lookup_["filter_2_osc2_input"].default_value = 1.0f;
-  // details_lookup_["filter_1_on"].default_value = 1.0f;
-  // details_lookup_["filter_2_on"].default_value = 1.0f;
-  // details_lookup_["filter_3_on"].default_value = 1.0f;
-  // details_lookup_["filter_4_on"].default_value = 1.0f;
-  // details_lookup_["filter_5_on"].default_value = 1.0f;
 
   std::sort(details_list_.begin(), details_list_.end(), compareValueDetails);
-
-  // for (auto d : details_list_) {
-  //   std::cout << "name:" << d->name << "|min:" << d->min << "|max:" << d->max << "|default:" << d->default_value << "|value_scale:" << d->value_scale << "|post_offset:" << d->post_offset << std::endl;
-  // }
-
-  // throw std::runtime_error("stop");
 }
 
 void ValueDetailsLookup::addParameterGroup(const ValueDetails* list, int num_parameters, int index, std::string id_prefix, std::string name_prefix, int version) {

@@ -20,6 +20,7 @@
 #include "module_new.h"
 #include "connection.h"
 #include "vital/synthesis/framework/synth_module.h"
+#include "gui/column_controls_container.h"
 
 using Modulation = Model::Modulation;
 using Block = Model::Block;
@@ -31,7 +32,8 @@ class MainComponent final: public Component,
   ConnectionComponent::Listener,
   ModulatorComponent::Listener,
   GridComponent::Listener,
-  NoteLogger::Listener {
+  NoteLogger::Listener,
+  ColumnControlsContainer::Listener {
 public:
   struct Delegate;
   Delegate* delegate;
@@ -41,11 +43,12 @@ public:
 
   BlocksLookAndFeel blocks_laf_;
   UILayer ui_layer_;
-  void loadState(PresetInfo preset);
+  void loadState(Preset preset);
   void visibilityChanged() override;
 protected:
   void paint(juce::Graphics&) override;
   void resized() override;
+  void resizeColumnControls();
 
   // MouseListener
   void mouseDown(const MouseEvent& event) override;
@@ -58,12 +61,13 @@ private:
   InspectorComponent inspector_;
   SavePopup save_popup_;
   GraphicsTimer timer_;
+  ColumnControlsContainer column_controls_;
 
   Array<BlockComponent*> blocks;
   GridItemComponent* focused_grid_item_ = nullptr;
   Point<int> current_mouse_position_;
 
-  BlockComponent* block_matrix_[Constants::rows][Constants::columns];
+  BlockComponent* block_matrix_[Constants::columns][Constants::rows];
   Cursor cursor;
   std::optional<int> previous_slider_under_mouse_ = {};
   BlockPlaceholder block_placeholder_;
@@ -110,7 +114,7 @@ private:
 
   // InspectorComponent::Listener
   void inspectorChangedParameter(int sliderIndex, float value) override;
-  void inspectorGestureChanged(int index, bool started) override;
+  void inspectorGestureChanged(std::string parameter_name, bool started) override;
 
   void DismissPopup(ButtonGridPopup& popup);
   void spawnBlockComponent(std::shared_ptr<model::Block> block);
@@ -123,7 +127,6 @@ private:
   void handleModuleLandedOnInspector(BlockComponent* moduleComponent, const Point<int>& inspectorRelativePosition);
   void refreshInspector();
   void setupUI();
-  void sliderValueChanged(Slider* slider) override;
   void setupBlockGrid();
   void setupTabGrid();
   void updateModuleComponentVisuals(int sliderIndex, float value, std::shared_ptr<model::Module> block);
@@ -135,7 +138,8 @@ private:
   void modulatorStartedDrag(ModulatorComponent* component, const MouseEvent& event) override;
   void modulatorStartedAdjusting(ModulatorComponent* modulatorComponent, int index) override;
   void modulatorEndedAdjusting(ModulatorComponent* modulatorComponent, int index) override;
-  void modulatorIsAdjusting(ModulatorComponent* component, int parameter, float value) override;
+  void modulatorIsAdjusting(ModulatorComponent* component, std::string parameter_name, float value) override;
+  void modulatorGestureChanged(ModulatorComponent* modulatorComponent, std::string parameter_name, bool started) override;
 
   void presentModulationOptionsMenu(int modulatorIndex, Index& indexUnderMouse, BlockComponent* block);
   void updateDotPosition(const Point<int> position);
@@ -147,6 +151,14 @@ private:
   void modulatorRemoved(ModulatorComponent* component) override;
   void setupPresetMenu();
   void presetButtonClicked();
+
+  void sliderValueChanged(Slider* slider) override;
+  // void sliderDragStarted(Slider* slider) override;
+  // void sliderDragEnded(Slider* slider) override;
+
+  void columnControlAdjusted(ColumnControlsContainer::ControlType control, int column, float value) override;
+  void columnControlStartedAdjusting(ColumnControlsContainer::ControlType control, int column) override;
+  void columnControlEndedAdjusting(ColumnControlsContainer::ControlType control, int column) override;
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MainComponent)
 };
@@ -161,30 +173,35 @@ struct MainComponent::Delegate {
   virtual void editorRemovedBlock(Index index) = 0;
   virtual void editorAdjustedBlock(Index moduleIndex, int parameterIndex, float value) = 0;
   virtual void editorAdjustedTab(int column, int parameterIndex, float value) = 0;
-  virtual void editorAdjustedModulator(int modulatorIndex, int parameterIndex, float value) = 0;
+  virtual void editorAdjustedModulator(std::string parameter_name, int index, float value) = 0;
   virtual void editorConnectedModulation(int modulator_index, std::string target_name, std::string parameter) = 0;
+
+  virtual void editorStartedAdjustingColumn(std::string control, int column) = 0;
+  virtual void editorEndedAdjustingColumn(std::string control, int column) = 0;
+  virtual void editorAdjustedColumn(std::string contorl, int column, float value) = 0;
 
   virtual void editorChangedModulationMagnitude(int modulationConnectionIndex, float magnitude) = 0;
   virtual void editorChangedModulationPolarity(int index, bool bipolar) = 0;
   virtual void editorDisconnectedModulation(int index) = 0;
-  virtual void editorParameterGestureChanged(String moduleName, int parameterIndex, bool started) = 0;
+  virtual void editorParameterGestureChanged(std::string module_name, std::string paramter_name, bool started) = 0;
   virtual void editorRemovedModulator(int index) = 0;
   virtual void editorChangedBlockLength(Index index, int times) = 0;
   virtual void editorSavedPreset(String name) = 0;
 
   virtual Array<MPENote> editorRequestsCurrentlyPlayingNotes() = 0;
   virtual StringArray editorRequestsPresetNames() = 0;
-  virtual PresetInfo editorChangedPreset(int index) = 0;
-  virtual PresetInfo getStateRepresentation() = 0;
+  virtual Preset editorChangedPreset(int index) = 0;
+  virtual Preset getStateRepresentation() = 0;
 
   virtual std::pair<float, float> editorRequestsModulatorValue(Index moduleIndex, int parameterIndex, int modulatorIndex) = 0;
   virtual std::pair<float, float> editorRequestsModulatorValue(int modulationConnectionIndex) = 0;
   virtual std::shared_ptr<Tab> getTab(int column) = 0;
   virtual std::shared_ptr<Module> getModulator(int index) = 0;
+  virtual std::shared_ptr<model::Module> getModulator2(int index) = 0;
   virtual std::shared_ptr<Module> editorAddedModulator(Model::Type code) = 0;
   virtual std::shared_ptr<model::Module> editorAddedModulator2(Model::Type code) = 0;
   virtual std::shared_ptr<Block> getBlock(Index index) = 0;
-  virtual std::shared_ptr<model::Module> getBlock2(Index index) = 0;
+  virtual std::shared_ptr<model::Block> getBlock2(Index index) = 0;
   virtual std::shared_ptr<model::Block> editorAddedBlock2(Model::Type code, Index index) = 0;
   virtual std::shared_ptr<Block> editorAddedBlock(Model::Type code, Index index) = 0;
   virtual Array<int> editorRequestsActiveColumns() = 0;

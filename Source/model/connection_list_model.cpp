@@ -33,10 +33,10 @@ Component* ModulationsListBoxModel::refreshComponentForRow(int rowNumber, bool i
   } else {
     auto magnitude_parameter = connection->amount_parameter_;
     component->slider.setRange(magnitude_parameter->min, magnitude_parameter->max);
-    component->slider.setValue(magnitude_parameter->val->value(), dontSendNotification);
+    component->slider.setValue(magnitude_parameter->value_processor->value(), dontSendNotification);
     component->source.setText(connection->source->display_name, dontSendNotification);
 
-    bool bipolar = static_cast<bool>(connection->bipolar_parameter_->val->value());
+    bool bipolar = static_cast<bool>(connection->bipolar_parameter_->value_processor->value());
     component->indicator.setBipolar(bipolar);
     component->bipolarButton.setState(bipolar);
   }

@@ -19,8 +19,11 @@
 #include "chorus_model.h"
 #include "flanger_model.h"  
 #include "phaser_model.h"  
+#include "column_control_model.h"
+#include "noise_model.h"
 
 namespace model {
+// Module
 ModulePool::~ModulePool() { }
 
 // std::shared_ptr<Tab> ModulePool::getTab(Type type, int number) { return tabs.get({ type, number }); }
@@ -42,15 +45,17 @@ ModulePool::ModulePool() {
   blocks.spawn({ "chorus" }, [](std::string type, int number) { return std::make_shared<model::ChorusModule>(number); });
   blocks.spawn({ "flanger" }, [](std::string type, int number) { return std::make_shared<model::FlangerModule>(number); });
   blocks.spawn({ "phaser" }, [](std::string type, int number) { return std::make_shared<model::PhaserModule>(number); });
+  blocks.spawn({ "noise" }, [](std::string type, int number) { return std::make_shared<model::NoiseModel>(number); });
 
   modulators.spawn({ "lfo" }, [](std::string type, int number) { return std::make_shared<model::LFOModule>(number); });
   modulators.spawn({ "envelope" }, [](std::string type, int number) { return std::make_shared<model::ADSRModule>(number); });
 
   for (int i = 1; i <= 40; i++) connections.push_back(std::make_shared<Connection>(i));
+  for (int i = 1; i <= Constants::columns; i++) column_controls_.push_back(std::make_shared<ColumnControl>(i));
 
-  allModules.insert(allModules.end(), blocks.all.begin(), blocks.all.end());
-  allModules.insert(allModules.end(), modulators.all.begin(), modulators.all.end());
-  // allModules.insert(allModules.end(), tabs.all.begin(), tabs.all.end());
+  all_modules_.insert(all_modules_.end(), blocks.all.begin(), blocks.all.end());
+  all_modules_.insert(all_modules_.end(), modulators.all.begin(), modulators.all.end());
+  all_modules_.insert(all_modules_.end(), column_controls_.begin(), column_controls_.end());
 }
 
 void ModulePool::retire(std::shared_ptr<model::Connection> modulationConnection) {

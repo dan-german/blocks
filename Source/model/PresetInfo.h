@@ -12,22 +12,26 @@
 #include "model/Block.h"
 #include "gui/Tab.h"
 #include "connection.h"
+#include "model/column_control_model.h"
 
-// #include "
-
-class PresetInfo {
+class Preset {
 public:
   struct Module {
     ID id;
-    std::map<String, float> parameters;
+    std::map<std::string, float> parameters;
   };
 
-  struct Block: public PresetInfo::Module {
+  struct Block: public Preset::Module {
     int length = 1;
     std::pair<int, int> index = { -1, -1 };
   };
 
-  struct Modulator: public PresetInfo::Module { int colour; };
+  struct Modulator: public Preset::Module { int colour; };
+
+  // struct Column: Module { 
+  //   float pan;
+  //   float level;
+  // };
 
   struct Connection {
     std::string source;
@@ -48,13 +52,15 @@ public:
   std::vector<Block> blocks;
   std::vector<Modulator> modulators;
   std::vector<Connection> connections_;
+  std::vector<Module> column_controls;
 
-  static PresetInfo create(String name,
+  static Preset create(String name,
     // std::vector<std::shared_ptr<model::Tab>> tabs,
     std::vector<std::shared_ptr<model::Block>> blocks,
     std::vector<std::shared_ptr<model::Module>> modulators,
-    std::vector<std::shared_ptr<model::Connection>> modulations);
+    std::vector<std::shared_ptr<model::Connection>> modulations, 
+    std::vector<std::shared_ptr<model::ColumnControl>> column_controls);
 private:
-  static void prepareModule(std::shared_ptr<model::Module> module, Module& moduleInfo);
+  static void setParamsAndID(std::shared_ptr<model::Module> module, Module& moduleInfo);
 };
 

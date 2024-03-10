@@ -23,7 +23,8 @@ MainComponent::MainComponent(juce::MidiKeyboardState& keyboard_state, Delegate* 
   setupTabGrid();
   setupBlockGrid();
   setupDarkBackground(&dark_background_, -1);
-
+  addAndMakeVisible(column_controls_);
+  column_controls_.listener = this;
   note_logger_.listener = this;
   ThemeManager::shared()->set(UserSettings::shared()->getInt("theme", 0));
 
@@ -59,15 +60,15 @@ void MainComponent::modulatorEndedAdjusting(ModulatorComponent* modulatorCompone
   // delegate->editorParameterGestureChanged(delegate->getModulator(modulatorComponent->row)->name, index, false);
 }
 
-void MainComponent::modulatorIsAdjusting(ModulatorComponent* component, int parameter, float value) {
-  delegate->editorAdjustedModulator(parameter, component->row, value);
+void MainComponent::modulatorIsAdjusting(ModulatorComponent* component, std::string parameter_name, float value) {
+  delegate->editorAdjustedModulator(parameter_name, component->row, value);
 }
 
 void MainComponent::paint(juce::Graphics& g) {
   g.fillAll(ThemeManager::shared()->getCurrent().background);
 }
 
-void MainComponent::inspectorGestureChanged(int index, bool started) {
+void MainComponent::inspectorGestureChanged(std::string parameter_name, bool started) {
   std::shared_ptr<model::Module> focusedModule = delegate->getBlock2(focused_grid_item_->index);
 
   // auto isTab = tabGrid.containsItem(focusedGridItem);
@@ -77,12 +78,12 @@ void MainComponent::inspectorGestureChanged(int index, bool started) {
   //   focusedModule = delegate->getBlock(focusedGridItem->index);
   // }
 
-  delegate->editorParameterGestureChanged(focusedModule->name, index, started);
+  delegate->editorParameterGestureChanged(focusedModule->name, parameter_name, started);
 }
 
 void MainComponent::changeModulePainter(int value) {
   auto cast_block = static_cast<BlockComponent*>(focused_grid_item_);
-  cast_block->getPainter()->setWaveformType(static_cast<OscillatorPainter::WaveformType>(value));
+  cast_block->getPainter()->setWaveformType(BlockComponent::getWaveformType(value));
 }
 
 MainComponent::~MainComponent() {
@@ -117,7 +118,7 @@ void MainComponent::darkBackgroundClicked(Component* component) {
 
 void MainComponent::setupTabGrid() {
   tab_grid_.listener = this;
-  addAndMakeVisible(tab_grid_, 2);
+  // addAndMakeVisible(tab_grid_, 2);
 
   for (auto glow_indicator_ : tab_grid_.glowIndicators) {
     addChildComponent(glow_indicator_);
@@ -170,9 +171,9 @@ void MainComponent::setupListeners() {
   };
 
   ui_layer_.newPresetButton->on_click_ = [this]() {
-    // DBG("changed preset");
     delegate->editorChangedPreset(-1);
     clear();
+    dark_background_.setVisible(false);
   };
 
   ui_layer_.saveButton->on_click_ = [this]() {
@@ -203,6 +204,7 @@ void MainComponent::addModulator(Model::Type code) {
 void MainComponent::resized() {
   ui_layer_.setBounds(getLocalBounds());
   resizeGrid();
+  resizeColumnControls();
   ResizeInspector();
   resizeTabContainer();
   dark_background_.path.addRectangle(getLocalBounds());
@@ -215,6 +217,11 @@ void MainComponent::resized() {
     bounds.removeFromTop(20);
     glowIndicator->setBounds(bounds);
   }
+}
+
+void MainComponent::resizeColumnControls() {
+  auto bounds = block_grid_.getBounds().withHeight(38).withY(block_grid_.getY() + block_grid_.getHeight() + 19);
+  column_controls_.setBounds(bounds);
 }
 
 void MainComponent::resizeTabContainer() {
@@ -278,8 +285,8 @@ void MainComponent::clickOnGrid(Index& index) {
 
 void MainComponent::resizeGrid() {
   using namespace Constants;
-  const float gridWidth = columns * moduleWidth + (columns - 1) * moduleSpacing + gridEdgeSpacing * 2;
-  const float gridHeight = rows * moduleHeight + (rows - 1) * (moduleSpacing)+gridEdgeSpacing * 2;
+  const float gridWidth = columns * blockWidth + (columns - 1) * moduleSpacing + gridEdgeSpacing * 2;
+  const float gridHeight = rows * blockHeight + (rows - 1) * (moduleSpacing)+gridEdgeSpacing * 2;
   const float x = (getLocalBounds().getWidth() - gridWidth) / 2;
 
   int gridTopOffset = 135;
@@ -294,6 +301,7 @@ void MainComponent::ShowBlocksPopup(Index index) {
   block_grid_.reset();
 
   auto blockSelectionCompletion = [this, index](Index selectedIndex) {
+    std::cout << "column " << index.column << " row " << index.row << std::endl;
     int code = selectedIndex.column == 0 ? selectedIndex.row : selectedIndex.row + 5;
     auto module = addBlock(code, index);
     if (module == nullptr) return;
@@ -326,11 +334,9 @@ void MainComponent::showPopupAt(ButtonGridPopup& popup, std::function<void(Index
 
 std::shared_ptr<model::Block> MainComponent::addBlock(int code, Index index) {
   std::shared_ptr<model::Block> block = nullptr;
-  const StringArray one { "osc", "filter", "drive", "flanger", "comp" };
-  const StringArray two { "reverb", "delay", "chorus", "phaser", "eq" };
   StringArray all;
-  all.addArray(one);
-  all.addArray(two);
+  all.addArray(model::block_popup_row_one);
+  all.addArray(model::block_popup_row_two);
   return delegate->editorAddedBlock2(all[code].toStdString(), index);
 }
 
@@ -400,13 +406,18 @@ void MainComponent::inspectorChangedParameter(int sliderIndex, float value) {
   } else {
     auto module = delegate->getBlock2(moduleIndex);
     delegate->editorAdjustedBlock(moduleIndex, sliderIndex, value);
-    // auto cast = 
     updateModuleComponentVisuals(sliderIndex, value, module);
   }
 }
 
 void MainComponent::updateModuleComponentVisuals(int sliderIndex, float value, std::shared_ptr<model::Module> module) {
   if (module->id.type == Model::Types::osc) {
+    if (module->parameters_[sliderIndex]->name == "wave") {
+      int adjusted_value = (int)value > 0 ? (int)value + 1 : 0;   
+      changeModulePainter(adjusted_value);
+    }
+    return;
+
     switch (OscillatorModule::Parameters(sliderIndex)) {
     case OscillatorModule::pWave:
       changeModulePainter((int)value);
@@ -437,13 +448,13 @@ void MainComponent::refreshInspector() {
   ResizeInspector();
 }
 
-PopupMenu MainComponent::spawnModulationMenu(Module& victim) {
+PopupMenu MainComponent::spawnModulationMenu(Module& target) {
   PopupMenu modulateMenu;
 
   modulateMenu.setLookAndFeel(&blocks_laf_);
 
-  for (int i = 0; i < victim.parameters.size(); i++)
-    modulateMenu.addItem(i + 1, victim.parameters[i]->id);
+  for (int i = 0; i < target.parameters.size(); i++)
+    modulateMenu.addItem(i + 1, target.parameters[i]->id);
 
   return modulateMenu;
 }
@@ -453,7 +464,7 @@ void MainComponent::spawnBlockComponent(std::shared_ptr<model::Block> block) {
 
   blocks.add(blockComponent);
   block_grid_.addItem(blockComponent, block->index, true);
-  block_matrix_[block->index.row][block->index.column] = blockComponent;
+  block_matrix_[block->index.column][block->index.row] = blockComponent;
   addAndMakeVisible(blockComponent, 1000);
   cursor.setAlwaysOnTop(true);
   if (block->length > 1) block_grid_.setItemLength(blockComponent, block->length);
@@ -481,16 +492,13 @@ void MainComponent::graphicsTimerCallback(const float secondsSincelastUpdate) {
   if (ui_layer_.connections.isVisible()) {
     auto modulationConnections = delegate->getModulations();
 
-    // modulation_source_
     for (int i = 0; i < modulationConnections.size(); i++) {
       if (auto mc = dynamic_cast<ConnectionComponent*>(ui_layer_.connections.listBox.getComponentForRowNumber(i))) {
-        // auto value = delegate->editorRequestsModulatorValue(i);
         auto source = delegate->editorRequestsStatusOutput("modulation_amount_" + std::to_string(i + 1));
-        // std::cout << source->value()[0] << std::endl;
-        // a
-        // mc->indicator.setMagnitude(value.second, false);
+        // auto amount = delegate->editorRequestsStatusOutput("modulation_amount_" + std::to_string(i + 1));
+        // auto source = delegate->editorRequestsStatusOutput("modulation_amount_" + std::to_string(i + 1));
         mc->indicator.setCurrentValue(source->value()[0]);
-        mc->indicator.repaint();
+        // mc->indicator.repaint();
       }
     }
   }
@@ -589,19 +597,22 @@ void MainComponent::connectionDeleted(ConnectionComponent* component) {
 void MainComponent::sliderValueChanged(Slider* slider) {
   bool isModulatorSlider = slider->getName() == "modulatorSlider";
   if (isModulatorSlider) {
-    auto listItemComponent = slider->getParentComponent()->getParentComponent()->getParentComponent()->getParentComponent()->getParentComponent();
-    auto index = ui_layer_.modulators_.listBox.getRowNumberOfComponent(listItemComponent);
-    delegate->editorAdjustedModulator(index, 1, static_cast<float>(slider->getValue()));
+    // auto listItemComponent = slider->getParentComponent()->getParentComponent()->getParentComponent()->getParentComponent()->getParentComponent();
+    // auto index = ui_layer_.modulators_.listBox.getRowNumberOfComponent(listItemComponent);
+    // delegate->editorAdjustedModulator(index, 1, static_cast<float>(slider->getValue()));
   } else {
     auto index = ui_layer_.connections.indexOfModulationConnection(slider->getParentComponent()->getParentComponent());
+    auto value = static_cast<float>(slider->getValue());
     delegate->editorChangedModulationMagnitude(index, static_cast<float>(slider->getValue()));
   }
 }
 
-void MainComponent::loadState(PresetInfo preset) {
+// void MainComponent::sliderValueChanged
+
+void MainComponent::loadState(Preset preset) {
   for (auto presetBlock : preset.blocks) {
-    auto block = delegate->getBlock(Index { presetBlock.index.first, presetBlock.index.second });
-    // spawnBlockComponent(block);
+    auto block = delegate->getBlock2(Index { presetBlock.index.first, presetBlock.index.second });
+    spawnBlockComponent(block);
   }
 
   for (auto presetTab : preset.tabs) {
@@ -609,8 +620,14 @@ void MainComponent::loadState(PresetInfo preset) {
     spawnTabComponent(tab);
   }
 
+  for (auto column_control : preset.column_controls) {
+    int index = column_control.id.number - 1;
+    column_controls_.pan_sliders_[index]->slider.setValue(column_control.parameters["pan"]);
+    column_controls_.level_sliders_[index]->slider.setValue(column_control.parameters["level"]);
+  }
+
   ui_layer_.setConnections(delegate->getModulations());
-  // uiLayer.setModulators(delegate->getModulators());
+  ui_layer_.setModulators(delegate->getModulators2());
   ui_layer_.preset_button_.content.label.setText(preset.name, dontSendNotification);
 
   for (auto block : blocks) block->animate();
@@ -633,9 +650,9 @@ void MainComponent::modulatorIsDragging(ModulatorComponent* modulatorComponent, 
 
     previous_slider_under_mouse_ = sliderIndexUnderMouse;
 
-    auto victim = getFocusedModule();
+    auto target = getFocusedModule();
 
-    // if (victim->parameters[sliderIndexUnderMouse]->isModulatable) {
+    // if (target->parameters[sliderIndexUnderMouse]->isModulatable) {
     auto slider = inspector_.getSliders()[sliderIndexUnderMouse];
     slider->setHighlighted(true, modulatorComponent->getColour());
     // }
@@ -683,7 +700,7 @@ void MainComponent::modulatorEndedDrag(ModulatorComponent* modulator_component, 
     refreshInspector();
 
     // auto modulator = delegate->getModulator(modulatorIndex);
-    auto focused_block = block_matrix_[focused_grid_item_->index.row][focused_grid_item_->index.column];
+    auto focused_block = block_matrix_[focused_grid_item_->index.column][focused_grid_item_->index.row];
 
     focused_block->setConfig(focused_module, delegate->getModulations());
   }
@@ -732,9 +749,7 @@ void MainComponent::modulatorRemoved(ModulatorComponent* component) {
 void MainComponent::setupPopupMenus() {
   addChildComponent(blocks_popup_);
 
-  const StringArray one { "osc", "filter", "drive", "flanger", "comp" };
-  const StringArray two { "reverb", "delay", "chorus", "phaser", "eq" };
-  blocks_popup_.setModel({ one, two });
+  blocks_popup_.setModel({ model::block_popup_row_one, model::block_popup_row_two });
 
   addChildComponent(modualtors_popup_);
   modualtors_popup_.setModel(model::modulators);
@@ -785,8 +800,8 @@ void MainComponent::gridItemRemoved(GridComponent* grid, GridItemComponent* item
 
 void MainComponent::gridItemRepositioned(GridComponent* grid, GridItemComponent* item, Index oldIndex) {
   if (grid == &block_grid_) {
-    block_matrix_[oldIndex.row][oldIndex.column] = nullptr;
-    block_matrix_[item->index.row][item->index.column] = static_cast<BlockComponent*>(item);
+    block_matrix_[oldIndex.column][oldIndex.row] = nullptr;
+    block_matrix_[item->index.column][item->index.row] = static_cast<BlockComponent*>(item);
     delegate->editorRepositionedBlock(oldIndex, item->index);
     // ResetDownFlowingDots();
   } else if (grid == &tab_grid_) {
@@ -873,4 +888,38 @@ void MainComponent::resetDownFlowingDots() {
   for (auto column : columns_with_blocks) {
     block_grid_.setDownFlowingHighlight(column, true);
   }
+}
+
+void MainComponent::columnControlAdjusted(ColumnControlsContainer::ControlType control, int column, float value) {
+  if (control == ColumnControlsContainer::ControlType::level) {
+    delegate->editorAdjustedColumn("level", column, value);
+  } else if (control == ColumnControlsContainer::ControlType::pan) {
+    delegate->editorAdjustedColumn("pan", column, value);
+  }
+}
+
+void MainComponent::columnControlStartedAdjusting(ColumnControlsContainer::ControlType control, int column) {
+  if (control == ColumnControlsContainer::ControlType::level) {
+    delegate->editorStartedAdjustingColumn("level", column);
+  } else if (control == ColumnControlsContainer::ControlType::pan) {
+    delegate->editorStartedAdjustingColumn("pan", column);
+  }
+}
+
+void MainComponent::columnControlEndedAdjusting(ColumnControlsContainer::ControlType control, int column) {
+  if (control == ColumnControlsContainer::ControlType::level) {
+    delegate->editorEndedAdjustingColumn("level", column);
+  } else if (control == ColumnControlsContainer::ControlType::pan) {
+    delegate->editorEndedAdjustingColumn("pan", column);
+  }
+}
+
+void MainComponent::modulatorGestureChanged(ModulatorComponent* modulatorComponent, std::string parameter_name, bool started) { 
+  // std::cout << "modulator gesture changed: " << parameter_name << std::endl;
+  // auto 
+  // delegate->editorParameterGestureChanged(parameter_name, started);k
+  // delegate->
+  // rGestureChanged(delegate->getModulator(modulatorComponent->row)->name, index, true);
+  auto modulator = delegate->getModulator2(modulatorComponent->row);  
+  delegate->editorParameterGestureChanged(modulator->name, parameter_name, started);
 }

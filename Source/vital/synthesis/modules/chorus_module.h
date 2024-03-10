@@ -41,7 +41,6 @@ public:
   void process(int num_samples) override;
   void correctToTime(double seconds) override;
   Processor* clone() const override {
-    // std::cout << "ChorusModule::clone()" << std::endl;
     auto newChorus = new ChorusModule(*this);
     for (int i = 0; i < kMaxDelayPairs; ++i) {
       MultiDelay* cloned = static_cast<MultiDelay*>(delays_[i]->clone());

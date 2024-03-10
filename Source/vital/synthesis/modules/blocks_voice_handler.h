@@ -33,6 +33,7 @@
 #include "vital/synthesis/modules/oscillator_module.h"
 #include "model/module_manager.h"
 #include "model/id.h"
+#include "vital/synthesis/modules/column_master_module.h"
 
 namespace vital {
 class AudioRateEnvelope;
@@ -87,8 +88,6 @@ public:
   void removeModulator(int index, std::string type, std::string name);
   void repositionBlock(Index from, Index to);
   std::shared_ptr<vital::Processor> findProcessorAbove(Index index);
-  void setOSCAmplitudeEnvelope(std::shared_ptr<model::Module> adsr, std::shared_ptr<model::Module> target);
-  void resetOSCAmplitudeEnvelope(std::shared_ptr<model::Module> target);
   // void getModulationSource(std::string name) override;
   void clear();
   void initializeDefaultAmpEnvs();
@@ -112,6 +111,7 @@ private:
   void createDistortions();
   void createChoruses();
   void createFlangers();
+  void createNoises();
   void createPhasers();
   void createDelays();
   void setupPolyModulationReadouts();
@@ -133,14 +133,15 @@ private:
   Processor* amplitude_;
   Processor* pitch_wheel_;
   Processor* voice_sum_;
-  VariableAdd* last_node_;
+  VariableAdd* master_node_;
 
   std::vector<std::vector<std::shared_ptr<SynthModule>>> processor_matrix_;
   std::vector<std::shared_ptr<OscillatorModule>> oscillators_;
-  std::vector<std::shared_ptr<OscillatorModule>> oscillators_with_default_envs_;
+  std::vector<std::shared_ptr<SynthModule>> processors_with_default_env;
 public:
-  void setDefaultAmpEnv(std::string target_name, bool enable);
-  std::map<std::shared_ptr<SynthModule>, std::shared_ptr<ModulationConnectionProcessor>> osc_to_default_env_mod_processor_map_;
+  std::vector<std::shared_ptr<ColumnMasterModule>> column_nodes_;
+  void setDefaultAmpEnvState(std::string target_name, bool enable);
+  std::map<std::shared_ptr<SynthModule>, std::shared_ptr<ModulationConnectionProcessor>> processor_default_env_mp_map_;
 
   std::vector<std::shared_ptr<SynthModule>> lfos_;
   std::vector<std::shared_ptr<SynthModule>> envelopes_;

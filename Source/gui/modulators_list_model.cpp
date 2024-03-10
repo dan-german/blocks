@@ -40,13 +40,12 @@ Component* ModulatorsListModel::refreshComponentForRow(int rowNumber, bool isRow
 
 void ModulatorsListModel::setupModulatorComponent(std::shared_ptr<model::Module> model, ModulatorComponent& component) const {
   component.title.setText(model->display_name, dontSendNotification);
-
-
   component.delegate_ = modulator_listener;
   component.setColour(model->colour.colour);
 
   if (model->id.type == Model::Types::lfo) {
     component.oscillatorPainter.setVisible(true);
+    component.envelopePath.setVisible(false);
   } else {
     component.oscillatorPainter.setVisible(false);
     component.envelopePath.setVisible(true);
@@ -74,8 +73,9 @@ void ModulatorsListModel::setupModulatorComponent(std::shared_ptr<model::Module>
     auto parameter = model->parameters_[i];
     if (parameter->hidden) continue;
     auto slider = component.sliders[i];
+    component.slider_parameter_name_map_[&slider->box_slider_.slider] = parameter->name;
 
-    auto value = parameter->val->value();
+    auto value = parameter->value_processor->value();
     slider->label.setText(parameter->display_name, dontSendNotification);
 
     double interval = 0.0;
@@ -94,7 +94,6 @@ void ModulatorsListModel::setupModulatorComponent(std::shared_ptr<model::Module>
       slider->box_slider_.slider.textFromValueFunction = [parameter](double value) { return juce::String(parameter->string_lookup[(int)value]); };
     } else {
       slider->box_slider_.slider.textFromValueFunction = [parameter](double value) { return UIUtils::getSliderTextFromValue(value, *parameter ); };
-      // slider->box_slider_.slider.textFromValueFunction = {};
     }
 
     slider->box_slider_.slider.setValue(value, dontSendNotification);
@@ -112,6 +111,8 @@ void ModulatorsListModel::setModulators(std::vector<std::shared_ptr<model::Modul
 }
 
 void ModulatorsListModel::onLFOParameterChange(std::shared_ptr<model::Module> module, ModulatorComponent& component, int index, float value) const {
+  std::cout << "on lfo " << index << " " << value << std::endl;
+  bool is_changing_wave = index == 0;
   bool is_changing_sync = index == 2;
   if (is_changing_sync) {
     LabeledSlider* rate_slider = component.sliders[1];
@@ -121,6 +122,9 @@ void ModulatorsListModel::onLFOParameterChange(std::shared_ptr<model::Module> mo
     } else {
       setSliderAsTempo(module, rate_slider);
     }
+  } else if (is_changing_wave) { 
+    auto wave = int(value);
+    component.oscillatorPainter.waveformType = static_cast<OscillatorPainter::WaveformType>(wave);
   }
 
   bool is_changing_tempo = index == 1;
@@ -136,12 +140,13 @@ void ModulatorsListModel::onLFOParameterChange(std::shared_ptr<model::Module> mo
 void ModulatorsListModel::setSliderAsFrequency(std::shared_ptr<model::Module> module, LabeledSlider* slider) const {
   slider->label.setText("seconds", dontSendNotification);
 
-  slider->box_slider_.slider.textFromValueFunction = [slider, module](double value) {
-    return UIUtils::getSliderTextFromValue(value, *(module->parameter_map_["frequency"]));
+  auto frequency_parameter = module->parameter_map_["frequency"];
+  slider->box_slider_.slider.textFromValueFunction = [frequency_parameter, module](double value) {
+    return UIUtils::getSliderTextFromValue(value, *frequency_parameter);
   };
 
-  slider->box_slider_.slider.setRange(-2.0, 9.0);
-  auto value = module->parameter_map_["frequency"]->val->value();
+  slider->box_slider_.slider.setRange(frequency_parameter->min, frequency_parameter->max);
+  auto value = frequency_parameter->value_processor->value();
   slider->box_slider_.slider.setValue(value, dontSendNotification);
   slider->box_slider_.valueLabel.setText(slider->box_slider_.slider.getTextFromValue(value), dontSendNotification);
 }
@@ -150,7 +155,7 @@ void ModulatorsListModel::setSliderAsTempo(std::shared_ptr<model::Module> module
   slider->label.setText("tempo", dontSendNotification);
   slider->box_slider_.slider.textFromValueFunction = [](double value) { return strings::kSyncedFrequencyNames[int(value)]; };
   slider->box_slider_.slider.setRange(0.0, 12.0, 1.0);
-  auto value = module->parameter_map_["tempo"]->val->value();
+  auto value = module->parameter_map_["tempo"]->value_processor->value();
   slider->box_slider_.slider.setValue(value, dontSendNotification);
   slider->box_slider_.valueLabel.setText(slider->box_slider_.slider.getTextFromValue(value), dontSendNotification);
 }

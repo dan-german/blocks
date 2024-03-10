@@ -15,7 +15,7 @@
 
 class OscillatorPainter: public Component, GraphicsTimer {
 public:
-  enum class WaveformType { saw, sine, square, triangle, noise };
+  enum class WaveformType { sine, was, saw, square, triangle, noise };
   WaveformType waveformType;
 
   OscillatorPainter();
@@ -48,16 +48,18 @@ private:
     return sin(x * unit);
   }
 
+  inline float was(float phase) {
+    return jmap(saw(phase), -1.0f, 1.0f, 1.0f, -1.0f);
+  }
+
   inline float saw(float phase) {
     float width = (float)getWidth();
-
     float x = fmod(phase * cycles, width) * 2.0f;
     return (width - x) / (width);
   }
 
   inline float square(float x) {
     float width = (float)getWidth();
-
     float value = (fmod(x, width / cycles)) >= width / cycles / 2 ? -1 : 1;
     return value;
   }
@@ -78,16 +80,12 @@ private:
 
   inline float getWaveform(float x) {
     switch (waveformType) {
-    case WaveformType::sine:
-      return sine(x);
-    case WaveformType::saw:
-      return saw(x);
-    case WaveformType::square:
-      return square(x);
-    case WaveformType::triangle:
-      return triangle(x);
-    case WaveformType::noise:
-      return 1.0f - 2.0f * rand() / RAND_MAX;
+    case WaveformType::sine: return sine(x);
+    case WaveformType::was: return was(x);
+    case WaveformType::saw: return saw(x);
+    case WaveformType::square: return square(x);
+    case WaveformType::triangle: return triangle(x);
+    case WaveformType::noise: return 1.0f - 2.0f * rand() / RAND_MAX;
     }
     return 0.f;
   }

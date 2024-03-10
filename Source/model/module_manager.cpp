@@ -10,7 +10,7 @@ std::shared_ptr<model::Block> ModuleManager::addBlock(std::string code, Index in
   if (block == nullptr) return nullptr;
   block->index = index;
   nameToModuleMap[block->name] = block;
-  blockMatrix[index.row][index.column] = block;
+  blockMatrix[index.column][index.row] = block;
   blocks.push_back(block);
   return block;
 }
@@ -20,7 +20,7 @@ void ModuleManager::removeBlock(std::shared_ptr<model::Block> block) {
     removeConnection(connection);
   }
   nameToModuleMap.erase(block->name);
-  blockMatrix[block->index.row][block->index.column] = nullptr;
+  blockMatrix[block->index.column][block->index.row] = nullptr;
   blocks.erase(std::remove(blocks.begin(), blocks.end(), block), blocks.end());
   pool.retire(block);
 }
@@ -69,8 +69,8 @@ void ModuleManager::repositionBlock(Index oldIndex, Index newIndex) {
 
   block->index = newIndex;
 
-  blockMatrix[newIndex.row][newIndex.column] = block;
-  blockMatrix[oldIndex.row][oldIndex.column] = {};
+  blockMatrix[newIndex.column][newIndex.row] = block;
+  blockMatrix[oldIndex.column][oldIndex.row] = {};
 }
 
 std::shared_ptr<Connection> ModuleManager::addConnection(std::shared_ptr<Module> source, std::shared_ptr<Module> target, std::string parameter_name, int number) {

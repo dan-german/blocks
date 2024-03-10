@@ -30,16 +30,16 @@ void BlockComponent::resizePainter() {
   painter->setBounds(x, y, width, height);
 }
 
-BlockComponent::BlockComponent(Index index): GridItemComponent({ index, Constants::moduleWidth }) {
+BlockComponent::BlockComponent(Index index): GridItemComponent({ index, Constants::blockWidth }) {
   isSelected = false;
   isStretching = false;
   isDragging = false;
   listener = nullptr;
 
   setupTitleLabel();
-  setBounds(0, 0, Constants::moduleWidth, Constants::moduleHeight);
+  setBounds(0, 0, Constants::blockWidth, Constants::blockHeight);
 
-  initialWidth = Constants::moduleWidth;
+  initialWidth = Constants::blockWidth;
   darkener.toFront(false);
   darkener.setInterceptsMouseClicks(false, false);
 
@@ -170,19 +170,18 @@ BlockComponent* BlockComponent::create(std::shared_ptr<model::Block> block) {
   component->colour = block->colour.colour;
 
   if (block->id.type == Model::Types::osc) {
-    float waveformFloat = block->parameters_[0]->val->value();  
+    float waveformFloat = block->parameters_[0]->value_processor->value();  
     int waveformInt = static_cast<int>(waveformFloat);
     auto painter = new OscillatorPainter();
-    painter->setWaveformType(static_cast<OscillatorPainter::WaveformType>(waveformInt));
+    painter->setWaveformType(getWaveformType(waveformInt));
     painter->thickness = 2.0f;
     component->setPainter(painter);
-  } else if (block->id.type == Model::Types::adsr) {
-    component->setEnvelopePath(component->colour);
-    // component->getEnvelopePath()->setAttack(block->parameters[0]->audioParameter->getValue());
-    // component->getEnvelopePath()->setDecay(block->parameters[1]->audioParameter->getValue());
-    // component->getEnvelopePath()->setSustain(block->parameters[2]->audioParameter->getValue());
-    // component->getEnvelopePath()->setRelease(block->parameters[3]->audioParameter->getValue());
-  }
+  } else if (block->id.type == Model::Types::noise) {
+    auto painter = new OscillatorPainter();
+    painter->setWaveformType(OscillatorPainter::WaveformType::noise);
+    painter->thickness = 2.0f;
+    component->setPainter(painter);
+  } 
 
   component->themeChanged(ThemeManager::shared()->getCurrent());
   return component;

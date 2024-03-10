@@ -14,12 +14,13 @@
 #include "module_new.h"
 #include "gui/Tab.h"
 
-PresetInfo PresetInfo::create(String name,
+Preset Preset::create(String name,
   // std::vector<std::shared_ptr<model::Tab>> tabs,
   std::vector<std::shared_ptr<model::Block>> blocks,
   std::vector<std::shared_ptr<model::Module>> modulators,
-  std::vector<std::shared_ptr<model::Connection>> connections) {
-  PresetInfo info;
+  std::vector<std::shared_ptr<model::Connection>> connections,
+  std::vector<std::shared_ptr<model::ColumnControl>> column_controls) {
+  Preset info;
 
   info.name = name;
 
@@ -34,8 +35,8 @@ PresetInfo PresetInfo::create(String name,
   for (auto block : blocks) {
     if (block->isChild) continue;
     Block blockInfo;
-    PresetInfo::prepareModule(block, blockInfo);
-    blockInfo.index = { block->index.row, block->index.column };
+    Preset::setParamsAndID(block, blockInfo);
+    blockInfo.index = { block->index.column, block->index.row };
     blockInfo.length = block->length;
 
     info.blocks.push_back(blockInfo);
@@ -43,7 +44,7 @@ PresetInfo PresetInfo::create(String name,
 
   for (auto modulator : modulators) {
     Modulator modulatorInfo;
-    PresetInfo::prepareModule(modulator, modulatorInfo);
+    Preset::setParamsAndID(modulator, modulatorInfo);
     modulatorInfo.colour = modulator->colour.id;
     info.modulators.push_back(modulatorInfo);
   }
@@ -51,26 +52,32 @@ PresetInfo PresetInfo::create(String name,
   for (auto connection : connections) {
     Connection modulationInfo;
 
-    // modulationInfo.parameter = modulation->target->parameter(modulation->parameterIndex)->id.toStdString();
-    modulationInfo.parameter = connection->target->parameter_map_[connection->parameter_name_]->val->value();
+    modulationInfo.parameter = connection->parameter_name_;
     modulationInfo.source = connection->source->name;
     modulationInfo.target = connection->target->name;
     modulationInfo.number = connection->number;
-    modulationInfo.bipolar = static_cast<bool>(connection->bipolar_parameter_->val->value());
-    modulationInfo.amount = connection->amount_parameter_->val->value();
+    modulationInfo.bipolar = static_cast<bool>(connection->bipolar_parameter_->value_processor->value());
+    modulationInfo.amount = connection->amount_parameter_->value_processor->value();
 
     info.connections_.push_back(modulationInfo);
+  }
+
+
+  for (auto column : column_controls) {
+    Module columnInfo;
+    setParamsAndID(column, columnInfo);
+    info.column_controls.push_back(columnInfo);
   }
 
   return info;
 }
 
-void PresetInfo::prepareModule(std::shared_ptr<model::Module> module, Module& moduleInfo) {
+void Preset::setParamsAndID(std::shared_ptr<model::Module> module, Module& moduleInfo) {
   moduleInfo.id = {
     .type = module->id.type,
     .number = module->id.number
   };
 
   for (auto parameter : module->parameters_)
-    moduleInfo.parameters[parameter->name] = parameter->val->value();
+    moduleInfo.parameters[parameter->name] = parameter->value_processor->value();
 }

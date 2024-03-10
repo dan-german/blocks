@@ -488,6 +488,7 @@ void SampleSource::process(int num_samples) {
   for (int i = 0; i < num_samples; ++i) {
     current_pan_amplitude += delta_pan_amplitude;
     poly_float level = utils::clamp(level_input[i], zero, max);
+    poly_float raw = raw_output[i];
     levelled_output[i] = current_pan_amplitude * level * level * raw_output[i];
   }
 

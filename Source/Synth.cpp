@@ -1,7 +1,8 @@
 #include "Synth.h"
 #include "util/Analytics.h"
 
-void Synth::editorAdjustedModulator(int parameter, int modulator, float value) { moduleManager.getModulator(modulator)->parameter(parameter)->setValue(value); }
+void Synth::editorAdjustedModulator(std::string parameter_name, int modulator, float value) { /* moduleManager.getModulator(modulator)->parameter(parameter)->setValue(value);*/ }
+
 void Synth::editorAdjustedBlock(Index index, int parameter, float value) { moduleManager.getBlock(index)->parameter(parameter)->setValue(value); }
 void Synth::editorChangedModulationMagnitude(int index, float magnitude) { moduleManager.getConnection(index)->setMagnitude(magnitude); }
 void Synth::editorChangedModulationPolarity(int index, bool bipolar) { moduleManager.getConnection(index)->setPolarity(bipolar); }
@@ -31,7 +32,7 @@ void Synth::editorDisconnectedModulation(int index) {
   disconnect(index);
 }
 
-PresetInfo Synth::editorChangedPreset(int index) {
+Preset Synth::editorChangedPreset(int index) {
   return changePreset(index);
 }
 
@@ -130,11 +131,11 @@ std::pair<float, float> Synth::editorRequestsModulatorValue(int modulationConnec
   return { 0.0f, 0.0f };
 }
 
-PresetInfo Synth::getStateRepresentation() {
-  auto currentState = PresetInfo();
+Preset Synth::getStateRepresentation() {
+  auto currentState = Preset();
 
   for (auto block : moduleManager.getBlocks()) {
-    auto presetBlock = PresetInfo::Block();
+    auto presetBlock = Preset::Block();
     presetBlock.index = { block->index.row, block->index.column }; ;
     presetBlock.id = block->id;
     presetBlock.length = block->length;
@@ -142,7 +143,7 @@ PresetInfo Synth::getStateRepresentation() {
   }
 
   for (auto tab : moduleManager.getTabs()) {
-    auto presetTab = PresetInfo::Tab();
+    auto presetTab = Preset::Tab();
     presetTab.column = tab->column;
     presetTab.id = tab->id;
     // currentState.tabs.add(presetTab);
@@ -367,13 +368,13 @@ void Synth::clear() {
   }
 }
 
-void Synth::editorParameterGestureChanged(String moduleName, int parameterIndex, bool started) {
+void Synth::editorParameterGestureChanged(std::string module_name, std::string parameter_name, bool started) {
   if (JUCE_STANDALONE_APPLICATION) return;
 
   if (started) {
-    moduleManager.getModule(moduleName)->parameter(parameterIndex)->audioParameter->beginChangeGesture();
+    // moduleManager.getModule(module_name)->parameter(parameterIndex)->audioParameter->beginChangeGesture();
   } else {
-    moduleManager.getModule(moduleName)->parameter(parameterIndex)->audioParameter->endChangeGesture();
+    // moduleManager.getModule(moduleName)->parameter(parameterIndex)->audioParameter->endChangeGesture();
   }
 }
 
@@ -424,11 +425,11 @@ void Synth::removeConnectionsFromTarget(std::shared_ptr<Module> module) {
     disconnect(connection);
 }
 
-PresetInfo Synth::changePreset(int index) {
+Preset Synth::changePreset(int index) {
   if (index == -1) {
     Analytics::shared()->countAction("Preset Initialized");
     clear();
-    return PresetInfo();
+    return Preset();
   }
 
   Analytics::shared()->countAction("Preset Changed");
@@ -437,16 +438,16 @@ PresetInfo Synth::changePreset(int index) {
   return preset;
 }
 
-void Synth::loadPreset(PresetInfo preset) {
+void Synth::loadPreset(Preset preset) {
   clear();
 
-  for (auto presetTab : preset.tabs) {
-    auto tab = moduleManager.addTab(presetTab.id.type, presetTab.column, presetTab.id.number);
-    tab->length = presetTab.length;
+  // for (auto presetTab : preset.tabs) {
+  //   auto tab = moduleManager.addTab(presetTab.id.type, presetTab.column, presetTab.id.number);
+  //   tab->length = presetTab.length;
 
-    for (auto const& [key, val] : presetTab.parameters)
-      tab->parameterMap[key]->audioParameter->setValue(val);
-  }
+  //   for (auto const& [key, val] : presetTab.parameters)
+  //     tab->parameterMap[key]->audioParameter->setValue(val);
+  // }
 
   for (auto presetBlock : preset.blocks) {
     Index index = { presetBlock.index.first, presetBlock.index.second };

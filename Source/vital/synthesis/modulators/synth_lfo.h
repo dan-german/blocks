@@ -35,6 +35,7 @@ public:
     kStereoPhase,
     kDelay,
     kNoteCount,
+    kWaveIndex,
     kNumInputs
   };
 
@@ -107,6 +108,7 @@ public:
 
   void process(int num_samples) override;
   void correctToTime(double seconds);
+  LineGenerator* source_;
 
 protected:
   void processTrigger();
@@ -131,7 +133,7 @@ protected:
   poly_mask held_mask_;
   poly_int trigger_sample_;
   poly_float trigger_delay_;
-  LineGenerator* source_;
+  int current_wave_index_;
 
   std::shared_ptr<double> sync_seconds_;
 

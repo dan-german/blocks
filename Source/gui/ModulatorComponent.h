@@ -40,6 +40,7 @@ private:
 
   int currentSliderIndex = -1;
 public:
+  std::map<Slider*, std::string> slider_parameter_name_map_;
   struct Listener;
   Listener* delegate_;
   OwnedArray<LabeledSlider> sliders;
@@ -84,6 +85,7 @@ struct ModulatorComponent::Listener {
   virtual void modulatorStartedDrag(ModulatorComponent* modulatorComponent, const MouseEvent& event) = 0;
   virtual void modulatorStartedAdjusting(ModulatorComponent* modulatorComponent, int index) = 0;
   virtual void modulatorEndedAdjusting(ModulatorComponent* modulatorComponent, int index) = 0;
-  virtual void modulatorIsAdjusting(ModulatorComponent* modulatorComponent, int index, float value) = 0;
+  virtual void modulatorIsAdjusting(ModulatorComponent* modulatorComponent, std::string parameter_name, float value) = 0;
   virtual void modulatorRemoved(ModulatorComponent* modulatorComponent) = 0;
+  virtual void modulatorGestureChanged(ModulatorComponent* modulatorComponent, std::string paramter_name, bool started) = 0;
 };

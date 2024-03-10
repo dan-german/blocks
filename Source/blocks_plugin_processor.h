@@ -89,29 +89,34 @@ public:
   void editorAdjustedBlock(Index index, int parameter, float value) override;
   void editorAdjustedTab(int column, int parameter, float value) override;
   void editorChangedModulationMagnitude(int connectionIndex, float magnitude) override;
-  void editorParameterGestureChanged(String moduleName, int parameterIndex, bool started) override;
+  void editorParameterGestureChanged(std::string module_name, std::string paramter_name, bool started) override;
   void editorChangedModulationPolarity(int index, bool bipolar) override;
   void editorDisconnectedModulation(int index) override;
   void editorSavedPreset(String name) override;
   void editorConnectedModulation(int modulatorIndex, std::string target_name, std::string parameter) override;
   void editorChangedBlockLength(Index index, int length) override;
-  void editorAdjustedModulator(int parameter, int modulator, float value) override;
+  void editorAdjustedModulator(std::string parameter_name, int modulator, float value) override;
   void editorRemovedModulator(int index) override;
   void removeModulator(int index);
+
+  void editorStartedAdjustingColumn(std::string control, int column) override;
+  void editorEndedAdjustingColumn(std::string control, int column) override;
+  void editorAdjustedColumn(std::string contorl, int column, float value) override;
 
   void disconnect(std::__1::shared_ptr<model::Connection>& connection);
 
   std::shared_ptr<Block> getBlock(Index index) override;
-  std::shared_ptr<model::Module> getBlock2(Index index) override;
+  std::shared_ptr<model::Block> getBlock2(Index index) override;
   std::shared_ptr<Tab> getTab(int column) override;
   std::shared_ptr<Block> editorAddedBlock(Model::Type code, Index index) override;
   std::shared_ptr<model::Block> editorAddedBlock2(Model::Type code, Index index) override;
   std::shared_ptr<model::Module> editorAddedModulator2(Model::Type code) override;
   std::shared_ptr<Module> getModulator(int index) override;
+  std::shared_ptr<model::Module> getModulator2(int index) override;
   std::shared_ptr<Module> editorAddedModulator(Model::Type code) override;
-  PresetInfo editorChangedPreset(int index) override;
+  Preset editorChangedPreset(int index) override;
   void clear();
-  PresetInfo getStateRepresentation() override;
+  Preset getStateRepresentation() override;
   juce::Array<std::shared_ptr<Module>> getModulators() override;
   std::vector<std::shared_ptr<model::Module>> getModulators2() override;
   juce::Array<std::shared_ptr<Modulation>> getConnectionsOfSource(std::shared_ptr<Module> source) override;
@@ -132,6 +137,9 @@ private:
   double last_seconds_time_;
   MidiKeyboardState keyboard_state_;
   MainComponent* mainComponent;
+  PresetManager preset_manager_;
+  void loadPreset(Preset preset);
+  void setValue(std::string module_id, std::string parameter, float value);
 
   juce::AudioPlayHead::CurrentPositionInfo position_info_;
 

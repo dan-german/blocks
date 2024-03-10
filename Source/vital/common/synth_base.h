@@ -90,7 +90,7 @@ public:
   bool isSourceConnected(const std::string& source);
   std::vector<vital::ModulationConnection*> getDestinationConnections(const std::string& destination);
 
-  std::shared_ptr<model::Block> addBlock(std::string type, Index index);
+  std::shared_ptr<model::Block> addBlock(std::string type, Index index, int number = -1);
   std::shared_ptr<model::Module> addModulator(Model::Type tpye, int number = -1, int colour_id = -1);
   void repositionBlock(Index from, Index to);
 
@@ -188,7 +188,7 @@ protected:
   void processKeyboardEvents(MidiBuffer& buffer, int num_samples);
   void processModulationChanges();
   void updateMemoryOutput(int samples, const vital::poly_float* audio);
-  void initModulationValues(const std::string& source, const std::string& destination);
+  // void initModulationValues(const std::string& source, const std::string& destination);
 
   std::unique_ptr<vital::SoundEngine> engine_;
   std::unique_ptr<MidiManager> midi_manager_;
@@ -215,7 +215,6 @@ protected:
   vital::CircularQueue<vital::ModulationConnection*> mod_connections_;
   moodycamel::ConcurrentQueue<vital::control_change> value_change_queue_;
   moodycamel::ConcurrentQueue<vital::modulation_change> modulation_change_queue_;
-  moodycamel::ConcurrentQueue<vital::block_change> block_change_queue_;
   Tuning tuning_;
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SynthBase)

@@ -11,10 +11,10 @@
 #pragma once
 
 struct Index {
-  int row, column;
-  Index(int row, int column): row(row), column(column) { }
+  int column, row;
+  Index(int column, int row): column(column), row(row) { }
   ~Index() { }
-  inline Index toTheRight(int times) { return Index { row, column + times }; }
-  inline bool operator==(const Index& other) const { return other.row == row && other.column == column; }
-  inline bool operator!=(const Index& other) const { return !(other.row == row && other.column == column); }
+  inline Index toTheRight(int times) { return Index { column, row + times }; }
+  inline bool operator==(const Index& other) const { return other.column == column && other.row == row; }
+  inline bool operator!=(const Index& other) const { return !(other.column == column && other.row == row); }
 };

@@ -10,17 +10,14 @@ public:
   BasePopup() = default;
 
   void paint(juce::Graphics& g) override;
+  void setVisible(bool shouldBeVisible) override;
+  void triggerDismissAnimation();
+  void present();
 
   virtual void setBackgroundColour(Colour newColour) {
     this->backgroundColour = newColour;
     repaint();
   }
-
-  void setVisible(bool shouldBeVisible) override;
-
-  void triggerDismissAnimation();
-
-  void present();
 private:
   Colour colour;
   Colour backgroundColour;
