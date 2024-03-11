@@ -34,7 +34,7 @@ void SampleModule::init() {
   Value* transpose_quantize = createBaseControl2({ .name = "transpose quantize" });
   Output* transpose = createPolyModControl2({ .name = "transpose" });
   Output* tune = createPolyModControl2({ .name = "tune" });
-  Output* level = createPolyModControl2({ .name = "level", .default_value = 1.0, .audio_rate = true, .smooth_value = true, .value_scale = ValueScale::kQuadratic });
+  Output* level = createPolyModControl2({ .name = "level", .audio_rate = true, .smooth_value = true, .value_scale = ValueScale::kQuadratic, .default_value = 1.0, });
   Output* pan = createPolyModControl2({ .name = "pan", .min = -1.0f });
 
   sampler_->useInput(input(kReset), SampleSource::kReset);

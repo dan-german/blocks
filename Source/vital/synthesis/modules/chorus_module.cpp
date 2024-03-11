@@ -41,8 +41,8 @@ void ChorusModule::init() {
   // std::cout << "ChorusModule::init()" << std::endl;
   static const cr::Value kDelayStyle(MultiDelay::kMono);
 
-  voices_ = createBaseControl2({ .name = "voices", .min = 1.0f, .max = 4.0f, .default_value = 4.0f, .value_scale = ValueScale::kIndexed });
-  Output* free_frequency = createPolyModControl2({ .name = "frequency", .min = -6.0f, .max = 3.0f, .default_value = 6.0f,. value_scale = ValueScale::kExponential });
+  voices_ = createBaseControl2({ .name = "voices", .value_scale = ValueScale::kIndexed ,.min = 1.0f, .max = 4.0f, .default_value = 4.0f });
+  Output* free_frequency = createPolyModControl2({ .name = "frequency", .value_scale = ValueScale::kExponential, .min = -6.0f, .max = 3.0f,.default_value = 6.0f });
   frequency_ = createTempoSyncSwitch("chorus", free_frequency->owner, beats_per_second_, false);
   Output* feedback = createPolyModControl2({ .name = "feedback", .min = -0.95f, .max = 0.95f, .default_value = 0.4f });
   wet_output_ = createPolyModControl2({ .name = "mix", .default_value = 0.5f });
@@ -51,9 +51,9 @@ void ChorusModule::init() {
   Output* cutoff = createMonoModControl2({ .name = "cutoff", .min = 8.0f, .max = 136.0f, .default_value = 60.0f });
   Output* spread = createMonoModControl2({ .name = "spread", .default_value = 1.0f });
 
-  delay_time_1_ = createMonoModControl2({ .name = "delay_1", .min = -10.0f, .max = -5.64386, .default_value = -9.0f, .value_scale = ValueScale::kExponential });
-  delay_time_2_ = createMonoModControl2({ .name = "delay_2", .min = -10.0f, .max = -5.64386, .default_value = -9.0f, .value_scale = ValueScale::kExponential });
-  
+  delay_time_1_ = createMonoModControl2({ .name = "delay_1", .value_scale = ValueScale::kExponential, .min = -10.0f, .max = -5.64386, .default_value = -9.0f });
+  delay_time_2_ = createMonoModControl2({ .name = "delay_2", .value_scale = ValueScale::kExponential, .min = -10.0f, .max = -5.64386, .default_value = -9.0f });
+
   for (int i = 0; i < kMaxDelayPairs; ++i) {
     delays_[i]->plug(&delay_frequencies_[i], MultiDelay::kFrequency);
     delays_[i]->plug(feedback, MultiDelay::kFeedback);

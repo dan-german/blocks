@@ -11,7 +11,7 @@ public:
     add({ .name = "high cut", .max = 128.0, .default_value = 110.0 });
     add({ .name = "low cut", .max = 128.0, .default_value = 0.0 });
     add({ .name = "mod rate", .min = -8.0, .max = 3.0, .default_value = -2.0, .value_scale = ValueScale::kExponential, .display_units = "hz" });
-    add({ .name = "mod amount", .default_value = 0.223607, .value_scale = ValueScale::kQuadratic, .display_multiply = 100.0, .display_units = "%" });
+    add({ .name = "mod amount", .default_value = 0.223607,  .display_multiply = 100.0, .value_scale = ValueScale::kQuadratic, .display_units = "%" });
   }
 };
 }

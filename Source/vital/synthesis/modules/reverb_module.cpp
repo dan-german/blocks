@@ -36,15 +36,15 @@ void ReverbModule::init() {
   reverb_->useOutput(output());
   reverb_->useInput(input(kReset), Reverb::kReset);
 
-  Output* reverb_decay_time = createMonoModControl2({ .name = "time", .min = -6.0, .max = 6.0, .value_scale = ValueScale::kExponential });
+  Output* reverb_decay_time = createMonoModControl2({ .name = "time", .value_scale = ValueScale::kExponential, .min = -6.0, .max = 6.0 });
   Output* reverb_pre_low_cutoff = createMonoModControl2({ .name = "low cut", .max = 128.0 });
   Output* reverb_pre_high_cutoff = createMonoModControl2({ .name = "high cut", .max = 128.0, .default_value = 110.0 });
   Output* reverb_low_shelf_cutoff = createMonoModControl2({ .name = "reverb_low_shelf_cutoff", .max = 128.0 });
   Output* reverb_low_shelf_gain = createMonoModControl2({ .name = "reverb_low_shelf_gain", .min = -6.0, .max = 0.0 });
   Output* reverb_high_shelf_cutoff = createMonoModControl2({ .name = "reverb_high_shelf_cutoff", .max = 128.0, .default_value = 90.0 });
   Output* reverb_high_shelf_gain = createMonoModControl2({ .name = "reverb_high_shelf_gain", .min = -6.0, .max = 0.0, .default_value = -1.0 });
-  Output* reverb_chorus_amount = createMonoModControl2({ .name = "mod amount", .default_value = 0.223607, .value_scale = ValueScale::kQuadratic });
-  Output* reverb_chorus_frequency = createMonoModControl2({ .name = "mod rate", .min = -8.0, .max = 3.0, .default_value = -2.0, .value_scale = ValueScale::kExponential });
+  Output* reverb_chorus_amount = createMonoModControl2({ .name = "mod amount", .value_scale = ValueScale::kQuadratic , .default_value = 0.223607 });
+  Output* reverb_chorus_frequency = createMonoModControl2({ .name = "mod rate", .value_scale = ValueScale::kExponential , .min = -8.0, .max = 3.0, .default_value = -2.0 });
   Output* reverb_size = createMonoModControl2({ .name = "size", .min = 0.0, .max = 1.0, .default_value = 0.5 });
   Output* reverb_delay = createMonoModControl2({ .name = "delay", .max = 0.3 });
   Output* reverb_wet = createMonoModControl2({ .name = "mix" });

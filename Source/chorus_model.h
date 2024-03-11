@@ -5,7 +5,7 @@ namespace model {
 class ChorusModule: public Block {
 public:
   ChorusModule(int number): Block("chorus", number) {
-    add({ .name = "voices", .min = 1.0, .max = 4.0, .value_scale = ValueScale::kIndexed, .display_multiply = 4.0 });
+    add({ .name = "voices", .min = 1.0, .max = 4.0, .display_multiply = 4.0, .value_scale = ValueScale::kIndexed });
     add({ .name = "depth", .default_value = 0.5f });
     add({ .name = "feedback", .min = -0.95f, .max = 0.95f, .default_value = 0.4f });
     add({ .name = "tempo", .max = 10.0f, .default_value = 4.0f, .value_scale = ValueScale::kIndexed, .string_lookup = strings::kSyncedFrequencyNames });
