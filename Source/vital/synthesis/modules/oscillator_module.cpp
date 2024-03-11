@@ -35,15 +35,15 @@ void OscillatorModule::init() {
   Value* midi_track = createBaseControl2({ .name = "midi_track", .value_scale = ValueScale::kIndexed, .default_value = 1.0 });
   Value* smooth_interpolation = createBaseControl2({ .name = "smooth_interpolation", .value_scale = ValueScale::kIndexed });
   Value* spectral_unison = createBaseControl2({ .name = "spectral_unison", .value_scale = ValueScale::kIndexed, .default_value = 1.0 });
-  Value* stack_style = createBaseControl2({ .name = "stack_style", .max = 10.0, .value_scale = ValueScale::kIndexed });
-  Value* transpose_quantize = createBaseControl2({ .name = "transpose_quantize", .max = 8191.0, .value_scale = ValueScale::kIndexed });
+  Value* stack_style = createBaseControl2({ .name = "stack_style", .value_scale = ValueScale::kIndexed, .max = 10.0 });
+  Value* transpose_quantize = createBaseControl2({ .name = "transpose_quantize", .value_scale = ValueScale::kIndexed, .max = 8191.0 });
 
   Input* reset = input(kReset);
 
-  Output* wave_frame = createPolyModControl2({ .name = "wave", .max = 3.0, .value_scale = ValueScale::kIndexed });
-  Output* transpose = createPolyModControl2({ .name = "transpose", .audio_rate = true, .reset = reset, .min = -48, .max = 48, .value_scale = ValueScale::kIndexed });
+  Output* wave_frame = createPolyModControl2({ .name = "wave", .value_scale = ValueScale::kIndexed, .max = 3.0 });
+  Output* transpose = createPolyModControl2({ .name = "transpose", .audio_rate = true, .reset = reset, .value_scale = ValueScale::kIndexed, .min = -48, .max = 48 });
   Output* tune = createPolyModControl2({ .name = "tune", .audio_rate = true, .reset = reset, .max = 1.0 });
-  Output* unison_voices = createPolyModControl2({ .name = "unison voices", .min = 1.0, .max = 16.0, .value_scale = ValueScale::kIndexed, .default_value = 1.0 });
+  Output* unison_voices = createPolyModControl2({ .name = "unison voices", .value_scale = ValueScale::kIndexed, .min = 1.0, .max = 16.0, .default_value = 1.0 });
   Output* unison_detune = createPolyModControl2({ .name = "unison detune", .value_scale = ValueScale::kQuadratic, .default_value = 2.2360679775 });
   Output* detune_power = createPolyModControl2({ .name = "detune power" });
   Output* detune_range = createPolyModControl2({ .name = "detune range", .max = 48, .default_value = 2.0 });
@@ -56,11 +56,12 @@ void OscillatorModule::init() {
   Output* stereo_spread = createPolyModControl2({ .name = "stereo spread", .default_value = 1.0 });
   Output* frame_spread = createPolyModControl2({ .name = "frame spread", .min = -128.0, .max = 128.0 });
   Output* distortion_spread = createPolyModControl2({ .name = "distortion spread", .min = -0.5, .max = 0.5 });
-  distortion_type_ = createBaseControl2({ .name = "distortion type", .max = 12.0, .value_scale = ValueScale::kIndexed });
+  distortion_type_ = createBaseControl2({ .name = "distortion type", .value_scale = ValueScale::kIndexed, .max = 12.0 });
   Output* distortion_amount = createPolyModControl2({ .name = "distortion amount", .default_value = 0.5 });
   Output* spectral_morph_spread = createPolyModControl2({ .name = "spectral morph spread", .min = -0.5, .max = 0.5 });
-  Value* spectral_morph_type = createBaseControl2({ .name = "spectral morph type", .max = 11.0, .value_scale = ValueScale::kIndexed });
+  Value* spectral_morph_type = createBaseControl2({ .name = "spectral morph type", .value_scale = ValueScale::kIndexed, .max = 11.0 });
   Output* spectral_morph_amount = createPolyModControl2({ .name = "spectral morph amount", .default_value = 0.5 });
+
 
   oscillator_->useInput(input(kReset), SynthOscillator::kReset);
   oscillator_->useInput(input(kRetrigger), SynthOscillator::kRetrigger);

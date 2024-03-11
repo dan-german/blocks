@@ -32,11 +32,11 @@ EnvelopeModule::EnvelopeModule(bool force_audio_rate):
 
 void EnvelopeModule::init() {
   Output* delay = createPolyModControl2({ .name = "delay", .max = 1.41421, .value_scale = ValueScale::kQuadratic });
-  Output* attack = createPolyModControl2({ .name = "attack", .max = 2.37842, .default_value = 0.1495, .value_scale = ValueScale::kQuartic });
+  Output* attack = createPolyModControl2({ .name = "attack", .max = 2.37842, .value_scale = ValueScale::kQuartic, .default_value = 0.1495 });
   Output* hold = createPolyModControl2({ .name = "hold", .max = 1.41421, .value_scale = ValueScale::kQuadratic });
-  Output* decay = createPolyModControl2({ .name = "decay", .max = 2.37842, .default_value = 1.0, .value_scale = ValueScale::kQuartic });
-  Output* sustain = createPolyModControl2({ .name = "sustain", .default_value = 1.0, });
-  Output* release = createPolyModControl2({ .name = "release", .max = 2.37842, .default_value = 0.5476, .value_scale = ValueScale::kQuartic });
+  Output* decay = createPolyModControl2({ .name = "decay", .max = 2.37842, .value_scale = ValueScale::kQuartic, .default_value = 1.0 });
+  Output* sustain = createPolyModControl2({ .name = "sustain", .default_value = 1.0 });
+  Output* release = createPolyModControl2({ .name = "release", .max = 2.37842, .value_scale = ValueScale::kQuartic, .default_value = 0.5476 });
 
   Value* attack_power = createBaseControl2({ .name = "attack_power", .min = -20.0, .max = 20.0 });
   Value* decay_power = createBaseControl2({ .name = "decay_power", .min = -20.0, .max = 20.0, .default_value = -2.0 });

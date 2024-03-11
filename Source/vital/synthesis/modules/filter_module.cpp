@@ -62,23 +62,21 @@ void FilterModule::init() {
   cr::Multiply* current_keytrack = new cr::Multiply();
   current_keytrack->useInput(input(kKeytrack), 0);
   current_keytrack->plug(keytrack_amount, 1);
-
-  AddControlInput midi_cutoff_input = { .name = "cutoff", .min = 8.0f, .max = 136.0f, .post_offset = -60.0f, .default_value = 100.0f, .audio_rate = true, .smooth_value = true, .internal_modulation = current_keytrack->output(), .reset = input(kReset) };
+ 
+  AddControlInput midi_cutoff_input = { .name = "cutoff", .audio_rate = true, .smooth_value = true, .internal_modulation = current_keytrack->output(), .reset = input(kReset), .post_offset = -60.0f, .min = 8.0f, .max = 136.0f, .default_value = 100.0f };
   Output* midi_cutoff = createPolyModControl2(midi_cutoff_input);
-
-  Output* resonance = createPolyModControl2({ .name = "resonance", .default_value = 0.5f, .reset = input(kReset) });
-  Output* drive = createPolyModControl2({ .name = "drive", .max = 20.0f, .default_value = 0.85f, .reset = input(kReset) });
-  Output* blend = createPolyModControl2({ .name = "blend", .max = 2.0f, .reset = input(kReset) });
-  Output* blend_transpose = createPolyModControl2({ .name = "blend_transpose", .min = 0.3f, .default_value = 0.85f, .reset = input(kReset) });
-
+  Output* resonance = createPolyModControl2({ .name = "resonance", .reset = input(kReset), .default_value = 0.5f });
+  Output* drive = createPolyModControl2({ .name = "drive", .reset = input(kReset), .max = 20.0f, .default_value = 0.85f });
+  Output* blend = createPolyModControl2({ .name = "blend", .reset = input(kReset), .max = 2.0f });
+  Output* blend_transpose = createPolyModControl2({ .name = "blend_transpose", .reset = input(kReset), .min = 0.3f, .default_value = 0.85f });
   if (create_on_value_) {
-    on_ = createBaseControl2({ .name = "on", .value_scale = ValueScale::kIndexed });
+    Value* on_ = createBaseControl2({ .name = "on", .value_scale = ValueScale::kIndexed });
   }
 
-  Value* filter_style = createBaseControl2({ .name = "style", .max = 9.0f, .value_scale = ValueScale::kIndexed });
-  filter_model_ = createBaseControl2({ .name = "model", .max = 7.0f, .value_scale = ValueScale::kIndexed });
+  Value* filter_style = createBaseControl2({ .name = "style", .value_scale = ValueScale::kIndexed, .max = 9.0f });
+  Value* filter_model_ = createBaseControl2({ .name = "model", .value_scale = ValueScale::kIndexed, .max = 7.0f });
+  Output* filter_mix_ = createPolyModControl2({ .name = "mix", .reset = input(kReset), .default_value = 1.0f });
 
-  filter_mix_ = createPolyModControl2({ .name = "mix", .default_value = 1.0f, .reset = input(kReset) });
 
   comb_filter_->useInput(input(kAudio), CombModule::kAudio);
   comb_filter_->plug(filter_style, CombModule::kStyle);

@@ -38,14 +38,13 @@ void FlangerModule::init() {
 
   phase_ = 0.0f;
 
-  free_frequency = createPolyModControl2({ .name = "frequency", .min = -5.0f, .max = 2.0f, .value_scale = ValueScale::kExponential, .default_value = 2.0f });
+  free_frequency = createPolyModControl2({ .name = "frequency", .value_scale = ValueScale::kExponential, .min = -5.0f, .max = 2.0f, .default_value = 2.0f });
   frequency_ = createTempoSyncSwitch("flanger", free_frequency->owner, beats_per_second_, false);
   center_ = createPolyModControl2({ .name = "center", .min = 8.0f, .max = 136.0f, .default_value = 64.0f, .reset = input(kReset) });
   feedback = createPolyModControl2({ .name = "feedback", .min = -1.0f, .default_value = 0.5f });
   wet = createPolyModControl2({ .name = "mix", .min = 0.0f, .max = 0.5f, .default_value = 0.5f, .reset = input(kReset) });
-  mod_depth_ = createPolyModControl2({ .name = "depth", .default_value = 0.5f });
-
-  phase_offset_ = createPolyModControl2({ .name = "offset", .default_value = 0.333333f });
+  mod_depth_ = createPolyModControl2({ .name = "depth",  .default_value = 0.5f });
+  phase_offset_ = createPolyModControl2({ .name = "offset",  .default_value = 0.333333f });
 
   delay_->plug(delay_frequency_, StereoDelay::kFrequency);
   delay_->plug(feedback, StereoDelay::kFeedback);

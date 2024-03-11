@@ -30,16 +30,18 @@ LfoModule::LfoModule(const std::string& prefix, LineGenerator* line_generator, c
 }
 
 void LfoModule::init() {
+
   Value* wave = createBaseControl2({ .name = "wave", .max = 4.0 });
-  Output* free_frequency = createPolyModControl2({ .name = "frequency", .min = -7.0f, .max = 9.0f, .value_scale = ValueDetails::kExponential, .default_value = 1.0f });
+  Output* free_frequency = createPolyModControl2({ .name = "frequency", .min = -7.0f, .max = 9.0f, .default_value = 1.0f, .value_scale = ValueScale::kExponential });
   Output* phase = createPolyModControl2({ .name = "phase" });
   Output* fade = createPolyModControl2({ .name = "fade time", .max = 8.0f });
   Output* delay = createPolyModControl2({ .name = "delay time", .max = 4.0f });
   Output* stereo_phase = createPolyModControl2({ .name = "stereo", .min = -0.5f, .max = 0.5f });
-  Value* sync_type = createBaseControl2({ .name = "sync type", .max = 5.0f, .value_scale = ValueDetails::kIndexed });
-  Value* smooth_mode = createBaseControl2({ .name = "smooth mode", .value_scale = ValueDetails::kIndexed, .default_value = 1.0f });
-  Output* smooth_time = createPolyModControl2({ .name = "smooth time", .min = -10.0f, .max = 4.0f, .value_scale = ValueDetails::kExponential, .default_value = -7.5f });
+  Value* sync_type = createBaseControl2({ .name = "sync type", .value_scale = ValueScale::kIndexed, .max = 5.0f });
+  Value* smooth_mode = createBaseControl2({ .name = "smooth mode", .value_scale = ValueScale::kIndexed, .default_value = 1.0f });
+  Output* smooth_time = createPolyModControl2({ .name = "smooth time", .min = -10.0f, .max = 4.0f, .default_value = -7.5f, .value_scale = ValueScale::kExponential });
   Output* frequency = createTempoSyncSwitch(prefix_, free_frequency->owner, beats_per_second_, true, input(kMidi));
+
   lfo_->useInput(input(kNoteTrigger), SynthLfo::kNoteTrigger);
   lfo_->useInput(input(kNoteCount), SynthLfo::kNoteCount);
 
