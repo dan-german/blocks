@@ -65,7 +65,7 @@ public:
 
   void connectModulation(int modulatorIndex, std::string targetName, std::string parameter);
   void connectModulationFromModel(std::shared_ptr<model::Connection> connection_model);
-  vital::ModulationConnection* createConnection(std::__1::string modulator_name, std::__1::string target_name, std::__1::string parameter_name, float destination_scale);
+  vital::ModulationConnection* createConnection(std::string modulator_name, std::string target_name, std::string parameter_name, float destination_scale);
 
   void valueChanged(const std::string& name, vital::mono_float value);
   void valueChangedThroughMidi(const std::string& name, vital::mono_float value) override;

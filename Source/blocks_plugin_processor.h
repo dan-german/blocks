@@ -103,7 +103,7 @@ public:
   void editorEndedAdjustingColumn(std::string control, int column) override;
   void editorAdjustedColumn(std::string contorl, int column, float value) override;
 
-  void disconnect(std::__1::shared_ptr<model::Connection>& connection);
+  void disconnect(std::shared_ptr<model::Connection>& connection);
 
   std::shared_ptr<Block> getBlock(Index index) override;
   std::shared_ptr<model::Block> getBlock2(Index index) override;
