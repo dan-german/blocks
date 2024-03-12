@@ -34,12 +34,12 @@ void DelayModule::init() {
   delay_->useOutput(output());
   delay_->useInput(input(kReset), MultiDelay::kReset);
 
-  AddControlInput tempo_input = { .name = "tempo", .min = -2.0f, .max = 9.0f, .default_value = 9.0f, .value_scale = ValueScale::kIndexed };
-  Output* free_frequency = createPolyModControl2({ .name = "frequency", .min = -2.0f, .max = 9.0f, .value_scale = ValueScale::kExponential, .default_value = 1.4f });
+  AddControlInput tempo_input = { .name = "tempo",  .value_scale = ValueScale::kIndexed,.min = -2.0f, .max = 9.0f, .default_value = 9.0f };
+  Output* free_frequency = createPolyModControl2({ .name = "frequency", .value_scale = ValueScale::kExponential, .min = -2.0f, .max = 9.0f, .default_value = 1.4f });
   Output* frequency = createTempoSyncSwitch2(tempo_input, free_frequency->owner, beats_per_second_, true);
 
-  Output* free_frequency_aux = createPolyModControl2({ .name = "frequency 2", .min = -2.0f, .max = 9.0f, .value_scale = ValueScale::kExponential, .default_value = 1.4f });
-  AddControlInput aux_tempo_input = { .name = "tempo 2", .min = -2.0f, .max = 9.0f, .default_value = 9.0f, .value_scale = ValueScale::kIndexed };
+  Output* free_frequency_aux = createPolyModControl2({ .name = "frequency 2", .value_scale = ValueScale::kExponential, .min = -2.0f, .max = 9.0f, .default_value = 1.4f });
+  AddControlInput aux_tempo_input = { .name = "tempo 2", .value_scale = ValueScale::kIndexed , .min = -2.0f, .max = 9.0f, .default_value = 9.0f };
   Output* frequency_aux = createTempoSyncSwitch2(aux_tempo_input, free_frequency_aux->owner, beats_per_second_, true, nullptr, "sync 2");
 
   Output* feedback = createPolyModControl2({ .name = "feedback", .min = -1.0f, .default_value = 0.5f });
@@ -47,7 +47,7 @@ void DelayModule::init() {
 
   Output* filter_cutoff = createPolyModControl2({ .name = "cutoff", .min = 8.0f, .max = 136.0f, .default_value = 60.0f });
   Output* filter_spread = createPolyModControl2({ .name = "spread", .default_value = 1.0f });
-  Value* style = createBaseControl2({ .name = "style", .max = 3.0f, .value_scale = ValueScale::kIndexed });
+  Value* style = createBaseControl2({ .name = "style", .value_scale = ValueScale::kIndexed , .max = 3.0f });
 
   delay_->plug(frequency, StereoDelay::kFrequency);
   delay_->plug(frequency_aux, StereoDelay::kFrequencyAux);
