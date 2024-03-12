@@ -68,14 +68,14 @@ void FilterModule::init() {
   Output* resonance = createPolyModControl2({ .name = "resonance", .reset = input(kReset), .default_value = 0.5f });
   Output* drive = createPolyModControl2({ .name = "drive", .reset = input(kReset), .max = 20.0f, .default_value = 0.85f });
   Output* blend = createPolyModControl2({ .name = "blend", .reset = input(kReset), .max = 2.0f });
-  Output* blend_transpose = createPolyModControl2({ .name = "blend_transpose", .reset = input(kReset), .min = 0.3f, .default_value = 0.85f });
+  Output* blend_transpose = createPolyModControl2({ .name = "blend transpose", .reset = input(kReset), .min = 0.3f, .default_value = 0.85f });
   if (create_on_value_) {
     Value* on_ = createBaseControl2({ .name = "on", .value_scale = ValueScale::kIndexed });
   }
 
   Value* filter_style = createBaseControl2({ .name = "style", .value_scale = ValueScale::kIndexed, .max = 9.0f });
-  Value* filter_model_ = createBaseControl2({ .name = "model", .value_scale = ValueScale::kIndexed, .max = 7.0f });
-  Output* filter_mix_ = createPolyModControl2({ .name = "mix", .reset = input(kReset), .default_value = 1.0f });
+  filter_model_ = createBaseControl2({ .name = "model", .value_scale = ValueScale::kIndexed, .max = 7.0f });
+  filter_mix_ = createPolyModControl2({ .name = "mix", .reset = input(kReset), .default_value = 1.0f });
 
 
   comb_filter_->useInput(input(kAudio), CombModule::kAudio);
