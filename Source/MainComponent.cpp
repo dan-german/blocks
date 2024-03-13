@@ -165,7 +165,7 @@ void MainComponent::setupListeners() {
     if (name.isEmpty()) return;
     if (!hasTabs && !hasModulators && !hasBlocks) return;
 
-    delegate->editorSavedPreset(name);
+    delegate->editorSavedPreset(name.toStdString());
     ui_layer_.preset_button_.setStrings(delegate->editorRequestsPresetNames());
     save_popup_.setVisible(false);
   };
@@ -784,7 +784,7 @@ void MainComponent::loadPreset(int index) {
 }
 
 void MainComponent::visibilityChanged() {
-  // loadState(delegate->getStateRepresentation());
+  loadState(delegate->getStateRepresentation());
 }
 
 void MainComponent::clickedOnGrid(GridComponent* grid, Index index) {

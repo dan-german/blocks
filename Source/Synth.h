@@ -97,7 +97,7 @@ public:
   void editorParameterGestureChanged(std::string module_name, std::string parameter_name, bool started) override;
   void editorChangedModulationPolarity(int index, bool bipolar) override;
   void editorDisconnectedModulation(int index) override;
-  void editorSavedPreset(String name) override;
+  void editorSavedPreset(std::string name) override;
   void editorConnectedModulation(int modulatorIndex, std::string targetName, std::string parameter) override;
   void editorChangedBlockLength(Index index, int length) override;
   void editorAdjustedModulator(std::string parameter_name, int modulator, float value) override;

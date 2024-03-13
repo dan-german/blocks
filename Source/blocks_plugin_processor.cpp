@@ -164,6 +164,13 @@ void PluginProcessor::prepareToPlay(double sample_rate, int buffer_size) {
   engine_->setSampleRate(sample_rate);
   engine_->updateAllModulationSwitches();
   midi_manager_->setSampleRate(sample_rate);
+  engine_prepared_ = true;
+  if (pending_preset_) {
+    loadPreset(*pending_preset_);
+    pending_preset_ = std::nullopt;
+  } else if (auto preset = preset_manager_.stringToPreset(getStateString())) {
+    loadPreset(*preset);
+  }
 }
 
 void PluginProcessor::releaseResources() {
@@ -238,8 +245,8 @@ juce::AudioProcessorEditor* PluginProcessor::createEditor() {
     TopLevelWindow* w = TopLevelWindow::getTopLevelWindow(0);
     w->setUsingNativeTitleBar(true);
   }
-  mainComponent = &editor->mainComponent;
-  editorReady = true;
+  main_component_ = &editor->mainComponent;
+  editor_ready_ = true;
   return editor;
 }
 
@@ -247,7 +254,16 @@ void PluginProcessor::parameterChanged(std::string name, vital::mono_float value
   valueChangedExternal(name, value);
 }
 
+std::string PluginProcessor::getStateString() { 
+  auto columns = getModuleManager().pool.column_controls_;
+  auto info = Preset::create("", getModuleManager().getBlocks(), getModuleManager().getModulators(), getModuleManager().getConnections(), columns);
+  return preset_manager_.presetToString(info);
+}
+
 void PluginProcessor::getStateInformation(MemoryBlock& dest_data) {
+  std::string state = getStateString();
+  dest_data.replaceAll(state.data(), state.size());
+
   // json data = LoadSave::stateToJson(this, getCallbackLock());
   // data["tuning"] = getTuning()->stateToJson();
 
@@ -258,6 +274,17 @@ void PluginProcessor::getStateInformation(MemoryBlock& dest_data) {
 }
 
 void PluginProcessor::setStateInformation(const void* data, int size_in_bytes) {
+  // return;
+  auto preset_string = String::fromUTF8(static_cast<const char*> (data), size_in_bytes);
+  if (auto preset = preset_manager_.stringToPreset(preset_string.toStdString())) {
+    if (engine_prepared_) {
+      loadPreset(*preset);
+      if (editor_ready_) main_component_->loadState(*preset);
+    } else {
+      pending_preset_ = preset;
+      // synth.presetToLoadOnInit = *preset;
+    }
+  }
   // juce::MemoryInputStream stream(data, size_in_bytes, false);
   // String data_string = stream.readEntireStreamAsString();
 
@@ -459,7 +486,7 @@ void PluginProcessor::loadPreset(Preset preset) {
   }
 
   for (auto column_control : preset.column_controls) {
-    auto index = column_control.id.number - 1; 
+    auto index = column_control.id.number - 1;
     for (auto const& [key, val] : column_control.parameters) {
       getModuleManager().pool.column_controls_[index]->parameter_map_[key]->set(val);
     }
@@ -615,12 +642,10 @@ juce::Array<std::shared_ptr<Module>> PluginProcessor::getModulators() {
   // return array;
 }
 
-void PluginProcessor::editorSavedPreset(String name) {
+void PluginProcessor::editorSavedPreset(std::string name) {
   auto columns = getModuleManager().pool.column_controls_;
   auto info = Preset::create(name, getModuleManager().getBlocks(), getModuleManager().getModulators(), getModuleManager().getConnections(), columns);
   preset_manager_.save(info);
-  // per
-  // presetManager.save(info);
 }
 
 #pragma warning(default:4716)
@@ -650,15 +675,15 @@ std::pair<float, float> PluginProcessor::editorRequestsModulatorValue(int modula
 
 #pragma warning(default:4716)
 Preset PluginProcessor::getStateRepresentation() {
-  // auto currentState = PresetInfo();
+  auto current_state = Preset();
 
-  // for (auto block : moduleManager.getBlocks()) {
-  //   auto presetBlock = PresetInfo::Block();
-  //   presetBlock.index = { block->index.row, block->index.column }; ;
-  //   presetBlock.id = block->id;
-  //   presetBlock.length = block->length;
-  //   currentState.blocks.add(presetBlock);
-  // }
+  for (auto block : getModuleManager().getBlocks()) {
+    auto preset_block = Preset::Block();
+    preset_block.index = { block->index.column, block->index.row }; ;
+    preset_block.id = block->id;
+    preset_block.length = block->length;
+    current_state.blocks.push_back(preset_block);
+  }
 
   // for (auto tab : moduleManager.getTabs()) {
   //   auto presetTab = PresetInfo::Tab();
@@ -667,7 +692,7 @@ Preset PluginProcessor::getStateRepresentation() {
   //   currentState.tabs.add(presetTab);
   // }
 
-  // return currentState;
+  return current_state;
 }
 
 juce::StringArray PluginProcessor::editorRequestsPresetNames() {

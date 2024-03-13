@@ -186,7 +186,7 @@ struct MainComponent::Delegate {
   virtual void editorParameterGestureChanged(std::string module_name, std::string paramter_name, bool started) = 0;
   virtual void editorRemovedModulator(int index) = 0;
   virtual void editorChangedBlockLength(Index index, int times) = 0;
-  virtual void editorSavedPreset(String name) = 0;
+  virtual void editorSavedPreset(std::string name) = 0;
 
   virtual Array<MPENote> editorRequestsCurrentlyPlayingNotes() = 0;
   virtual StringArray editorRequestsPresetNames() = 0;

@@ -47,14 +47,14 @@ public:
     int length;
   };
 
-  String name = "";
+  std::string name = "";
   std::vector<Tab> tabs;
   std::vector<Block> blocks;
   std::vector<Modulator> modulators;
   std::vector<Connection> connections_;
   std::vector<Module> column_controls;
 
-  static Preset create(String name,
+  static Preset create(std::string name,
     // std::vector<std::shared_ptr<model::Tab>> tabs,
     std::vector<std::shared_ptr<model::Block>> blocks,
     std::vector<std::shared_ptr<model::Module>> modulators,

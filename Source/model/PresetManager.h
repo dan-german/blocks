@@ -33,8 +33,8 @@ public:
   void loadPresetsDirectory();
   void setPresetsDirectory();
   void loadStockPresets();
-  void createAndSavePresetFile(String& name, const std::string& presetJson) const;
-  void removePreset(String& name);
+  void createAndSavePresetFile(std::string& name, const std::string& presetJson) const;
+  void removePreset(std::string& name);
 
   std::string presetToString(Preset preset);
   std::optional<Preset> stringToPreset(std::string preset);

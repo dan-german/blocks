@@ -103,7 +103,7 @@ Array<std::shared_ptr<Module>> Synth::getModulators() {
   return array;
 }
 
-void Synth::editorSavedPreset(String name) {
+void Synth::editorSavedPreset(std::string name) {
   Analytics::shared()->countAction("Preset Saved");
   // auto info = PresetInfo::create(name, moduleManager.getTabs(), moduleManager.getBlocks(), moduleManager.getModulators(), moduleManager.getConnections());
   // presetManager.save(info);

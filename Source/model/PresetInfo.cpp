@@ -14,7 +14,7 @@
 #include "module_new.h"
 #include "gui/Tab.h"
 
-Preset Preset::create(String name,
+Preset Preset::create(std::string name,
   // std::vector<std::shared_ptr<model::Tab>> tabs,
   std::vector<std::shared_ptr<model::Block>> blocks,
   std::vector<std::shared_ptr<model::Module>> modulators,

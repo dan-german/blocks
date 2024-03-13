@@ -70,7 +70,7 @@ void PresetManager::save(Preset presetData) {
     presets.push_back(*preset);
 }
 
-void PresetManager::removePreset(String& name) {
+void PresetManager::removePreset(std::string& name) {
   for (int i = 0; i < presets.size(); i++) {
     if (presets[i].name == name) {
       presetsDirectory.getChildFile(name).withFileExtension("blocks").deleteFile();
@@ -82,7 +82,7 @@ void PresetManager::removePreset(String& name) {
   }
 }
 
-void PresetManager::createAndSavePresetFile(String& name, const std::string& presetJson) const {
+void PresetManager::createAndSavePresetFile(std::string& name, const std::string& presetJson) const {
   auto newFile = presetsDirectory.getChildFile(name).withFileExtension("blocks");
   newFile.create();
   newFile.appendText(presetJson);

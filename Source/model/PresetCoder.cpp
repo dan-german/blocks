@@ -13,7 +13,7 @@
 std::string PresetCoder::encode(Preset presetData) {
   json jsonPreset;
 
-  jsonPreset["name"] = presetData.name.toStdString();
+  jsonPreset["name"] = presetData.name;
   jsonPreset["tabs"] = encodeTabs(presetData.tabs);
   jsonPreset["blocks"] = encodeBlocks(presetData.blocks);
   jsonPreset["modulators"] = encodeModulators(presetData.modulators);
