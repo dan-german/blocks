@@ -173,15 +173,15 @@ void BlocksVoiceHandler::unplugAll() {
 
 void BlocksVoiceHandler::init() {
   createNoteArticulation();
-  // createOscillators();
-  // createReverbs();
-  // createDistortions();
-  // createChoruses();
-  // createFlangers();
-  // createNoises();
-  // createPhasers();
-  // createDelays();
-  // createModulators();
+  createOscillators();
+  createReverbs();
+  createDistortions();
+  createChoruses();
+  createFlangers();
+  createNoises();
+  createPhasers();
+  createDelays();
+  createModulators();
   createFilters(note_from_reference_->output());
   createVoiceOutput();
 
@@ -677,6 +677,7 @@ void BlocksVoiceHandler::correctToTime(double seconds) {
 }
 
 void BlocksVoiceHandler::disableUnnecessaryModSources() {
+  return;
   for (int i = 0; i < kNumLfos; ++i)
     lfos_[i]->enable(false);
 
