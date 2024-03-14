@@ -71,7 +71,7 @@ void ReverbModule::hardReset() {
 
 void ReverbModule::enable(bool enable) {
   SynthModule::enable(enable);
-  process(1);
+//  process(1);
   if (!enable)
     reverb_->hardReset();
 }

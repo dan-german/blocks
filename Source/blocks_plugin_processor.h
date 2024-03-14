@@ -39,7 +39,7 @@ public:
   void beginChangeGesture(const std::string& name) override;
   void endChangeGesture(const std::string& name) override;
   void setValueNotifyHost(const std::string& name, vital::mono_float value) override;
-  const juce::CriticalSection& getCriticalSection() override;
+  // const juce::CriticalSection& getCriticalSection() override;
   void pauseProcessing(bool pause) override;
 
   void prepareToPlay(double sample_rate, int buffer_size) override;

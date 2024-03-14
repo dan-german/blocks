@@ -148,7 +148,7 @@ public:
   vital::ModulationConnectionBank& getModulationBank();
   void notifyOversamplingChanged();
   void checkOversampling();
-  virtual const juce::CriticalSection& getCriticalSection() = 0;
+  // virtual const juce::CriticalSection& getCriticalSection() = 0;
   virtual void pauseProcessing(bool pause) = 0;
   Tuning* getTuning() { return &tuning_; }
 
@@ -222,9 +222,9 @@ protected:
 
 class HeadlessSynth: public SynthBase {
 public:
-  virtual const juce::CriticalSection& getCriticalSection() override {
-    return critical_section_;
-  }
+  // virtual const juce::CriticalSection& getCriticalSection() override {
+  //   return critical_section_;
+  // }
 
   virtual void pauseProcessing(bool pause) override {
     if (pause)

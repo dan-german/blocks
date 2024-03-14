@@ -173,15 +173,15 @@ void BlocksVoiceHandler::unplugAll() {
 
 void BlocksVoiceHandler::init() {
   createNoteArticulation();
-  createOscillators();
-  createReverbs();
-  createDistortions();
-  createChoruses();
-  createFlangers();
-  createNoises();
-  createPhasers();
-  createDelays();
-  createModulators();
+  // createOscillators();
+  // createReverbs();
+  // createDistortions();
+  // createChoruses();
+  // createFlangers();
+  // createNoises();
+  // createPhasers();
+  // createDelays();
+  // createModulators();
   createFilters(note_from_reference_->output());
   createVoiceOutput();
 

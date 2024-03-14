@@ -61,7 +61,9 @@ ProcessorRouter::ProcessorRouter(const ProcessorRouter& original):
   }
 }
 
-ProcessorRouter::~ProcessorRouter() { }
+ProcessorRouter::~ProcessorRouter() {
+  // delete 
+ }
 
 void ProcessorRouter::process(int num_samples) {
   if (shouldUpdate())

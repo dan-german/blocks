@@ -340,7 +340,7 @@ LineGenerator* SynthBase::getLfoSource(int index) {
 }
 
 json SynthBase::saveToJson() {
-  return LoadSave::stateToJson(this, getCriticalSection());
+  // return LoadSave::stateToJson(this, getCriticalSection());
 }
 
 int SynthBase::getSampleRate() {
@@ -434,7 +434,7 @@ void SynthBase::renderAudioToFile(File file, float seconds, float bpm, std::vect
   static constexpr int kOscilloscopeResolution = 512;
   static constexpr float kFadeRatio = 0.3f;
 
-  ScopedLock lock(getCriticalSection());
+  // ScopedLock lock(getCriticalSection());
 
   processModulationChanges();
   engine_->setSampleRate(kSampleRate);
@@ -551,7 +551,7 @@ void SynthBase::renderAudioForResynthesis(float* data, int samples, int note) {
   static constexpr int kPreProcessSamples = 44100;
   static constexpr int kBufferSize = 64;
 
-  ScopedLock lock(getCriticalSection());
+  // ScopedLock lock(getCriticalSection());
 
   double sample_time = 1.0 / getSampleRate();
   double current_time = -kPreProcessSamples * sample_time;

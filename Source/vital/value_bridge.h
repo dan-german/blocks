@@ -38,7 +38,8 @@ public:
   }
 
   float getValue() const override {
-    return convertToPluginValue(value_->value());
+    return 0.0f;
+//    return convertToPluginValue(value_->value());
   }
 
   void setValue(float value) override {

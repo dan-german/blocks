@@ -32,17 +32,17 @@ PluginProcessor::PluginProcessor(): juce::AudioProcessor(BusesProperties().withO
     }
   }
 
-  for (auto module : getModuleManager().pool.all_modules_) {
-    for (auto parameter : module->parameters_) {
-      ValueBridge* bridge = new ValueBridge(*(parameter.get()));
-      // bridge->
-      bridge->setListener(this);
-      auto key = module->name + " " + parameter->name;
-      bridge_lookup_[key] = bridge;
-      // parameter->bridge = bridge;
-      addParameter(bridge);
-    }
-  }
+  // for (auto module : getModuleManager().pool.all_modules_) {
+  //   for (auto parameter : module->parameters_) {
+  //     ValueBridge* bridge = new ValueBridge(*(parameter.get()));
+  //     // bridge->
+  //     bridge->setListener(this);
+  //     auto key = module->name + " " + parameter->name;
+  //     bridge_lookup_[key] = bridge;
+  //     // parameter->bridge = bridge;
+  //     addParameter(bridge);
+  //   }
+  // }
 
   // for (auto module : synth.moduleManager.pool.allModules) {
   //   for (auto parameter : module->parameters) {
@@ -69,7 +69,7 @@ PluginProcessor::PluginProcessor(): juce::AudioProcessor(BusesProperties().withO
     // addParameter(bridge);
   // }
 
-  bypass_parameter_ = bridge_lookup_["bypass"];
+  // bypass_parameter_ = bridge_lookup_["bypass"];
 }
 
 PluginProcessor::~PluginProcessor() {
@@ -100,9 +100,9 @@ void PluginProcessor::setValueNotifyHost(const std::string& name, vital::mono_fl
   // }
 }
 
-const juce::CriticalSection& PluginProcessor::getCriticalSection() {
-  return getCallbackLock();
-}
+// const juce::CriticalSection& PluginProcessor::getCriticalSection() {
+//   return getCallbackLock();
+// }
 
 void PluginProcessor::pauseProcessing(bool pause) {
   suspendProcessing(pause);
