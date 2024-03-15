@@ -111,7 +111,7 @@ void ModulatorsListModel::setModulators(std::vector<std::shared_ptr<model::Modul
 }
 
 void ModulatorsListModel::onLFOParameterChange(std::shared_ptr<model::Module> module, ModulatorComponent& component, int index, float value) const {
-  std::cout << "on lfo " << index << " " << value << std::endl;
+  // std::cout << "on lfo " << index << " " << value << std::endl;
   bool is_changing_wave = index == 0;
   bool is_changing_sync = index == 2;
   if (is_changing_sync) {

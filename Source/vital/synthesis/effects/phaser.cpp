@@ -27,7 +27,6 @@ Phaser::Phaser(): ProcessorRouter(kNumInputs, kNumOutputs), mix_(0.0f), mod_dept
   phaser_filter_ = new PhaserFilter(true);
   cutoff_ = new Output();
   addIdleProcessor(phaser_filter_);
-  std::cout << "phaser constructor" << std::endl;
 }
 
 void Phaser::init() {

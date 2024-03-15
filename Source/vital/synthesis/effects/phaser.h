@@ -48,7 +48,6 @@ public:
   virtual ~Phaser() { }
 
   virtual Processor* clone() const override {
-    std::cout << "cloning phaser " << std::endl;
     return new Phaser(*this);
   }
 

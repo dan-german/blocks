@@ -143,7 +143,6 @@ void SoundEngine::init() {
 }
 
 void SoundEngine::connectModulation(const modulation_change& change) {
-  std::cout << "connect change mod proc " << change.modulation_processor << std::endl;
   change.modulation_processor->plug(change.source, ModulationConnectionProcessor::kModulationInput);
   change.modulation_processor->setDestinationScale(change.destination_scale);
   VITAL_ASSERT(vital::utils::isFinite(change.destination_scale));
@@ -181,7 +180,6 @@ int SoundEngine::getNumPressedNotes() {
 }
 
 void SoundEngine::disconnectModulation(const modulation_change& change) {
-  std::cout << " disconnect change mod proc " << change.modulation_processor << std::endl;
   change.modulation_processor->setDestinationScale(0.0f);
 
   Processor* destination = change.mono_destination;

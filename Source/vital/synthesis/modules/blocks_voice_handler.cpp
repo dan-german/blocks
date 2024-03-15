@@ -129,7 +129,6 @@ void BlocksVoiceHandler::connectAll() {
     }
 
     if (current) {
-      std::cout << "blugging" << std::endl;
       column_nodes_[column]->plug(current);
     }
     current = nullptr;
@@ -299,7 +298,6 @@ void BlocksVoiceHandler::disconnectAllDefaultEnvs() {
 
 void BlocksVoiceHandler::connectAllDefaultEnvs() {
   for (auto osc : processors_with_default_env) {
-    std::cout << "connecting default dev" << std::endl;
     auto processor = processor_default_env_mp_map_[osc];
     auto destination = osc->getPolyModulationDestination("amp env destination");
     processor->setDestinationScale(1.0f);

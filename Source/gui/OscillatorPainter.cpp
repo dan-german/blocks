@@ -83,7 +83,7 @@ void OscillatorPainter::setUnison(int unison) {
 }
 
 void OscillatorPainter::setWaveformType(OscillatorPainter::WaveformType waveformType) {
-  std::cout << "setWaveformType: " << static_cast<int>(waveformType) << std::endl;
+  // std::cout << "setWaveformType: " << static_cast<int>(waveformType) << std::endl;
   if (this->waveformType == waveformType) return;
   this->waveformType = waveformType;
   setFPS(waveformType == WaveformType::noise ? 15 : 60);

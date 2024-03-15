@@ -301,7 +301,7 @@ void MainComponent::ShowBlocksPopup(Index index) {
   block_grid_.reset();
 
   auto blockSelectionCompletion = [this, index](Index selectedIndex) {
-    std::cout << "column " << index.column << " row " << index.row << std::endl;
+    // std::cout << "column " << index.column << " row " << index.row << std::endl;
     int code = selectedIndex.column == 0 ? selectedIndex.row : selectedIndex.row + 5;
     auto module = addBlock(code, index);
     if (module == nullptr) return;
