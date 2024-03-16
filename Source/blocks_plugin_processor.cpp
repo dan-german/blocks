@@ -21,6 +21,7 @@
 #include "vital/common/load_save.h"
 #include "vital/synthesis/modules/blocks_voice_handler.h"
 #include "playground.h"
+#include "util/Analytics.h"
 
 PluginProcessor::PluginProcessor(): juce::AudioProcessor(BusesProperties().withOutput("Output", AudioChannelSet::stereo(), true)), SynthGuiInterface(this, false) {
 
@@ -31,6 +32,9 @@ PluginProcessor::PluginProcessor(): juce::AudioProcessor(BusesProperties().withO
       column_control->parameter_map_[pair.first]->value_processor = processor->control_map_[pair.first];
     }
   }
+
+  Analytics::shared()->initProfileIfNeeded();
+  Analytics::shared()->handleLaunch(getWrapperTypeDescription(wrapperType));
 
   // for (auto module : getModuleManager().pool.all_modules_) {
   //   for (auto parameter : module->parameters_) {
@@ -74,6 +78,7 @@ PluginProcessor::PluginProcessor(): juce::AudioProcessor(BusesProperties().withO
 
 PluginProcessor::~PluginProcessor() {
   midi_manager_ = nullptr;
+  Analytics::shared()->handleQuit();
   // keyboard_state_ = nullptr;
 }
 
@@ -254,7 +259,7 @@ void PluginProcessor::parameterChanged(std::string name, vital::mono_float value
   valueChangedExternal(name, value);
 }
 
-std::string PluginProcessor::getStateString() { 
+std::string PluginProcessor::getStateString() {
   auto columns = getModuleManager().pool.column_controls_;
   auto info = Preset::create("", getModuleManager().getBlocks(), getModuleManager().getModulators(), getModuleManager().getConnections(), columns);
   auto s = preset_manager_.presetToString(info);
