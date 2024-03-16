@@ -31,6 +31,7 @@ PluginProcessor::PluginProcessor(): juce::AudioProcessor(BusesProperties().withO
       column_control->parameter_map_[pair.first]->value_processor = processor->control_map_[pair.first];
     }
   }
+  std::cout << "plugin processor" << std::endl; 
 
   // for (auto module : getModuleManager().pool.all_modules_) {
   //   for (auto parameter : module->parameters_) {
@@ -168,8 +169,10 @@ void PluginProcessor::prepareToPlay(double sample_rate, int buffer_size) {
   if (pending_preset_) {
     loadPreset(*pending_preset_);
     pending_preset_ = std::nullopt;
+    std::cout << "blbla 1" << std::endl;
   } else if (auto preset = preset_manager_.stringToPreset(getStateString())) {
     loadPreset(*preset);
+    std::cout << "blbla 2" << std::endl;
   }
 }
 
@@ -257,7 +260,9 @@ void PluginProcessor::parameterChanged(std::string name, vital::mono_float value
 std::string PluginProcessor::getStateString() { 
   auto columns = getModuleManager().pool.column_controls_;
   auto info = Preset::create("", getModuleManager().getBlocks(), getModuleManager().getModulators(), getModuleManager().getConnections(), columns);
-  return preset_manager_.presetToString(info);
+  auto s = preset_manager_.presetToString(info);
+  std::cout << "preset string " << s << std::endl;  
+  return s;
 }
 
 void PluginProcessor::getStateInformation(MemoryBlock& dest_data) {
@@ -276,11 +281,15 @@ void PluginProcessor::getStateInformation(MemoryBlock& dest_data) {
 void PluginProcessor::setStateInformation(const void* data, int size_in_bytes) {
   // return;
   auto preset_string = String::fromUTF8(static_cast<const char*> (data), size_in_bytes);
+  // std::
+  std::cout << "setting state information with preset " << preset_string << std::endl;
   if (auto preset = preset_manager_.stringToPreset(preset_string.toStdString())) {
     if (engine_prepared_) {
+      std::cout << "loading through here" << std::endl;
       loadPreset(*preset);
       if (editor_ready_) main_component_->loadState(*preset);
     } else {
+      std::cout << "nonono" << std::endl;
       pending_preset_ = preset;
       // synth.presetToLoadOnInit = *preset;
     }
@@ -488,6 +497,7 @@ void PluginProcessor::loadPreset(Preset preset) {
   for (auto column_control : preset.column_controls) {
     auto index = column_control.id.number - 1;
     for (auto const& [key, val] : column_control.parameters) {
+      std::cout << "setting " << key << " to " << val << std::endl;
       getModuleManager().pool.column_controls_[index]->parameter_map_[key]->set(val);
     }
   }
@@ -683,6 +693,15 @@ Preset PluginProcessor::getStateRepresentation() {
     preset_block.id = block->id;
     preset_block.length = block->length;
     current_state.blocks.push_back(preset_block);
+  }
+
+  for (auto column_control : getModuleManager().pool.column_controls_) {
+    auto preset_column_control = Preset::Module();
+    preset_column_control.id = column_control->id;
+    for (auto parameter : column_control->parameter_map_) {
+      preset_column_control.parameters[parameter.first] = parameter.second->value_processor->value();
+    }
+    current_state.column_controls.push_back(preset_column_control);
   }
 
   // for (auto tab : moduleManager.getTabs()) {

@@ -72,7 +72,7 @@ public:
 
   void getStateInformation(juce::MemoryBlock& destData) override;
   void setStateInformation(const void* data, int size_in_bytes) override;
-  juce::AudioProcessorParameter* getBypassParameter() const override { return bypass_parameter_; }
+  // juce::AudioProcessorParameter* getBypassParameter() const override { return bypass_parameter_; }
 
   void parameterChanged(std::string name, vital::mono_float value) override;
 

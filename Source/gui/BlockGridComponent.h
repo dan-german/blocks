@@ -7,6 +7,7 @@
 class BlockGridComponent: public GridComponent, public ThemeListener {
 public:
   BlockGridComponent(Config config);
+  ~BlockGridComponent() override { ThemeManager::shared()->removeListener(this); };
   void highlightColumn(int start, int end);
   void gridItemStretchEnded(GridItemComponent* item, int offset) override;
   void ResetDotsVisibility();

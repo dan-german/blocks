@@ -108,8 +108,8 @@ VoiceHandler::VoiceHandler(int num_outputs, int polyphony, bool control_rate):
   pitch_wheel_percent_.owner = &voice_router_;
   local_pitch_bend_.owner = &voice_router_;
 
-  setPolyphony(polyphony);
-  // setPolyphony(1);
+  setPolyphony(6);
+  // setPolyphony(polyphony);
   voice_router_.router(this);
   global_router_.router(this);
 }
@@ -296,8 +296,8 @@ void VoiceHandler::process(int num_samples) {
   }
 
   int polyphony = static_cast<int>(std::roundf(input(kPolyphony)->at(0)[0]));
-  setPolyphony(utils::iclamp(polyphony, 1, kMaxActivePolyphony));
-  //  setPolyphony(1);
+  // setPolyphony(utils::iclamp(polyphony, 1, kMaxActivePolyphony));
+   setPolyphony(6);
 
   int priority = utils::roundToInt(input(kVoicePriority)->at(0))[0];
   voice_priority_ = static_cast<VoicePriority>(priority);

@@ -134,7 +134,7 @@ vital::ModulationConnection* SynthBase::getConnection(const std::string& source,
 int SynthBase::getConnectionIndex(const std::string& source, const std::string& destination) {
   vital::ModulationConnectionBank& modulation_bank = getModulationBank();
   for (int i = 0; i < vital::kMaxModulationConnections; ++i) {
-    vital::ModulationConnection* connection = modulation_bank.atIndex(i);
+    vital::ModulationConnection* connection = modulation_bank.atIndex(i).get();
     if (connection->source_name == source && connection->destination_name == destination)
       return i;
   }
@@ -819,6 +819,11 @@ void SynthBase::connectModulationFromModel(std::shared_ptr<model::Connection> co
 
   bool is_env_to_osc_level = connection_model->source->id.type == "envelope" && connection_model->target->id.type == "osc" && connection_model->parameter_name_ == "level";
   std::string parameter_name = is_env_to_osc_level ? "amp env destination" : connection_model->parameter_name_;
+
+    if (is_env_to_osc_level) {
+    getVoiceHandler()->setDefaultAmpEnvState(connection_model->target->name, false);
+  }
+
 
   std::string modulator_name = connection_model->source->name;
   auto connection = createConnection(modulator_name, connection_model->target->name, parameter_name, destination_scale);

@@ -36,10 +36,12 @@ force_inline bool isConnectionAvailable(ModulationConnection* connection) {
 
 ModulationConnection::ModulationConnection(int index, std::string from, std::string to):
   source_name(std::move(from)), destination_name(std::move(to)) {
-  modulation_processor = std::make_unique<ModulationConnectionProcessor>(index);
+  modulation_processor = std::make_shared<ModulationConnectionProcessor>(index);
 }
 
-ModulationConnection::~ModulationConnection() { }
+ModulationConnection::~ModulationConnection() { 
+
+}
 
 bool ModulationConnection::isModulationSourceDefaultBipolar(const std::string& source) {
   std::size_t pos = source.find(kModulationSourceDelimiter);
@@ -49,8 +51,8 @@ bool ModulationConnection::isModulationSourceDefaultBipolar(const std::string& s
 
 ModulationConnectionBank::ModulationConnectionBank() {
   for (int i = 0; i < kMaxModulationConnections; ++i) {
-    std::unique_ptr<ModulationConnection> connection = std::make_unique<ModulationConnection>(i);
-    all_connections_.push_back(std::move(connection));
+    std::shared_ptr<ModulationConnection> connection = std::make_shared<ModulationConnection>(i);
+    all_connections_.push_back(connection);
   }
 }
 

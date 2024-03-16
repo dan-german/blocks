@@ -27,7 +27,7 @@ class Wavetable;
 class OscillatorModule: public SynthModule {
 public:
   enum {
-    kAudioIn, 
+    kAudioIn,
     kReset,
     kRetrigger,
     kMidi,
@@ -46,7 +46,9 @@ public:
 
   void process(int num_samples) override;
   void init() override;
-  virtual Processor* clone() const override { return new OscillatorModule(*this); }
+  virtual Processor* clone() const override {
+    return new OscillatorModule(*this);
+  }
 
   Output* amp_env_destination;
   poly_float multiply_;

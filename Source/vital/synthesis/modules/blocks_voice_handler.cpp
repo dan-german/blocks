@@ -100,6 +100,7 @@ void BlocksVoiceHandler::repositionBlock(Index from, Index to) {
 
 void BlocksVoiceHandler::removeBlock(Index index, std::shared_ptr<model::Block> block) {
   auto processor = processor_matrix_[index.column][index.row];
+  processor->enable(false); 
 
   if (processor->control_map_.count("on"))
     processor->control_map_["on"]->set(0.0f);

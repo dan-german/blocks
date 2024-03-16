@@ -46,10 +46,11 @@ ProcessorRouter::ProcessorRouter(const ProcessorRouter& original):
 
   int num_processors = global_order_->size();
   for (int i = 0; i < num_processors; ++i) {
-    const Processor* next = global_order_->at(i);
-    std::unique_ptr<Processor> clone(next->clone());
-    local_order_[i] = clone.get();
-    processors_[next] = { 0, std::move(clone) };
+    Processor* next = global_order_->at(i);
+    auto clone = next->clone();
+    // std::unique_ptr<Processor> clone(next->clone());
+    local_order_[i] = clone;
+    processors_[next] = { 0, clone };
   }
 
   int num_feedbacks = static_cast<int>(global_feedback_order_->size());
@@ -62,8 +63,10 @@ ProcessorRouter::ProcessorRouter(const ProcessorRouter& original):
 }
 
 ProcessorRouter::~ProcessorRouter() {
-  // delete 
- }
+  // processors_.clear();
+  // for (auto& processor : processors_)
+  //   delete processor.second.second.release();
+}
 
 void ProcessorRouter::process(int num_samples) {
   if (shouldUpdate())
@@ -149,7 +152,7 @@ void ProcessorRouter::addProcessorRealTime(Processor* processor) {
     processor->setOversampleAmount(getOversampleAmount());
 
   global_order_->push_back(processor);
-  processors_[processor] = { 0, std::unique_ptr<Processor>(processor) };
+  processors_[processor] = { 0, processor };
   local_order_.push_back(processor);
 
   for (int i = 0; i < processor->numInputs(); ++i)
@@ -171,7 +174,7 @@ void ProcessorRouter::removeProcessor(Processor* processor) {
   global_order_->remove(processor);
   local_order_.remove(processor);
 
-  Processor* old_processor = processors_[processor].second.release();
+  Processor* old_processor = processors_[processor].second;
   VITAL_ASSERT(old_processor == processor);
   UNUSED(old_processor);
   processor->router(nullptr);
@@ -334,8 +337,8 @@ void ProcessorRouter::createAddedProcessors() {
     Processor* next = global_order_->at(i);
     if (next->hasState()) {
       if (processors_.count(next) == 0)
-        processors_[next] = { 0, std::unique_ptr<Processor>(next->clone()) };
-      local_order_[i] = processors_[next].second.get();
+        processors_[next] = { 0, next->clone() };
+      local_order_[i] = processors_[next].second;
     } else
       local_order_[i] = next;
   }
@@ -389,7 +392,7 @@ const Processor* ProcessorRouter::getContext(const Processor* processor) const {
 }
 
 Processor* ProcessorRouter::getLocalProcessor(const Processor* global_processor) {
-  return processors_[global_processor].second.get();
+  return processors_[global_processor].second;
 }
 
 void ProcessorRouter::getDependencies(const Processor* processor) const {

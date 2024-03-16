@@ -14,6 +14,7 @@ public:
   Listener* listener;
 
   ColumnControlsContainer();
+  ~ColumnControlsContainer();
   void paint(juce::Graphics&) override;
   float plusLineLength = 10;
   float plusLineWidth = 2;

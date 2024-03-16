@@ -93,7 +93,7 @@ protected:
   std::shared_ptr<CircularQueue<Processor*>> global_order_;
   std::shared_ptr<CircularQueue<Processor*>> global_reorder_;
   CircularQueue<Processor*> local_order_;
-  std::map<const Processor*, std::pair<int, std::unique_ptr<Processor>>> processors_;
+  std::map<const Processor*, std::pair<int, Processor*>> processors_;
   std::map<const Processor*, std::unique_ptr<Processor>> idle_processors_;
 
   std::shared_ptr<std::vector<const Feedback*>> global_feedback_order_;

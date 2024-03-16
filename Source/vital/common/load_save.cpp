@@ -95,105 +95,105 @@ void LoadSave::convertPcmToFloatBuffer(json& data, const std::string& field) {
 
 json LoadSave::stateToJson(SynthBase* synth, const CriticalSection& critical_section) {
   json settings_data;
-  vital::control_map& controls = synth->getControls();
-  for (auto& control : controls)
-    settings_data[control.first] = control.second->value();
+  // vital::control_map& controls = synth->getControls();
+  // for (auto& control : controls)
+  //   settings_data[control.first] = control.second->value();
 
-  vital::Sample* sample = synth->getSample();
-  if (sample)
-    settings_data["sample"] = sample->stateToJson();
+  // vital::Sample* sample = synth->getSample();
+  // if (sample)
+  //   settings_data["sample"] = sample->stateToJson();
 
-  json modulations;
-  vital::ModulationConnectionBank& modulation_bank = synth->getModulationBank();
-  for (int i = 0; i < vital::kMaxModulationConnections; ++i) {
-    vital::ModulationConnection* connection = modulation_bank.atIndex(i);
-    json modulation_data;
-    modulation_data["source"] = connection->source_name;
-    modulation_data["destination"] = connection->destination_name;
+  // json modulations;
+  // vital::ModulationConnectionBank& modulation_bank = synth->getModulationBank();
+  // for (int i = 0; i < vital::kMaxModulationConnections; ++i) {
+  //   vital::ModulationConnection* connection = modulation_bank.atIndex(i);
+  //   json modulation_data;
+  //   modulation_data["source"] = connection->source_name;
+  //   modulation_data["destination"] = connection->destination_name;
 
-    LineGenerator* line_mapping = connection->modulation_processor->lineMapGenerator();
-    if (!line_mapping->linear())
-      modulation_data["line_mapping"] = line_mapping->stateToJson();
+  //   LineGenerator* line_mapping = connection->modulation_processor->lineMapGenerator();
+  //   if (!line_mapping->linear())
+  //     modulation_data["line_mapping"] = line_mapping->stateToJson();
 
-    modulations.push_back(modulation_data);
-  }
+  //   modulations.push_back(modulation_data);
+  // }
 
-  settings_data["modulations"] = modulations;
+  // settings_data["modulations"] = modulations;
 
-  if (synth->getWavetableCreator(0)) {
-    json wavetables;
-    for (int i = 0; i < vital::kNumOscillators; ++i) {
-      WavetableCreator* wavetable_creator = synth->getWavetableCreator(i);
-      wavetables.push_back(wavetable_creator->stateToJson());
-    }
+  // if (synth->getWavetableCreator(0)) {
+  //   json wavetables;
+  //   for (int i = 0; i < vital::kNumOscillators; ++i) {
+  //     WavetableCreator* wavetable_creator = synth->getWavetableCreator(i);
+  //     wavetables.push_back(wavetable_creator->stateToJson());
+  //   }
 
-    settings_data["wavetables"] = wavetables;
-  }
+  //   settings_data["wavetables"] = wavetables;
+  // }
 
-  json lfos;
-  for (int i = 0; i < vital::kNumLfos; ++i) {
-    LineGenerator* lfo_source = synth->getLfoSource(i);
-    lfos.push_back(lfo_source->stateToJson());
-  }
+  // json lfos;
+  // for (int i = 0; i < vital::kNumLfos; ++i) {
+  //   LineGenerator* lfo_source = synth->getLfoSource(i);
+  //   lfos.push_back(lfo_source->stateToJson());
+  // }
 
-  settings_data["lfos"] = lfos;
+  // settings_data["lfos"] = lfos;
 
-  json data;
-  // data["synth_version"] = ProjectInfo::versionString;
-  data["preset_name"] = synth->getPresetName().toStdString();
-  data["author"] = synth->getAuthor().toStdString();
-  data["comments"] = synth->getComments().toStdString();
-  data["preset_style"] = synth->getStyle().toStdString();
-  for (int i = 0; i < vital::kNumMacros; ++i) {
-    std::string name = synth->getMacroName(i).toStdString();
-    data["macro" + std::to_string(i + 1)] = name;
-  }
-  data["settings"] = settings_data;
-  return data;
+  // json data;
+  // // data["synth_version"] = ProjectInfo::versionString;
+  // data["preset_name"] = synth->getPresetName().toStdString();
+  // data["author"] = synth->getAuthor().toStdString();
+  // data["comments"] = synth->getComments().toStdString();
+  // data["preset_style"] = synth->getStyle().toStdString();
+  // for (int i = 0; i < vital::kNumMacros; ++i) {
+  //   std::string name = synth->getMacroName(i).toStdString();
+  //   data["macro" + std::to_string(i + 1)] = name;
+  // }
+  // data["settings"] = settings_data;
+  return settings_data;
 }
 
 void LoadSave::loadControls(SynthBase* synth, const json& data) {
-  vital::control_map controls = synth->getControls();
-  for (auto& control : controls) {
-    std::string name = control.first;
-    if (data.count(name)) {
-      vital::mono_float value = data[name];
-      control.second->set(value);
-    } else {
-      vital::ValueDetails details = vital::Parameters::getDetails(name);
-      control.second->set(details.default_value);
-    }
-  }
+//   vital::control_map controls = synth->getControls();
+//   for (auto& control : controls) {
+//     std::string name = control.first;
+//     if (data.count(name)) {
+//       vital::mono_float value = data[name];
+//       control.second->set(value);
+//     } else {
+//       vital::ValueDetails details = vital::Parameters::getDetails(name);
+//       control.second->set(details.default_value);
+//     }
+//   }
 
-  synth->modWheelGuiChanged(controls["mod_wheel"]->value());
+//   synth->modWheelGuiChanged(controls["mod_wheel"]->value());
 }
 
 void LoadSave::loadModulations(SynthBase* synth, const json& modulations) {
-  synth->clearModulations();
-  vital::ModulationConnectionBank& modulation_bank = synth->getModulationBank();
-  int index = 0;
-  for (const json& modulation : modulations) {
-    std::string source = modulation["source"];
-    std::string destination = modulation["destination"];
-    vital::ModulationConnection* connection = modulation_bank.atIndex(index);
-    index++;
+//   synth->clearModulations();
+//   vital::ModulationConnectionBank& modulation_bank = synth->getModulationBank();
+//   int index = 0;
+//   for (const json& modulation : modulations) {
+//     std::string source = modulation["source"];
+//     std::string destination = modulation["destination"];
+//     vital::ModulationConnection* connection = modulation_bank.atIndex(index);
+//     index++;
 
-    if (synth->getEngine()->getModulationSource(source) == nullptr ||
-      synth->getEngine()->getMonoModulationDestination(destination) == nullptr) {
-      continue;
-    }
+//     if (synth->getEngine()->getModulationSource(source) == nullptr ||
+//       synth->getEngine()->getMonoModulationDestination(destination) == nullptr) {
+//       continue;
+//     }
 
-    if (source.length() && destination.length()) {
-      connection->source_name = source;
-      connection->destination_name = destination;
-      synth->connectModulation(connection);
-    }
+//     if (source.length() && destination.length()) {
+//       connection->source_name = source;
+//       connection->destination_name = destination;
+//       synth->connectModulation(connection);
+//     }
 
-    if (modulation.count("line_mapping"))
-      connection->modulation_processor->lineMapGenerator()->jsonToState(modulation["line_mapping"]);
-    else
-      connection->modulation_processor->lineMapGenerator()->initLinear();
-  }
+//     if (modulation.count("line_mapping"))
+//       connection->modulation_processor->lineMapGenerator()->jsonToState(modulation["line_mapping"]);
+//     else
+//       connection->modulation_processor->lineMapGenerator()->initLinear();
+//   }
 }
 
 void LoadSave::loadSample(SynthBase* synth, const json& json_sample) {

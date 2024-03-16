@@ -25,6 +25,10 @@ ColumnControlsContainer::ColumnControlsContainer() {
   ThemeManager::shared()->addListener(this);
 }
 
+ColumnControlsContainer::~ColumnControlsContainer() {
+  ThemeManager::shared()->removeListener(this);
+}
+
 std::unique_ptr<BoxSlider> ColumnControlsContainer::createSlider(std::string title, int column) {
   auto slider = std::make_unique<BoxSlider>();
   slider->setAlpha(0.5f);

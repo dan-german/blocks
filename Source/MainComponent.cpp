@@ -413,7 +413,7 @@ void MainComponent::inspectorChangedParameter(int sliderIndex, float value) {
 void MainComponent::updateModuleComponentVisuals(int sliderIndex, float value, std::shared_ptr<model::Module> module) {
   if (module->id.type == Model::Types::osc) {
     if (module->parameters_[sliderIndex]->name == "wave") {
-      int adjusted_value = (int)value > 0 ? (int)value + 1 : 0;   
+      int adjusted_value = (int)value > 0 ? (int)value + 1 : 0;
       changeModulePainter(adjusted_value);
     }
     return;
@@ -550,7 +550,7 @@ void MainComponent::clear() {
 
   tab_grid_.clear();
 
-  ui_layer_.preset_button_.label.setText("empty", dontSendNotification);
+  ui_layer_.preset_button_.content.label.setText("empty", dontSendNotification);
   ui_layer_.setConnections(delegate->getModulations());
   ui_layer_.setModulators(delegate->getModulators2());
   resetDownFlowingDots();
@@ -610,6 +610,7 @@ void MainComponent::sliderValueChanged(Slider* slider) {
 // void MainComponent::sliderValueChanged
 
 void MainComponent::loadState(Preset preset) {
+  std::cout << "main component loading preset" << std::endl;
   for (auto presetBlock : preset.blocks) {
     auto block = delegate->getBlock2(Index { presetBlock.index.first, presetBlock.index.second });
     spawnBlockComponent(block);
@@ -621,6 +622,8 @@ void MainComponent::loadState(Preset preset) {
   }
 
   for (auto column_control : preset.column_controls) {
+    std::cout << "pan: " << column_control.parameters["pan"] << std::endl;
+    std::cout << "volumn: " << column_control.parameters["volume"] << std::endl;
     int index = column_control.id.number - 1;
     column_controls_.pan_sliders_[index]->slider.setValue(column_control.parameters["pan"]);
     column_controls_.level_sliders_[index]->slider.setValue(column_control.parameters["level"]);
@@ -914,12 +917,12 @@ void MainComponent::columnControlEndedAdjusting(ColumnControlsContainer::Control
   }
 }
 
-void MainComponent::modulatorGestureChanged(ModulatorComponent* modulatorComponent, std::string parameter_name, bool started) { 
+void MainComponent::modulatorGestureChanged(ModulatorComponent* modulatorComponent, std::string parameter_name, bool started) {
   // std::cout << "modulator gesture changed: " << parameter_name << std::endl;
   // auto 
   // delegate->editorParameterGestureChanged(parameter_name, started);k
   // delegate->
   // rGestureChanged(delegate->getModulator(modulatorComponent->row)->name, index, true);
-  auto modulator = delegate->getModulator2(modulatorComponent->row);  
+  auto modulator = delegate->getModulator2(modulatorComponent->row);
   delegate->editorParameterGestureChanged(modulator->name, parameter_name, started);
 }

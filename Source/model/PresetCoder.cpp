@@ -18,7 +18,7 @@ std::string PresetCoder::encode(Preset presetData) {
   jsonPreset["blocks"] = encodeBlocks(presetData.blocks);
   jsonPreset["modulators"] = encodeModulators(presetData.modulators);
   jsonPreset["modulations"] = encodeModulations(presetData.connections_);
-  jsonPreset["columns"] = encodeColumns(presetData.column_controls);
+  jsonPreset["column controls"] = encodeColumns(presetData.column_controls);
   jsonPreset["format_version"] = 0;
 
   return jsonPreset.dump(2);
@@ -129,7 +129,7 @@ std::optional<Preset> PresetCoder::decode(std::string jsonString) {
     preset.modulators.push_back(module);
   }
 
-  for (json& jsonColumn : presetInJson.at("columns")) {
+  for (json& jsonColumn : presetInJson.at("column controls")) {
     Preset::Module column {};
     decodeModule(jsonColumn, column);
     preset.column_controls.push_back(column);
