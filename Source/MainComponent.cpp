@@ -610,7 +610,6 @@ void MainComponent::sliderValueChanged(Slider* slider) {
 // void MainComponent::sliderValueChanged
 
 void MainComponent::loadState(Preset preset) {
-  std::cout << "main component loading preset" << std::endl;
   for (auto presetBlock : preset.blocks) {
     auto block = delegate->getBlock2(Index { presetBlock.index.first, presetBlock.index.second });
     spawnBlockComponent(block);
@@ -622,8 +621,6 @@ void MainComponent::loadState(Preset preset) {
   }
 
   for (auto column_control : preset.column_controls) {
-    std::cout << "pan: " << column_control.parameters["pan"] << std::endl;
-    std::cout << "volumn: " << column_control.parameters["volume"] << std::endl;
     int index = column_control.id.number - 1;
     column_controls_.pan_sliders_[index]->slider.setValue(column_control.parameters["pan"]);
     column_controls_.level_sliders_[index]->slider.setValue(column_control.parameters["level"]);

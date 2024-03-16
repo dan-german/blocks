@@ -41,14 +41,16 @@ Component* ModulationsListBoxModel::refreshComponentForRow(int rowNumber, bool i
     component->bipolarButton.setState(bipolar);
   }
 
-  auto stringo = connection->parameter_name_;
-  for (char& c : stringo) {
-    if (c == '_') {
-      c = ' ';
-    }
-  }
+  auto parameter_name = connection->parameter_name_;
+  auto target_name = connection->target->display_name;
+  // auto stringo = connection->parameter_name_;
+  // for (char& c : stringo) {
+  //   if (c == '_') {
+  //     c = ' ';
+  //   }
+  // }
 
-  component->target.setText(stringo, dontSendNotification);
+  component->target.setText(target_name + " " + parameter_name, dontSendNotification);
   component->slider.setNumDecimalPlacesToDisplay(3);
   component->slider.addListener(this->slider_listener_);
   component->delegate = delegate_;
