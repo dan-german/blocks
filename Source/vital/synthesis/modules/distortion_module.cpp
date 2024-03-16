@@ -33,7 +33,7 @@ void DistortionModule::init() {
 
   Value* distortion_type = createBaseControl2({ .name = "type" });
   Output* distortion_drive = createPolyModControl2({ .name = "drive", .audio_rate = true, .smooth_value = true, .reset = input(kReset) });
-  distortion_mix_ = createPolyModControl2({ .name = "mix" });
+  distortion_mix_ = createPolyModControl2({ .name = "mix", .default_value = 1.0f });
   distortion_->plug(distortion_type, Distortion::kType);
   distortion_->plug(distortion_drive, Distortion::kDrive);
 

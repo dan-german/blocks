@@ -43,7 +43,11 @@ public:
     parameter_map_[short_name] = shared_ptr;
   }
 
-  virtual void reset() {}
+  virtual void reset() {
+    for (auto parameter : parameters_) {
+      parameter->set(parameter->default_value);
+    }
+  }
 };
 
 class Block: public Module {

@@ -65,7 +65,7 @@ void FilterModule::init() {
  
   AddControlInput midi_cutoff_input = { .name = "cutoff", .audio_rate = true, .smooth_value = true, .internal_modulation = current_keytrack->output(), .reset = input(kReset), .post_offset = -60.0f, .min = 8.0f, .max = 136.0f, .default_value = 100.0f };
   Output* midi_cutoff = createPolyModControl2(midi_cutoff_input);
-  Output* resonance = createPolyModControl2({ .name = "resonance", .reset = input(kReset), .default_value = 0.5f });
+  Output* resonance = createPolyModControl2({ .name = "resonance", .reset = input(kReset), .default_value = 0.25f });
   Output* drive = createPolyModControl2({ .name = "drive", .reset = input(kReset), .max = 20.0f, .default_value = 0.85f });
   Output* blend = createPolyModControl2({ .name = "blend", .reset = input(kReset), .max = 2.0f });
   Output* blend_transpose = createPolyModControl2({ .name = "blend transpose", .reset = input(kReset), .min = 0.3f, .default_value = 0.85f });
