@@ -34,6 +34,8 @@ public:
     display_name = prefix + " " + std::to_string(number);
   }
 
+  virtual std::string getParameterName(int index) { return parameters_[index]->name; }
+
   void add(vital::ValueDetails parameter) {
     parameter.display_name = parameter.display_name != "" ? parameter.display_name : parameter.name;
     std::string short_name = parameter.name;

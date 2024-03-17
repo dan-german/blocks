@@ -17,5 +17,15 @@ public:
     add({ .name = "frequency", .min = -2.0f, .max = 9.0f, .default_value = 2.0f, .value_scale = ValueScale::kExponential, .display_invert = true, .decimal_places = 3, .hidden = true });
     add({ .name = "frequency 2", .min = -2.0f, .max = 9.0f, .default_value = 2.0f, .value_scale = ValueScale::kExponential, .display_invert = true, .decimal_places = 3, .hidden = true });
   }
+
+  std::string getParameterName(int index) override {
+    bool is_tempo_or_secs_1 = index == 4;
+    if (is_tempo_or_secs_1) return parameters_[5]->value_processor->value() < 1.0 ? "frequency" : "tempo";
+
+    bool is_tempo_or_secs_2 = index == 6;
+    if (is_tempo_or_secs_2) return parameters_[7]->value_processor->value() < 1.0 ? "frequency 2" : "tempo 2";
+
+    return Block::getParameterName(index);
+  }
 };
 }

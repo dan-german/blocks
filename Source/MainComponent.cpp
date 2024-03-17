@@ -693,14 +693,13 @@ void MainComponent::modulatorEndedDrag(ModulatorComponent* modulator_component, 
 
     // auto isModulatable = focusedModule->parameters[parameterIndex]->isModulatable;
     // if (!isModulatable) return;
-    auto parameter_name = focused_module->parameters_[parameter_index]->name;
+    auto parameter_name = focused_module->getParameterName(parameter_index);  
     delegate->editorConnectedModulation(modulator_component->row, focused_module->name, parameter_name);
     ui_layer_.setConnections(delegate->getModulations());
     refreshInspector();
 
     // auto modulator = delegate->getModulator(modulatorIndex);
     auto focused_block = block_matrix_[focused_grid_item_->index.column][focused_grid_item_->index.row];
-
     focused_block->setConfig(focused_module, delegate->getModulations());
   }
 }
