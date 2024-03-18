@@ -27,7 +27,7 @@ Component* ModulationsListBoxModel::refreshComponentForRow(int rowNumber, bool i
   if (rowNumber >= connections_.size()) return component;
   auto connection = connections_[rowNumber];
 
-  bool envelopeToOscGain = connection->source->id.type == "envelope" && connection->target->id.type == "osc";
+  bool envelopeToOscGain = connection->source->id.type == "envelope" && connection->target->id.type == "osc" && connection->parameter_name_ == "level";
   if (envelopeToOscGain) {
     component->handleOscGainEnvelope();
   } else {
