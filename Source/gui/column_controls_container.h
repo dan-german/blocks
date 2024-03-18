@@ -21,6 +21,7 @@ public:
   std::vector<std::unique_ptr<BoxSlider>> level_sliders_;
   std::vector<std::unique_ptr<BoxSlider>> pan_sliders_;
   void resized() override;
+  void reset();
   // Colour colour = Colour(66, 66, 66);
 private:
 

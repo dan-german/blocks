@@ -96,3 +96,8 @@ void ColumnControlsContainer::sliderDragEnded(Slider* slider) {
     listener->columnControlEndedAdjusting(ControlType::pan, column);
   }
 }
+
+void ColumnControlsContainer::reset() {
+  for (auto& slider : level_sliders_) { slider->slider.setValue(1.0f); }
+  for (auto& slider : pan_sliders_) { slider->slider.setValue(0.0f); }
+}

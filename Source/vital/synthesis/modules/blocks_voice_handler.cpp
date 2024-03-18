@@ -98,23 +98,6 @@ void BlocksVoiceHandler::repositionBlock(Index from, Index to) {
   processor_matrix_[from.column][from.row] = nullptr;
 }
 
-void BlocksVoiceHandler::removeBlock(Index index, std::shared_ptr<model::Block> block) {
-  auto processor = processor_matrix_[index.column][index.row];
-  processor->enable(false); 
-
-  if (processor->control_map_.count("on"))
-    processor->control_map_["on"]->set(0.0f);
-
-  processor_pool_[block->id.type].push_back(processor);
-  processor_matrix_[index.column][index.row] = nullptr;
-}
-
-int y = 0;
-
-void BlocksVoiceHandler::addBlock(std::shared_ptr<model::Block> block) {
-  createProcessorForBlock(block);
-}
-
 void BlocksVoiceHandler::connectAll() {
   Processor* current = nullptr;
   Processor* target = nullptr;
@@ -407,6 +390,21 @@ void BlocksVoiceHandler::createDelays() {
   }
 }
 
+void BlocksVoiceHandler::removeBlock(Index index, std::shared_ptr<model::Block> block) {
+  auto processor = processor_matrix_[index.column][index.row];
+  processor->enable(false); 
+
+  if (processor->control_map_.count("on"))
+    processor->control_map_["on"]->set(0.0f);
+
+  processor_pool_[block->id.type].push_back(processor);
+  processor_matrix_[index.column][index.row] = nullptr;
+}
+
+void BlocksVoiceHandler::addBlock(std::shared_ptr<model::Block> block) {
+  createProcessorForBlock(block);
+}
+
 std::shared_ptr<SynthModule> BlocksVoiceHandler::createProcessorForBlock(std::shared_ptr<model::Block> module) {
   std::shared_ptr<SynthModule> processor = processor_pool_[module->id.type][0];
   processor_pool_[module->id.type].erase(processor_pool_[module->id.type].begin());
@@ -448,11 +446,6 @@ void BlocksVoiceHandler::createOscillators() {
 
 void BlocksVoiceHandler::clear() {
   unplugAll();
-
-  for (auto processor : active_processors_) {
-    processor_pool_[processor->module_->id.type].push_back(processor);
-    processor->enable(false);
-  }
 
   active_processors_.clear();
   active_processor_map_.clear();

@@ -58,7 +58,6 @@ struct ValueDetails {
   int decimal_places = 2;
   bool hidden = false;
   void set(mono_float value) { 
-    std::cout << "value: " << value << std::endl;
     this->value = value;
     this->value_processor->set(value);
   }

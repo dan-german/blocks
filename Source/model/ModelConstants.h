@@ -14,7 +14,7 @@
 
 namespace model {
 const StringArray waveforms { "sine", "was", "saw", "square", "triangle" };
-const StringArray modulators { "lfo", "envelope" };
+const StringArray modulators { "lfo", "adsr" };
 const StringArray effects { "filter", "drive", "reverb", "delay", "chorus", "flanger", "phaser", "comp" };
 const StringArray tabs { "oscillator", "modulator", "effect" };
 

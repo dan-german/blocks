@@ -34,7 +34,6 @@ Component* ModulationsListBoxModel::refreshComponentForRow(int rowNumber, bool i
     auto magnitude_parameter = connection->amount_parameter_;
     component->slider.setRange(magnitude_parameter->min, magnitude_parameter->max);
     component->slider.setValue(magnitude_parameter->value_processor->value(), dontSendNotification);
-    component->source.setText(connection->source->display_name, dontSendNotification);
 
     bool bipolar = static_cast<bool>(connection->bipolar_parameter_->value_processor->value());
     component->indicator.setBipolar(bipolar);
@@ -43,18 +42,15 @@ Component* ModulationsListBoxModel::refreshComponentForRow(int rowNumber, bool i
 
   auto parameter_name = connection->parameter_name_;
   auto target_name = connection->target->display_name;
-  // auto stringo = connection->parameter_name_;
-  // for (char& c : stringo) {
-  //   if (c == '_') {
-  //     c = ' ';
-  //   }
-  // }
 
   component->target.setText(target_name + " " + parameter_name, dontSendNotification);
   component->slider.setNumDecimalPlacesToDisplay(3);
   component->slider.addListener(this->slider_listener_);
   component->delegate = delegate_;
   component->indicator.setColour(connection->source->colour.colour);
+
+  // auto source_display_name = connection->source->display_name + " " + std::to_string(connection->source->id.number);
+  component->source.setText(connection->source->display_name , dontSendNotification);
 
 
   // using Parameters = Model::OscillatorModule::Parameters;

@@ -507,6 +507,12 @@ void PluginProcessor::clear() {
   // initEngine();
   clearModulations();
 
+  for (auto column_control : getModuleManager().pool.column_controls_) {
+    for (auto const& [key, val] : column_control->parameter_map_) {
+      column_control->parameter_map_[key]->value_processor->set(column_control->parameter_map_[key]->default_value);
+    }
+  }
+
   auto num_modulators = synth_->getModuleManager().getModulators().size();
   for (int i = num_modulators - 1; i >= 0; i--) {
     removeModulator(i);

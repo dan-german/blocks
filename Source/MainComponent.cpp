@@ -166,8 +166,10 @@ void MainComponent::setupListeners() {
     if (!hasTabs && !hasModulators && !hasBlocks) return;
 
     delegate->editorSavedPreset(name.toStdString());
+    ui_layer_.preset_button_.content.label.setText(name, dontSendNotification);
     ui_layer_.preset_button_.setStrings(delegate->editorRequestsPresetNames());
     save_popup_.setVisible(false);
+    dark_background_.setVisible(false);
   };
 
   ui_layer_.newPresetButton->on_click_ = [this]() {
@@ -552,6 +554,7 @@ void MainComponent::clear() {
   ui_layer_.preset_button_.content.label.setText("empty", dontSendNotification);
   ui_layer_.setConnections(delegate->getModulations());
   ui_layer_.setModulators(delegate->getModulators2());
+  column_controls_.reset();
   resetDownFlowingDots();
 }
 
