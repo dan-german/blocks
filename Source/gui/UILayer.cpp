@@ -125,7 +125,6 @@ void UILayer::resizePresetButton() {
 }
 
 void UILayer::setupSideMenus() {
-  addChildComponent(connections);
   connections.listBox.setModel(&connections_list_box_model_);
   modulators_.isOnLeft = false;
 }

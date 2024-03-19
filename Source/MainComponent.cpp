@@ -20,6 +20,7 @@ MainComponent::MainComponent(juce::MidiKeyboardState& keyboard_state, Delegate* 
   setupPresetMenu();
   setupDarkBackground(&grid_dark_background_, 3);
   addChildComponent(ui_layer_.modulators_);
+  addChildComponent(ui_layer_.connections);
   setupTabGrid();
   setupBlockGrid();
   setupDarkBackground(&dark_background_, -1);
