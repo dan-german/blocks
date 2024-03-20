@@ -187,6 +187,7 @@ struct MainComponent::Delegate {
   virtual void editorRemovedModulator(int index) = 0;
   virtual void editorChangedBlockLength(Index index, int times) = 0;
   virtual void editorSavedPreset(std::string name) = 0;
+  virtual std::optional<Preset> editorNavigatedPreset(bool next) = 0;
 
   virtual Array<MPENote> editorRequestsCurrentlyPlayingNotes() = 0;
   virtual StringArray editorRequestsPresetNames() = 0;

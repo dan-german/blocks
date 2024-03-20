@@ -14,7 +14,7 @@ void BaseButton::mouseEnter(const juce::MouseEvent& event) {
 }
 
 void BaseButton::mouseUp(const juce::MouseEvent& event) {
-  if (on_click_ != nullptr) on_click_();
+  if (on_click_) on_click_();
 }
 
 void BaseButton::mouseExit(const juce::MouseEvent& event) {

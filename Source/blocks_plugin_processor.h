@@ -75,6 +75,8 @@ public:
   // juce::AudioProcessorParameter* getBypassParameter() const override { return bypass_parameter_; }
 
   void parameterChanged(std::string name, vital::mono_float value) override;
+  void removeModulator(int index);
+  void removeBlock(const Index& index);
 
   // MainComponent::Delegate
   std::shared_ptr<Tab> editorAddedTab(int column) override;
@@ -84,7 +86,6 @@ public:
 
   void editorRemovedTab(int column) override;
   void editorRemovedBlock(Index index) override;
-  void removeBlock(const Index& index);
   void editorRepositionedBlock(Index from, Index to) override;
   void editorAdjustedBlock(Index index, int parameter, float value) override;
   void editorAdjustedTab(int column, int parameter, float value) override;
@@ -97,7 +98,7 @@ public:
   void editorChangedBlockLength(Index index, int length) override;
   void editorAdjustedModulator(std::string parameter_name, int modulator, float value) override;
   void editorRemovedModulator(int index) override;
-  void removeModulator(int index);
+  std::optional<Preset> editorNavigatedPreset(bool next) override; 
 
   void editorStartedAdjustingColumn(std::string control, int column) override;
   void editorEndedAdjustingColumn(std::string control, int column) override;
@@ -130,6 +131,7 @@ public:
   const vital::StatusOutput* editorRequestsStatusOutput(std::string name) override;
   // *********************************************************
 private:
+  int current_preset_index_ = -1;
   bool editor_ready_ = false;
   bool block_modified_ = false;
   bool engine_prepared_ = false;

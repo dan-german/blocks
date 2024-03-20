@@ -443,6 +443,7 @@ void PluginProcessor::editorDisconnectedModulation(int index) {
 Preset PluginProcessor::editorChangedPreset(int index) {
   if (index == -1) {
     clear();
+    current_preset_index_ = -1;
     return Preset();
   }
 
@@ -452,11 +453,14 @@ Preset PluginProcessor::editorChangedPreset(int index) {
 }
 
 void PluginProcessor::loadPreset(Preset preset) {
+  pauseProcessing(true);
+  engine_->allSoundsOff();
   clear();
+
+  // tabs will come back soon 
   // for (auto presetTab : preset.tabs) {
   //   auto tab = moduleManager.addTab(presetTab.id.type, presetTab.column, presetTab.id.number);
   //   tab->length = presetTab.length;
-
   //   for (auto const& [key, val] : presetTab.parameters)
   //     tab->parameterMap[key]->audioParameter->setValue(val);
   // }
@@ -469,6 +473,7 @@ void PluginProcessor::loadPreset(Preset preset) {
       block->parameter_map_[key]->set(val);
     }
 
+    // expanding will come back soon 
     // if (presetBlock.length > 1) {
       // expand(block->index, presetBlock.length - 1, true);
     // }
@@ -500,6 +505,7 @@ void PluginProcessor::loadPreset(Preset preset) {
   }
 
   block_modified_ = true;
+  pauseProcessing(false);
 }
 
 void PluginProcessor::clear() {
@@ -657,6 +663,7 @@ void PluginProcessor::editorSavedPreset(std::string name) {
   auto columns = getModuleManager().pool.column_controls_;
   auto info = Preset::create(name, getModuleManager().getBlocks(), getModuleManager().getModulators(), getModuleManager().getConnections(), columns);
   preset_manager_.save(info);
+  current_preset_index_ = preset_manager_.presets.size() - 1;
 }
 
 #pragma warning(default:4716)
@@ -762,4 +769,19 @@ void PluginProcessor::setValue(std::string module_id, std::string parameter_name
   // p->paramter_map_[parameter_name]->val->set(value);
   // parameter->b
   // parameter->bridge->set
+}
+
+std::optional<Preset> PluginProcessor::editorNavigatedPreset(bool next) { 
+  if (preset_manager_.presets.size() == 0) return {};
+  int previous_index = current_preset_index_;
+  if (next) {
+    if (++current_preset_index_ >= preset_manager_.presets.size()) current_preset_index_ = 0;
+  } else {
+    if (--current_preset_index_ < 0) current_preset_index_ = preset_manager_.presets.size() - 1;
+  }
+
+  if (current_preset_index_ == previous_index) return {};
+  auto preset = preset_manager_.presets[current_preset_index_];
+  loadPreset(preset);
+  return preset;
 }

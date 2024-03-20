@@ -179,6 +179,14 @@ void MainComponent::setupListeners() {
     dark_background_.setVisible(false);
   };
 
+  ui_layer_.preset_button_.on_arrow_click_ = [this](bool right) {
+    if (auto preset = delegate->editorNavigatedPreset(right)) {
+      clear();
+      loadState(*preset);
+      dark_background_.setVisible(false);
+    }
+  };
+
   ui_layer_.saveButton->on_click_ = [this]() {
     this->dark_background_.setVisible(true);
     this->dark_background_.toFront(true);
@@ -697,7 +705,7 @@ void MainComponent::modulatorEndedDrag(ModulatorComponent* modulator_component, 
 
     // auto isModulatable = focusedModule->parameters[parameterIndex]->isModulatable;
     // if (!isModulatable) return;
-    auto parameter_name = focused_module->getParameterName(parameter_index);  
+    auto parameter_name = focused_module->getParameterName(parameter_index);
     delegate->editorConnectedModulation(modulator_component->row, focused_module->name, parameter_name);
     ui_layer_.setConnections(delegate->getModulations());
     refreshInspector();
