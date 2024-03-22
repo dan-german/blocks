@@ -453,6 +453,7 @@ Preset PluginProcessor::editorChangedPreset(int index) {
 }
 
 void PluginProcessor::loadPreset(Preset preset) {
+  return;
   pauseProcessing(true);
   engine_->allSoundsOff();
   clear();

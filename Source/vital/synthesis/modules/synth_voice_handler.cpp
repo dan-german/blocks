@@ -77,7 +77,7 @@ void SynthVoiceHandler::init() {
   setVoiceKiller(amplitude_->output());
 
   for (int i = 0; i < vital::kMaxModulationConnections; ++i) {
-    ModulationConnectionProcessor* processor = modulation_bank_.atIndex(i)->modulation_processor.get();
+    ModulationConnectionProcessor* processor = modulation_bank_.atIndex(i)->modulation_processor;
 
     processor->plug(reset(), ModulationConnectionProcessor::kReset);
 
@@ -123,7 +123,7 @@ void SynthVoiceHandler::init() {
   std::string modulation_source_prefix = "modulation_source_";
   std::string modulation_amount_prefix = "modulation_amount_";
   for (int i = 0; i < vital::kMaxModulationConnections; ++i) {
-    ModulationConnectionProcessor* processor = modulation_bank_.atIndex(i)->modulation_processor.get();
+    ModulationConnectionProcessor* processor = modulation_bank_.atIndex(i)->modulation_processor;
     std::string number = std::to_string(i + 1);
     Output* source_output = processor->output(ModulationConnectionProcessor::kModulationSource);
     Output* pre_scale_output = processor->output(ModulationConnectionProcessor::kModulationPreScale);
@@ -134,7 +134,7 @@ void SynthVoiceHandler::init() {
 
 void SynthVoiceHandler::prepareDestroy() {
   for (int i = 0; i < vital::kMaxModulationConnections; ++i) {
-    ModulationConnectionProcessor* processor = modulation_bank_.atIndex(i)->modulation_processor.get();
+    ModulationConnectionProcessor* processor = modulation_bank_.atIndex(i)->modulation_processor;
     removeProcessor(processor);
   }
 }

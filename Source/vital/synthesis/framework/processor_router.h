@@ -22,6 +22,7 @@
 #include <map>
 #include <set>
 #include <vector>
+#include <juce_core/juce_core.h>
 
 namespace vital {
 
@@ -93,8 +94,8 @@ protected:
   std::shared_ptr<CircularQueue<Processor*>> global_order_;
   std::shared_ptr<CircularQueue<Processor*>> global_reorder_;
   CircularQueue<Processor*> local_order_;
-  std::map<const Processor*, std::pair<int, Processor*>> processors_;
-  std::map<const Processor*, std::unique_ptr<Processor>> idle_processors_;
+  std::map<const Processor*, std::pair<int, std::shared_ptr<Processor>>> processors_;
+  std::map<const Processor*, std::shared_ptr<Processor>> idle_processors_;
 
   std::shared_ptr<std::vector<const Feedback*>> global_feedback_order_;
   std::vector<Feedback*> local_feedback_order_;
@@ -107,7 +108,8 @@ protected:
   std::shared_ptr<CircularQueue<const Processor*>> dependencies_visited_;
   std::shared_ptr<CircularQueue<const Processor*>> dependency_inputs_;
 
-  JUCE_LEAK_DETECTOR(ProcessorRouter)
+  // JUCE_LEAK_DETECTOR(ProcessorRouter)
+  JUCE_HEAVYWEIGHT_LEAK_DETECTOR(ProcessorRouter)
 };
 } // namespace vital
 

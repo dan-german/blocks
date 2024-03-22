@@ -39,7 +39,9 @@ public:
   };
 
   ModulationConnectionProcessor(int index);
-  virtual ~ModulationConnectionProcessor() { }
+  virtual ~ModulationConnectionProcessor() { 
+    std::cout << "bye bye mcp" << std::endl;
+  }
 
   void init() override;
   void process(int num_samples) override;

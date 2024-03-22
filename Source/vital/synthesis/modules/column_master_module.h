@@ -26,7 +26,9 @@ public:
 protected:
   poly_float level_;
   poly_float pan_;
-  JUCE_LEAK_DETECTOR(ColumnMasterModule)
+  // JUCE_LEAK_DETECTOR(ColumnMasterModule)
+  JUCE_HEAVYWEIGHT_LEAK_DETECTOR(ColumnMasterModule)
 };
+
 } // namespace vital
 

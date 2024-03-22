@@ -48,7 +48,7 @@ struct ModulationConnection {
   std::string source_name;
   std::string destination_name;
   std::string parameter_name;
-  std::shared_ptr<ModulationConnectionProcessor> modulation_processor;
+  ModulationConnectionProcessor* modulation_processor;
   mono_float destination_scale;
 
 private: JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ModulationConnection)
@@ -60,11 +60,11 @@ public:
   ~ModulationConnectionBank();
   ModulationConnection* createConnection(const std::string& from, const std::string& to, const std::string& parameter);
 
-  std::shared_ptr<ModulationConnection> atIndex(int index) { return all_connections_[index]; }
+  ModulationConnection* atIndex(int index) { return all_connections_[index].get(); }
   size_t numConnections() { return all_connections_.size(); }
 
 private:
-  std::vector<std::shared_ptr<ModulationConnection>> all_connections_;
+  std::vector<std::unique_ptr<ModulationConnection>> all_connections_;
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ModulationConnectionBank)
 };
