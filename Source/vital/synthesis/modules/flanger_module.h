@@ -76,7 +76,7 @@ protected:
   Output* feedback;
   Output* wet;
 
-  cr::Value* delay_frequency_;
+  cr::Value delay_frequency_;
   MultiDelay* delay_;
 
   JUCE_LEAK_DETECTOR(FlangerModule)

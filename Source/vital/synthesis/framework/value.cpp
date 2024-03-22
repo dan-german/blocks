@@ -55,7 +55,14 @@ void cr::Value::process(int num_samples) {
     poly_float trigger_value = input(kSet)->source->trigger_value;
     value_ = utils::maskLoad(value_, trigger_value, trigger_mask);
   }
-
+  output()->buffer[0] = value_;
+}
+void cr::Value2::process(int num_samples) {
+  poly_mask trigger_mask = input(kSet)->source->trigger_mask;
+  if (trigger_mask.anyMask()) {
+    poly_float trigger_value = input(kSet)->source->trigger_value;
+    value_ = utils::maskLoad(value_, trigger_value, trigger_mask);
+  }
   output()->buffer[0] = value_;
 }
 } // namespace vital

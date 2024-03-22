@@ -75,7 +75,9 @@ public:
     hardReset();
   }
 
-  virtual ~Delay() { }
+  virtual ~Delay() { 
+    delete memory_;
+  }
 
   virtual Processor* clone() const override {
     auto new_delay = new Delay(*this);

@@ -361,8 +361,7 @@ void SoundEngine::setBpm(mono_float bpm) {
 }
 
 Wavetable* SoundEngine::getWavetable(int index) {
-  return nullptr;
-  // return voice_handler_->getWavetable(index);
+  return voice_handler_->getWavetable(index);
 }
 
 Sample* SoundEngine::getSample() {
