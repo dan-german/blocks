@@ -20,6 +20,7 @@
 
 namespace vital {
 PhaserFilter::PhaserFilter(bool clean): Processor(PhaserFilter::kNumInputs, 1) {
+  std::cout << "PhaserFilter: " << this << std::endl;
   clean_ = clean;
   hardReset();
   invert_mult_ = 1.0f;

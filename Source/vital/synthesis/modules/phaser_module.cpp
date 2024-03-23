@@ -22,7 +22,6 @@ namespace vital {
 PhaserModule::PhaserModule(const Output* beats_per_second):
   SynthModule(1, kNumOutputs), beats_per_second_(beats_per_second), phaser_(nullptr) {
   phaser_ = new Phaser();
-  // addProcessor(phaser_);
 }
 
 PhaserModule::~PhaserModule() {
@@ -83,6 +82,8 @@ void PhaserModule::process(int num_samples) {
 }
 
 Processor* PhaserModule::clone() const {
-  return new PhaserModule(*this);
+  auto copy = new PhaserModule(*this);
+  copy->phaser_ = static_cast<Phaser*>(copy->phaser_->clone());
+  return copy;
 }
 } // namespace vital

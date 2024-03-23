@@ -162,10 +162,10 @@ void BlocksVoiceHandler::init() {
   createChoruses();
   createFlangers();
   createNoises();
-  // createPhasers();
+  createPhasers();
   createDelays();
   createModulators();
-  // createFilters(note_from_reference_->output());
+  createFilters(note_from_reference_->output());
   createVoiceOutput();
 
   master_node_ = new VariableAdd(5);
@@ -406,7 +406,7 @@ void BlocksVoiceHandler::removeBlock(Index index, std::shared_ptr<model::Block> 
 }
 
 void BlocksVoiceHandler::addBlock(std::shared_ptr<model::Block> block) {
-  // createProcessorForBlock(block);
+  createProcessorForBlock(block);
 }
 
 SynthModule* BlocksVoiceHandler::createProcessorForBlock(std::shared_ptr<model::Block> module) {

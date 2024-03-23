@@ -26,17 +26,11 @@ FlangerModule::FlangerModule(const Output* beats_per_second):
   frequency_(nullptr), phase_offset_(nullptr), mod_depth_(nullptr),
   phase_(0.0f), delay_(nullptr) { }
 
-FlangerModule::~FlangerModule() { 
-  // delay_->unplug(delay_frequency_);
-  // delete delay_frequency_;
-  // delay_frequency_
-  // delay_->removeProcessor(delay_frequency_);
-  // removeProcessor(delay_);
-}
+FlangerModule::~FlangerModule() { }
 
 void FlangerModule::init() {
+  std::cout << "FlangerModule::init()" << std::endl;
   static const cr::Value kDelayStyle(StereoDelay::kClampedUnfiltered);
-  // delay_frequency_ = new cr::Value(0.0f);
 
   delay_ = new MultiDelay(kMaxSamples);
   addIdleProcessor(delay_);
@@ -58,6 +52,10 @@ void FlangerModule::init() {
   delay_->plug(&kDelayStyle, StereoDelay::kStyle);
 
   SynthModule::init();
+
+  // for (const auto& idle : idle_processors_) {
+  //   std::cout << "origin idle: " << idle.first << std::endl;
+  // }
 }
 
 void FlangerModule::process(int num_samples) {

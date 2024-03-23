@@ -34,9 +34,14 @@ public:
   static constexpr int kMaxStages = 3 * kPeakStage;
 
   PhaserFilter(bool clean);
-  virtual ~PhaserFilter() { }
+  virtual ~PhaserFilter() {
+    std::cout << "removing" << std::endl;
+  }
 
-  virtual Processor* clone() const override { return new PhaserFilter(*this); }
+  virtual Processor* clone() const override {
+    std::cout << "gloning" << std::endl;
+    return new PhaserFilter(*this);
+  }
   virtual void process(int num_samples) override;
   void processWithInput(const poly_float* audio_in, int num_samples) override;
 
