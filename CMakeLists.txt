@@ -106,7 +106,7 @@ target_compile_definitions(blocks
 
 # juce_add_binary_data(AudioPluginData SOURCES ...)
 
-file(GLOB_RECURSE BinaryAssets CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/Assets/*.ttf" "${CMAKE_CURRENT_SOURCE_DIR}/Assets/*.svg" "${CMAKE_CURRENT_SOURCE_DIR}/Assets/*.key")
+file(GLOB_RECURSE BinaryAssets CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/Assets/*.ttf" "${CMAKE_CURRENT_SOURCE_DIR}/Assets/*.svg" "${CMAKE_CURRENT_SOURCE_DIR}/Assets/*.key" "${CMAKE_CURRENT_SOURCE_DIR}/Assets/*.blocks")
 juce_add_binary_data(blocks_binary_data NAMESPACE BinaryData SOURCES ${BinaryAssets})
 
 if (UNIX AND NOT APPLE)

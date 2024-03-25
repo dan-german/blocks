@@ -17,6 +17,7 @@ std::optional<Preset> PresetManager::stringToPreset(std::string preset) { return
 PresetManager::PresetManager(): coder(new PresetCoder()) {
   setPresetsDirectory();
   loadPresetsDirectory();
+  loadStockPresets();
 }
 
 void PresetManager::setPresetsDirectory() {
@@ -55,6 +56,9 @@ void PresetManager::loadStockPresets() {
 
       for (int j = 0; j < size; j++)
         presetString += preset[j];
+        
+      if (auto preset = coder->decode(presetString))
+        presets.push_back(*preset);
     }
   }
 }
