@@ -925,11 +925,6 @@ void MainComponent::columnControlEndedAdjusting(ColumnControlsContainer::Control
 }
 
 void MainComponent::modulatorGestureChanged(ModulatorComponent* modulatorComponent, std::string parameter_name, bool started) {
-  // std::cout << "modulator gesture changed: " << parameter_name << std::endl;
-  // auto 
-  // delegate->editorParameterGestureChanged(parameter_name, started);k
-  // delegate->
-  // rGestureChanged(delegate->getModulator(modulatorComponent->row)->name, index, true);
   auto modulator = delegate->getModulator2(modulatorComponent->row);
   delegate->editorParameterGestureChanged(modulator->name, parameter_name, started);
 }

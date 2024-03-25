@@ -183,7 +183,6 @@ vital::modulation_change SynthBase::createModulationChange(vital::ModulationConn
       num_audio_rate++;
     }
   }
-  // std::cout << "NUM AUDIO RATE " << num_audio_rate << std::endl;
   change.num_audio_rate = num_audio_rate;
   // printModulationChange(change);
   return change;

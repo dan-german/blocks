@@ -34,12 +34,9 @@ public:
   static constexpr int kMaxStages = 3 * kPeakStage;
 
   PhaserFilter(bool clean);
-  virtual ~PhaserFilter() {
-    std::cout << "removing: " << this << std::endl;
-  }
+  virtual ~PhaserFilter() { }
 
   virtual Processor* clone() const override {
-    std::cout << "cloning PhaserFilter" << std::endl;
     return new PhaserFilter(*this);
   }
 

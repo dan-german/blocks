@@ -63,7 +63,6 @@ void PresetManager::save(Preset presetData) {
   removePreset(presetData.name);
 
   auto jsonPreset = coder->encode(presetData);
-  // std::cout << jsonPreset << std::endl;
   createAndSavePresetFile(presetData.name, jsonPreset);
 
   if (auto preset = coder->decode(jsonPreset))

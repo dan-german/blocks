@@ -372,7 +372,6 @@ void Reverb::processWithInput(const poly_float* audio_in, int num_samples) {
     current_high_amplitude += delta_high_amplitude;
   }
   auto se = std::chrono::high_resolution_clock::now();
-  // std::cout << "Reverb::processWithInput() took " << std::chrono::duration_cast<std::chrono::microseconds>(se - as).count() << " microseconds" << std::endl;
 
   sample_delay_increment_ = current_delay_increment;
   sample_delay_ = current_sample_delay;

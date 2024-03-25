@@ -46,19 +46,14 @@ public:
 
   Phaser();
   virtual ~Phaser() {
-    std::cout << "removing phaser\n";
-    // removeProcessor(phaser_filter_);
     delete phaser_filter_;
     delete cutoff_;
   }
 
   virtual Processor* clone() const override {
     auto p = new Phaser(*this);
-    std::cout << "first filter: " << p->phaser_filter_ << std::endl;
     p->phaser_filter_ = static_cast<PhaserFilter*>(phaser_filter_->clone());
     p->cutoff_ = new Output();
-    std::cout << "second filter: " << p->phaser_filter_ << std::endl;
-    // p->addIdleProcessor(p->phaser_filter_);
     p->phaser_filter_->useInput(p->input(kFeedbackGain), PhaserFilter::kResonance);
     p->phaser_filter_->useInput(p->input(kBlend), PhaserFilter::kPassBlend);
     p->phaser_filter_->plug(p->cutoff_, PhaserFilter::kMidiCutoff);

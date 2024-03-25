@@ -25,7 +25,6 @@ PhaserModule::PhaserModule(const Output* beats_per_second):
 }
 
 PhaserModule::~PhaserModule() {
-  std::cout << "removing phaser module\n";
   delete phaser_;
 }
 
