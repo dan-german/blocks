@@ -29,6 +29,10 @@
 
 namespace vital {
 
+FilterProcessor::~FilterProcessor() {
+  delete phaser_filter_;
+}
+
 FilterProcessor::FilterProcessor(std::string prefix):
   SynthModule(kNumInputs, 1), last_model_(-1), was_on_(false),
   prefix_(std::move(prefix)), create_on_value_(true), mono_(false),
@@ -158,8 +162,6 @@ void FilterProcessor::init() {
   formant_filter_->enable(false);
   ladder_filter_->enable(false);
   sallen_key_filter_->enable(false);
-
-
 }
 
 void FilterProcessor::hardReset() {

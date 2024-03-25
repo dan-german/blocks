@@ -40,7 +40,7 @@ public:
   };
 
   FilterProcessor(std::string prefix = "");
-  virtual ~FilterProcessor() { }
+  virtual ~FilterProcessor();
 
   void process(int num_samples) override;
   void setCreateOnValue(bool create_on_value) { create_on_value_ = create_on_value; }

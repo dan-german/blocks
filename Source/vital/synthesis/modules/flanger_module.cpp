@@ -29,7 +29,6 @@ FlangerModule::FlangerModule(const Output* beats_per_second):
 FlangerModule::~FlangerModule() { }
 
 void FlangerModule::init() {
-  std::cout << "FlangerModule::init()" << std::endl;
   static const cr::Value kDelayStyle(StereoDelay::kClampedUnfiltered);
 
   delay_ = new MultiDelay(kMaxSamples);
@@ -39,12 +38,25 @@ void FlangerModule::init() {
   phase_ = 0.0f;
 
   free_frequency = createPolyModControl2({ .name = "frequency", .value_scale = ValueScale::kExponential, .min = -5.0f, .max = 2.0f, .default_value = 2.0f });
-  frequency_ = createTempoSyncSwitch("flanger", free_frequency->owner, beats_per_second_, false);
-  center_ = createPolyModControl2({ .name = "center", .reset = input(kReset), .min = 8.0f, .max = 136.0f, .default_value = 64.0f });
-  feedback = createPolyModControl2({ .name = "feedback", .min = -1.0f, .default_value = 0.5f });
-  wet = createPolyModControl2({ .name = "mix", .reset = input(kReset), .min = 0.0f, .max = 0.5f, .default_value = 0.5f });
-  mod_depth_ = createPolyModControl2({ .name = "depth", .default_value = 0.5f });
-  phase_offset_ = createPolyModControl2({ .name = "offset", .default_value = 0.333333f });
+  // frequency_ = createTempoSyncSwitch2("tempo", free_frequency->owner, beats_per_second_, false);
+
+
+  // AddControlInput tempo_input = { .name = "tempo",  .value_scale = ValueScale::kIndexed,.min = -2.0f, .max = 9.0f, .default_value = 9.0f };
+  // Output* free_frequency = createPolyModControl2({ .name = "frequency", .value_scale = ValueScale::kExponential, .min = -2.0f, .max = 9.0f, .default_value = 1.4f });
+  // Output* frequency = createTempoSyncSwitch2(tempo_input, free_frequency->owner, beats_per_second_, true);
+
+  // { "delay_tempo", 0x000000, 4.0, 12.0, 9.0, 0.0, 1.0,
+  // ValueDetails::kIndexed, false, "", "Delay Tempo", strings::kSyncedFrequencyNames },
+
+  // { "flanger_tempo", 0x000000, 0.0, 10.0, 4.0, 0.0, 1.0,
+  //   ValueDetails::kIndexed, false, "", "Flanger Tempo", strings::kSyncedFrequencyNames }
+
+  frequency_ = createTempoSyncSwitch2({ .name = "tempo", .value_scale = ValueScale::kIndexed, .min = 0.0, .max = 9.0, .default_value = 9.0 }, free_frequency->owner, beats_per_second_, false);
+  center_ = createPolyModControl2({ .name = "center", .reset = input(kReset), .min = 8.0, .max = 136.0, .default_value = 64.0 });
+  feedback = createPolyModControl2({ .name = "feedback", .min = -1.0, .default_value = 0.5 });
+  wet = createPolyModControl2({ .name = "mix", .reset = input(kReset), .min = 0.0, .max = 0.5, .default_value = 0.5 });
+  mod_depth_ = createPolyModControl2({ .name = "depth", .default_value = 0.5 });
+  phase_offset_ = createPolyModControl2({ .name = "offset", .default_value = 0.333333 });
 
   delay_->plug(&delay_frequency_, StereoDelay::kFrequency);
   delay_->plug(feedback, StereoDelay::kFeedback);

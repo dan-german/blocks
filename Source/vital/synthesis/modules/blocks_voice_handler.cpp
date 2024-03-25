@@ -264,8 +264,6 @@ void BlocksVoiceHandler::initializeDefaultAmpEnvs() {
     modulation_connection_processor->init();
     processor_default_env_mp_map_[processor] = modulation_connection_processor;
   }
-
-  std::cout << "processor_default_env_mp_map_" << processor_default_env_mp_map_.size() << std::endl;
 }
 
 void BlocksVoiceHandler::setDefaultAmpEnvState(std::string target_name, bool enable) {
@@ -301,7 +299,6 @@ void BlocksVoiceHandler::connectAllDefaultEnvs() {
 }
 
 void BlocksVoiceHandler::prepareDestroy() {
-  std::cout << "please please" << std::endl;
   for (int i = 0; i < vital::kMaxModulationConnections; ++i) {
     ModulationConnectionProcessor* processor = modulation_bank_.atIndex(i)->modulation_processor;
     removeProcessor(processor);

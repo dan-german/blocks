@@ -25,12 +25,14 @@ PhaserModule::PhaserModule(const Output* beats_per_second):
 }
 
 PhaserModule::~PhaserModule() {
+  std::cout << "removing phaser module\n";
+  delete phaser_;
 }
 
 void PhaserModule::init() {
   phaser_->useOutput(output(kAudioOutput), Phaser::kAudioOutput);
   phaser_->useOutput(output(kCutoffOutput), Phaser::kCutoffOutput);
-  addIdleProcessor(phaser_);
+  // addIdleProcessor(phaser_);
 
   Output* phaser_free_frequency = createPolyModControl2({ .name = "frequency", .value_scale = ValueScale::kExponential, .min = -5.0f, .max = 2.0f, .default_value = -3.0f, });
   Output* phaser_frequency = createTempoSyncSwitch("phaser", phaser_free_frequency->owner, beats_per_second_, false);
