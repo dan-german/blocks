@@ -1,0 +1,196 @@
+{
+  "blocks": [
+    {
+      "index": [
+        0,
+        0
+      ],
+      "length": 1,
+      "name": "osc 1",
+      "parameters": {
+        "amp env destination": 0.0,
+        "level": 0.7071067690849304,
+        "pan": 0.0,
+        "transpose": -12.0,
+        "tune": 0.0,
+        "unison detune": 2.2360680103302,
+        "unison voices": 1.0,
+        "wave": 0.0
+      }
+    },
+    {
+      "index": [
+        0,
+        1
+      ],
+      "length": 1,
+      "name": "chorus 1",
+      "parameters": {
+        "depth": 0.5,
+        "feedback": 0.4000000059604645,
+        "frequency": 6.0,
+        "mix": 0.006849315017461777,
+        "sync": 1.0,
+        "tempo": 4.0,
+        "voices": 4.0
+      }
+    },
+    {
+      "index": [
+        0,
+        2
+      ],
+      "length": 1,
+      "name": "drive 1",
+      "parameters": {
+        "drive": 24.24657440185547,
+        "mix": 0.0,
+        "type": 3.0
+      }
+    },
+    {
+      "index": [
+        0,
+        3
+      ],
+      "length": 1,
+      "name": "drive 2",
+      "parameters": {
+        "drive": -4.109589099884033,
+        "mix": 1.0,
+        "type": 0.0
+      }
+    },
+    {
+      "index": [
+        1,
+        0
+      ],
+      "length": 1,
+      "name": "osc 2",
+      "parameters": {
+        "amp env destination": 0.0,
+        "level": 0.7071067690849304,
+        "pan": 0.0,
+        "transpose": -24.0,
+        "tune": 0.0,
+        "unison detune": 2.2360680103302,
+        "unison voices": 1.0,
+        "wave": 2.0
+      }
+    },
+    {
+      "index": [
+        1,
+        1
+      ],
+      "length": 1,
+      "name": "filter 1",
+      "parameters": {
+        "blend": 0.0,
+        "cutoff": 64.10958862304688,
+        "mix": 1.0,
+        "model": 0.0,
+        "resonance": 0.0,
+        "style": 0.0
+      }
+    }
+  ],
+  "column controls": [
+    {
+      "name": "column control 1",
+      "parameters": {
+        "level": 0.8548387289047241,
+        "pan": 0.0
+      }
+    },
+    {
+      "name": "column control 2",
+      "parameters": {
+        "level": 1.0,
+        "pan": 0.0
+      }
+    },
+    {
+      "name": "column control 3",
+      "parameters": {
+        "level": 1.0,
+        "pan": 0.0
+      }
+    },
+    {
+      "name": "column control 4",
+      "parameters": {
+        "level": 1.0,
+        "pan": 0.0
+      }
+    },
+    {
+      "name": "column control 5",
+      "parameters": {
+        "level": 1.0,
+        "pan": 0.0
+      }
+    }
+  ],
+  "format_version": 0,
+  "modulations": [
+    {
+      "amount": 0.28110599517822266,
+      "bipolar": false,
+      "number": 1,
+      "parameter": "mix",
+      "source": "envelope 1",
+      "target": "chorus 1"
+    },
+    {
+      "amount": 1.0,
+      "bipolar": false,
+      "number": 2,
+      "parameter": "mix",
+      "source": "envelope 1",
+      "target": "drive 1"
+    },
+    {
+      "amount": 0.10599078238010406,
+      "bipolar": true,
+      "number": 4,
+      "parameter": "tune",
+      "source": "lfo 1",
+      "target": "osc 1"
+    },
+    {
+      "amount": 0.557603657245636,
+      "bipolar": false,
+      "number": 5,
+      "parameter": "cutoff",
+      "source": "envelope 1",
+      "target": "filter 1"
+    }
+  ],
+  "modulators": [
+    {
+      "color": 14,
+      "name": "envelope 1",
+      "parameters": {
+        "attack": 0.5385102033615112,
+        "decay": 1.256523847579956,
+        "release": 0.5475999712944031,
+        "sustain": 0.0
+      }
+    },
+    {
+      "color": 11,
+      "name": "lfo 1",
+      "parameters": {
+        "frequency": 1.0,
+        "mode": 0.0,
+        "sync": 1.0,
+        "tempo": 7.0,
+        "wave": 0.0
+      }
+    }
+  ],
+  "name": "BA fuser",
+  "tabs": []
+}
