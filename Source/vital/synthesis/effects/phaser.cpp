@@ -25,13 +25,14 @@ namespace vital {
 
 Phaser::Phaser(): ProcessorRouter(kNumInputs, kNumOutputs), mix_(0.0f), mod_depth_(0.0f), phase_offset_(0.0f), phase_(0) {
   phaser_filter_ = new PhaserFilter(true);
+  addProcessor(phaser_filter_);
   cutoff_ = new Output();
 }
 
 void Phaser::init() {
   setupFilter();
-  phaser_filter_->init();
-  ProcessorRouter::init();
+  // phaser_filter_->init();
+  // ProcessorRouter::init();
 }
 
 void Phaser::setupFilter() {
@@ -39,7 +40,6 @@ void Phaser::setupFilter() {
   phaser_filter_->useInput(input(kFeedbackGain), PhaserFilter::kResonance);
   phaser_filter_->useInput(input(kBlend), PhaserFilter::kPassBlend);
   phaser_filter_->plug(cutoff_, PhaserFilter::kMidiCutoff);
-  addProcessor(phaser_filter_);
 }
 
 void Phaser::hardReset() {

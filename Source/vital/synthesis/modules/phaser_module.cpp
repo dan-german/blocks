@@ -22,6 +22,7 @@ namespace vital {
 PhaserModule::PhaserModule(const Output* beats_per_second):
   SynthModule(1, kNumOutputs), beats_per_second_(beats_per_second), phaser_(nullptr) {
   phaser_ = new Phaser();
+  addProcessor(phaser_);
 }
 
 PhaserModule::~PhaserModule() {
@@ -59,6 +60,11 @@ void PhaserModule::hardReset() {
   phaser_->hardReset();
 }
 
+void PhaserModule::setOversampleAmount(int oversample) { 
+  SynthModule::setOversampleAmount(oversample);
+  phaser_->setOversampleAmount(oversample);
+}
+
 void PhaserModule::enable(bool enable) {
   SynthModule::enable(enable);
   process(1);
@@ -76,15 +82,15 @@ void PhaserModule::setSampleRate(int sample_rate) {
   phaser_->setSampleRate(sample_rate);
 }
 
-void PhaserModule::process(int num_samples) {
-  SynthModule::process(num_samples);
-  poly_float* audio_in = input()->source->buffer;
-  phaser_->processWithInput(audio_in, num_samples);
-}
+// void PhaserModule::process(int num_samples) {
+//   SynthModule::process(num_samples);
+  // poly_float* audio_in = input()->source->buffer;
+  // phaser_->processWithInput(audio_in, num_samples);
+// }
 
 Processor* PhaserModule::clone() const {
   auto copy = new PhaserModule(*this);
-  copy->phaser_ = static_cast<Phaser*>(copy->phaser_->clone());
+  // copy->phaser_ = static_cast<Phaser*>(copy->phaser_->clone());
   return copy;
 }
 } // namespace vital

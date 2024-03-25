@@ -19,7 +19,6 @@
 #include "vital/synthesis/framework/futils.h"
 #include "vital/synthesis/lookups/memory.h"
 #include "vital/common/synth_constants.h"
-#include <chrono>
 
 namespace vital {
 static constexpr float kMaxChorusDrift = 2500.0f;
@@ -371,8 +370,6 @@ void Reverb::processWithInput(const poly_float* audio_in, int num_samples) {
     current_high_coefficient += delta_high_coefficient;
     current_high_amplitude += delta_high_amplitude;
   }
-  auto se = std::chrono::high_resolution_clock::now();
-
   sample_delay_increment_ = current_delay_increment;
   sample_delay_ = current_sample_delay;
 }

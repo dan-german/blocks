@@ -17,7 +17,6 @@
 #include "reverb_module.h"
 
 #include "vital/synthesis/effects/reverb.h"
-#include <chrono>
 
 namespace vital {
 
@@ -83,14 +82,7 @@ void ReverbModule::setSampleRate(int sample_rate) {
 
 
 void ReverbModule::processWithInput(const poly_float* audio_in, int num_samples) {
-  // auto now = std::chrono::high_resolution_clock::now();
   SynthModule::process(num_samples);
-  // auto end = std::chrono::high_resolution_clock::now();
-
-  // if (b++ % 20 == 0) {
-  //   std::cout << "reverb took: " << std::chrono::duration_cast<std::chrono::microseconds>(end - now).count() << " microseconds" << std::endl;
-  // }
-  // reverb_->processWithInput(audio_in, num_samples);
 }
 
 Processor* ReverbModule::clone() const {
