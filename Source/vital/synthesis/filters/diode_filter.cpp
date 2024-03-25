@@ -54,7 +54,6 @@ void DiodeFilter::process(int num_samples) {
 
   poly_mask reset_mask = getResetMask(kReset);
   if (reset_mask.anyMask()) {
-    utils::print_mask(reset_mask, "DiodeFilter::process reset_mask", this);
     reset(reset_mask);
 
     current_resonance = utils::maskLoad(current_resonance, resonance_, reset_mask);

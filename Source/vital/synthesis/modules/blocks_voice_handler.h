@@ -80,6 +80,7 @@ public:
     return enabled_modulation_processors_;
   }
 
+  void allSoundsOff() override;
   void addBlock(std::shared_ptr<model::Block> block);
   void removeBlock(Index index, std::shared_ptr<model::Block> block);
   void connectAll();

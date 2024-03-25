@@ -392,7 +392,7 @@ void BlocksVoiceHandler::createDelays() {
 
 void BlocksVoiceHandler::removeBlock(Index index, std::shared_ptr<model::Block> block) {
   auto processor = processor_matrix_[index.column][index.row];
-  processor->enable(false); 
+  processor->enable(false);
 
   if (processor->control_map_.count("on"))
     processor->control_map_["on"]->set(0.0f);
@@ -706,4 +706,10 @@ output_map& BlocksVoiceHandler::getPolyModulations() {
   return poly_readouts_;
 }
 
+void BlocksVoiceHandler::allSoundsOff() {
+  VoiceHandler::allSoundsOff();
+  for (auto& processor : active_processors_) {
+    processor->hardReset();
+  }
+}
 } // namespace vital
