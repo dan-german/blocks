@@ -207,8 +207,6 @@ void BlocksVoiceHandler::init() {
   // disable all processors
   for (const auto& pair : processor_pool_) {
     const std::string& key = pair.first;
-    // const std::vector<std::shared_ptr<SynthModule>>& modules = pair.second;
-    // its not a regular pointer 
     const std::vector<SynthModule*>& modules = pair.second;
     for (const auto& modulePtr : modules) {
       modulePtr->enable(false);

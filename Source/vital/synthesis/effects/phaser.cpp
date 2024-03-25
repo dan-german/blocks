@@ -26,7 +26,6 @@ namespace vital {
 Phaser::Phaser(): ProcessorRouter(kNumInputs, kNumOutputs), mix_(0.0f), mod_depth_(0.0f), phase_offset_(0.0f), phase_(0) {
   phaser_filter_ = new PhaserFilter(true);
   cutoff_ = new Output();
-  // addIdleProcessor(phaser_filter_);
 }
 
 void Phaser::init() {

@@ -108,8 +108,7 @@ protected:
   std::shared_ptr<CircularQueue<const Processor*>> dependencies_visited_;
   std::shared_ptr<CircularQueue<const Processor*>> dependency_inputs_;
 
-  // JUCE_LEAK_DETECTOR(ProcessorRouter)
-  JUCE_HEAVYWEIGHT_LEAK_DETECTOR(ProcessorRouter)
+  JUCE_LEAK_DETECTOR(ProcessorRouter)
 };
 } // namespace vital
 

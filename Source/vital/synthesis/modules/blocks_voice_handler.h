@@ -118,7 +118,6 @@ private:
 
   SynthModule* createProcessorForBlock(std::shared_ptr<model::Block> module);
   EnvelopeModule* createEnvelope(bool audio_rate = false);
-  // std::shared_ptr<EnvelopeModule> amplitude_envelope_;
   std::vector<std::shared_ptr<EnvelopeModule>> amplitude_envs;
 
   ModulationConnectionBank modulation_bank_;

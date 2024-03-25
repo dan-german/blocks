@@ -50,14 +50,6 @@ public:
 
   void process(int num_samples) override;
 };
-
-class Value2: public ::vital::Value {
-public:
-  Value2(poly_float value = 0.0f): ::vital::Value(value, true) { }
-  virtual Processor* clone() const override { return new Value2(*this); }
-
-  void process(int num_samples) override;
-};
 } // namespace cr
 } // namespace vital
 

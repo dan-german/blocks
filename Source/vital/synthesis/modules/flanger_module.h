@@ -66,11 +66,6 @@ public:
     flanger->delay_ = cloned;
     flanger->addIdleProcessor(cloned);
 
-    // for (const auto& idle : flanger->idle_processors_) {
-    //   std::cout << "copy idle: " << idle.first << std::endl;
-    // }
-    // std::cout << "flanger delay: " << flanger->delay_ << std::endl;
-
     return flanger;
   }
 protected:

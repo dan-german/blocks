@@ -334,7 +334,6 @@ void PluginProcessor::editorAdjustedModulator(std::string parameter_name, int in
 void PluginProcessor::editorAdjustedBlock(Index index, int parameter, float value) {
   auto block = synth_->getModuleManager().getBlock(index);
 
-  // if (block->id.type == "delay" || block->id.type == "phaser" || block->id.type == "chorus" || block->id.type == "reverb") {
   if (block->id.type == "delay") {
     if (parameter == 4 || parameter == 6) {
       auto sync_parameter_name = parameter == 4 ? "sync" : "sync 2";

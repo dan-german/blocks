@@ -36,7 +36,6 @@ force_inline bool isConnectionAvailable(ModulationConnection* connection) {
 
 ModulationConnection::ModulationConnection(int index, std::string from, std::string to):
   source_name(std::move(from)), destination_name(std::move(to)) {
-  // modulation_processor = std::make_unique<ModulationConnectionProcessor>(index);
   modulation_processor = new ModulationConnectionProcessor(index);
 }
 
