@@ -51,18 +51,13 @@ public:
   }
 
   virtual Processor* clone() const override {
-    auto p = new Phaser(*this);
-    p->phaser_filter_ = static_cast<PhaserFilter*>(phaser_filter_->clone());
-    p->cutoff_ = new Output();
-    p->phaser_filter_->useInput(p->input(kFeedbackGain), PhaserFilter::kResonance);
-    p->phaser_filter_->useInput(p->input(kBlend), PhaserFilter::kPassBlend);
-    p->phaser_filter_->plug(p->cutoff_, PhaserFilter::kMidiCutoff);
-    return p;
+    return new Phaser(*this);
   }
 
   void process(int num_samples) override;
   void processWithInput(const poly_float* audio_in, int num_samples) override;
   void init() override;
+  void setupFilter();
   void hardReset() override;
   void correctToTime(double seconds);
   void setOversampleAmount(int oversample) override {

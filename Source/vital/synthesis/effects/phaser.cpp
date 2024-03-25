@@ -29,12 +29,17 @@ Phaser::Phaser(): ProcessorRouter(kNumInputs, kNumOutputs), mix_(0.0f), mod_dept
 }
 
 void Phaser::init() {
+  setupFilter();
+  phaser_filter_->init();
+  ProcessorRouter::init();
+}
+
+void Phaser::setupFilter() {
+  phaser_filter_->useInput(input(kAudio), PhaserFilter::kAudio);
   phaser_filter_->useInput(input(kFeedbackGain), PhaserFilter::kResonance);
   phaser_filter_->useInput(input(kBlend), PhaserFilter::kPassBlend);
   phaser_filter_->plug(cutoff_, PhaserFilter::kMidiCutoff);
-
-  phaser_filter_->init();
-  ProcessorRouter::init();
+  addProcessor(phaser_filter_);
 }
 
 void Phaser::hardReset() {
@@ -48,6 +53,7 @@ void Phaser::process(int num_samples) {
 }
 
 void Phaser::processWithInput(const poly_float* audio_in, int num_samples) {
+
   VITAL_ASSERT(checkInputAndOutputSize(num_samples));
 
   poly_float tick_delta = input(kRate)->at(0) * (1.0f / getSampleRate());
@@ -76,8 +82,7 @@ void Phaser::processWithInput(const poly_float* audio_in, int num_samples) {
     poly_float modulation = utils::toFloat(folded_phase) * (2.0f / INT_MAX) - 1.0f;
     cutoff_->buffer[i] = center_buffer[i] + modulation * current_mod_depth;
   }
-
-  phaser_filter_->processWithInput(audio_in, num_samples);
+  ProcessorRouter::process(num_samples);
 
   phase_ += utils::toInt((tick_delta * num_samples) * UINT_MAX);
   poly_float current_mix = mix_;

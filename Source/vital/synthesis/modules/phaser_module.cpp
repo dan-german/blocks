@@ -29,6 +29,7 @@ PhaserModule::~PhaserModule() {
 }
 
 void PhaserModule::init() {
+  phaser_->useInput(input());
   phaser_->useOutput(output(kAudioOutput), Phaser::kAudioOutput);
   phaser_->useOutput(output(kCutoffOutput), Phaser::kCutoffOutput);
 
