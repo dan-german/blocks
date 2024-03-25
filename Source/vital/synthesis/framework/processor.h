@@ -18,6 +18,7 @@
 
 #include "vital/synthesis/framework/common.h"
 #include "vital/synthesis/framework/poly_utils.h"
+#include <juce_core/juce_core.h>
 
 #include <cstring>
 #include <vector>

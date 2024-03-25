@@ -44,9 +44,9 @@ public:
   void process(int num_samples) override;
   Processor* clone() const override; 
 
+  Phaser* phaser_;
 protected:
   const Output* beats_per_second_;
-  Phaser* phaser_;
 
   JUCE_LEAK_DETECTOR(PhaserModule)
 };

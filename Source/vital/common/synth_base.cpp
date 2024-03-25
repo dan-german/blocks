@@ -134,7 +134,7 @@ vital::ModulationConnection* SynthBase::getConnection(const std::string& source,
 int SynthBase::getConnectionIndex(const std::string& source, const std::string& destination) {
   vital::ModulationConnectionBank& modulation_bank = getModulationBank();
   for (int i = 0; i < vital::kMaxModulationConnections; ++i) {
-    vital::ModulationConnection* connection = modulation_bank.atIndex(i).get();
+    vital::ModulationConnection* connection = modulation_bank.atIndex(i);
     if (connection->source_name == source && connection->destination_name == destination)
       return i;
   }
@@ -168,7 +168,7 @@ vital::modulation_change SynthBase::createModulationChange(vital::ModulationConn
   change.destination_scale = connection->destination_scale;
   change.poly_modulation_switch = target_processor->getPolyModulationSwitch(connection->parameter_name);
   change.poly_destination = target_processor->getPolyModulationDestination(connection->parameter_name);
-  change.modulation_processor = connection->modulation_processor.get();
+  change.modulation_processor = connection->modulation_processor;
 
   int num_audio_rate = 0;
   vital::ModulationConnectionBank& modulation_bank = getModulationBank();
@@ -183,7 +183,6 @@ vital::modulation_change SynthBase::createModulationChange(vital::ModulationConn
       num_audio_rate++;
     }
   }
-  // std::cout << "NUM AUDIO RATE " << num_audio_rate << std::endl;
   change.num_audio_rate = num_audio_rate;
   // printModulationChange(change);
   return change;

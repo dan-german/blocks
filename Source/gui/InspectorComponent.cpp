@@ -49,9 +49,9 @@ void InspectorComponent::spawnSlider(vital::ValueDetails parameter, std::shared_
         auto frequency_slider = getSliders()[3];
         bool is_seconds = int(value) == 0;
         if (is_seconds) {
-          setSliderAsFrequency(module, frequency_slider);
+          setSliderAsFrequency(module, frequency_slider, "frequency");
         } else {
-          setSliderAsTempo(module, frequency_slider);
+          setSliderAsTempo(module, frequency_slider, "tempo");
         }
       }
     }
@@ -63,7 +63,8 @@ void InspectorComponent::spawnSlider(vital::ValueDetails parameter, std::shared_
   parameterSliders.add(slider);
   slider_to_parameter_name_map_[&slider->slider] = parameter.name;
   addAndMakeVisible(slider);
-  slider->slider.setValue(parameter.value_processor->value(), dontSendNotification);
+  auto value = parameter.value_processor->value();
+  slider->slider.setValue(value, dontSendNotification);
 }
 
 void InspectorComponent::onDelayAdjusted(std::shared_ptr<model::Module> module, vital::ValueDetails parameter, double value) {
@@ -71,13 +72,15 @@ void InspectorComponent::onDelayAdjusted(std::shared_ptr<model::Module> module, 
   bool is_changing_sync_2 = parameter.name == "sync 2";
   if (is_changing_sync_1 || is_changing_sync_2) {
     int tempo_slider = is_changing_sync_1 ? 4 : 6;
+    std::string tempo_name = is_changing_sync_1 ? "tempo" : "tempo 2";
+    std::string frequency_name = is_changing_sync_1 ? "frequency" : "frequency 2";
 
     auto frequency_slider = getSliders()[tempo_slider];
     bool is_seconds = int(value) == 0;
     if (is_seconds) {
-      setSliderAsFrequency(module, frequency_slider);
+      setSliderAsFrequency(module, frequency_slider, frequency_name);
     } else {
-      setSliderAsTempo(module, frequency_slider);
+      setSliderAsTempo(module, frequency_slider, tempo_name);
     }
   }
 }
@@ -117,19 +120,22 @@ void InspectorComponent::setModulationIndicatorPolarity(int parameterIndex, int 
   getSliders()[parameterIndex]->setModulatorBipolar(modulatorIndex, bipolar);
 }
 
-void InspectorComponent::setSliderAsFrequency(std::shared_ptr<model::Module> module, InspectorSlider* slider) const {
+void InspectorComponent::setSliderAsFrequency(std::shared_ptr<model::Module> module, InspectorSlider* slider, std::string parameter_name = "frequency") const {
   slider->titleLabel.setText("seconds", dontSendNotification);
-  auto parameter = module->parameter_map_["frequency"];
+  auto parameter = module->parameter_map_[parameter_name];
   slider->slider.textFromValueFunction = [slider, module, parameter](double value) {
     return UIUtils::getSliderTextFromValue(value, *parameter);
   };
   slider->slider.setRange(parameter->min, parameter->max);
+  slider->slider.setValue(parameter->value_processor->value(), dontSendNotification);
 }
 
-void InspectorComponent::setSliderAsTempo(std::shared_ptr<model::Module> module, InspectorSlider* slider) const {
+void InspectorComponent::setSliderAsTempo(std::shared_ptr<model::Module> module, InspectorSlider* slider, std::string paramter_name = "tempo") const {
   slider->titleLabel.setText("tempo", dontSendNotification);
   slider->slider.textFromValueFunction = [slider, module](double value) {
     return juce::String(strings::kSyncedFrequencyNames[int(value)]);
   };
-  slider->slider.setRange(0.0, 12.0, 1.0);
+  auto parameter = module->parameter_map_[paramter_name];
+  slider->slider.setRange(parameter->min, parameter->max, 1.0);
+  slider->slider.setValue(parameter->value_processor->value(), dontSendNotification);
 }

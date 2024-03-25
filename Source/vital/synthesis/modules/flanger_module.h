@@ -34,9 +34,9 @@ public:
     kNumOutputs
   };
 
-  enum { 
+  enum {
     kAudioIn,
-    kReset, 
+    kReset,
     kNumInputs
   };
 
@@ -60,9 +60,12 @@ public:
 
   Processor* clone() const override {
     auto flanger = new FlangerModule(*this);
+
+
     auto cloned = static_cast<MultiDelay*>(delay_->clone());
     flanger->delay_ = cloned;
     flanger->addIdleProcessor(cloned);
+
     return flanger;
   }
 protected:
@@ -76,7 +79,7 @@ protected:
   Output* feedback;
   Output* wet;
 
-  cr::Value* delay_frequency_;
+  cr::Value delay_frequency_;
   MultiDelay* delay_;
 
   JUCE_LEAK_DETECTOR(FlangerModule)

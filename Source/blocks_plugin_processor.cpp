@@ -334,8 +334,20 @@ void PluginProcessor::editorAdjustedModulator(std::string parameter_name, int in
 void PluginProcessor::editorAdjustedBlock(Index index, int parameter, float value) {
   auto block = synth_->getModuleManager().getBlock(index);
 
-  if (block->id.type == "delay" || block->id.type == "phaser") {
-    if (parameter == 4) {
+  if (block->id.type == "delay") {
+    if (parameter == 4 || parameter == 6) {
+      auto sync_parameter_name = parameter == 4 ? "sync" : "sync 2";
+      auto sync = block->parameter_map_[sync_parameter_name]->value_processor->value();
+      bool is_changing_seconds = block->parameter_map_[sync_parameter_name]->value_processor->value() == 0.0f;
+      std::string name = is_changing_seconds ? "frequency" : "tempo";
+      if (parameter == 6) name += " 2";
+      block->parameter_map_[name]->value_processor->set(value);
+      return;
+    }
+  }
+
+  if (block->id.type == "delay" || block->id.type == "phaser" || block->id.type == "chorus") {
+    if (parameter == 3) {
       auto sync = block->parameter_map_["sync"]->value_processor->value();
       bool is_changing_seconds = block->parameter_map_["sync"]->value_processor->value() == 0.0f;
       if (is_changing_seconds) {
@@ -453,6 +465,7 @@ Preset PluginProcessor::editorChangedPreset(int index) {
 }
 
 void PluginProcessor::loadPreset(Preset preset) {
+  return;
   pauseProcessing(true);
   engine_->allSoundsOff();
   clear();

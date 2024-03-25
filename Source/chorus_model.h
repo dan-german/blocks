@@ -13,5 +13,11 @@ public:
     add({ .name = "mix", .default_value = 0.5f });
     add({ .name = "frequency", .min = -6.0f, .max = 3.0f, .default_value = 2.0f, .value_scale = ValueScale::kExponential, .display_invert = true, .decimal_places = 3, .hidden = true });
   }
+
+  std::string getParameterName(int index) override {
+    bool is_tempo_or_secs = index == 3;
+    if (is_tempo_or_secs) return parameters_[4]->value_processor->value() < 1.0 ? "frequency" : "tempo";
+    return Block::getParameterName(index);
+  } 
 };
 }

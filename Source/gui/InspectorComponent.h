@@ -40,8 +40,8 @@ private:
   std::map<Slider*, std::string> slider_to_parameter_name_map_;
 
   void onDelayAdjusted(std::shared_ptr<model::Module> module, vital::ValueDetails parameter, double value); 
-  void setSliderAsTempo(std::shared_ptr<model::Module> module, InspectorSlider* slider) const;
-  void setSliderAsFrequency(std::shared_ptr<model::Module> module, InspectorSlider* slider) const;
+  void setSliderAsTempo(std::shared_ptr<model::Module> module, InspectorSlider* slider, std::string parameter_name) const;
+  void setSliderAsFrequency(std::shared_ptr<model::Module> module, InspectorSlider* slider, std::string parameter_name) const;
   void spawnSlider(vital::ValueDetails parameter, std::shared_ptr<model::Module> module);
   void sliderValueChanged(Slider* slider) override;
   void updateSize();

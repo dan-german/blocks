@@ -46,10 +46,11 @@ ProcessorRouter::ProcessorRouter(const ProcessorRouter& original):
 
   int num_processors = global_order_->size();
   for (int i = 0; i < num_processors; ++i) {
-    Processor* next = global_order_->at(i);
-    auto clone = next->clone();
-    // std::unique_ptr<Processor> clone(next->clone());
-    local_order_[i] = clone;
+    const Processor* next = global_order_->at(i);
+
+    std::shared_ptr<Processor> clone(next->clone());
+
+    local_order_[i] = clone.get();
     processors_[next] = { 0, clone };
   }
 
@@ -62,11 +63,7 @@ ProcessorRouter::ProcessorRouter(const ProcessorRouter& original):
   }
 }
 
-ProcessorRouter::~ProcessorRouter() {
-  // processors_.clear();
-  // for (auto& processor : processors_)
-  //   delete processor.second.second.release();
-}
+ProcessorRouter::~ProcessorRouter() { }
 
 void ProcessorRouter::process(int num_samples) {
   if (shouldUpdate())
@@ -152,7 +149,7 @@ void ProcessorRouter::addProcessorRealTime(Processor* processor) {
     processor->setOversampleAmount(getOversampleAmount());
 
   global_order_->push_back(processor);
-  processors_[processor] = { 0, processor };
+  processors_[processor] = { 0, std::shared_ptr<Processor>(processor) };
   local_order_.push_back(processor);
 
   for (int i = 0; i < processor->numInputs(); ++i)
@@ -174,7 +171,7 @@ void ProcessorRouter::removeProcessor(Processor* processor) {
   global_order_->remove(processor);
   local_order_.remove(processor);
 
-  Processor* old_processor = processors_[processor].second;
+  Processor* old_processor = processors_[processor].second.get();
   VITAL_ASSERT(old_processor == processor);
   UNUSED(old_processor);
   processor->router(nullptr);
@@ -336,9 +333,11 @@ void ProcessorRouter::createAddedProcessors() {
   for (int i = 0; i < num_processors; ++i) {
     Processor* next = global_order_->at(i);
     if (next->hasState()) {
-      if (processors_.count(next) == 0)
-        processors_[next] = { 0, next->clone() };
-      local_order_[i] = processors_[next].second;
+      if (processors_.count(next) == 0) { 
+        auto shared = std::shared_ptr<Processor>(next->clone());
+        processors_[next] = { 0, shared };
+      }
+      local_order_[i] = processors_[next].second.get();
     } else
       local_order_[i] = next;
   }
@@ -392,7 +391,7 @@ const Processor* ProcessorRouter::getContext(const Processor* processor) const {
 }
 
 Processor* ProcessorRouter::getLocalProcessor(const Processor* global_processor) {
-  return processors_[global_processor].second;
+  return processors_[global_processor].second.get();
 }
 
 void ProcessorRouter::getDependencies(const Processor* processor) const {

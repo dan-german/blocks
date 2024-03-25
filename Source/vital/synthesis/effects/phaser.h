@@ -45,10 +45,19 @@ public:
   };
 
   Phaser();
-  virtual ~Phaser() { }
+  virtual ~Phaser() {
+    delete phaser_filter_;
+    delete cutoff_;
+  }
 
   virtual Processor* clone() const override {
-    return new Phaser(*this);
+    auto p = new Phaser(*this);
+    p->phaser_filter_ = static_cast<PhaserFilter*>(phaser_filter_->clone());
+    p->cutoff_ = new Output();
+    p->phaser_filter_->useInput(p->input(kFeedbackGain), PhaserFilter::kResonance);
+    p->phaser_filter_->useInput(p->input(kBlend), PhaserFilter::kPassBlend);
+    p->phaser_filter_->plug(p->cutoff_, PhaserFilter::kMidiCutoff);
+    return p;
   }
 
   void process(int num_samples) override;
@@ -61,9 +70,10 @@ public:
     cutoff_->ensureBufferSize(oversample * kMaxBufferSize);
   }
 
-private:
   Output* cutoff_;
   PhaserFilter* phaser_filter_;
+
+private:
   poly_float mix_;
   poly_float mod_depth_;
   poly_float phase_offset_;
@@ -72,4 +82,3 @@ private:
   JUCE_LEAK_DETECTOR(Phaser)
 };
 } // namespace vital
-

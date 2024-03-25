@@ -88,18 +88,18 @@ public:
   void addModulator(std::shared_ptr<model::Module> module);
   void removeModulator(int index, std::string type, std::string name);
   void repositionBlock(Index from, Index to);
-  std::shared_ptr<vital::Processor> findProcessorAbove(Index index);
+  vital::Processor* findProcessorAbove(Index index);
   // void getModulationSource(std::string name) override;
   void clear();
   void initializeDefaultAmpEnvs();
 
-  std::map<std::string, std::vector<std::shared_ptr<SynthModule>>> processor_pool_;
-  std::vector<std::shared_ptr<SynthModule>> active_modulators_;
-  std::map<std::string, std::shared_ptr<SynthModule>> active_modulators_map_;
-  std::vector<std::shared_ptr<SynthModule>> active_processors_;
-  std::map<std::string, std::shared_ptr<SynthModule>> active_processor_map_;
+  std::map<std::string, std::vector<SynthModule*>> processor_pool_;
+  std::vector<SynthModule*> active_modulators_;
+  std::map<std::string, SynthModule*> active_modulators_map_;
+  std::vector<SynthModule*> active_processors_;
+  std::map<std::string, SynthModule*> active_processor_map_;
 
-  std::shared_ptr<EnvelopeModule> default_amp_env_;
+  EnvelopeModule* default_amp_env_;
   void disconnectAllDefaultEnvs();
   void connectAllDefaultEnvs();
 private:
@@ -117,9 +117,8 @@ private:
   void createDelays();
   void setupPolyModulationReadouts();
 
-  std::shared_ptr<SynthModule> createProcessorForBlock(std::shared_ptr<model::Block> module);
-  std::shared_ptr<EnvelopeModule> createEnvelope(bool audio_rate = false);
-  // std::shared_ptr<EnvelopeModule> amplitude_envelope_;
+  SynthModule* createProcessorForBlock(std::shared_ptr<model::Block> module);
+  EnvelopeModule* createEnvelope(bool audio_rate = false);
   std::vector<std::shared_ptr<EnvelopeModule>> amplitude_envs;
 
   ModulationConnectionBank modulation_bank_;
@@ -136,16 +135,16 @@ private:
   Processor* voice_sum_;
   VariableAdd* master_node_;
 
-  std::vector<std::vector<std::shared_ptr<SynthModule>>> processor_matrix_;
-  std::vector<std::shared_ptr<OscillatorModule>> oscillators_;
-  std::vector<std::shared_ptr<SynthModule>> processors_with_default_env;
+  std::vector<std::vector<SynthModule*>> processor_matrix_;
+  std::vector<OscillatorModule*> oscillators_;
+  std::vector<SynthModule*> processors_with_default_env;
 public:
-  std::vector<std::shared_ptr<ColumnMasterModule>> column_nodes_;
+  std::vector<ColumnMasterModule*> column_nodes_;
   void setDefaultAmpEnvState(std::string target_name, bool enable);
-  std::map<std::shared_ptr<SynthModule>, std::shared_ptr<ModulationConnectionProcessor>> processor_default_env_mp_map_;
+  std::map<SynthModule*, ModulationConnectionProcessor*> processor_default_env_mp_map_;
 
-  std::vector<std::shared_ptr<SynthModule>> lfos_;
-  std::vector<std::shared_ptr<SynthModule>> envelopes_;
+  std::vector<SynthModule*> lfos_;
+  std::vector<SynthModule*> envelopes_;
 
   std::vector<FilterModule*> filters_;
 

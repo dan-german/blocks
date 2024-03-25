@@ -111,7 +111,7 @@ void SynthGuiInterface::initModulationValues(const std::string& source, const st
   if (connection_index < 0)
     return;
 
-  vital::ModulationConnection* connection = synth_->getModulationBank().atIndex(connection_index).get();
+  vital::ModulationConnection* connection = synth_->getModulationBank().atIndex(connection_index);
   LineGenerator* map_generator = connection->modulation_processor->lineMapGenerator();
   map_generator->initLinear();
 

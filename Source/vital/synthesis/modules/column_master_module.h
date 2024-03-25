@@ -28,5 +28,6 @@ protected:
   poly_float pan_;
   JUCE_LEAK_DETECTOR(ColumnMasterModule)
 };
+
 } // namespace vital
 

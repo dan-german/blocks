@@ -14,5 +14,11 @@ public:
     add({ .name = "center", .min = 8.0, .max = 136.0, .default_value = 64.0 });
     add({ .name = "frequency", .min = -5.0, .max = 2.0, .default_value = 2.0, .value_scale = ValueScale::kExponential, .display_invert = true, .decimal_places = 3, .hidden = true });
   }
+
+  std::string getParameterName(int index) override {
+    bool is_tempo_or_secs = index == 3;
+    if (is_tempo_or_secs) return parameters_[4]->value_processor->value() < 1.0 ? "frequency" : "tempo";
+    return Block::getParameterName(index);
+  } 
 };
 }

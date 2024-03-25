@@ -36,7 +36,10 @@ public:
   PhaserFilter(bool clean);
   virtual ~PhaserFilter() { }
 
-  virtual Processor* clone() const override { return new PhaserFilter(*this); }
+  virtual Processor* clone() const override {
+    return new PhaserFilter(*this);
+  }
+
   virtual void process(int num_samples) override;
   void processWithInput(const poly_float* audio_in, int num_samples) override;
 

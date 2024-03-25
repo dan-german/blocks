@@ -22,16 +22,15 @@ namespace vital {
 PhaserModule::PhaserModule(const Output* beats_per_second):
   SynthModule(1, kNumOutputs), beats_per_second_(beats_per_second), phaser_(nullptr) {
   phaser_ = new Phaser();
-  // addProcessor(phaser_);
 }
 
 PhaserModule::~PhaserModule() {
+  delete phaser_;
 }
 
 void PhaserModule::init() {
   phaser_->useOutput(output(kAudioOutput), Phaser::kAudioOutput);
   phaser_->useOutput(output(kCutoffOutput), Phaser::kCutoffOutput);
-  addIdleProcessor(phaser_);
 
   Output* phaser_free_frequency = createPolyModControl2({ .name = "frequency", .value_scale = ValueScale::kExponential, .min = -5.0f, .max = 2.0f, .default_value = -3.0f, });
   Output* phaser_frequency = createTempoSyncSwitch("phaser", phaser_free_frequency->owner, beats_per_second_, false);
@@ -83,6 +82,8 @@ void PhaserModule::process(int num_samples) {
 }
 
 Processor* PhaserModule::clone() const {
-  return new PhaserModule(*this);
+  auto copy = new PhaserModule(*this);
+  copy->phaser_ = static_cast<Phaser*>(copy->phaser_->clone());
+  return copy;
 }
 } // namespace vital
