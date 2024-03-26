@@ -45,13 +45,15 @@ public:
   };
 
   Phaser();
-  virtual ~Phaser() {
-    delete phaser_filter_;
+  virtual ~Phaser() { 
     delete cutoff_;
   }
 
   virtual Processor* clone() const override {
-    return new Phaser(*this);
+    Phaser* phaser = new Phaser(*this);
+    phaser->cutoff_ = new Output();
+    phaser->phaser_filter_->plug(phaser->cutoff_, PhaserFilter::kMidiCutoff);
+    return phaser;
   }
 
   void process(int num_samples) override;

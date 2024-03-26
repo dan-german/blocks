@@ -26,7 +26,6 @@ PhaserModule::PhaserModule(const Output* beats_per_second):
 }
 
 PhaserModule::~PhaserModule() {
-  delete phaser_;
 }
 
 void PhaserModule::init() {
