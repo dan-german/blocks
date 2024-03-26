@@ -51,7 +51,9 @@ public:
 
   virtual Processor* clone() const override {
     Phaser* phaser = new Phaser(*this);
-    phaser->cutoff_ = new Output();
+    Output* cutoff = new Output();
+    cutoff->ensureBufferSize(cutoff_->buffer_size);
+    phaser->cutoff_ = cutoff;
     phaser->phaser_filter_->plug(phaser->cutoff_, PhaserFilter::kMidiCutoff);
     return phaser;
   }
