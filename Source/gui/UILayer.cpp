@@ -12,25 +12,26 @@
 #include <juce_audio_plugin_client/Standalone/juce_StandaloneFilterWindow.h>
 #include "model/ModelConstants.h"
 #include "BinaryData.h"
+#include "module_new.h"
 
-UILayer::UILayer(juce::MidiKeyboardState& keyboard_state, Slider::Listener* listener): 
-    keyboard(keyboard_state, MidiKeyboardComponent::Orientation::horizontalKeyboard), ComponentMovementWatcher(this) {
+UILayer::UILayer(juce::MidiKeyboardState& keyboard_state, Slider::Listener* listener):
+  keyboard(keyboard_state, MidiKeyboardComponent::Orientation::horizontalKeyboard), ComponentMovementWatcher(this) {
   addModulatorsButton();
-  addAndMakeVisible(presetButton);
+  addAndMakeVisible(preset_button_);
 
   if (JUCEApplication::isStandaloneApp()) setupSettingsButton();
 
   addSVGButton(newPresetButton, BinaryData::plus_svg, BinaryData::plus_svgSize);
   addSVGButton(saveButton, BinaryData::save_svg, BinaryData::save_svgSize);
-  addSVGButton(themeButton, BinaryData::theme_svg, BinaryData::theme_svgSize);
+  addSVGButton(theme_button_, BinaryData::theme_svg, BinaryData::theme_svgSize);
   addSVGButton(matrixButton, BinaryData::matrix_svg, BinaryData::matrix_svgSize);
 
   setupSideMenus();
 
-  matrixButton->onClick = [this]() { matrix.setVisible(true); };
+  matrixButton->on_click_ = [this]() { connections.setVisible(true); };
 
   setupKeyboard();
-  modulationsListBoxModel.sliderListener = listener;
+  connections_list_box_model_.slider_listener_ = listener;
   setInterceptsMouseClicks(false, true);
   setOpaque(false);
 }
@@ -45,13 +46,13 @@ void UILayer::addModulatorsButton() {
   modulatorsButton.reset(new ModulatorsButton());
   addAndMakeVisible(*modulatorsButton);
 
-  modulatorsButton->onClick = [this]() { modulators.setVisible(true); };
+  modulatorsButton->on_click_ = [this]() { modulators_.setVisible(true); };
 }
 
 void UILayer::setupSettingsButton() {
   addSVGButton(settingsButton, BinaryData::settings_svg, BinaryData::settings_svgSize);
 
-  settingsButton->onClick = []() {
+  settingsButton->on_click_ = []() {
     if (auto holder = juce::StandalonePluginHolder::getInstance()) {
       holder->showAudioSettingsDialog();
     }
@@ -74,35 +75,35 @@ void UILayer::resized() {
 
   resizePresetButton();
   int sidePanelWidth = 260;
-  matrix.setBounds(0, 0, sidePanelWidth, getHeight() - keyboardHeight);
-  modulators.setBounds(getWidth() - sidePanelWidth, 0, sidePanelWidth, getHeight() - keyboardHeight);
+  connections.setBounds(0, 0, sidePanelWidth, getHeight() - keyboardHeight);
+  modulators_.setBounds(getWidth() - sidePanelWidth, 0, sidePanelWidth, getHeight() - keyboardHeight);
 
   resizeSaveAndNewButtons();
 
   if (JUCEApplication::isStandaloneApp()) resizeSettingsButton();
 
   auto newSize = 22;
-  auto newY = presetButton.getY() + (presetButton.getHeight() / 2) - newSize / 2;
+  auto newY = preset_button_.getY() + (preset_button_.getHeight() / 2) - newSize / 2;
   matrixButton->setBounds(edgeMargin, newY, 24, 24);
 
   resizeModulatorsButton();
 
   int themeButtonSize = 24;
   int y = keyboard.getY() - themeButtonSize - edgeMargin;
-  themeButton->setBounds(edgeMargin, y, themeButtonSize, themeButtonSize);
+  theme_button_->setBounds(edgeMargin, y, themeButtonSize, themeButtonSize);
 }
 
 void UILayer::resizeSaveAndNewButtons() {
   int buttonSize = 23;
   int verticalSpacing = 12;
-  int saveButtonX = presetButton.getRight() + verticalSpacing + buttonSize / 2;
+  int saveButtonX = preset_button_.getRight() + verticalSpacing + buttonSize / 2;
 
   saveButton->setBounds(0, 0, buttonSize, buttonSize);
-  saveButton->setCentrePosition(saveButtonX, presetButton.getBounds().getCentreY());
+  saveButton->setCentrePosition(saveButtonX, preset_button_.getBounds().getCentreY());
 
-  int newPresetX = presetButton.getX() - verticalSpacing - buttonSize / 2;
+  int newPresetX = preset_button_.getX() - verticalSpacing - buttonSize / 2;
   newPresetButton->setBounds(0, 0, buttonSize, buttonSize);
-  newPresetButton->setCentrePosition(newPresetX, presetButton.getBounds().getCentreY());
+  newPresetButton->setCentrePosition(newPresetX, preset_button_.getBounds().getCentreY());
 }
 
 void UILayer::resizeSettingsButton() {
@@ -114,32 +115,31 @@ void UILayer::resizeSettingsButton() {
 
 void UILayer::resizeModulatorsButton() {
   int modulatorsButtonWidth = 32;
-  modulatorsButton->setBounds(getWidth() - modulatorsButtonWidth - edgeMargin, presetButton.getY(), modulatorsButtonWidth, 15);
+  modulatorsButton->setBounds(getWidth() - modulatorsButtonWidth - edgeMargin, preset_button_.getY(), modulatorsButtonWidth, 15);
 }
 
 void UILayer::resizePresetButton() {
   int width = 170;
   int verticalSpacing = 15;
-  presetButton.setBounds(getWidth() / 2 - width / 2, verticalSpacing, width, Constants::tabHeight);
+  preset_button_.setBounds(getWidth() / 2 - width / 2, verticalSpacing, width, Constants::tabHeight);
 }
 
 void UILayer::setupSideMenus() {
-  addChildComponent(matrix);
-  matrix.listBox.setModel(&modulationsListBoxModel);
-  modulators.isOnLeft = false;
+  connections.listBox.setModel(&connections_list_box_model_);
+  modulators_.isOnLeft = false;
 }
 
 void UILayer::showModulatorsSideMenu() {
-  modulators.listBox.updateContent();
-  modulators.setVisible(false);
+  modulators_.listBox.updateContent();
+  modulators_.setVisible(false);
 }
 
-void UILayer::setModulations(Array<std::shared_ptr<Modulation>> modulationConnections) {
-  modulationsListBoxModel.setConnections(modulationConnections);
-  if (matrix.listBox.isVisible()) matrix.listBox.updateContent();
+void UILayer::setConnections(std::vector<std::shared_ptr<model::Connection>> modulationConnections) {
+  connections_list_box_model_.setConnections(modulationConnections);
+  if (connections.listBox.isVisible()) connections.listBox.updateContent();
 }
 
-void UILayer::setModulators(Array<std::shared_ptr<Module>> newModulators) {
-  modulators.modulatorsListModel.setModulators(newModulators);
-  if (modulators.listBox.isVisible()) modulators.listBox.updateContent();
+void UILayer::setModulators(std::vector<std::shared_ptr<model::Module>> newModulators) {
+  modulators_.modulators_list_model_.setModulators(newModulators);
+  if (modulators_.listBox.isVisible()) modulators_.listBox.updateContent();
 }

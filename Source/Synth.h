@@ -48,7 +48,7 @@ public:
   Array<Voice*> blockVoices;
   ModuleManager moduleManager;
   PresetManager presetManager;
-  std::optional<PresetInfo> presetToLoadOnInit;
+  std::optional<Preset> presetToLoadOnInit;
 
   Synth();
 
@@ -75,8 +75,8 @@ public:
   std::shared_ptr<Block> addBlock(Model::Type type, Index index, int number = -1);
   std::shared_ptr<Module> addModulator(Model::Type tpye, int number = -1, int colourId = -1);
   void removeConnectionsFromTarget(std::shared_ptr<Module> module);
-  PresetInfo changePreset(int index);
-  void loadPreset(PresetInfo preset);
+  Preset changePreset(int index);
+  void loadPreset(Preset preset);
   std::string getState();
   void correctToTime(int64 timeInSamples);
 
@@ -94,13 +94,13 @@ public:
   void editorAdjustedBlock(Index index, int parameter, float value) override;
   void editorAdjustedTab(int column, int parameter, float value) override;
   void editorChangedModulationMagnitude(int connectionIndex, float magnitude) override;
-  void editorParameterGestureChanged(String moduleName, int parameterIndex, bool started) override;
+  void editorParameterGestureChanged(std::string module_name, std::string parameter_name, bool started) override;
   void editorChangedModulationPolarity(int index, bool bipolar) override;
   void editorDisconnectedModulation(int index) override;
-  void editorSavedPreset(String name) override;
-  void editorConnectedModulation(int modulatorIndex, String targetName, int parameter) override;
+  void editorSavedPreset(std::string name) override;
+  void editorConnectedModulation(int modulatorIndex, std::string targetName, std::string parameter) override;
   void editorChangedBlockLength(Index index, int length) override;
-  void editorAdjustedModulator(int parameter, int modulator, float value) override;
+  void editorAdjustedModulator(std::string parameter_name, int modulator, float value) override;
   void editorRemovedModulator(int index) override;
 
   std::shared_ptr<Block> getBlock(Index index) override;
@@ -108,11 +108,11 @@ public:
   std::shared_ptr<Block> editorAddedBlock(Model::Type code, Index index) override;
   std::shared_ptr<Module> getModulator(int index) override;
   std::shared_ptr<Module> editorAddedModulator(Model::Type code) override;
-  PresetInfo editorChangedPreset(int index) override;
-  PresetInfo getStateRepresentation() override;
+  Preset editorChangedPreset(int index) override;
+  Preset getStateRepresentation() override;
   Array<std::shared_ptr<Module>> getModulators() override;
   Array<std::shared_ptr<Modulation>> getConnectionsOfSource(std::shared_ptr<Module> source) override;
-  Array<std::shared_ptr<Modulation>> getModulations() override;
+  std::vector<std::shared_ptr<model::Connection>> getModulations() override;
 
   std::pair<float, float> editorRequestsModulatorValue(Index moduleIndex, int parameterIndex, int modulatorIndex) override;
   std::pair<float, float> editorRequestsModulatorValue(int modulationConnectionIndex) override;

@@ -14,6 +14,6 @@
 using namespace juce;
 
 namespace GridConfigs {
-  inline const GridComponent::Config tab = { Constants::tabHeight, Constants::Functions::tabWidth(), 0, 0, 1, Constants::columns, false };
-  inline const GridComponent::Config blocks = { Constants::moduleHeight, Constants::moduleWidth, Constants::gridEdgeSpacing, Constants::moduleSpacing, Constants::rows, Constants::columns, true };
+inline const GridComponent::Config tab = { Constants::tabHeight, Constants::Functions::tabWidth(), 0, 0, 1, Constants::columns, false };
+inline const GridComponent::Config blocks = { Constants::blockHeight, Constants::blockWidth, Constants::gridEdgeSpacing, Constants::moduleSpacing, Constants::rows, Constants::columns, true };
 }

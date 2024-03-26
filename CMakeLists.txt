@@ -14,7 +14,7 @@ cmake_minimum_required(VERSION 3.15)
 # `project()` command. `project()` sets up some helpful variables that describe source/binary
 # directories, and the current project version. This is a standard CMake command.
 
-project(blocks VERSION 0.0.5)
+project(blocks VERSION 0.1.0)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX20_STANDARD_COMPILE_OPTION "-std:c++latest")
 # If you've installed JUCE somehow (via a package manager, or directly using the CMake install
@@ -47,7 +47,7 @@ add_subdirectory(JUCE)                    # If you've put JUCE in a subdirectory
 # Check the readme at `docs/CMake API.md` in the JUCE repo for the full list.
 
 juce_add_plugin(blocks
-    VERSION 0.0.5                           # Set this if the plugin version is different to the project version
+    VERSION 0.1.0                           # Set this if the plugin version is different to the project version
     # ICON_BIG ...                              # ICON_* arguments specify a path to an image file to use as an icon for the Standalone
     # ICON_SMALL ...
     COMPANY_NAME soonth                          # Specify the name of the plugin's author
@@ -106,7 +106,7 @@ target_compile_definitions(blocks
 
 # juce_add_binary_data(AudioPluginData SOURCES ...)
 
-file(GLOB_RECURSE BinaryAssets CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/Assets/*.ttf" "${CMAKE_CURRENT_SOURCE_DIR}/Assets/*.svg" "${CMAKE_CURRENT_SOURCE_DIR}/Assets/*.key")
+file(GLOB_RECURSE BinaryAssets CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/Assets/*.ttf" "${CMAKE_CURRENT_SOURCE_DIR}/Assets/*.svg" "${CMAKE_CURRENT_SOURCE_DIR}/Assets/*.key" "${CMAKE_CURRENT_SOURCE_DIR}/Assets/*.blocks")
 juce_add_binary_data(blocks_binary_data NAMESPACE BinaryData SOURCES ${BinaryAssets})
 
 if (UNIX AND NOT APPLE)

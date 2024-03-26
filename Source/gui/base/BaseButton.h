@@ -17,7 +17,7 @@ public:
   const float MAX_ORBIT_BRIGHTNESS = 0.1f;
 
   bool isMouseHovering = false;
-  std::function<void()> onClick;
+  std::function<void()> on_click_;
 
   Colour colour;
 

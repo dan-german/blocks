@@ -46,7 +46,7 @@ void ButtonGrid::setModel(Array<StringArray> models) {
 
     listBox->setRowHeight(itemHeight);
     listBox->setColour(ListBox::ColourIds::backgroundColourId, ThemeManager::shared()->getCurrent().background);
-    
+
     listBoxModels.push_back(std::move(listBoxModel));
     listBoxes.push_back(std::move(listBox));
 

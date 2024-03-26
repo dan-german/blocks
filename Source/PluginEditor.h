@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include "PluginProcessor.h"
+#include "blocks_plugin_processor.h"
 #include "MainComponent.h"
 
 class PluginEditor: public AudioProcessorEditor, juce::Timer {

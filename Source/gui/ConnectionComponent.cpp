@@ -95,8 +95,8 @@ void ConnectionComponent::resizeExitButton() {
 
 void ConnectionComponent::handleOscGainEnvelope() {
   bipolarButton.setVisible(false);
-  slider.getProperties().set("disabled", true);
-  slider.setEnabled(false);
+  // slider.getProperties().set("disabled", true);
+  // slider.setEnabled(false);
 }
 
 void ConnectionComponent::reset() {

@@ -11,12 +11,13 @@
 #include "model/PresetManager.h"
 #include "PresetCoder.h"
 
-std::string PresetManager::presetToString(PresetInfo presetData) { return coder->encode(presetData); }
-std::optional<PresetInfo> PresetManager::stringToPreset(std::string preset) { return coder->decode(preset); }
+std::string PresetManager::presetToString(Preset presetData) { return coder->encode(presetData); }
+std::optional<Preset> PresetManager::stringToPreset(std::string preset) { return coder->decode(preset); }
 
 PresetManager::PresetManager(): coder(new PresetCoder()) {
   setPresetsDirectory();
   loadPresetsDirectory();
+  loadStockPresets();
 }
 
 void PresetManager::setPresetsDirectory() {
@@ -35,7 +36,7 @@ void PresetManager::loadPresetsDirectory() {
 
     try {
       if (auto preset = coder->decode(stringFile))
-        presets.add(*preset);
+        presets.push_back(*preset);
     } catch (const std::exception& e) {
       DBG("Error decoding " + file.getFullPathName());
     }
@@ -55,32 +56,36 @@ void PresetManager::loadStockPresets() {
 
       for (int j = 0; j < size; j++)
         presetString += preset[j];
+        
+      if (auto preset = coder->decode(presetString))
+        presets.push_back(*preset);
     }
   }
 }
 
-void PresetManager::save(PresetInfo presetData) {
+void PresetManager::save(Preset presetData) {
   removePreset(presetData.name);
 
   auto jsonPreset = coder->encode(presetData);
-  std::cout << jsonPreset << std::endl;
   createAndSavePresetFile(presetData.name, jsonPreset);
 
   if (auto preset = coder->decode(jsonPreset))
-    presets.add(*preset);
+    presets.push_back(*preset);
 }
 
-void PresetManager::removePreset(String& name) {
+void PresetManager::removePreset(std::string& name) {
   for (int i = 0; i < presets.size(); i++) {
     if (presets[i].name == name) {
       presetsDirectory.getChildFile(name).withFileExtension("blocks").deleteFile();
-      presets.remove(i);
+      // presets.remove(i);
+      // remove the preset from the vector
+      presets.erase(presets.begin() + i);
       break;
     }
   }
 }
 
-void PresetManager::createAndSavePresetFile(String& name, const std::string& presetJson) const {
+void PresetManager::createAndSavePresetFile(std::string& name, const std::string& presetJson) const {
   auto newFile = presetsDirectory.getChildFile(name).withFileExtension("blocks");
   newFile.create();
   newFile.appendText(presetJson);

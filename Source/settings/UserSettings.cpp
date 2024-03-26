@@ -1,7 +1,7 @@
 #include "settings/UserSettings.h"
 
 namespace {
-  std::unique_ptr<PropertiesFile> get_file();
+std::unique_ptr<PropertiesFile> get_file();
 }
 
 UserSettings* UserSettings::shared() {

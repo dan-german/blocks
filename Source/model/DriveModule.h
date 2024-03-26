@@ -15,15 +15,15 @@
 #include "model/ModuleParameter.h"
 
 namespace Model {
-  struct DriveModule: public Block {
-    enum Parameters { pType, pDrive };
+struct DriveModule: public Block {
+  enum Parameters { pType, pDrive };
 
-    DriveModule(int number): Block(Model::Types::drive, number) {
-      category = Module::Category::effect;
-      createChoiceParameter({ "type", { "soft", "hard" }, 0 });
-      createFloatParameter({ .name = "drive", .defaultValue = 0.0f, .range = { 0.0f, 1.0f, 0.01f } });
-    }
+  DriveModule(int number): Block(Model::Types::drive, number) {
+    category = Module::Category::effect;
+    createChoiceParameter({ "type", { "soft", "hard" }, 0 });
+    createFloatParameter({ .name = "drive", .defaultValue = 0.0f, .range = { 0.0f, 1.0f, 0.01f } });
+  }
 
-    ~DriveModule() {}
-  };
+  ~DriveModule() {}
+};
 }

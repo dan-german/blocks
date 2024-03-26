@@ -25,7 +25,7 @@ public:
 
   MouseListener* mouseListener = nullptr;
   Colour colour;
-  PlusComponent addButton;
+  PlusComponent add_button_;
   std::optional<Index> previousPlaceholderIndex;
   Path path;
   int currentPlaceholderLength = 1;
@@ -45,6 +45,9 @@ public:
   Rectangle<int> getModuleBounds() const;
   virtual Index indexForPoint(Point<int> point) const;
   Point<int> pointForIndex(Index index) const;
+  // static int xForColumn(int column, Config config) const;
+  static int xForColumn(int column, Config config) { return config.edgeSpacing + config.itemWidth * column + column * config.spacing; }
+  static int yForRow(int row, Config config) { return config.edgeSpacing + config.itemHeight * row + row * config.spacing; }
 
   virtual void clear();
   void show();

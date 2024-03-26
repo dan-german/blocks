@@ -20,6 +20,7 @@ public:
   PresetButtonContent content;
   struct Listener;
   Listener* listener = nullptr;
+  std::function<void(bool)> on_arrow_click_;
 
   PresetButtonComponent();
   ~PresetButtonComponent() override;
@@ -28,6 +29,7 @@ public:
   void paint(juce::Graphics&) override;
   void setStrings(StringArray strings);
   void setButtonColour(Colour colour) override;
+  void mouseUp(const juce::MouseEvent& event) override;
   Component* getContent() override;
 private:
   int index = 0;

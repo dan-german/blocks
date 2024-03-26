@@ -12,12 +12,12 @@
 #include "model/Module.h"
 
 namespace Model {
-  struct Block: public Module {
-    Block(Type type, int number): Module(type, number) { };
-    Index index = { -1, -1 };
-    void reset() override {
-      Module::reset();
-      index = { -1, -1 };
-    };
+struct Block: public Module {
+  Block(Type type, int number): Module(type, number) { };
+  Index index = { -1, -1 };
+  void reset() override {
+    Module::reset();
+    index = { -1, -1 };
   };
+};
 }

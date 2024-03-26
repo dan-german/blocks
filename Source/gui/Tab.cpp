@@ -51,7 +51,7 @@ int Tab::stepColumn(Selection selection) {
     return rand() % length;
   default: jassertfalse;
   }
-  return 0; 
+  return 0;
 }
 
 Array<int> Tab::getAllColumns() {

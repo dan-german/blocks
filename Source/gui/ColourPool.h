@@ -32,9 +32,9 @@ private:
   Colour l = Colour(250, 92, 92);
   Colour o = Colour(255, 237, 41);
 
-  const Array<Colour> colours { a, b, c, d, e, f, g, h, i, j, k, m, n, l, o };
+  const juce::Array<Colour> colours { a, b, c, d, e, f, g, h, i, j, k, m, n, l, o };
 
-  Array<int> ids;
+  juce::Array<int> ids;
 
   inline Colour getColourForId(int id) { return (id == -1) ? getRandom().colour : colours[id]; }
 public:

@@ -30,16 +30,16 @@ void BlockComponent::resizePainter() {
   painter->setBounds(x, y, width, height);
 }
 
-BlockComponent::BlockComponent(Index index): GridItemComponent({ index, Constants::moduleWidth }) {
+BlockComponent::BlockComponent(Index index): GridItemComponent({ index, Constants::blockWidth }) {
   isSelected = false;
   isStretching = false;
   isDragging = false;
   listener = nullptr;
 
   setupTitleLabel();
-  setBounds(0, 0, Constants::moduleWidth, Constants::moduleHeight);
+  setBounds(0, 0, Constants::blockWidth, Constants::blockHeight);
 
-  initialWidth = Constants::moduleWidth;
+  initialWidth = Constants::blockWidth;
   darkener.toFront(false);
   darkener.setInterceptsMouseClicks(false, false);
 
@@ -161,28 +161,27 @@ void BlockComponent::setEnvelopePath(Colour colour) {
   envelopePath->colour = colour;
 }
 
-BlockComponent* BlockComponent::create(std::shared_ptr<Block> block) {
+BlockComponent* BlockComponent::create(std::shared_ptr<model::Block> block) {
   auto component = new BlockComponent(block->index);
 
-  component->setTitle(block->name);
-  component->isStretchable = block->category == Model::Module::Category::effect;
+  component->setTitle(block->display_name);
+  component->isStretchable = block->category == model::Module::Category::effect;
   component->length = block->length;
   component->colour = block->colour.colour;
 
   if (block->id.type == Model::Types::osc) {
-    float waveformFloat = block->parameters[0]->audioParameter->getValue();
-    int waveformInt = static_cast<int>(block->parameters[0]->audioParameter->convertFrom0to1(waveformFloat));
+    float waveformFloat = block->parameters_[0]->value_processor->value();  
+    int waveformInt = static_cast<int>(waveformFloat);
     auto painter = new OscillatorPainter();
-    painter->setWaveformType(static_cast<OscillatorPainter::WaveformType>(waveformInt));
+    painter->setWaveformType(getWaveformType(waveformInt));
     painter->thickness = 2.0f;
     component->setPainter(painter);
-  } else if (block->id.type == Model::Types::adsr) {
-    component->setEnvelopePath(component->colour);
-    component->getEnvelopePath()->setAttack(block->parameters[0]->audioParameter->getValue());
-    component->getEnvelopePath()->setDecay(block->parameters[1]->audioParameter->getValue());
-    component->getEnvelopePath()->setSustain(block->parameters[2]->audioParameter->getValue());
-    component->getEnvelopePath()->setRelease(block->parameters[3]->audioParameter->getValue());
-  }
+  } else if (block->id.type == Model::Types::noise) {
+    auto painter = new OscillatorPainter();
+    painter->setWaveformType(OscillatorPainter::WaveformType::noise);
+    painter->thickness = 2.0f;
+    component->setPainter(painter);
+  } 
 
   component->themeChanged(ThemeManager::shared()->getCurrent());
   return component;
@@ -197,15 +196,21 @@ void BlockComponent::themeChanged(Theme theme) {
     painter->waveColour = selectionColour;
 }
 
-void BlockComponent::setConfig(std::shared_ptr<Module> m) {
+void BlockComponent::setConfig(std::shared_ptr<model::Module> m, std::vector<std::shared_ptr<model::Connection>> connections) {
   indicators.reset();
 
-  std::unordered_set<std::shared_ptr<Module>> uniqueSources;
-  std::vector<std::shared_ptr<Module>> uniqueSourceVector;
+  std::unordered_set<std::shared_ptr<model::Module>> uniqueSources;
+  std::vector<std::shared_ptr<model::Module>> uniqueSourceVector;
 
-  for (const auto& param : m->parameters)
-    for (const auto& connection : param->connections)
+  for (const auto& connection : connections) { 
+    if (connection->target == m) {
       uniqueSources.insert(connection->source);
+    }
+  }
+
+  // for (const auto& param : m->parameters_)
+  //   for (const auto& connection : param->connections)
+  //     uniqueSources.insert(connection->source);
 
   uniqueSourceVector.assign(uniqueSources.begin(), uniqueSources.end());
 
@@ -225,7 +230,7 @@ void BlockComponent::animate() {
     setBounds(x, y, width, height);
   };
 
-  float scaleAtDrag = 0.93f;
+  const float scaleAtDrag = 0.93f;
 
   auto completion = [bounds, scaleAtDrag, this]() {
     auto factor = isDragging ? scaleAtDrag : 1.0f;

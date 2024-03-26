@@ -13,10 +13,22 @@
 #include "gui/ThemeManager.h"
 
 PresetButtonContent::PresetButtonContent() {
-  label.setText("blank", dontSendNotification);
-  label.setColour(Label::ColourIds::textColourId, Colour(190, 190, 190));
+  Colour background_color = ThemeManager::shared()->getCurrent().background;
+  setupLabel(label, "empty", Colour(190, 190, 190), 14.0f);
+  setupLabel(left_arrow_, "<", background_color, 18.0f);
+  setupLabel(right, ">", background_color, 18.0f);
+  ThemeManager::shared()->addListener(this);
+}
+
+PresetButtonContent::~PresetButtonContent() {
+  ThemeManager::shared()->removeListener(this);
+}
+
+void PresetButtonContent::setupLabel(Label& label, String text, Colour color, float fontSize) {
+  label.setText(text, dontSendNotification);
+  label.setColour(Label::ColourIds::textColourId, color);
   label.setJustificationType(Justification::centred);
-  label.setFont(Font(14.0f, Font::bold));
+  label.setFont(Font(fontSize, Font::bold));
   addAndMakeVisible(label);
 }
 
@@ -27,4 +39,13 @@ void PresetButtonContent::paint(juce::Graphics& g) {
 
 void PresetButtonContent::resized() {
   label.setBounds(getLocalBounds());
+  left_arrow_.setBounds(2, 0, 20, getHeight());
+  right.setBounds(getWidth() - 22, 0, 20, getHeight());
+}
+
+void PresetButtonContent::themeChanged(Theme theme) {
+  Colour background_color = ThemeManager::shared()->getCurrent().background;
+  left_arrow_.setColour(Label::ColourIds::textColourId, background_color);
+  right.setColour(Label::ColourIds::textColourId, background_color);
+  repaint();
 }

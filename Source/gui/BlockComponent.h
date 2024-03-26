@@ -19,6 +19,8 @@
 #include "gui/ThemeListener.h"
 #include "gui/CircleIndicatorList.h"
 #include "gui/CircleIndicators.h"
+#include "module_new.h"
+#include "connection.h"
 
 class BlockComponent;
 using Block = Model::Block;
@@ -50,8 +52,20 @@ public:
   void setTitleColour(Colour newColour) { this->titleLabel.setColour(Label::ColourIds::textColourId, newColour); }
   EnvelopePath* getEnvelopePath() { return this->envelopePath.get(); }
 
-  static BlockComponent* create(std::shared_ptr<Block> block);
-  void setConfig(std::shared_ptr<Module> m);
+  static BlockComponent* create(std::shared_ptr<model::Block> block);
+
+  static OscillatorPainter::WaveformType getWaveformType(int value) {
+    switch (value) {
+    case 0: return OscillatorPainter::WaveformType::saw; break;
+    case 1: return OscillatorPainter::WaveformType::sine; break;
+    case 2: return OscillatorPainter::WaveformType::square; break;
+    case 3: return OscillatorPainter::WaveformType::triangle; break;
+    default: return OscillatorPainter::WaveformType::sine; break;
+    }
+  }
+
+  // void setConfig(std::shared_ptr<model::Module> m);
+  void setConfig(std::shared_ptr<model::Module> m, std::vector<std::shared_ptr<model::Connection>> connections);
   void animate();
 protected:
   void paint(Graphics& g) override;

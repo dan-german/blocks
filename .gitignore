@@ -38,3 +38,8 @@
 .DS_Store
 CMakeFiles
 .cache/
+CMakeCache.txt
+Source/vital/common
+Source/vital/common
+Source/vital/common
+Source/vital/common

@@ -12,7 +12,7 @@
 
 #include "gui/SideMenu.h"
 #include "gui/PlusComponent.h"
-#include "gui/ModulatorsListModel.h"
+#include "gui/modulators_list_model.h"
 #include "model/Module.h"
 #include "gui/controls/ButtonGridPopup.h"
 
@@ -21,10 +21,10 @@ private:
   PlusComponent plusComponent;
   ShapeButton button;
 public:
-  ModulatorsListModel modulatorsListModel;
+  ModulatorsListModel modulators_list_model_;
   ModulatorsSideMenu();
   void resized() override;
-  std::function<void(int)> addedModulator;
+  std::function<void(int)> on_added_modulator_;
   std::function<void(Component&)> onPlusButtonClicked;
   void resizeAddButton();
   void setupAddButton();

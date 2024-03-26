@@ -18,39 +18,40 @@
 #include "gui/KeyboardComponent.h"
 #include "gui/ValueAnimator.h"
 #include "model/Module.h"
-#include "gui/ModulatorsListModel.h"
+#include "gui/modulators_list_model.h"
 #include "gui/ModulatorsSideMenu.h"
 #include "gui/controls/ButtonGridPopup.h"
 #include <juce_gui_basics/juce_gui_basics.h>
 #include "gui/controls/SVGButton.h"
 #include "gui/controls/SavePopup.h"
+#include "connection.h"
 
 using Modulation = Model::Modulation;
 using Module = Model::Module;
 
 class UILayer: public juce::Component, ComponentMovementWatcher {
 public:
-  SideMenu matrix;
-  ModulatorsSideMenu modulators;
-  PresetButtonComponent presetButton;
+  SideMenu connections;
+  ModulatorsSideMenu modulators_;
+  PresetButtonComponent preset_button_;
   KeyboardComponent keyboard;
 
   std::unique_ptr<SVGButton> settingsButton;
   std::unique_ptr<SVGButton> matrixButton;
   std::unique_ptr<SVGButton> saveButton;
   std::unique_ptr<SVGButton> newPresetButton;
-  std::unique_ptr<SVGButton> themeButton;
+  std::unique_ptr<SVGButton> theme_button_;
 
   std::unique_ptr<ModulatorsButton> modulatorsButton;
 
-  ModulationsListBoxModel modulationsListBoxModel;
+  ModulationsListBoxModel connections_list_box_model_;
 
   UILayer(juce::MidiKeyboardState& keyboard_state, Slider::Listener* listener);
   ~UILayer() override;
 
   void resized() override;
-  void setModulations(Array<std::shared_ptr<Modulation>> modulationConnections);
-  void setModulators(Array<std::shared_ptr<Module>> modulators);
+  void setConnections(std::vector<std::shared_ptr<model::Connection>> connections);
+  void setModulators(std::vector<std::shared_ptr<model::Module>> modulators);
   void componentMovedOrResized(bool wasMoved, bool wasResized) override {};
   void componentPeerChanged() override {};
   void componentVisibilityChanged() override {};

@@ -18,7 +18,7 @@ void ModulatorsSideMenu::setup() {
 }
 
 void ModulatorsSideMenu::setupListBox() {
-  listBox.setModel(&modulatorsListModel);
+  listBox.setModel(&modulators_list_model_);
   listBox.setRowHeight(106);
 }
 

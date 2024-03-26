@@ -11,26 +11,33 @@
 #pragma once
 #include "model/Block.h"
 #include "gui/Tab.h"
+#include "connection.h"
+#include "model/column_control_model.h"
 
-class PresetInfo {
+class Preset {
 public:
   struct Module {
-    Model::ID id;
-    std::map<String, float> parameters;
+    ID id;
+    std::map<std::string, float> parameters;
   };
 
-  struct Block: public PresetInfo::Module {
+  struct Block: public Preset::Module {
     int length = 1;
     std::pair<int, int> index = { -1, -1 };
   };
 
-  struct Modulator: public PresetInfo::Module { int colour; };
+  struct Modulator: public Preset::Module { int colour; };
 
-  struct Modulation {
+  // struct Column: Module { 
+  //   float pan;
+  //   float level;
+  // };
+
+  struct Connection {
     std::string source;
     std::string target;
     std::string parameter;
-    float magnitude;
+    float amount;
     bool bipolar;
     int number;
   };
@@ -40,18 +47,20 @@ public:
     int length;
   };
 
-  String name = "";
-  Array<Tab> tabs;
-  Array<Block> blocks;
-  Array<Modulator> modulators;
-  Array<Modulation> modulations;
+  std::string name = "";
+  std::vector<Tab> tabs;
+  std::vector<Block> blocks;
+  std::vector<Modulator> modulators;
+  std::vector<Connection> connections_;
+  std::vector<Module> column_controls;
 
-  static PresetInfo create(String name,
-    Array<std::shared_ptr<Model::Tab>> tabs,
-    Array<std::shared_ptr<Model::Block>> blocks,
-    Array<std::shared_ptr<Model::Module>> modulators,
-    Array<std::shared_ptr<Model::Modulation>> modulations);
+  static Preset create(std::string name,
+    // std::vector<std::shared_ptr<model::Tab>> tabs,
+    std::vector<std::shared_ptr<model::Block>> blocks,
+    std::vector<std::shared_ptr<model::Module>> modulators,
+    std::vector<std::shared_ptr<model::Connection>> modulations, 
+    std::vector<std::shared_ptr<model::ColumnControl>> column_controls);
 private:
-  static void prepareModule(std::shared_ptr<Model::Module> module, Module& moduleInfo);
+  static void setParamsAndID(std::shared_ptr<model::Module> module, Module& moduleInfo);
 };
 

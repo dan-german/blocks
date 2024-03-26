@@ -19,10 +19,10 @@ WaveTable::WaveTable() noexcept
 }
 
 void WaveTable::addWaveform(int length, float* waveform, float topFrequency) {
-  
-  Waveform new_waveform{.topFrequency = topFrequency, 
-                        .data = std::vector<float>(length + 1), 
-                        .length = length};
+
+  Waveform new_waveform { .topFrequency = topFrequency,
+                        .data = std::vector<float>(length + 1),
+                        .length = length };
 
   std::copy_n(waveform, length, new_waveform.data.begin());
   new_waveform.data[length] = new_waveform.data[0];

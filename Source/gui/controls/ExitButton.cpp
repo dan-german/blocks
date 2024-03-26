@@ -14,7 +14,7 @@
 ExitButton::~ExitButton() {}
 void ExitButton::resized() {}
 void ExitButton::paintButton(Graphics& g, bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown) {}
-ExitButton::ExitButton() : Button("exitButton") { colour = normalColour; }
+ExitButton::ExitButton(): Button("exitButton") { colour = normalColour; }
 
 void ExitButton::paint(juce::Graphics& g) {
   g.setColour(ThemeManager::shared()->getCurrent().two);

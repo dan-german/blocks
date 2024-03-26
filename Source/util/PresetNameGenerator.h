@@ -59,7 +59,7 @@ struct PresetNameGenerator {
     "seabreeze", "smoke", "spruce", "tide", "tundra",
     "galaxy", "nostalgia", "carbon", "oxygen",
     "matter", "comet", "ember", "meteor", "satellite"
-    };
+  };
 
   static std::string generate() {
     auto adjIndex = std::rand() % PresetNameGenerator::adjectives.size();

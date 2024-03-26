@@ -4,26 +4,49 @@
 #include "settings/GridConfigs.h"
 #include "gui/ThemeManager.h"
 #include "settings/UserSettings.h"
+#include "module_new.h"
+#include "vital/common/synth_constants.h"
 
-MainComponent::MainComponent(juce::MidiKeyboardState& keyboard_state, Delegate* delegate): delegate(delegate), uiLayer(keyboard_state, this), tabGrid(GridConfigs::tab), blockGrid(GridConfigs::blocks) {
+MainComponent::MainComponent(juce::MidiKeyboardState& keyboard_state, Delegate* delegate): delegate(delegate), ui_layer_(keyboard_state, this), tab_grid_(GridConfigs::tab), block_grid_(GridConfigs::blocks) {
   setWantsKeyboardFocus(false);
 
-  setLookAndFeel(&blocksLookAndFeel);
+  setLookAndFeel(&blocks_laf_);
   setupPopupMenus();
   setupInspector();
   setupUI();
   setupListeners();
-  addAndMakeVisible(blockPlaceholder);
+  addAndMakeVisible(block_placeholder_);
   addChildComponent(cursor, 1000);
   setupPresetMenu();
-  setupDarkBackground(&gridDarkBackground, 3);
-  addChildComponent(uiLayer.modulators);
+  setupDarkBackground(&grid_dark_background_, 3);
+  addChildComponent(ui_layer_.modulators_);
+  addChildComponent(ui_layer_.connections);
   setupTabGrid();
   setupBlockGrid();
-  setupDarkBackground(&darkBackground, -1);
-
-  noteLogger.listener = this;
+  setupDarkBackground(&dark_background_, -1);
+  addAndMakeVisible(column_controls_);
+  column_controls_.listener = this;
+  note_logger_.listener = this;
   ThemeManager::shared()->set(UserSettings::shared()->getInt("theme", 0));
+
+  // "osc", "filter", "drive", "flanger", "comp", "reverb", "delay", "chorus", "phaser", "eq"
+  // add 2 envs, add one lfo, crash
+  // for (int i = 0; i < 1000; i++) {
+  //   addModulator(Model::Types::lfo);
+  //   auto osc_block = addBlock(0, { 0, 0 });
+  //   spawnBlockComponent(osc_block);
+  //   delegate->editorConnectedModulation(0, "osc_1", "tune");
+  //   delegate->editorChangedPreset(-1);
+  //   clear();
+  // }
+
+  // addModulator(Model::Types::lfo);
+  // auto osc_block = addBlock(0, { 0, 0 });
+  // spawnBlockComponent(osc_block);
+  // delegate->editorConnectedModulation(0, "osc_1", "tune");
+  // ui_layer_.setConnections(delegate->getModulations());
+  // auto osc_block2 = addBlock(0, { 0, 0 });
+  // spawnBlockComponent(osc_block2);
 }
 
 void MainComponent::updateDotPosition(const Point<int> position) {
@@ -31,37 +54,37 @@ void MainComponent::updateDotPosition(const Point<int> position) {
 }
 
 void MainComponent::modulatorStartedAdjusting(ModulatorComponent* modulatorComponent, int index) {
-  delegate->editorParameterGestureChanged(delegate->getModulator(modulatorComponent->row)->name, index, true);
+  // delegate->editorParameterGestureChanged(delegate->getModulator(modulatorComponent->row)->name, index, true);
 }
 
 void MainComponent::modulatorEndedAdjusting(ModulatorComponent* modulatorComponent, int index) {
-  delegate->editorParameterGestureChanged(delegate->getModulator(modulatorComponent->row)->name, index, false);
+  // delegate->editorParameterGestureChanged(delegate->getModulator(modulatorComponent->row)->name, index, false);
 }
 
-void MainComponent::modulatorIsAdjusting(ModulatorComponent* component, int parameter, float value) {
-  delegate->editorAdjustedModulator(parameter, component->row, value);
+void MainComponent::modulatorIsAdjusting(ModulatorComponent* component, std::string parameter_name, float value) {
+  delegate->editorAdjustedModulator(parameter_name, component->row, value);
 }
 
 void MainComponent::paint(juce::Graphics& g) {
   g.fillAll(ThemeManager::shared()->getCurrent().background);
 }
 
-void MainComponent::inspectorGestureChanged(int index, bool started) {
-  std::shared_ptr<Module> focusedModule;
+void MainComponent::inspectorGestureChanged(std::string parameter_name, bool started) {
+  std::shared_ptr<model::Module> focusedModule = delegate->getBlock2(focused_grid_item_->index);
 
-  auto isTab = tabGrid.containsItem(focusedGridItem);
-  if (isTab) {
-    focusedModule = delegate->getTab(focusedGridItem->index.column);
-  } else {
-    focusedModule = delegate->getBlock(focusedGridItem->index);
-  }
+  // auto isTab = tabGrid.containsItem(focusedGridItem);
+  // if (isTab) {
+  //   focusedModule = delegate->getTab(focusedGridItem->index.column);
+  // } else {
+  //   focusedModule = delegate->getBlock(focusedGridItem->index);
+  // }
 
-  delegate->editorParameterGestureChanged(focusedModule->name, index, started);
+  delegate->editorParameterGestureChanged(focusedModule->name, parameter_name, started);
 }
 
 void MainComponent::changeModulePainter(int value) {
-  auto castedBlock = static_cast<BlockComponent*>(focusedGridItem);
-  castedBlock->getPainter()->setWaveformType(static_cast<OscillatorPainter::WaveformType>(value));
+  auto cast_block = static_cast<BlockComponent*>(focused_grid_item_);
+  cast_block->getPainter()->setWaveformType(BlockComponent::getWaveformType(value));
 }
 
 MainComponent::~MainComponent() {
@@ -77,7 +100,7 @@ void MainComponent::setupDarkBackground(DarkBackground* darkBackgroundComponent,
 
 void MainComponent::darkBackgroundClicked(Component* component) {
   component->setVisible(false);
-  Component* popups[] = { &blocksPopup, &modulatorsPopup, &presetsPopup, &savePopup };
+  Component* popups[] = { &blocks_popup_, &modualtors_popup_, &presets_popup_, &save_popup_ };
 
   for (auto popup : popups) {
     if (popup->isVisible()) {
@@ -85,42 +108,42 @@ void MainComponent::darkBackgroundClicked(Component* component) {
     }
   }
 
-  if (focusedGridItem) {
-    auto currentGrid = static_cast<GridComponent*>(focusedGridItem->getParentComponent()); // ehh
-    toggleGridItemSelection(currentGrid, focusedGridItem, false);
+  if (focused_grid_item_) {
+    auto currentGrid = static_cast<GridComponent*>(focused_grid_item_->getParentComponent()); // ehh
+    toggleGridItemSelection(currentGrid, focused_grid_item_, false);
   }
 
-  tabGrid.hideAllItems(false);
-  blockGrid.hideAllItems(false);
+  tab_grid_.hideAllItems(false);
+  block_grid_.hideAllItems(false);
 }
 
 void MainComponent::setupTabGrid() {
-  tabGrid.listener = this;
-  addAndMakeVisible(tabGrid, 2);
+  tab_grid_.listener = this;
+  // addAndMakeVisible(tab_grid_, 2);
 
-  for (auto glowIndicator : tabGrid.glowIndicators) {
-    addChildComponent(glowIndicator);
-    glowIndicator->toFront(false);
+  for (auto glow_indicator_ : tab_grid_.glowIndicators) {
+    addChildComponent(glow_indicator_);
+    glow_indicator_->toFront(false);
   }
 }
 
 void MainComponent::setupPresetMenu() {
-  addChildComponent(presetsPopup);
-  presetsPopup.scrollMode = true;
-  presetsPopup.itemHeight = 23;
+  addChildComponent(presets_popup_);
+  presets_popup_.scrollMode = true;
+  presets_popup_.itemHeight = 23;
 }
 
 void MainComponent::setupBlockGrid() {
-  addAndMakeVisible(blockGrid, 4);
-  blockGrid.addMouseListener(this, true);
-  blockGrid.listener = this;
+  addAndMakeVisible(block_grid_, 4);
+  block_grid_.addMouseListener(this, true);
+  block_grid_.listener = this;
 }
 
 void MainComponent::setupUI() {
-  uiLayer.presetButton.setStrings(delegate->editorRequestsPresetNames());
-  uiLayer.modulationsListBoxModel.delegate = this;
-  uiLayer.modulators.addMouseListener(this, true);
-  addAndMakeVisible(uiLayer, 2);
+  // uiLayer.presetButton.setStrings(delegate->editorRequestsPresetNames());
+  ui_layer_.connections_list_box_model_.delegate_ = this;
+  ui_layer_.modulators_.addMouseListener(this, true);
+  addAndMakeVisible(ui_layer_, 2);
 }
 
 void MainComponent::modulatorStartedDrag(ModulatorComponent* component, const MouseEvent& event) {
@@ -129,76 +152,93 @@ void MainComponent::modulatorStartedDrag(ModulatorComponent* component, const Mo
 }
 
 void MainComponent::setupListeners() {
-  timer.start();
-  timer.callback = [this](float secondsSinceUpdate) { this->graphicsTimerCallback(secondsSinceUpdate); };
+  timer_.start();
+  timer_.callback = [this](float secondsSinceUpdate) { this->graphicsTimerCallback(secondsSinceUpdate); };
 
-  uiLayer.modulators.modulatorsListModel.modulatorListener = this;
+  ui_layer_.modulators_.modulators_list_model_.modulator_listener = this;
 
-  savePopup.saveButton.onClick = [this]() {
-    auto name = savePopup.textEditor.getText();
-    bool hasTabs = tabGrid.getItems().size() > 0;
-    bool hasModulators = uiLayer.modulators.modulatorsListModel.getNumRows() > 0;
-    bool hasBlocks = blockGrid.getItems().size() > 0;
+  save_popup_.saveButton.on_click_ = [this]() {
+    auto name = save_popup_.textEditor.getText();
+    bool hasTabs = tab_grid_.getItems().size() > 0;
+    bool hasModulators = ui_layer_.modulators_.modulators_list_model_.getNumRows() > 0;
+    bool hasBlocks = block_grid_.getItems().size() > 0;
 
     if (name.isEmpty()) return;
     if (!hasTabs && !hasModulators && !hasBlocks) return;
 
-    delegate->editorSavedPreset(name);
-    uiLayer.presetButton.setStrings(delegate->editorRequestsPresetNames());
-    savePopup.setVisible(false);
+    delegate->editorSavedPreset(name.toStdString());
+    ui_layer_.preset_button_.content.label.setText(name, dontSendNotification);
+    ui_layer_.preset_button_.setStrings(delegate->editorRequestsPresetNames());
+    save_popup_.setVisible(false);
+    dark_background_.setVisible(false);
   };
 
-  uiLayer.newPresetButton->onClick = [this]() {
+  ui_layer_.newPresetButton->on_click_ = [this]() {
     delegate->editorChangedPreset(-1);
     clear();
+    dark_background_.setVisible(false);
   };
 
-  uiLayer.saveButton->onClick = [this]() {
-    this->darkBackground.setVisible(true);
-    this->darkBackground.toFront(true);
-    this->savePopup.setBounds(0, 0, 210, 37);
+  ui_layer_.preset_button_.on_arrow_click_ = [this](bool right) {
+    if (auto preset = delegate->editorNavigatedPreset(right)) {
+      clear();
+      loadState(*preset);
+      dark_background_.setVisible(false);
+    }
+  };
+
+  ui_layer_.saveButton->on_click_ = [this]() {
+    this->dark_background_.setVisible(true);
+    this->dark_background_.toFront(true);
+    this->save_popup_.setBounds(0, 0, 210, 37);
 
     int y = this->getHeight() / 12;
-    this->savePopup.setCentrePosition(uiLayer.saveButton->getBounds().getCentre().x, y);
-    this->savePopup.present();
+    this->save_popup_.setCentrePosition(ui_layer_.saveButton->getBounds().getCentre().x, y);
+    this->save_popup_.present();
   };
 
-  uiLayer.modulators.modulatorsListModel.modulatorListener = this;
-  uiLayer.modulators.addedModulator = [this](int index) { addModulator(Model::Types::all[index]); };
-  uiLayer.presetButton.onClick = [this]() { presetButtonClicked(); };
-  uiLayer.themeButton->onClick = [this]() {
+  ui_layer_.modulators_.modulators_list_model_.modulator_listener = this;
+  ui_layer_.modulators_.on_added_modulator_ = [this](int index) { addModulator(Model::Types::all[index]); };
+  ui_layer_.preset_button_.on_click_ = [this]() { presetButtonClicked(); };
+  ui_layer_.theme_button_->on_click_ = [this]() {
     UserSettings::shared()->set("theme", ThemeManager::shared()->next());
     repaint();
   };
 }
 
 void MainComponent::addModulator(Model::Type code) {
-  auto module = delegate->editorAddedModulator(code);
+  auto module = delegate->editorAddedModulator2(code);
   if (module == nullptr) return;
-  uiLayer.setModulators(delegate->getModulators());
+  ui_layer_.setModulators(delegate->getModulators2());
 }
 
 void MainComponent::resized() {
-  uiLayer.setBounds(getLocalBounds());
+  ui_layer_.setBounds(getLocalBounds());
   resizeGrid();
-  resizeInspector();
+  resizeColumnControls();
+  ResizeInspector();
   resizeTabContainer();
-  darkBackground.path.addRectangle(getLocalBounds());
-  darkBackground.setBounds(getLocalBounds());
-  gridDarkBackground.path.addRectangle(getLocalBounds());
-  gridDarkBackground.setBounds(getLocalBounds());
+  dark_background_.path.addRectangle(getLocalBounds());
+  dark_background_.setBounds(getLocalBounds());
+  grid_dark_background_.path.addRectangle(getLocalBounds());
+  grid_dark_background_.setBounds(getLocalBounds());
 
-  for (auto glowIndicator : tabGrid.glowIndicators) {
-    auto bounds = tabGrid.boundsForItem(glowIndicator, true);
+  for (auto glowIndicator : tab_grid_.glowIndicators) {
+    auto bounds = tab_grid_.boundsForItem(glowIndicator, true);
     bounds.removeFromTop(20);
     glowIndicator->setBounds(bounds);
   }
 }
 
+void MainComponent::resizeColumnControls() {
+  auto bounds = block_grid_.getBounds().withHeight(38).withY(block_grid_.getY() + block_grid_.getHeight() + 19);
+  column_controls_.setBounds(bounds);
+}
+
 void MainComponent::resizeTabContainer() {
   int height = Constants::tabHeight;
   int verticalSpacing = 19;
-  tabGrid.setBounds(blockGrid.getX(), blockGrid.getY() - height - verticalSpacing, blockGrid.getWidth(), height);
+  tab_grid_.setBounds(block_grid_.getX(), block_grid_.getY() - height - verticalSpacing, block_grid_.getWidth(), height);
 }
 
 void MainComponent::mouseDown(const MouseEvent& event) {
@@ -209,31 +249,31 @@ void MainComponent::mouseDown(const MouseEvent& event) {
 void MainComponent::mouseUp(const MouseEvent& event) {
   setMouseCursor(MouseCursor::NormalCursor);
 
-  if (darkBackground.isVisible()) {
-    darkBackground.setVisible(false);
+  if (dark_background_.isVisible()) {
+    dark_background_.setVisible(false);
   }
 
-  if (modulatorDragMode) {
-    previousSliderUnderMouse = {};
-    modulatorDragMode = false;
+  if (modulator_drag_mode_) {
+    previous_slider_under_mouse_ = {};
+    modulator_drag_mode_ = false;
     return;
   }
 
-  auto mousePosition = event.getEventRelativeTo(&blockGrid).getPosition();
+  auto mousePosition = event.getEventRelativeTo(&block_grid_).getPosition();
   auto componentName = event.eventComponent->getName();
 
   if (componentName == "ModulatorsPlusButton") {
-    auto position = event.eventComponent->getPosition() + uiLayer.modulators.getPosition();
-    modulatorsPopup.setBounds(position.getX(), position.getY(), 72, 54);
-    showPopupAt(modulatorsPopup, [this](Index i) { this->clickOnModulatorsPopup(i); });
+    auto position = event.eventComponent->getPosition() + ui_layer_.modulators_.getPosition();
+    modualtors_popup_.setBounds(position.getX(), position.getY(), 72, 54);
+    showPopupAt(modualtors_popup_, [this](Index i) { this->clickOnModulatorsPopup(i); });
   } else if (componentName == "PresetMainButton") {
     auto componentY = event.eventComponent->getPosition().getY();
     auto point = event.eventComponent->getPosition().withY(componentY + 8);
-    showPopupAt(presetsPopup, [this](Index i) { this->clickOnModulatorsPopup(i); });
+    showPopupAt(presets_popup_, [this](Index i) { this->clickOnModulatorsPopup(i); });
   }
 
-  if (blockGrid.contains(mousePosition)) {
-    auto index = blockGrid.indexForPoint(mousePosition); // todo fix 
+  if (block_grid_.contains(mousePosition)) {
+    auto index = block_grid_.indexForPoint(mousePosition); // todo fix 
     clickOnGrid(index);
   }
 
@@ -243,57 +283,58 @@ void MainComponent::mouseUp(const MouseEvent& event) {
 void MainComponent::clickOnModulatorsPopup(Index index) {
   auto code = index.row == 0 ? Types::lfo : Types::adsr;
   addModulator(code);
-  darkBackground.setVisible(false);
+  dark_background_.setVisible(false);
 }
 
 void MainComponent::clickOnGrid(Index& index) {
-  if (blocksPopup.isVisible()) {
-    blocksPopup.setVisible(false);
+  if (blocks_popup_.isVisible()) {
+    blocks_popup_.setVisible(false);
   } else {
-    showBlocksPopup(index);
+    ShowBlocksPopup(index);
   }
 }
 
 void MainComponent::resizeGrid() {
   using namespace Constants;
-  const float gridWidth = columns * moduleWidth + (columns - 1) * moduleSpacing + gridEdgeSpacing * 2;
-  const float gridHeight = rows * moduleHeight + (rows - 1) * (moduleSpacing)+gridEdgeSpacing * 2;
+  const float gridWidth = columns * blockWidth + (columns - 1) * moduleSpacing + gridEdgeSpacing * 2;
+  const float gridHeight = rows * blockHeight + (rows - 1) * (moduleSpacing)+gridEdgeSpacing * 2;
   const float x = (getLocalBounds().getWidth() - gridWidth) / 2;
 
   int gridTopOffset = 135;
-  blockGrid.setBounds(x, getLocalBounds().getY() + gridTopOffset, gridWidth, gridHeight);
+  block_grid_.setBounds(x, getLocalBounds().getY() + gridTopOffset, gridWidth, gridHeight);
 
-  for (auto moduleComponent : blockGrid.getItems())
-    blockGrid.resnapBlock(moduleComponent);
+  for (auto moduleComponent : block_grid_.getItems())
+    block_grid_.resnapBlock(moduleComponent);
 }
 
-void MainComponent::showBlocksPopup(Index index) {
-  blockGrid.addButton.setAlpha(0);
-  blockGrid.reset();
+void MainComponent::ShowBlocksPopup(Index index) {
+  block_grid_.add_button_.setAlpha(0);
+  block_grid_.reset();
 
   auto blockSelectionCompletion = [this, index](Index selectedIndex) {
+    // std::cout << "column " << index.column << " row " << index.row << std::endl;
     int code = selectedIndex.column == 0 ? selectedIndex.row : selectedIndex.row + 5;
     auto module = addBlock(code, index);
     if (module == nullptr) return;
     spawnBlockComponent(module);
   };
 
-  blocksPopup.setBounds(
-    blockGrid.addButton.getX() + blockGrid.getX(),
-    blockGrid.addButton.getY() + blockGrid.getY(),
+  blocks_popup_.setBounds(
+    block_grid_.add_button_.getX() + block_grid_.getX(),
+    block_grid_.add_button_.getY() + block_grid_.getY(),
     140,
     120
   );
 
-  showPopupAt(blocksPopup, blockSelectionCompletion);
+  showPopupAt(blocks_popup_, blockSelectionCompletion);
 }
 
 void MainComponent::showPopupAt(ButtonGridPopup& popup, std::function<void(Index)> callback) {
-  darkBackground.setVisible(true);
-  darkBackground.toFront(true);
+  dark_background_.setVisible(true);
+  dark_background_.toFront(true);
 
   auto callbackWrapper = [this, callback, &popup](Index index) {
-    darkBackground.setVisible(false);
+    dark_background_.setVisible(false);
     popup.setVisible(false);
     popup.setInterceptsMouseClicks(false, false);
     callback(index);
@@ -302,116 +343,99 @@ void MainComponent::showPopupAt(ButtonGridPopup& popup, std::function<void(Index
   popup.present(callbackWrapper);
 }
 
-std::shared_ptr<Block> MainComponent::addBlock(int code, Index index) {
-  std::shared_ptr<Block> block = nullptr;
-
-  switch (code) { // the first row's 5 codes are reserved for different wave types in the block selection menu popup
-  case 0:
-  case 1:
-  case 2:
-  case 3:
-  case 4: {
-    block = delegate->editorAddedBlock(Model::Types::osc, index);
-    if (block == nullptr) return nullptr; // todo - grey out the button in the block selection popup if the block is not available
-    auto range = block->parameters[0]->audioParameter->getNormalisableRange();
-    block->parameters[0]->audioParameter->setValue(range.convertTo0to1(code));
-    break;
-  }
-  case 5: block = delegate->editorAddedBlock(Model::Types::filter, index); break;
-  case 6: block = delegate->editorAddedBlock(Model::Types::reverb, index); break;
-  case 7: block = delegate->editorAddedBlock(Model::Types::delay, index); break;
-  case 8: block = delegate->editorAddedBlock(Model::Types::drive, index); break;
-  case 9: block = delegate->editorAddedBlock(Model::Types::mixer, index); break;
-  default: break;
-  }
-
-  return block;
+std::shared_ptr<model::Block> MainComponent::addBlock(int code, Index index) {
+  std::shared_ptr<model::Block> block = nullptr;
+  StringArray all;
+  all.addArray(model::block_popup_row_one);
+  all.addArray(model::block_popup_row_two);
+  return delegate->editorAddedBlock2(all[code].toStdString(), index);
 }
 
 void MainComponent::setupInspector() {
-  inspector.addMouseListener(this, true);
-  inspector.delegate = this;
-  addChildComponent(inspector);
+  inspector_.addMouseListener(this, true);
+  inspector_.delegate = this;
+  addChildComponent(inspector_);
 }
 
-void MainComponent::resizeInspector() {
-  auto gridY = blockGrid.getY() + blockGrid.getHeight();
-  auto gridCenterX = blockGrid.getX() + blockGrid.getWidth() / 2;
-  int inspectorX = gridCenterX - inspector.calculateWidth() / 2;
-  inspector.setBounds(inspectorX, gridY + 60, 1, 220);
+void MainComponent::ResizeInspector() {
+  auto gridY = block_grid_.getY() + block_grid_.getHeight();
+  auto gridCenterX = block_grid_.getX() + block_grid_.getWidth() / 2;
+  int inspectorX = gridCenterX - inspector_.calculateWidth() / 2;
+  inspector_.setBounds(inspectorX, gridY + 60, 1, 220);
 }
 
-void MainComponent::dismissPopup(ButtonGridPopup& popup) {
+void MainComponent::DismissPopup(ButtonGridPopup& popup) {
   popup.setVisible(false);
 }
 
 void MainComponent::removeTab(GridItemComponent* tab) {
-  if (tab == focusedGridItem) {
-    inspector.setVisible(false);
-    focusedGridItem = nullptr;
-  } else if (inspector.isVisible()) {
+  if (tab == focused_grid_item_) {
+    inspector_.setVisible(false);
+    focused_grid_item_ = nullptr;
+  } else if (inspector_.isVisible()) {
     refreshInspector();
   }
 
   removeChildComponent(tab);
 
   auto tab_column = tab->index.column;
-  tabGrid.detachModule(tab->index, true);
-  
+  tab_grid_.detachModule(tab->index, true);
+
   delegate->editorRemovedTab(tab_column);
-  gridDarkBackground.setVisible(false);
+  grid_dark_background_.setVisible(false);
 }
 
 void MainComponent::removeBlock(GridItemComponent* block) {
   auto item = static_cast<BlockComponent*>(block);
-  if (item == focusedGridItem) {
-    inspector.setVisible(false);
-    focusedGridItem = nullptr;
-  } else if (inspector.isVisible()) {
+  if (item == focused_grid_item_) {
+    inspector_.setVisible(false);
+    focused_grid_item_ = nullptr;
+  } else if (inspector_.isVisible()) {
     refreshInspector();
   }
   blocks.removeFirstMatchingValue(item);
 
   auto index = block->index;
-  blockGrid.detachModule(index);
-  blockGrid.ResetDotsVisibility();
+  block_grid_.detachModule(index);
+  block_grid_.ResetDotsVisibility();
 
   delegate->editorRemovedBlock(index);
-  uiLayer.setModulations(delegate->getModulations());
-  ResetDownFlowingDots();
+  ui_layer_.setConnections(delegate->getModulations());
+  // resetDownFlowingDots();
 }
 
 void MainComponent::handleModuleLandedOnInspector(BlockComponent* moduleComponent, const Point<int>& inspectorRelativePosition) {
-  blockGrid.resnapBlock(moduleComponent);
-}
-
-void MainComponent::connectModulation(BlockComponent* moduleComponent, Index& victimIndex, int parameterIndex) {
-  uiLayer.setModulations(delegate->getModulations());
+  block_grid_.resnapBlock(moduleComponent);
 }
 
 void MainComponent::inspectorChangedParameter(int sliderIndex, float value) {
-  Index moduleIndex(focusedGridItem->index);
-  auto isTab = tabGrid.containsItem(focusedGridItem);
+  Index moduleIndex(focused_grid_item_->index);
+  auto isTab = tab_grid_.containsItem(focused_grid_item_);
 
   if (isTab) {
     delegate->editorAdjustedTab(moduleIndex.column, sliderIndex, value);
   } else {
-    auto module = delegate->getBlock(moduleIndex);
+    auto module = delegate->getBlock2(moduleIndex);
     delegate->editorAdjustedBlock(moduleIndex, sliderIndex, value);
-    updateModuleComponentVisuals(sliderIndex, value, static_cast<std::shared_ptr<Block>>(module));
+    updateModuleComponentVisuals(sliderIndex, value, module);
   }
 }
 
-void MainComponent::updateModuleComponentVisuals(int sliderIndex, float value, std::shared_ptr<Block> block) {
-  if (block->id.type == Model::Types::osc) {
+void MainComponent::updateModuleComponentVisuals(int sliderIndex, float value, std::shared_ptr<model::Module> module) {
+  if (module->id.type == Model::Types::osc) {
+    if (module->parameters_[sliderIndex]->name == "wave") {
+      changeModulePainter((int)value);
+    }
+    return;
+
     switch (OscillatorModule::Parameters(sliderIndex)) {
     case OscillatorModule::pWave:
       changeModulePainter((int)value);
       break;
     case OscillatorModule::pUnison: {
-      auto moduleComponent = blockMatrix[block->index.row][block->index.column];
-      if (auto painter = moduleComponent->getPainter())
-        painter->setUnison(static_cast<int>(value));
+      // auto module_component = block_matrix_[block->index.row][block->index.column];
+      // if (auto painter = module_component->getPainter())
+      //   painter->setUnison(static_cast<int>(value));
       break;
     }
     default:
@@ -421,85 +445,88 @@ void MainComponent::updateModuleComponentVisuals(int sliderIndex, float value, s
 }
 
 void MainComponent::refreshInspector() {
-  std::shared_ptr<Module> focusedModule;
+  std::shared_ptr<model::Module> focused_module;
 
-  auto isTab = tabGrid.containsItem(focusedGridItem);
-  if (isTab) {
-    focusedModule = delegate->getTab(focusedGridItem->index.column);
-  } else {
-    focusedModule = delegate->getBlock(focusedGridItem->index);
-  }
+  // auto isTab = tabGrid.containsItem(focusedGridItem);
+  // if (isTab) {
+  //   focusedModule = delegate->getTab(focusedGridItem->index.column);
+  // } else {
+  focused_module = delegate->getBlock2(focused_grid_item_->index);
+  // }
 
-  inspector.setConfiguration(focusedModule);
-  resizeInspector();
+  inspector_.setConfiguration(focused_module);
+  ResizeInspector();
 }
 
-PopupMenu MainComponent::spawnModulationMenu(Module& victim) {
+PopupMenu MainComponent::spawnModulationMenu(Module& target) {
   PopupMenu modulateMenu;
 
-  modulateMenu.setLookAndFeel(&blocksLookAndFeel);
+  modulateMenu.setLookAndFeel(&blocks_laf_);
 
-  for (int i = 0; i < victim.parameters.size(); i++)
-    modulateMenu.addItem(i + 1, victim.parameters[i]->id);
+  for (int i = 0; i < target.parameters.size(); i++)
+    modulateMenu.addItem(i + 1, target.parameters[i]->id);
 
   return modulateMenu;
 }
 
-void MainComponent::spawnBlockComponent(std::shared_ptr<Block> block) {
+void MainComponent::spawnBlockComponent(std::shared_ptr<model::Block> block) {
   auto blockComponent = BlockComponent::create(block);
 
   blocks.add(blockComponent);
-  blockGrid.addItem(blockComponent, block->index, true);
-  blockMatrix[block->index.row][block->index.column] = blockComponent;
+  block_grid_.addItem(blockComponent, block->index, true);
+  block_matrix_[block->index.column][block->index.row] = blockComponent;
   addAndMakeVisible(blockComponent, 1000);
   cursor.setAlwaysOnTop(true);
-  if (block->length > 1) blockGrid.setItemLength(blockComponent, block->length);
-  blockComponent->setConfig(block);
-  ResetDownFlowingDots();
+  if (block->length > 1) block_grid_.setItemLength(blockComponent, block->length);
+  blockComponent->setConfig(block, delegate->getModulations());
+  // ResetDownFlowingDots();
 }
 
 void MainComponent::spawnTabComponent(std::shared_ptr<Tab> tab) {
-  auto tabComponent = TabComponent::create(*tab, &tabGrid);
+  auto tabComponent = TabComponent::create(*tab, &tab_grid_);
   addAndMakeVisible(tabComponent, 5);
   tabComponent->toFront(false);
-  tabGrid.addItem(tabComponent, { 0, tab->column }, true);
-  if (tab->length > 1) tabGrid.setItemLength(tabComponent, tab->length);
+  tab_grid_.addItem(tabComponent, { 0, tab->column }, true);
+  if (tab->length > 1) tab_grid_.setItemLength(tabComponent, tab->length);
 
-  for (auto glowIndicator : tabGrid.glowIndicators)
+  for (auto glowIndicator : tab_grid_.glowIndicators)
     glowIndicator->toFront(false);
 }
 
 void MainComponent::graphicsTimerCallback(const float secondsSincelastUpdate) {
-  auto currentlyPlayingNotes = delegate->editorRequestsCurrentlyPlayingNotes();
-  noteLogger.log(currentlyPlayingNotes);
+  // auto statusOutput = delegate->editorRequestsStatusOutput("osc 1");
+  // return;
+  // auto currently_playing_notes = delegate->editorRequestsCurrentlyPlayingNotes();
+  // note_logger_.log(currently_playing_notes);
 
-  if (uiLayer.matrix.isVisible()) {
+  if (ui_layer_.connections.isVisible()) {
     auto modulationConnections = delegate->getModulations();
 
     for (int i = 0; i < modulationConnections.size(); i++) {
-      if (auto mc = dynamic_cast<ConnectionComponent*>(uiLayer.matrix.listBox.getComponentForRowNumber(i))) {
-        auto value = delegate->editorRequestsModulatorValue(i);
-        mc->indicator.setMagnitude(value.second, false);
-        mc->indicator.setCurrentValue(value.first);
-        mc->indicator.repaint();
+      if (auto mc = dynamic_cast<ConnectionComponent*>(ui_layer_.connections.listBox.getComponentForRowNumber(i))) {
+        auto source = delegate->editorRequestsStatusOutput("modulation_amount_" + std::to_string(i + 1));
+        // auto amount = delegate->editorRequestsStatusOutput("modulation_amount_" + std::to_string(i + 1));
+        // auto source = delegate->editorRequestsStatusOutput("modulation_amount_" + std::to_string(i + 1));
+        mc->indicator.setCurrentValue(source->value()[0]);
+        // mc->indicator.repaint();
       }
     }
   }
 
-  if (focusedGridItem != nullptr) {
-    updateInspectorModulationIndicators(); // todo - fix
-  }
+  // if (focused_grid_item_ != nullptr) {
+  //   updateInspectorModulationIndicators(); // todo - fix
+  // }
 }
 
 void MainComponent::mouseMove(const MouseEvent& event) {
-  this->currentMousePosition = event.getEventRelativeTo(this).getPosition();
+  this->current_mouse_position_ = event.getEventRelativeTo(this).getPosition();
 }
 
 void MainComponent::updateInspectorModulationIndicators() {
-  if (focusedGridItem == nullptr) return;
-  if (focusedGridItem->getName() != "BlockComponent") return;
+  if (focused_grid_item_ == nullptr) return;
+  if (focused_grid_item_->getName() != "BlockComponent") return;
 
-  auto module = delegate->getBlock(focusedGridItem->index);
+  auto module = delegate->getBlock(focused_grid_item_->index);
 
   for (int parameterIndex = 0; parameterIndex < module->parameters.size(); parameterIndex++) {
     auto parameter = module->parameters[parameterIndex];
@@ -507,91 +534,95 @@ void MainComponent::updateInspectorModulationIndicators() {
     auto range = parameter->audioParameter->getNormalisableRange();
     auto value = parameter->audioParameter->getValue();
 
-    inspector.getSliders()[parameterIndex]->setValue(range.convertFrom0to1(value));
+    inspector_.getSliders()[parameterIndex]->setValue(range.convertFrom0to1(value));
 
     auto modulators = parameter->connections;
 
     for (int modulatorIndex = 0; modulatorIndex < parameter->connections.size(); modulatorIndex++) {
-      auto modulatorValue = delegate->editorRequestsModulatorValue(focusedGridItem->index, parameterIndex, modulatorIndex);
-      inspector.setModulationIndicatorValue(parameterIndex, modulatorIndex, modulatorValue.first, modulatorValue.second);
+      auto modulatorValue = delegate->editorRequestsModulatorValue(focused_grid_item_->index, parameterIndex, modulatorIndex);
+      inspector_.setModulationIndicatorValue(parameterIndex, modulatorIndex, modulatorValue.first, modulatorValue.second);
     }
   }
 }
 
 void MainComponent::clear() {
-  focusedGridItem = nullptr;
-  inspector.setVisible(false);
+  focused_grid_item_ = nullptr;
+  inspector_.setVisible(false);
 
-  for (auto mc : blockGrid.getItems())
+  for (auto mc : block_grid_.getItems())
     removeChildComponent(mc);
 
-  blockGrid.clear();
+  block_grid_.clear();
   blocks.clear();
 
-  for (auto tab : tabGrid.getItems())
+  for (auto tab : tab_grid_.getItems())
     removeChildComponent(tab);
 
-  tabGrid.clear();
+  tab_grid_.clear();
 
-  uiLayer.presetButton.label.setText("empty", dontSendNotification);
-  uiLayer.setModulations(delegate->getModulations());
-  uiLayer.setModulators(delegate->getModulators());
-  ResetDownFlowingDots();
+  ui_layer_.preset_button_.content.label.setText("empty", dontSendNotification);
+  ui_layer_.setConnections(delegate->getModulations());
+  ui_layer_.setModulators(delegate->getModulators2());
+  column_controls_.reset();
+  resetDownFlowingDots();
 }
 
 void MainComponent::modulationConnectionBipolarPressed(ConnectionComponent* component, bool bipolar) {
-  auto index = uiLayer.matrix.indexOfModulationConnection(component->getParentComponent());
+  auto index = ui_layer_.connections.indexOfModulationConnection(component->getParentComponent());
   delegate->editorChangedModulationPolarity(index, bipolar);
 
   auto connection = delegate->getModulations()[index];
 
-  if (!focusedGridItem) return;
-  auto focused = delegate->getBlock(focusedGridItem->index);
+  if (!focused_grid_item_) return;
+  auto focused = delegate->getBlock(focused_grid_item_->index);
   auto target = connection->target;
 
   if (target->name != focused->name) return;
 
-  auto parameter = target->parameters[connection->parameterIndex];
+  // auto parameter = target->parameters_[connection->parameterIndex];
 
-  for (int m = 0; m < parameter->connections.size(); m++)
-    if (connection->source->name == parameter->connections[m]->source->name)
-      inspector.getSliders()[connection->parameterIndex]->setModulatorBipolar(m, bipolar);
+  // for (int m = 0; m < parameter->connections.size(); m++)
+  //   if (connection->source->name == parameter->connections[m]->source->name)
+  //     inspector.getSliders()[connection->parameterIndex]->setModulatorBipolar(m, bipolar);
 }
 
 void MainComponent::connectionDeleted(ConnectionComponent* component) {
   auto connection = delegate->getModulations()[component->row];
-  if (focusedGridItem) {
-    auto focused = delegate->getBlock(focusedGridItem->index);
+  if (focused_grid_item_) {
+    auto focused = delegate->getBlock(focused_grid_item_->index);
     auto target = connection->target;
 
     if (target->name != focused->name) return;
 
-    int index = target->parameters[connection->parameterIndex]->getIndexOfConnection(connection);
-    inspector.getSliders()[connection->parameterIndex]->removeIndicator(index);
+    // int index = target->parameters[connection->parameterIndex]->getIndexOfConnection(connection);
+    // inspector.getSliders()[connection->parameterIndex]->removeIndicator(index);
   }
 
   delegate->editorDisconnectedModulation(component->row);
-  uiLayer.setModulations(delegate->getModulations());
+  ui_layer_.setConnections(delegate->getModulations());
 
-  if (inspector.isVisible()) inspector.setConfiguration(delegate->getBlock(focusedGridItem->index));
-  for (auto block : blocks) block->setConfig(delegate->getBlock(block->index));
+  if (inspector_.isVisible()) inspector_.setConfiguration(delegate->getBlock2(focused_grid_item_->index));
+  for (auto block : blocks) block->setConfig(delegate->getBlock2(block->index), delegate->getModulations());
 }
 
 void MainComponent::sliderValueChanged(Slider* slider) {
   bool isModulatorSlider = slider->getName() == "modulatorSlider";
   if (isModulatorSlider) {
-    auto listItemComponent = slider->getParentComponent()->getParentComponent()->getParentComponent()->getParentComponent()->getParentComponent();
-    auto index = uiLayer.modulators.listBox.getRowNumberOfComponent(listItemComponent);
-    delegate->editorAdjustedModulator(index, 1, static_cast<float>(slider->getValue()));
+    // auto listItemComponent = slider->getParentComponent()->getParentComponent()->getParentComponent()->getParentComponent()->getParentComponent();
+    // auto index = ui_layer_.modulators_.listBox.getRowNumberOfComponent(listItemComponent);
+    // delegate->editorAdjustedModulator(index, 1, static_cast<float>(slider->getValue()));
   } else {
-    auto index = uiLayer.matrix.indexOfModulationConnection(slider->getParentComponent()->getParentComponent());
+    auto index = ui_layer_.connections.indexOfModulationConnection(slider->getParentComponent()->getParentComponent());
+    auto value = static_cast<float>(slider->getValue());
     delegate->editorChangedModulationMagnitude(index, static_cast<float>(slider->getValue()));
   }
 }
 
-void MainComponent::loadState(PresetInfo preset) {
+// void MainComponent::sliderValueChanged
+
+void MainComponent::loadState(Preset preset) {
   for (auto presetBlock : preset.blocks) {
-    auto block = delegate->getBlock(Index { presetBlock.index.first, presetBlock.index.second });
+    auto block = delegate->getBlock2(Index { presetBlock.index.first, presetBlock.index.second });
     spawnBlockComponent(block);
   }
 
@@ -600,9 +631,15 @@ void MainComponent::loadState(PresetInfo preset) {
     spawnTabComponent(tab);
   }
 
-  uiLayer.setModulations(delegate->getModulations());
-  uiLayer.setModulators(delegate->getModulators());
-  uiLayer.presetButton.content.label.setText(preset.name, dontSendNotification);
+  for (auto column_control : preset.column_controls) {
+    int index = column_control.id.number - 1;
+    column_controls_.pan_sliders_[index]->slider.setValue(column_control.parameters["pan"]);
+    column_controls_.level_sliders_[index]->slider.setValue(column_control.parameters["level"]);
+  }
+
+  ui_layer_.setConnections(delegate->getModulations());
+  ui_layer_.setModulators(delegate->getModulators2());
+  ui_layer_.preset_button_.content.label.setText(preset.name, dontSendNotification);
 
   for (auto block : blocks) block->animate();
 }
@@ -610,151 +647,150 @@ void MainComponent::loadState(PresetInfo preset) {
 void MainComponent::modulatorIsDragging(ModulatorComponent* modulatorComponent, const MouseEvent& event) {
   updateDotPosition(event.getEventRelativeTo(this).getPosition());
 
-  if (!inspector.isVisible()) return;
+  if (!inspector_.isVisible()) return;
 
-  auto relativePosition = event.getEventRelativeTo(&inspector).getPosition();
-  bool draggingInsideInspector = inspector.contains(relativePosition);
+  auto relativePosition = event.getEventRelativeTo(&inspector_).getPosition();
+  bool draggingInsideInspector = inspector_.contains(relativePosition);
 
   if (draggingInsideInspector) {
-    int sliderIndexUnderMouse = (int)ceilf(relativePosition.getX() / inspector.sliderWidth);
-    if (sliderIndexUnderMouse == previousSliderUnderMouse) return;
+    int sliderIndexUnderMouse = (int)ceilf(relativePosition.getX() / inspector_.sliderWidth);
+    if (sliderIndexUnderMouse == previous_slider_under_mouse_) return;
 
-    if (previousSliderUnderMouse.has_value())
-      inspector.getSliders()[*previousSliderUnderMouse]->setHighlighted(false);
+    if (previous_slider_under_mouse_.has_value())
+      inspector_.getSliders()[*previous_slider_under_mouse_]->setHighlighted(false);
 
-    previousSliderUnderMouse = sliderIndexUnderMouse;
+    previous_slider_under_mouse_ = sliderIndexUnderMouse;
 
-    auto victim = getFocusedModule();
+    auto target = getFocusedModule();
 
-    if (victim->parameters[sliderIndexUnderMouse]->isModulatable) {
-      auto slider = inspector.getSliders()[sliderIndexUnderMouse];
-      slider->setHighlighted(true, modulatorComponent->getColour());
-    }
-  } else {
-    if (previousSliderUnderMouse.has_value()) {
-      inspector.getSliders()[*previousSliderUnderMouse]->setHighlighted(false);
-      previousSliderUnderMouse = {};
-    }
+    // if (target->parameters[sliderIndexUnderMouse]->isModulatable) {
+    auto slider = inspector_.getSliders()[sliderIndexUnderMouse];
+    slider->setHighlighted(true, modulatorComponent->getColour());
+    // }
+  // } else {
+    // if (previousSliderUnderMouse.has_value()) {
+    //   inspector.getSliders()[*previousSliderUnderMouse]->setHighlighted(false);
+    //   previousSliderUnderMouse = {};
+    // }
   }
 }
 
-std::shared_ptr<Module> MainComponent::getFocusedModule() {
-  if (focusedGridItem->grid == &blockGrid)
-    return delegate->getBlock(focusedGridItem->index);
-  else
-    return delegate->getTab(focusedGridItem->index.column);
+std::shared_ptr<model::Module> MainComponent::getFocusedModule() {
+  // if (focusedGridItem->grid == &blockGrid)
+  return delegate->getBlock2(focused_grid_item_->index);
+  // else
+  //   return delegate->getTab(focusedGridItem->index.column);
 }
 
-void MainComponent::modulatorEndedDrag(ModulatorComponent* modulatorComponent, const MouseEvent& event) {
+void MainComponent::modulatorEndedDrag(ModulatorComponent* modulator_component, const MouseEvent& event) {
   exitModulatorDragMode();
 
-  auto gridRelativePosition = event.getEventRelativeTo(&blockGrid).getPosition();
-  auto inspectorRelativePosition = event.getEventRelativeTo(&inspector).getPosition();
-  auto modulatorIndex = uiLayer.modulators.listBox.getRowNumberOfComponent(modulatorComponent->getParentComponent());
+  auto grid_relative_pos = event.getEventRelativeTo(&block_grid_).getPosition();
+  auto inspector_relative_pos = event.getEventRelativeTo(&inspector_).getPosition();
+  auto modulator_index = ui_layer_.modulators_.listBox.getRowNumberOfComponent(modulator_component->getParentComponent());
 
-  if (blockGrid.contains(gridRelativePosition)) {
-    auto indexUnderMouse = blockGrid.indexForPoint(gridRelativePosition);
+  if (block_grid_.contains(grid_relative_pos)) {
+    auto index_under_mouse = block_grid_.indexForPoint(grid_relative_pos);
 
     // if landed on a block
-    if (auto block = blockGrid.isSlotTaken(indexUnderMouse)) {
+    if (auto block = block_grid_.isSlotTaken(index_under_mouse)) {
       // presentModulationOptionsMenu(modulatorIndex, indexUnderMouse, block); // todo - reimplement
       return;
     }
-  } else if (inspector.contains(inspectorRelativePosition)) {
-    int parameterIndex = (int)ceilf(inspectorRelativePosition.getX() / inspector.sliderWidth);
+  } else if (inspector_.contains(inspector_relative_pos)) {
+    int parameter_index = (int)ceilf(inspector_relative_pos.getX() / inspector_.sliderWidth);
 
-    auto focusedModule = getFocusedModule();
-    if (focusedModule == nullptr) return;
+    auto focused_module = getFocusedModule();
+    if (focused_module == nullptr) return;
 
-    auto isModulatable = focusedModule->parameters[parameterIndex]->isModulatable;
-    if (!isModulatable) return;
-
-    delegate->editorConnectedModulation(modulatorComponent->row, focusedModule->name, parameterIndex);
-    uiLayer.setModulations(delegate->getModulations());
+    // auto isModulatable = focusedModule->parameters[parameterIndex]->isModulatable;
+    // if (!isModulatable) return;
+    auto parameter_name = focused_module->getParameterName(parameter_index);
+    delegate->editorConnectedModulation(modulator_component->row, focused_module->name, parameter_name);
+    ui_layer_.setConnections(delegate->getModulations());
     refreshInspector();
 
-    auto modulator = delegate->getModulator(modulatorIndex);
-    auto focusedBlock = blockMatrix[focusedGridItem->index.row][focusedGridItem->index.column];
-
-    focusedBlock->setConfig(focusedModule);
+    // auto modulator = delegate->getModulator(modulatorIndex);
+    auto focused_block = block_matrix_[focused_grid_item_->index.column][focused_grid_item_->index.row];
+    focused_block->setConfig(focused_module, delegate->getModulations());
   }
 }
 
 void MainComponent::exitModulatorDragMode() {
   setMouseCursor(MouseCursor::NormalCursor);
-  darkBackground.setVisible(false);
+  dark_background_.setVisible(false);
   cursor.setVisible(false);
 }
 
 void MainComponent::presentModulationOptionsMenu(int modulatorIndex, Index& indexUnderMouse, BlockComponent* block) {
-  auto blockModel = delegate->getBlock(indexUnderMouse);
-  PopupMenu modulateMenu = spawnModulationMenu(*blockModel);
+  auto block_model = delegate->getBlock(indexUnderMouse);
+  PopupMenu modulate_menu = spawnModulationMenu(*block_model);
 
-  const int chosenIndex = 1;
+  const int chosen_index = 1;
+  bool discarded_menu = chosen_index == 0;
+  if (discarded_menu) return;
 
-  bool discardedMenu = chosenIndex == 0;
-  if (discardedMenu) return;
+  // delegate->editorConnectedModulation(modulatorIndex, blockModel->name, chosenIndex);
+  ui_layer_.setConnections(delegate->getModulations());
 
-  delegate->editorConnectedModulation(modulatorIndex, blockModel->name, chosenIndex);
-  uiLayer.setModulations(delegate->getModulations());
-
-  if (inspector.isVisible()) refreshInspector();
+  if (inspector_.isVisible()) refreshInspector();
 }
 
 void MainComponent::enterModulatorDragMode(Colour colour) {
-  darkBackground.setVisible(true);
+  dark_background_.setVisible(true);
   cursor.colour = colour;
   cursor.setVisible(true);
-  inspector.setAlwaysOnTop(true);
+  inspector_.setAlwaysOnTop(true);
   cursor.setAlwaysOnTop(true);
-  modulatorDragMode = true;
+  modulator_drag_mode_ = true;
 }
 
 void MainComponent::modulatorRemoved(ModulatorComponent* component) {
-  uiLayer.modulators.modulatorsListModel.remove(component->row);
-  uiLayer.modulators.listBox.updateContent();
+  ui_layer_.modulators_.modulators_list_model_.remove(component->row);
+  ui_layer_.modulators_.listBox.updateContent();
 
   delegate->editorRemovedModulator(component->row);
-  uiLayer.setModulations(delegate->getModulations());
+  ui_layer_.setConnections(delegate->getModulations());
 
-  if (inspector.isVisible()) inspector.setConfiguration(delegate->getBlock(focusedGridItem->index));
-  for (auto block : blocks) block->setConfig(delegate->getBlock(block->index));
+  // if (inspector.isVisible()) inspector.setConfiguration(delegate->getBlock(focusedGridItem->index));
+  for (auto block : blocks) block->setConfig(delegate->getBlock2(block->index), delegate->getModulations());
 }
 
 void MainComponent::setupPopupMenus() {
-  addChildComponent(blocksPopup);
-  blocksPopup.setModel({ waveforms, effects });
+  addChildComponent(blocks_popup_);
 
-  addChildComponent(modulatorsPopup);
-  modulatorsPopup.setModel(modulators);
+  blocks_popup_.setModel({ model::block_popup_row_one, model::block_popup_row_two });
 
-  addChildComponent(savePopup);
+  addChildComponent(modualtors_popup_);
+  modualtors_popup_.setModel(model::modulators);
+
+  addChildComponent(save_popup_);
 }
 
 void MainComponent::presetButtonClicked() {
-  auto presetButtonBounds = uiLayer.presetButton.getBounds();
+  auto presetButtonBounds = ui_layer_.preset_button_.getBounds();
   auto y = presetButtonBounds.getY() + presetButtonBounds.getHeight() + 6;
 
   auto width = 140;
   auto x = presetButtonBounds.getCentreX() - width / 2;
 
   int presetCount = delegate->editorRequestsPresetNames().size();
-  int desiredHeight = presetsPopup.calculateHeight(presetCount);
-  int maxHeight = presetsPopup.calculateHeight(10);
+  int desiredHeight = presets_popup_.calculateHeight(presetCount);
+  int maxHeight = presets_popup_.calculateHeight(10);
   auto height = std::clamp(desiredHeight, desiredHeight, maxHeight);
-  presetsPopup.setBounds(x, y, width, height);
+  presets_popup_.setBounds(x, y, width, height);
 
   auto presetNames = delegate->editorRequestsPresetNames();
-  presetsPopup.setModel({ presetNames });
+  presets_popup_.setModel({ presetNames });
 
-  showPopupAt(presetsPopup, [this](Index i) { this->loadPreset(i.row); });
+  showPopupAt(presets_popup_, [this](Index i) { this->loadPreset(i.row); });
 }
 
 void MainComponent::loadPreset(int index) {
   clear();
   auto preset = delegate->editorChangedPreset(index);
   loadState(preset);
-  darkBackground.setVisible(false);
+  dark_background_.setVisible(false);
 }
 
 void MainComponent::visibilityChanged() {
@@ -762,59 +798,59 @@ void MainComponent::visibilityChanged() {
 }
 
 void MainComponent::clickedOnGrid(GridComponent* grid, Index index) {
-  if (grid == &blockGrid) return;
+  if (grid == &block_grid_) return;
   spawnTabComponent(delegate->editorAddedTab(index.column));
 }
 
 void MainComponent::gridItemRemoved(GridComponent* grid, GridItemComponent* item) {
-  if (grid == &blockGrid) {
+  if (grid == &block_grid_) {
     removeBlock(item);
   }
 }
 
 void MainComponent::gridItemRepositioned(GridComponent* grid, GridItemComponent* item, Index oldIndex) {
-  if (grid == &blockGrid) {
-    blockMatrix[oldIndex.row][oldIndex.column] = nullptr;
-    blockMatrix[item->index.row][item->index.column] = static_cast<BlockComponent*>(item);
+  if (grid == &block_grid_) {
+    block_matrix_[oldIndex.column][oldIndex.row] = nullptr;
+    block_matrix_[item->index.column][item->index.row] = static_cast<BlockComponent*>(item);
     delegate->editorRepositionedBlock(oldIndex, item->index);
-    ResetDownFlowingDots();
-  } else if (grid == &tabGrid) {
+    // ResetDownFlowingDots();
+  } else if (grid == &tab_grid_) {
     delegate->editorRepositionedTab(oldIndex.column, item->index.column);
   }
 }
 
 void MainComponent::gridItemLengthChanged(GridComponent* grid, GridItemComponent* item, int length) {
-  if (grid == &blockGrid) {
+  if (grid == &block_grid_) {
     delegate->editorChangedBlockLength(item->index, length);
-  } else if (grid == &tabGrid) {
+  } else if (grid == &tab_grid_) {
     delegate->editorChangedTabLength(item->index.column, length);
   }
 }
 
 void MainComponent::gridItemHovered(GridComponent* grid, GridItemComponent* item, Index index) {
-  if (grid == &tabGrid) {
-    blockGrid.highlightColumn(index.column, index.column + item->length);
+  if (grid == &tab_grid_) {
+    block_grid_.highlightColumn(index.column, index.column + item->length);
   }
 }
 
 void MainComponent::gridItemStartedDrag(GridComponent* grid, GridItemComponent* item, const MouseEvent& mouseEvent) {
-  if (grid == &tabGrid) {
-    tabGrid.hideAllItems(true, item);
-    gridDarkBackground.setVisible(true);
+  if (grid == &tab_grid_) {
+    tab_grid_.hideAllItems(true, item);
+    grid_dark_background_.setVisible(true);
   }
 }
 
 void MainComponent::gridItemEndedDrag(GridComponent* grid, GridItemComponent* item, const MouseEvent& mouseEvent) {
-  if (grid == &tabGrid) {
-    gridDarkBackground.setVisible(false);
-    tabGrid.hideAllItems(false, item);
-    blockGrid.reset();
-    blockGrid.ResetDotsVisibility();
+  if (grid == &tab_grid_) {
+    grid_dark_background_.setVisible(false);
+    tab_grid_.hideAllItems(false, item);
+    block_grid_.reset();
+    block_grid_.ResetDotsVisibility();
   }
 }
 
 void MainComponent::gridItemClicked(GridComponent* grid, GridItemComponent* item, const MouseEvent& event) {
-  if (event.mods.isRightButtonDown() && grid == &tabGrid) {
+  if (event.mods.isRightButtonDown() && grid == &tab_grid_) {
     removeTab(item);
     return;
   }
@@ -823,43 +859,72 @@ void MainComponent::gridItemClicked(GridComponent* grid, GridItemComponent* item
 }
 
 void MainComponent::toggleGridItemSelection(GridComponent* grid, GridItemComponent* item, bool selected) {
-  gridDarkBackground.setVisible(selected);
-  inspector.setVisible(selected);
+  grid_dark_background_.setVisible(selected);
+  inspector_.setVisible(selected);
 
   if (selected) {
     item->setHidden(false);
-    bool otherModuleCurrentlyChosen = focusedGridItem != nullptr;
-    if (otherModuleCurrentlyChosen) focusedGridItem->setSelected(false);
-    focusedGridItem = item;
+    bool is_other_module_currently_chosen = focused_grid_item_ != nullptr;
+    if (is_other_module_currently_chosen) focused_grid_item_->setSelected(false);
+    focused_grid_item_ = item;
     refreshInspector();
   } else {
-    focusedGridItem = nullptr;
+    focused_grid_item_ = nullptr;
   }
 
   item->setSelected(selected);
-  blockGrid.hideAllItems(selected, item);
-  tabGrid.hideAllItems(selected, item);
+  block_grid_.hideAllItems(selected, item);
+  tab_grid_.hideAllItems(selected, item);
 }
 
 void MainComponent::notesStarted(Array<int> notes) {
-  tabGrid.animateGlowIndicators(delegate->editorRequestsActiveColumns());
+  tab_grid_.animateGlowIndicators(delegate->editorRequestsActiveColumns());
 }
 
 void MainComponent::notesEnded(Array<int> notes) { }
 
-void MainComponent::ResetDownFlowingDots() {
+void MainComponent::resetDownFlowingDots() {
   std::set<int> columns_with_blocks;
-  for (auto block_component : blocks) { 
-    auto block_model = delegate->getBlock(block_component->index);
+  for (auto block_component : blocks) {
+    auto block_model = delegate->getBlock2(block_component->index);
     if (block_model->id.type != Model::Types::osc) continue;
     columns_with_blocks.insert(block_component->index.column);
   }
 
-  for (int column = 0; column < GridConfigs::blocks.columns; column++) { 
-    blockGrid.SetDownFlowingHighlight(column, false);
+  for (int column = 0; column < GridConfigs::blocks.columns; column++) {
+    block_grid_.setDownFlowingHighlight(column, false);
   }
-  
+
   for (auto column : columns_with_blocks) {
-    blockGrid.SetDownFlowingHighlight(column, true);
+    block_grid_.setDownFlowingHighlight(column, true);
   }
+}
+
+void MainComponent::columnControlAdjusted(ColumnControlsContainer::ControlType control, int column, float value) {
+  if (control == ColumnControlsContainer::ControlType::level) {
+    delegate->editorAdjustedColumn("level", column, value);
+  } else if (control == ColumnControlsContainer::ControlType::pan) {
+    delegate->editorAdjustedColumn("pan", column, value);
+  }
+}
+
+void MainComponent::columnControlStartedAdjusting(ColumnControlsContainer::ControlType control, int column) {
+  if (control == ColumnControlsContainer::ControlType::level) {
+    delegate->editorStartedAdjustingColumn("level", column);
+  } else if (control == ColumnControlsContainer::ControlType::pan) {
+    delegate->editorStartedAdjustingColumn("pan", column);
+  }
+}
+
+void MainComponent::columnControlEndedAdjusting(ColumnControlsContainer::ControlType control, int column) {
+  if (control == ColumnControlsContainer::ControlType::level) {
+    delegate->editorEndedAdjustingColumn("level", column);
+  } else if (control == ColumnControlsContainer::ControlType::pan) {
+    delegate->editorEndedAdjustingColumn("pan", column);
+  }
+}
+
+void MainComponent::modulatorGestureChanged(ModulatorComponent* modulatorComponent, std::string parameter_name, bool started) {
+  auto modulator = delegate->getModulator2(modulatorComponent->row);
+  delegate->editorParameterGestureChanged(modulator->name, parameter_name, started);
 }

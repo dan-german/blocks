@@ -12,7 +12,7 @@
 
 LabeledSlider::LabeledSlider() {
   addAndMakeVisible(label);
-  addAndMakeVisible(boxSlider);
+  addAndMakeVisible(box_slider_);
   label.setText("attack", dontSendNotification);
   label.setJustificationType(Justification::centredLeft);
 
@@ -26,7 +26,7 @@ LabeledSlider::~LabeledSlider() {
 
 void LabeledSlider::resized() {
   label.setBounds(0, 0, getWidth() / 2, getHeight());
-  boxSlider.setBounds(getWidth() / 2, 0, getWidth() / 2, getHeight());
+  box_slider_.setBounds(getWidth() / 2, 0, getWidth() / 2, getHeight());
 }
 
 void LabeledSlider::themeChanged(Theme theme) {

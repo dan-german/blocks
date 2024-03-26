@@ -2,12 +2,12 @@
 
 #include "dsp/Processor.h"
 
-inline float soft(float value) 
-{ 
+inline float soft(float value)
+{
 #ifdef __linux__
-    return tanhf(value);
+  return tanhf(value);
 #else
-    return std::tanhf(value); 
+  return std::tanhf(value);
 #endif
 }
 inline float hard(float value) { return std::clamp(value, -1.0f, 1.0f); }

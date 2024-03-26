@@ -32,9 +32,9 @@ public:
   ModulePool();
   ~ModulePool();
 
-  std::shared_ptr<Tab> getTab(Type code, int number);
-  std::shared_ptr<Block> getBlock(Type code, int number);
-  std::shared_ptr<Module> getModulator(Type code, int number, int colourId);
+  std::shared_ptr<Tab> getTab(Model::Type code, int number);
+  std::shared_ptr<Block> getBlock(Model::Type code, int number);
+  std::shared_ptr<Module> getModulator(Model::Type code, int number, int colourId);
   std::shared_ptr<Modulation> getModulation(int number = -1);
 
   void retire(std::shared_ptr<Modulation> modulationConnection);

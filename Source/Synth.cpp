@@ -1,7 +1,8 @@
 #include "Synth.h"
 #include "util/Analytics.h"
 
-void Synth::editorAdjustedModulator(int parameter, int modulator, float value) { moduleManager.getModulator(modulator)->parameter(parameter)->setValue(value); }
+void Synth::editorAdjustedModulator(std::string parameter_name, int modulator, float value) { /* moduleManager.getModulator(modulator)->parameter(parameter)->setValue(value);*/ }
+
 void Synth::editorAdjustedBlock(Index index, int parameter, float value) { moduleManager.getBlock(index)->parameter(parameter)->setValue(value); }
 void Synth::editorChangedModulationMagnitude(int index, float magnitude) { moduleManager.getConnection(index)->setMagnitude(magnitude); }
 void Synth::editorChangedModulationPolarity(int index, bool bipolar) { moduleManager.getConnection(index)->setPolarity(bipolar); }
@@ -10,7 +11,7 @@ void Synth::editorAdjustedTab(int column, int parameter, float value) { moduleMa
 std::shared_ptr<Module> Synth::getModulator(int index) { return moduleManager.getModulator(index); }
 
 Array<std::shared_ptr<Modulation>> Synth::getConnectionsOfSource(std::shared_ptr<Module> source) { return moduleManager.getConnectionsOfSource(source); }
-Array<std::shared_ptr<Modulation>> Synth::getModulations() { return moduleManager.getConnections(); }
+std::vector<std::shared_ptr<model::Connection>> Synth::getModulations() { return {}; }
 std::shared_ptr<Block> Synth::getBlock(Index index) { return (index.row == -1 || index.column == -1) ? nullptr : moduleManager.getBlock(index); }
 std::shared_ptr<Tab> Synth::getTab(int column) { return moduleManager.getTab(column); }
 Array<MPENote> Synth::editorRequestsCurrentlyPlayingNotes() { return currentlyPlayingNotes; }
@@ -21,9 +22,9 @@ void Synth::editorRepositionedBlock(Index oldIndex, Index newIndex) {
   repositionProcessor(oldIndex, newIndex);
 }
 
-void Synth::editorConnectedModulation(int modulatorIndex, String targetName, int parameter) {
+void Synth::editorConnectedModulation(int modulatorIndex, std::string targetName, std::string parameter) {
   Analytics::shared()->countAction("Modulation Connected");
-  connect(modulatorIndex, targetName, parameter);
+  // connect(modulatorIndex, targetName, parameter);
 }
 
 void Synth::editorDisconnectedModulation(int index) {
@@ -31,7 +32,7 @@ void Synth::editorDisconnectedModulation(int index) {
   disconnect(index);
 }
 
-PresetInfo Synth::editorChangedPreset(int index) {
+Preset Synth::editorChangedPreset(int index) {
   return changePreset(index);
 }
 
@@ -102,10 +103,10 @@ Array<std::shared_ptr<Module>> Synth::getModulators() {
   return array;
 }
 
-void Synth::editorSavedPreset(String name) {
+void Synth::editorSavedPreset(std::string name) {
   Analytics::shared()->countAction("Preset Saved");
-  auto info = PresetInfo::create(name, moduleManager.getTabs(), moduleManager.getBlocks(), moduleManager.getModulators(), moduleManager.getConnections());
-  presetManager.save(info);
+  // auto info = PresetInfo::create(name, moduleManager.getTabs(), moduleManager.getBlocks(), moduleManager.getModulators(), moduleManager.getConnections());
+  // presetManager.save(info);
 }
 
 std::pair<float, float> Synth::editorRequestsModulatorValue(Index moduleIndex, int parameterIndex, int modulatorIndex) {
@@ -130,22 +131,22 @@ std::pair<float, float> Synth::editorRequestsModulatorValue(int modulationConnec
   return { 0.0f, 0.0f };
 }
 
-PresetInfo Synth::getStateRepresentation() {
-  auto currentState = PresetInfo();
+Preset Synth::getStateRepresentation() {
+  auto currentState = Preset();
 
   for (auto block : moduleManager.getBlocks()) {
-    auto presetBlock = PresetInfo::Block();
+    auto presetBlock = Preset::Block();
     presetBlock.index = { block->index.row, block->index.column }; ;
     presetBlock.id = block->id;
     presetBlock.length = block->length;
-    currentState.blocks.add(presetBlock);
+    // currentState.blocks.add(presetBlock);
   }
 
   for (auto tab : moduleManager.getTabs()) {
-    auto presetTab = PresetInfo::Tab();
+    auto presetTab = Preset::Tab();
     presetTab.column = tab->column;
     presetTab.id = tab->id;
-    currentState.tabs.add(presetTab);
+    // currentState.tabs.add(presetTab);
   }
 
   return currentState;
@@ -367,13 +368,13 @@ void Synth::clear() {
   }
 }
 
-void Synth::editorParameterGestureChanged(String moduleName, int parameterIndex, bool started) {
+void Synth::editorParameterGestureChanged(std::string module_name, std::string parameter_name, bool started) {
   if (JUCE_STANDALONE_APPLICATION) return;
 
   if (started) {
-    moduleManager.getModule(moduleName)->parameter(parameterIndex)->audioParameter->beginChangeGesture();
+    // moduleManager.getModule(module_name)->parameter(parameterIndex)->audioParameter->beginChangeGesture();
   } else {
-    moduleManager.getModule(moduleName)->parameter(parameterIndex)->audioParameter->endChangeGesture();
+    // moduleManager.getModule(moduleName)->parameter(parameterIndex)->audioParameter->endChangeGesture();
   }
 }
 
@@ -424,11 +425,11 @@ void Synth::removeConnectionsFromTarget(std::shared_ptr<Module> module) {
     disconnect(connection);
 }
 
-PresetInfo Synth::changePreset(int index) {
+Preset Synth::changePreset(int index) {
   if (index == -1) {
     Analytics::shared()->countAction("Preset Initialized");
     clear();
-    return PresetInfo();
+    return Preset();
   }
 
   Analytics::shared()->countAction("Preset Changed");
@@ -437,16 +438,16 @@ PresetInfo Synth::changePreset(int index) {
   return preset;
 }
 
-void Synth::loadPreset(PresetInfo preset) {
+void Synth::loadPreset(Preset preset) {
   clear();
 
-  for (auto presetTab : preset.tabs) {
-    auto tab = moduleManager.addTab(presetTab.id.type, presetTab.column, presetTab.id.number);
-    tab->length = presetTab.length;
+  // for (auto presetTab : preset.tabs) {
+  //   auto tab = moduleManager.addTab(presetTab.id.type, presetTab.column, presetTab.id.number);
+  //   tab->length = presetTab.length;
 
-    for (auto const& [key, val] : presetTab.parameters)
-      tab->parameterMap[key]->audioParameter->setValue(val);
-  }
+  //   for (auto const& [key, val] : presetTab.parameters)
+  //     tab->parameterMap[key]->audioParameter->setValue(val);
+  // }
 
   for (auto presetBlock : preset.blocks) {
     Index index = { presetBlock.index.first, presetBlock.index.second };
@@ -467,7 +468,7 @@ void Synth::loadPreset(PresetInfo preset) {
       modulator->parameterMap[key]->audioParameter->setValue(val);
   }
 
-  for (auto presetConnection : preset.modulations) {
+  for (auto presetConnection : preset.connections_) {
     auto modulator = moduleManager.getModule(presetConnection.source);
 
     int modulatorIndex = moduleManager.modulators.indexOf(modulator);
@@ -478,7 +479,7 @@ void Synth::loadPreset(PresetInfo preset) {
     auto parameterIndex = target->parameters.indexOf(parameter);
     auto modulation = connect(modulatorIndex, presetConnection.target, parameterIndex, presetConnection.number);
 
-    modulation->magnitudeParameter->setValue(presetConnection.magnitude);
+    modulation->magnitudeParameter->setValue(presetConnection.amount);
     modulation->setPolarity(presetConnection.bipolar);
   }
 }
@@ -486,8 +487,8 @@ void Synth::loadPreset(PresetInfo preset) {
 void Synth::noteStopped(bool allowTailOff) {}
 
 std::string Synth::getState() {
-  auto info = PresetInfo::create(name, moduleManager.getTabs(), moduleManager.getBlocks(), moduleManager.getModulators(), moduleManager.getConnections());
-  return presetManager.presetToString(info);
+  // auto info = PresetInfo::create(name, moduleManager.getTabs(), moduleManager.getBlocks(), moduleManager.getModulators(), moduleManager.getConnections());
+  // return presetManager.presetToString(info);
 }
 
 void Synth::noteStarted(Voice* voice, float frequencyInHertz) {
