@@ -1133,7 +1133,7 @@ File LoadSave::getConfigFile() {
   config_options.filenameSuffix = "config";
 
 #ifdef LINUX
-  config_options.folderName = "." + String(ProjectInfo::projectName).toLowerCase();
+  // config_options.folderName = "." + String(ProjectInfo::projectName).toLowerCase();
 #else
   // config_options.folderName = String(ProjectInfo::projectName).toLowerCase();
 #endif
