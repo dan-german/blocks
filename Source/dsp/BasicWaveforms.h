@@ -25,7 +25,7 @@ struct LookUpTable {
 
 class BasicWaveforms {
 private:
-  static constexpr size_t size = 100;
+  static constexpr std::size_t size = 100;
 
   inline static LookUpTable sine { size };
   inline static LookUpTable saw { size };
