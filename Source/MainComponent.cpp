@@ -25,6 +25,7 @@ MainComponent::MainComponent(juce::MidiKeyboardState& keyboard_state, Delegate* 
   setupBlockGrid();
   setupDarkBackground(&dark_background_, -1);
   addAndMakeVisible(column_controls_);
+  // addAndMakeVisible(selection_rect_);
   column_controls_.listener = this;
   note_logger_.listener = this;
   ThemeManager::shared()->set(UserSettings::shared()->getInt("theme", 0));
@@ -213,6 +214,7 @@ void MainComponent::addModulator(Model::Type code) {
 }
 
 void MainComponent::resized() {
+  selection_rect_.setBounds(getLocalBounds());
   ui_layer_.setBounds(getLocalBounds());
   resizeGrid();
   resizeColumnControls();
@@ -519,7 +521,12 @@ void MainComponent::graphicsTimerCallback(const float secondsSincelastUpdate) {
 }
 
 void MainComponent::mouseMove(const MouseEvent& event) {
-  this->current_mouse_position_ = event.getEventRelativeTo(this).getPosition();
+  auto position = event.getPosition();
+  selection_rect_.setBounds(position.getX(), position.getY(), 10, 10);
+
+
+
+
 }
 
 void MainComponent::updateInspectorModulationIndicators() {

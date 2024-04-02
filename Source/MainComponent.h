@@ -21,6 +21,7 @@
 #include "connection.h"
 #include "vital/synthesis/framework/synth_module.h"
 #include "gui/column_controls_container.h"
+#include "selection_rect.h"
 
 using Modulation = Model::Modulation;
 using Block = Model::Block;
@@ -62,10 +63,10 @@ private:
   SavePopup save_popup_;
   GraphicsTimer timer_;
   ColumnControlsContainer column_controls_;
+  SelectionRect selection_rect_;
 
   Array<BlockComponent*> blocks;
   GridItemComponent* focused_grid_item_ = nullptr;
-  Point<int> current_mouse_position_;
 
   BlockComponent* block_matrix_[Constants::columns][Constants::rows];
   Cursor cursor;
