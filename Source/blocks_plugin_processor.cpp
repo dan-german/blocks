@@ -521,7 +521,7 @@ void PluginProcessor::loadPreset(Preset preset) {
 }
 
 void PluginProcessor::clear() {
-  // pauseProcessing(true);
+  pauseProcessing(true);
   // initEngine();
   clearModulations();
 
@@ -543,7 +543,7 @@ void PluginProcessor::clear() {
 
   getModuleManager().clear();
   getVoiceHandler()->clear();
-  // pauseProcessing(false);
+  pauseProcessing(false);
 }
 
 void PluginProcessor::editorRemovedTab(int column) {
