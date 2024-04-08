@@ -15,6 +15,9 @@ ModulatorsSideMenu::ModulatorsSideMenu(): button("ModulatorsPlusButton", Colours
 void ModulatorsSideMenu::setup() {
   setupAddButton();
   setupListBox();
+  // plus_button.addMouseListener(this, false);
+  // addMouseListener(&button, false);
+  button.addMouseListener(this, false); 
 }
 
 void ModulatorsSideMenu::setupListBox() {
@@ -23,8 +26,9 @@ void ModulatorsSideMenu::setupListBox() {
 }
 
 void ModulatorsSideMenu::setupAddButton() {
-  addAndMakeVisible(plusComponent);
+  addAndMakeVisible(plus_button);
   addAndMakeVisible(button);
+  // addAndMakeVisible(plus_button2);
 }
 
 void ModulatorsSideMenu::resized() {
@@ -32,11 +36,20 @@ void ModulatorsSideMenu::resized() {
   resizeAddButton();
 }
 
+void ModulatorsSideMenu::mouseUp(const MouseEvent& event) {
+  auto relative_position = event.getEventRelativeTo(this).getPosition();
+  if (button.getBounds().contains(relative_position)) {
+    if (plus_button_callback) {
+      plus_button_callback(event);
+    }
+  }
+}
+
 void ModulatorsSideMenu::resizeAddButton() {
   int addButtonSize = 12;
   int x = exitButton.getX() + exitButton.getWidth() + 12;
-  plusComponent.setAlpha(1.0f);
-  plusComponent.plusLineLength = 11;
-  plusComponent.setBounds(x, exitButton.getY(), addButtonSize, addButtonSize);
-  button.setBounds(plusComponent.getBounds().expanded(4));
+  plus_button.setAlpha(1.0f);
+  plus_button.plusLineLength = 11;
+  plus_button.setBounds(x, exitButton.getY(), addButtonSize, addButtonSize);
+  button.setBounds(plus_button.getBounds().expanded(4));
 }

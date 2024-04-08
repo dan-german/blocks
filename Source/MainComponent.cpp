@@ -146,7 +146,7 @@ void MainComponent::setupBlockGrid() {
 void MainComponent::setupUI() {
   // uiLayer.presetButton.setStrings(delegate->editorRequestsPresetNames());
   ui_layer_.connections_list_box_model_.delegate_ = this;
-  ui_layer_.modulators_.addMouseListener(this, true);
+  // ui_layer_.modulators_.addMouseListener(this, true);
   addAndMakeVisible(ui_layer_, 2);
 }
 
@@ -174,6 +174,30 @@ void MainComponent::setupListeners() {
     ui_layer_.preset_button_.content.label.setText(name, dontSendNotification);
     ui_layer_.preset_button_.setStrings(delegate->editorRequestsPresetNames());
     save_popup_.setVisible(false);
+  };
+
+  // ui_layer_.modulators_.plus_button_callback = [this](juce::MouseEvent& event) {
+    // auto position = event.eventComponent->getPosition() + ui_layer_.modulators_.getPosition();
+    // modulators_popup_.setBounds(position.getX(), position.getY(), 72, 54);
+    // showPopupAt(modulators_popup_, [this](Index i) { this->clickOnModulatorsPopup(i); });
+
+    // dark_background_.setVisible(true);
+    // dark_background_.toFront(true);
+    // auto position = ui_layer_.modulators_.plusComponent.getBounds().getPosition() + ui_layer_.modulators_.getPosition();
+    // modulators_popup_.setBounds(position.getX(), position.getY(), 72, 54);
+    // modulators_popup_.present();
+
+  // };
+
+  ui_layer_.modulators_.plus_button_callback = [this](const juce::MouseEvent& event) {
+    auto position = event.eventComponent->getPosition() + ui_layer_.modulators_.getPosition();
+    modulators_popup_.setBounds(position.getX(), position.getY(), 72, 54);
+    showPopupAt(modulators_popup_, [this](Index i) { this->clickOnModulatorsPopup(i); });
+    //   auto p = component.getBounds().getPosition();
+    //   auto position = p + ui_layer_.modulators_.getPosition();
+      // auto relative_position = component.getParentComponent()->getPosition();
+    //   modulators_popup_.setBounds(position.getX(), position.getY(), 72, 54);
+    //   showPopupAt(modulators_popup_, [this](Index i) { this->clickOnModulatorsPopup(i); });
   };
 
   ui_layer_.newPresetButton->on_click_ = [this]() {
@@ -563,11 +587,16 @@ void MainComponent::graphicsTimerCallback(const float secondsSincelastUpdate) {
 }
 
 void MainComponent::mouseDrag(const MouseEvent& event) {
+  if (event.eventComponent == &ui_layer_.modulators_) {
+    std::cout << "pslsls" << std::endl;
+    return;
+  }
+  // std::cout << "mouse drag: " << name << std::endl;
   block_grid_.add_button_.setAlpha(0);
   if (event.mods.isRightButtonDown()) return;
-  // maybe the selection rect code should be in selection rect itself? 
   auto starting_position = event.getEventRelativeTo(this).getMouseDownPosition();
   auto current_position = event.getEventRelativeTo(this).getPosition();
+  auto component_under_start = block_grid_.getComponentAt(starting_position);
   selection_rect_.setBounds(Rectangle<int>(starting_position, current_position).getSmallestIntegerContainer());
 }
 
@@ -996,7 +1025,7 @@ void MainComponent::copy() {
   auto items = block_grid_.getItems();
   for (auto item : items) {
     if (item->isSelected) {
-      auto block = delegate->getBlock2(item->index);  
+      auto block = delegate->getBlock2(item->index);
       copied_blocks_.push_back(*block);
     }
   }
