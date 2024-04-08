@@ -13,11 +13,16 @@ SelectionRect::~SelectionRect() {
 }
 
 void SelectionRect::resized() {
-
+  stroke_.clear();
+  stroke_.addRectangle(getLocalBounds().toFloat());
 }
 
 void SelectionRect::paint(juce::Graphics& g) {
-  g.fillAll(juce::Colours::red);
+  Colour c(175, 188, 255);
+  // g.setColour(c.withAlpha(0.5f));
+  g.fillAll(c.withAlpha(0.1f));
+  g.setColour(c);
+  g.strokePath(stroke_, PathStrokeType(2.0f));
 }
 
 void SelectionRect::themeChanged(Theme theme) {

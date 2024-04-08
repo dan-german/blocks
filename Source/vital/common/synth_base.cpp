@@ -349,13 +349,13 @@ int SynthBase::getSampleRate() {
 void SynthBase::initEngine() {
   clearModulations();
   if (getWavetableCreator(0)) {
-    for (int i = 0; i < vital::kNumOscillators; ++i)
+    for (int i = 0; i < model::MAX_MODULES_PER_TYPE; ++i)
       getWavetableCreator(i)->init();
 
     engine_->getSample()->init();
   }
 
-  for (int i = 0; i < vital::kNumLfos; ++i)
+  for (int i = 0; i < model::MAX_MODULES_PER_TYPE; ++i)
     getLfoSource(i)->initTriangle();
 
   vital::control_map controls = engine_->getControls();

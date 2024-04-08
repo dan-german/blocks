@@ -22,6 +22,7 @@
 #include "vital/synthesis/lookups/wavetable.h"
 #include "vital/common/synth_types.h"
 #include "vital/common/line_generator.h"
+#include "model/ModelConstants.h"
 
 #include <vector>
 
@@ -94,12 +95,12 @@ private:
 
   FiltersModule* filters_module_;
 
-  LfoModule* lfos_[kNumLfos];
-  EnvelopeModule* envelopes_[kNumEnvelopes];
+  LfoModule* lfos_[model::MAX_MODULES_PER_TYPE];
+  EnvelopeModule* envelopes_[model::MAX_MODULES_PER_TYPE];
 
   Output note_retriggered_;
 
-  LineGenerator lfo_sources_[kNumLfos];
+  LineGenerator lfo_sources_[model::MAX_MODULES_PER_TYPE];
 
   TriggerRandom* random_;
   RandomLfoModule* random_lfos_[kNumRandomLfos];

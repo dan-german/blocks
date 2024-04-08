@@ -6,6 +6,7 @@ ModuleManager::~ModuleManager() {
 }
 
 std::shared_ptr<model::Block> ModuleManager::addBlock(std::string code, Index index, int number) {
+  if (index.row >= model::rows || index.column >= model::columns || slotTaken(index)) return nullptr;
   auto block = pool.getBlock(code, number);
   if (block == nullptr) return nullptr;
   block->index = index;

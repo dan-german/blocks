@@ -17,4 +17,6 @@ struct Index {
   inline Index toTheRight(int times) { return Index { column, row + times }; }
   inline bool operator==(const Index& other) const { return other.column == column && other.row == row; }
   inline bool operator!=(const Index& other) const { return !(other.column == column && other.row == row); }
+  inline Index operator+(const Index& other) const { return Index { column + other.column, row + other.row }; }
+  inline Index operator-(const Index& other) const { return Index { column - other.column, row - other.row }; }
 };

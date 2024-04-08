@@ -107,7 +107,6 @@ void BlockComponent::resizeIndicators() {
 
 void BlockComponent::setSelected(bool isSelected) {
   GridItemComponent::setSelected(isSelected);
-
   auto theme = ThemeManager::shared()->getCurrent();
   setTitleColour(isSelected ? Colours::black : selectionColour);
   if (painter != nullptr) {
@@ -198,22 +197,14 @@ void BlockComponent::themeChanged(Theme theme) {
 
 void BlockComponent::setConfig(std::shared_ptr<model::Module> m, std::vector<std::shared_ptr<model::Connection>> connections) {
   indicators.reset();
-
   std::unordered_set<std::shared_ptr<model::Module>> uniqueSources;
   std::vector<std::shared_ptr<model::Module>> uniqueSourceVector;
-
   for (const auto& connection : connections) { 
     if (connection->target == m) {
       uniqueSources.insert(connection->source);
     }
   }
-
-  // for (const auto& param : m->parameters_)
-  //   for (const auto& connection : param->connections)
-  //     uniqueSources.insert(connection->source);
-
   uniqueSourceVector.assign(uniqueSources.begin(), uniqueSources.end());
-
   for (auto source : uniqueSourceVector) {
     indicators.addModulationIndicator(source->colour.colour);
   }

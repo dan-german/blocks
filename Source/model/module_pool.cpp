@@ -28,7 +28,10 @@ ModulePool::~ModulePool() { }
 
 // std::shared_ptr<Tab> ModulePool::getTab(Type type, int number) { return tabs.get({ type, number }); }
 std::shared_ptr<Block> ModulePool::getBlock(std::string type, int number = -1) { return blocks.get({ type, number }); }
-void ModulePool::retire(std::shared_ptr<Block> block) { blocks.retire(block); }
+void ModulePool::retire(std::shared_ptr<Block> block) { 
+  std::cout << "retiring block " << block->name << " index: " << block->index.column << " " << block->index.row << std::endl;
+  blocks.retire(block); 
+  }
 // void ModulePool::Retire(std::shared_ptr<Tab> tab) { tabs.retire(tab); }
 
 void ModulePool::retire(std::shared_ptr<Module> modulator) {

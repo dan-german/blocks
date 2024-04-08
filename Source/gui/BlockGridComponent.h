@@ -10,7 +10,7 @@ public:
   ~BlockGridComponent() override { ThemeManager::shared()->removeListener(this); };
   void highlightColumn(int start, int end);
   void gridItemStretchEnded(GridItemComponent* item, int offset) override;
-  void ResetDotsVisibility();
+  void resetDotsVisibility();
   void snapItem(GridItemComponent* item, Index index, bool resetBounds = false) override;
   virtual void setItemLength(GridItemComponent* moduleComponent, int length) override;
   void reset();

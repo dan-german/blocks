@@ -14,6 +14,7 @@ public:
   void resized() override;
   void reset();
 private:
+  Path stroke_;
   void themeChanged(Theme theme) override;
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SelectionRect)
 };

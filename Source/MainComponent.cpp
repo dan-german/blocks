@@ -25,7 +25,7 @@ MainComponent::MainComponent(juce::MidiKeyboardState& keyboard_state, Delegate* 
   setupBlockGrid();
   setupDarkBackground(&dark_background_, -1);
   addAndMakeVisible(column_controls_);
-  // addAndMakeVisible(selection_rect_);
+  addAndMakeVisible(selection_rect_);
   column_controls_.listener = this;
   note_logger_.listener = this;
   ThemeManager::shared()->set(UserSettings::shared()->getInt("theme", 0));
@@ -99,11 +99,14 @@ void MainComponent::setupDarkBackground(DarkBackground* darkBackgroundComponent,
   darkBackgroundComponent->onClick = [this](Component* c) { darkBackgroundClicked(c); };
 }
 
+std::vector<Component*> MainComponent::allPopups() {
+  return { &blocks_popup_, &modulators_popup_, &presets_popup_, &save_popup_, &copy_delete_popup_, &paste_popup_ };
+}
+
 void MainComponent::darkBackgroundClicked(Component* component) {
   component->setVisible(false);
-  Component* popups[] = { &blocks_popup_, &modualtors_popup_, &presets_popup_, &save_popup_ };
 
-  for (auto popup : popups) {
+  for (auto popup : allPopups()) {
     if (popup->isVisible()) {
       popup->setVisible(false);
     }
@@ -171,20 +174,17 @@ void MainComponent::setupListeners() {
     ui_layer_.preset_button_.content.label.setText(name, dontSendNotification);
     ui_layer_.preset_button_.setStrings(delegate->editorRequestsPresetNames());
     save_popup_.setVisible(false);
-    dark_background_.setVisible(false);
   };
 
   ui_layer_.newPresetButton->on_click_ = [this]() {
     delegate->editorChangedPreset(-1);
     clear();
-    dark_background_.setVisible(false);
   };
 
   ui_layer_.preset_button_.on_arrow_click_ = [this](bool right) {
     if (auto preset = delegate->editorNavigatedPreset(right)) {
       clear();
       loadState(*preset);
-      dark_background_.setVisible(false);
     }
   };
 
@@ -214,7 +214,6 @@ void MainComponent::addModulator(Model::Type code) {
 }
 
 void MainComponent::resized() {
-  selection_rect_.setBounds(getLocalBounds());
   ui_layer_.setBounds(getLocalBounds());
   resizeGrid();
   resizeColumnControls();
@@ -249,11 +248,27 @@ void MainComponent::mouseDown(const MouseEvent& event) {
 }
 
 void MainComponent::mouseUp(const MouseEvent& event) {
-  setMouseCursor(MouseCursor::NormalCursor);
+  multiple_selection_ = false;
+  auto area = selection_rect_.getBounds();
+  selection_rect_.setBounds(Rectangle<int>());
+  bool was_dragging = event.getEventRelativeTo(this).getDistanceFromDragStart() > 2;
+  if (was_dragging) {
+    block_grid_.setAllItemsSelected(false);
+    auto selectedItems = block_grid_.getItemsInRectangle(area);
 
-  if (dark_background_.isVisible()) {
-    dark_background_.setVisible(false);
+    for (auto item : selectedItems) {
+      if (auto block = dynamic_cast<BlockComponent*>(item)) {
+        block->setSelected(true);
+      }
+    }
+
+    multiple_selection_ = selectedItems.size() > 1;
+    return;
   }
+
+  setMouseCursor(MouseCursor::NormalCursor);
+  for (auto popup : allPopups()) { popup->setVisible(false); }
+  block_grid_.setAllItemsSelected(false);
 
   if (modulator_drag_mode_) {
     previous_slider_under_mouse_ = {};
@@ -266,8 +281,8 @@ void MainComponent::mouseUp(const MouseEvent& event) {
 
   if (componentName == "ModulatorsPlusButton") {
     auto position = event.eventComponent->getPosition() + ui_layer_.modulators_.getPosition();
-    modualtors_popup_.setBounds(position.getX(), position.getY(), 72, 54);
-    showPopupAt(modualtors_popup_, [this](Index i) { this->clickOnModulatorsPopup(i); });
+    modulators_popup_.setBounds(position.getX(), position.getY(), 72, 54);
+    showPopupAt(modulators_popup_, [this](Index i) { this->clickOnModulatorsPopup(i); });
   } else if (componentName == "PresetMainButton") {
     auto componentY = event.eventComponent->getPosition().getY();
     auto point = event.eventComponent->getPosition().withY(componentY + 8);
@@ -275,11 +290,39 @@ void MainComponent::mouseUp(const MouseEvent& event) {
   }
 
   if (block_grid_.contains(mousePosition)) {
-    auto index = block_grid_.indexForPoint(mousePosition); // todo fix 
-    clickOnGrid(index);
+    if (event.mods.isLeftButtonDown()) {
+      // can this be moved to the grid component?
+      auto mouse_down_position = event.getEventRelativeTo(&block_grid_).getMouseDownPosition();
+      Index index = block_grid_.indexForPoint(mousePosition);
+      bool slot_taken = block_grid_.isSlotTaken(index);
+
+      Index starting_index = block_grid_.indexForPoint(mouse_down_position);
+      if (starting_index == index && !slot_taken) {
+        clickOnGrid(index);
+      }
+    } else {
+      handlePastePopup(event);
+    }
   }
 
   cursor.setVisible(false);
+}
+
+void MainComponent::handlePastePopup(const juce::MouseEvent& event) {
+  StringArray model { "paste" };
+  paste_popup_.setModel(model);
+  auto relative_position = event.getEventRelativeTo(this);
+  paste_popup_.setBounds(relative_position.getPosition().getX(), relative_position.getPosition().getY(), 56, 40);
+  showPopupAt(paste_popup_, [this, event](Index i) {
+    if (this->copied_blocks_.size() > 0) {
+      auto grid_relative_position = event.getEventRelativeTo(&block_grid_);
+      Index target = block_grid_.indexForPoint(grid_relative_position.getPosition());
+      auto new_blocks = this->delegate->editorPastedIndices(this->copied_blocks_, target);
+      for (auto block : new_blocks) {
+        spawnBlockComponent(block);
+      }
+    }
+  });
 }
 
 void MainComponent::clickOnModulatorsPopup(Index index) {
@@ -292,7 +335,7 @@ void MainComponent::clickOnGrid(Index& index) {
   if (blocks_popup_.isVisible()) {
     blocks_popup_.setVisible(false);
   } else {
-    ShowBlocksPopup(index);
+    showBlocksPopup(index);
   }
 }
 
@@ -309,12 +352,11 @@ void MainComponent::resizeGrid() {
     block_grid_.resnapBlock(moduleComponent);
 }
 
-void MainComponent::ShowBlocksPopup(Index index) {
+void MainComponent::showBlocksPopup(Index index) {
   block_grid_.add_button_.setAlpha(0);
   block_grid_.reset();
 
   auto blockSelectionCompletion = [this, index](Index selectedIndex) {
-    // std::cout << "column " << index.column << " row " << index.row << std::endl;
     int code = selectedIndex.column == 0 ? selectedIndex.row : selectedIndex.row + 5;
     auto module = addBlock(code, index);
     if (module == nullptr) return;
@@ -348,8 +390,8 @@ void MainComponent::showPopupAt(ButtonGridPopup& popup, std::function<void(Index
 std::shared_ptr<model::Block> MainComponent::addBlock(int code, Index index) {
   std::shared_ptr<model::Block> block = nullptr;
   StringArray all;
-  all.addArray(model::block_popup_row_one);
-  all.addArray(model::block_popup_row_two);
+  all.addArray(model::block_popup_column_one);
+  all.addArray(model::block_popup_column_two);
   return delegate->editorAddedBlock2(all[code].toStdString(), index);
 }
 
@@ -366,7 +408,7 @@ void MainComponent::ResizeInspector() {
   inspector_.setBounds(inspectorX, gridY + 60, 1, 220);
 }
 
-void MainComponent::DismissPopup(ButtonGridPopup& popup) {
+void MainComponent::dismissPopup(ButtonGridPopup& popup) {
   popup.setVisible(false);
 }
 
@@ -399,7 +441,7 @@ void MainComponent::removeBlock(GridItemComponent* block) {
 
   auto index = block->index;
   block_grid_.detachModule(index);
-  block_grid_.ResetDotsVisibility();
+  block_grid_.resetDotsVisibility();
 
   delegate->editorRemovedBlock(index);
   ui_layer_.setConnections(delegate->getModulations());
@@ -520,36 +562,36 @@ void MainComponent::graphicsTimerCallback(const float secondsSincelastUpdate) {
   // }
 }
 
-void MainComponent::mouseMove(const MouseEvent& event) {
-  auto position = event.getPosition();
-  selection_rect_.setBounds(position.getX(), position.getY(), 10, 10);
-
-
-
-
+void MainComponent::mouseDrag(const MouseEvent& event) {
+  block_grid_.add_button_.setAlpha(0);
+  if (event.mods.isRightButtonDown()) return;
+  // maybe the selection rect code should be in selection rect itself? 
+  auto starting_position = event.getEventRelativeTo(this).getMouseDownPosition();
+  auto current_position = event.getEventRelativeTo(this).getPosition();
+  selection_rect_.setBounds(Rectangle<int>(starting_position, current_position).getSmallestIntegerContainer());
 }
 
 void MainComponent::updateInspectorModulationIndicators() {
-  if (focused_grid_item_ == nullptr) return;
-  if (focused_grid_item_->getName() != "BlockComponent") return;
+  // if (focused_grid_item_ == nullptr) return;
+  // if (focused_grid_item_->getName() != "BlockComponent") return;
 
-  auto module = delegate->getBlock(focused_grid_item_->index);
+  // auto module = delegate->getBlock(focused_grid_item_->index);
 
-  for (int parameterIndex = 0; parameterIndex < module->parameters.size(); parameterIndex++) {
-    auto parameter = module->parameters[parameterIndex];
+  // for (int parameterIndex = 0; parameterIndex < module->parameters.size(); parameterIndex++) {
+  //   auto parameter = module->parameters[parameterIndex];
 
-    auto range = parameter->audioParameter->getNormalisableRange();
-    auto value = parameter->audioParameter->getValue();
+  //   auto range = parameter->audioParameter->getNormalisableRange();
+  //   auto value = parameter->audioParameter->getValue();
 
-    inspector_.getSliders()[parameterIndex]->setValue(range.convertFrom0to1(value));
+  //   inspector_.getSliders()[parameterIndex]->setValue(range.convertFrom0to1(value));
 
-    auto modulators = parameter->connections;
+  //   auto modulators = parameter->connections;
 
-    for (int modulatorIndex = 0; modulatorIndex < parameter->connections.size(); modulatorIndex++) {
-      auto modulatorValue = delegate->editorRequestsModulatorValue(focused_grid_item_->index, parameterIndex, modulatorIndex);
-      inspector_.setModulationIndicatorValue(parameterIndex, modulatorIndex, modulatorValue.first, modulatorValue.second);
-    }
-  }
+  //   for (int modulatorIndex = 0; modulatorIndex < parameter->connections.size(); modulatorIndex++) {
+  //     auto modulatorValue = delegate->editorRequestsModulatorValue(focused_grid_item_->index, parameterIndex, modulatorIndex);
+  //     inspector_.setModulationIndicatorValue(parameterIndex, modulatorIndex, modulatorValue.first, modulatorValue.second);
+  //   }
+  // }
 }
 
 void MainComponent::clear() {
@@ -581,7 +623,7 @@ void MainComponent::modulationConnectionBipolarPressed(ConnectionComponent* comp
   auto connection = delegate->getModulations()[index];
 
   if (!focused_grid_item_) return;
-  auto focused = delegate->getBlock(focused_grid_item_->index);
+  auto focused = delegate->getBlock2(focused_grid_item_->index);
   auto target = connection->target;
 
   if (target->name != focused->name) return;
@@ -596,7 +638,7 @@ void MainComponent::modulationConnectionBipolarPressed(ConnectionComponent* comp
 void MainComponent::connectionDeleted(ConnectionComponent* component) {
   auto connection = delegate->getModulations()[component->row];
   if (focused_grid_item_) {
-    auto focused = delegate->getBlock(focused_grid_item_->index);
+    auto focused = delegate->getBlock2(focused_grid_item_->index);
     auto target = connection->target;
 
     if (target->name != focused->name) return;
@@ -730,21 +772,21 @@ void MainComponent::exitModulatorDragMode() {
 }
 
 void MainComponent::presentModulationOptionsMenu(int modulatorIndex, Index& indexUnderMouse, BlockComponent* block) {
-  auto block_model = delegate->getBlock(indexUnderMouse);
-  PopupMenu modulate_menu = spawnModulationMenu(*block_model);
+  // auto block_model = delegate->getBlock2(indexUnderMouse);
+  // PopupMenu modulate_menu = spawnModulationMenu(*block_model);
 
-  const int chosen_index = 1;
-  bool discarded_menu = chosen_index == 0;
-  if (discarded_menu) return;
+  // const int chosen_index = 1;
+  // bool discarded_menu = chosen_index == 0;
+  // if (discarded_menu) return;
 
-  // delegate->editorConnectedModulation(modulatorIndex, blockModel->name, chosenIndex);
-  ui_layer_.setConnections(delegate->getModulations());
+  // // delegate->editorConnectedModulation(modulatorIndex, blockModel->name, chosenIndex);
+  // ui_layer_.setConnections(delegate->getModulations());
 
-  if (inspector_.isVisible()) refreshInspector();
+  // if (inspector_.isVisible()) refreshInspector();
 }
 
 void MainComponent::enterModulatorDragMode(Colour colour) {
-  dark_background_.setVisible(true);
+  // dark_background_.setVisible(true);
   cursor.colour = colour;
   cursor.setVisible(true);
   inspector_.setAlwaysOnTop(true);
@@ -765,13 +807,12 @@ void MainComponent::modulatorRemoved(ModulatorComponent* component) {
 
 void MainComponent::setupPopupMenus() {
   addChildComponent(blocks_popup_);
-
-  blocks_popup_.setModel({ model::block_popup_row_one, model::block_popup_row_two });
-
-  addChildComponent(modualtors_popup_);
-  modualtors_popup_.setModel(model::modulators);
-
+  blocks_popup_.setModel({ model::block_popup_column_one, model::block_popup_column_two });
+  addChildComponent(modulators_popup_);
+  modulators_popup_.setModel(model::modulators);
   addChildComponent(save_popup_);
+  addChildComponent(copy_delete_popup_);
+  addChildComponent(paste_popup_);
 }
 
 void MainComponent::presetButtonClicked() {
@@ -787,7 +828,7 @@ void MainComponent::presetButtonClicked() {
   auto height = std::clamp(desiredHeight, desiredHeight, maxHeight);
   presets_popup_.setBounds(x, y, width, height);
 
-  auto presetNames = delegate->editorRequestsPresetNames();
+  juce::StringArray presetNames = delegate->editorRequestsPresetNames();
   presets_popup_.setModel({ presetNames });
 
   showPopupAt(presets_popup_, [this](Index i) { this->loadPreset(i.row); });
@@ -805,6 +846,7 @@ void MainComponent::visibilityChanged() {
 }
 
 void MainComponent::clickedOnGrid(GridComponent* grid, Index index) {
+  std::cout << "clicked on grid" << std::endl;
   if (grid == &block_grid_) return;
   spawnTabComponent(delegate->editorAddedTab(index.column));
 }
@@ -843,7 +885,7 @@ void MainComponent::gridItemHovered(GridComponent* grid, GridItemComponent* item
 void MainComponent::gridItemStartedDrag(GridComponent* grid, GridItemComponent* item, const MouseEvent& mouseEvent) {
   if (grid == &tab_grid_) {
     tab_grid_.hideAllItems(true, item);
-    grid_dark_background_.setVisible(true);
+    // grid_dark_background_.setVisible(true);
   }
 }
 
@@ -852,25 +894,40 @@ void MainComponent::gridItemEndedDrag(GridComponent* grid, GridItemComponent* it
     grid_dark_background_.setVisible(false);
     tab_grid_.hideAllItems(false, item);
     block_grid_.reset();
-    block_grid_.ResetDotsVisibility();
+    block_grid_.resetDotsVisibility();
   }
 }
 
 void MainComponent::gridItemClicked(GridComponent* grid, GridItemComponent* item, const MouseEvent& event) {
-  if (event.mods.isRightButtonDown() && grid == &tab_grid_) {
-    removeTab(item);
+  if (event.mods.isRightButtonDown()) {
+    auto e = event.getEventRelativeTo(this);
+    juce::StringArray options = { "copy", "delete" };
+    copy_delete_popup_.setModel(options);
+    copy_delete_popup_.setBounds(e.getPosition().getX(), e.getPosition().getY(), 56, 62);
+    showPopupAt(copy_delete_popup_, [this, item](Index i) {
+      if (i.row == 0) {
+        copy();
+      } else {
+        for (auto index : this->getSelectedIndices()) {
+          auto block_component = block_matrix_[index.column][index.row];
+          removeBlock(block_component);
+        }
+      }
+    });
     return;
   }
 
+  if (multiple_selection_) {
+    block_grid_.setAllItemsSelected(false);
+    multiple_selection_ = false;
+  }
   toggleGridItemSelection(grid, item, !item->isSelected);
 }
 
 void MainComponent::toggleGridItemSelection(GridComponent* grid, GridItemComponent* item, bool selected) {
-  grid_dark_background_.setVisible(selected);
   inspector_.setVisible(selected);
 
   if (selected) {
-    item->setHidden(false);
     bool is_other_module_currently_chosen = focused_grid_item_ != nullptr;
     if (is_other_module_currently_chosen) focused_grid_item_->setSelected(false);
     focused_grid_item_ = item;
@@ -880,8 +937,6 @@ void MainComponent::toggleGridItemSelection(GridComponent* grid, GridItemCompone
   }
 
   item->setSelected(selected);
-  block_grid_.hideAllItems(selected, item);
-  tab_grid_.hideAllItems(selected, item);
 }
 
 void MainComponent::notesStarted(Array<int> notes) {
@@ -934,4 +989,26 @@ void MainComponent::columnControlEndedAdjusting(ColumnControlsContainer::Control
 void MainComponent::modulatorGestureChanged(ModulatorComponent* modulatorComponent, std::string parameter_name, bool started) {
   auto modulator = delegate->getModulator2(modulatorComponent->row);
   delegate->editorParameterGestureChanged(modulator->name, parameter_name, started);
+}
+
+void MainComponent::copy() {
+  copied_blocks_.clear();
+  auto items = block_grid_.getItems();
+  for (auto item : items) {
+    if (item->isSelected) {
+      auto block = delegate->getBlock2(item->index);  
+      copied_blocks_.push_back(*block);
+    }
+  }
+}
+
+std::vector<Index> MainComponent::getSelectedIndices() { // should probably move to grid 
+  std::vector<Index> selected_indices;
+  auto items = block_grid_.getItems();
+  for (auto item : items) {
+    if (item->isSelected) {
+      selected_indices.push_back(item->index);
+    }
+  }
+  return selected_indices;
 }

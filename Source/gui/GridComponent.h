@@ -45,9 +45,12 @@ public:
   Rectangle<int> getModuleBounds() const;
   virtual Index indexForPoint(Point<int> point) const;
   Point<int> pointForIndex(Index index) const;
-  // static int xForColumn(int column, Config config) const;
   static int xForColumn(int column, Config config) { return config.edgeSpacing + config.itemWidth * column + column * config.spacing; }
   static int yForRow(int row, Config config) { return config.edgeSpacing + config.itemHeight * row + row * config.spacing; }
+
+  // returns items of the grid that are inside the given rectangle
+  std::vector<GridItemComponent*> getItemsInRectangle(Rectangle<int> rectangle);
+  GridItemComponent* getItemInIndex(Index index);
 
   virtual void clear();
   void show();
@@ -60,6 +63,7 @@ public:
   virtual void addItem(GridItemComponent* item, Index index, bool resetBounds = false);
   virtual void hideAllItems(bool hidden, GridItemComponent* ignore = nullptr);
   inline void setItemHidden(Index index, bool hidden) { if (auto item = itemMatrix[index.row][index.column]) item->setHidden(hidden); }
+  inline void setAllItemsSelected(bool selected, GridItemComponent* ignore = nullptr) { for (auto item : items) if (item != ignore) item->setSelected(selected); }
 
   /// Checks if the slot is taken and if so returns the parent item
   GridItemComponent* isSlotTaken(Index index, GridItemComponent* candidate);
@@ -68,13 +72,13 @@ public:
   GridComponent::Config getConfig() { return config; }
 
   bool isIndexValid(Index currentIndex, Index targetIndex, int length);
-  bool containsItem(const GridItemComponent* item) { return items.contains(item); }
+  bool containsItem(const GridItemComponent* item) { return std::find(items.begin(), items.end(), item) != items.end(); }
   int getNumberOfItems() { return items.size(); }
-  OwnedArray<GridItemComponent>& getItems() { return items; }
+  std::vector<GridItemComponent*> getItems() const { return items; }
   Config config;
 protected:
   std::vector<std::vector<GridItemComponent*>> itemMatrix;
-  OwnedArray<GridItemComponent> items;
+  std::vector<GridItemComponent*> items;
 
   inline bool isIndexInside(Index index) { return !isIndexOutside(index); }
   inline bool isIndexOutside(Index index) { return index.row >= config.rows || index.row < 0 || index.column >= config.columns || index.column < 0; }

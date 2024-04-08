@@ -40,7 +40,7 @@ public:
   Delegate* delegate;
   MainComponent(juce::MidiKeyboardState& keyboard_state, Delegate* delegate);
   ~MainComponent() override;
-  void mouseMove(const MouseEvent& event) override;
+  void mouseDrag(const MouseEvent& event) override;
 
   BlocksLookAndFeel blocks_laf_;
   UILayer ui_layer_;
@@ -54,6 +54,7 @@ protected:
   // MouseListener
   void mouseDown(const MouseEvent& event) override;
   void mouseUp(const MouseEvent& event) override;
+  void handlePastePopup(const juce::MouseEvent& event);
 private:
   DarkBackground dark_background_;
   DarkBackground grid_dark_background_;
@@ -64,6 +65,7 @@ private:
   GraphicsTimer timer_;
   ColumnControlsContainer column_controls_;
   SelectionRect selection_rect_;
+  std::vector<model::Block> copied_blocks_;
 
   Array<BlockComponent*> blocks;
   GridItemComponent* focused_grid_item_ = nullptr;
@@ -74,10 +76,15 @@ private:
   BlockPlaceholder block_placeholder_;
   bool is_blocks_popup_visible_ = false;
   bool modulator_drag_mode_ = false;
-  ButtonGridPopup blocks_popup_;
-  ButtonGridPopup modualtors_popup_;
-  ButtonGridPopup presets_popup_;
+  bool is_mouse_down_ = false;
   NoteLogger note_logger_;
+
+  ButtonGridPopup blocks_popup_;
+  ButtonGridPopup modulators_popup_;
+  ButtonGridPopup presets_popup_;
+  ButtonGridPopup copy_delete_popup_;
+  ButtonGridPopup paste_popup_;
+  bool multiple_selection_ = false;
 
   void setupInspector();
   void clear();
@@ -90,9 +97,12 @@ private:
   void darkBackgroundClicked(Component* darkBackground);
   void setupDarkBackground(DarkBackground* component, int layer);
   void resetDownFlowingDots();
+  void copy();
+  std::vector<Index> getSelectedIndices();
 
   void toggleGridItemSelection(GridComponent* grid, GridItemComponent* item, bool selected);
-  void ShowBlocksPopup(Index index);
+  void showBlocksPopup(Index index);
+  std::vector<Component*> allPopups();
   std::shared_ptr<model::Block> addBlock(int code, Index index);
   void removeBlock(GridItemComponent* block);
   void removeTab(GridItemComponent* tab);
@@ -117,7 +127,7 @@ private:
   void inspectorChangedParameter(int sliderIndex, float value) override;
   void inspectorGestureChanged(std::string parameter_name, bool started) override;
 
-  void DismissPopup(ButtonGridPopup& popup);
+  void dismissPopup(ButtonGridPopup& popup);
   void spawnBlockComponent(std::shared_ptr<model::Block> block);
   void spawnTabComponent(std::shared_ptr<Tab> tab);
   void graphicsTimerCallback(const float secondsSinceLastUpdate);
@@ -188,6 +198,7 @@ struct MainComponent::Delegate {
   virtual void editorRemovedModulator(int index) = 0;
   virtual void editorChangedBlockLength(Index index, int times) = 0;
   virtual void editorSavedPreset(std::string name) = 0;
+  virtual std::vector<std::shared_ptr<model::Block>> editorPastedIndices(const std::vector<model::Block> copied_blocks, Index target) = 0;
   virtual std::optional<Preset> editorNavigatedPreset(bool next) = 0;
 
   virtual Array<MPENote> editorRequestsCurrentlyPlayingNotes() = 0;
@@ -198,16 +209,11 @@ struct MainComponent::Delegate {
   virtual std::pair<float, float> editorRequestsModulatorValue(Index moduleIndex, int parameterIndex, int modulatorIndex) = 0;
   virtual std::pair<float, float> editorRequestsModulatorValue(int modulationConnectionIndex) = 0;
   virtual std::shared_ptr<Tab> getTab(int column) = 0;
-  virtual std::shared_ptr<Module> getModulator(int index) = 0;
   virtual std::shared_ptr<model::Module> getModulator2(int index) = 0;
-  virtual std::shared_ptr<Module> editorAddedModulator(Model::Type code) = 0;
   virtual std::shared_ptr<model::Module> editorAddedModulator2(Model::Type code) = 0;
-  virtual std::shared_ptr<Block> getBlock(Index index) = 0;
   virtual std::shared_ptr<model::Block> getBlock2(Index index) = 0;
   virtual std::shared_ptr<model::Block> editorAddedBlock2(Model::Type code, Index index) = 0;
-  virtual std::shared_ptr<Block> editorAddedBlock(Model::Type code, Index index) = 0;
   virtual Array<int> editorRequestsActiveColumns() = 0;
-  virtual Array<std::shared_ptr<Module>> getModulators() = 0;
   virtual std::vector<std::shared_ptr<model::Module>> getModulators2() = 0;
   virtual std::vector<std::shared_ptr<model::Connection>> getModulations() = 0;
   virtual Array<std::shared_ptr<Modulation>> getConnectionsOfSource(std::shared_ptr<Module> source) = 0;

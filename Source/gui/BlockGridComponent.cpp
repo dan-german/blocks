@@ -98,7 +98,7 @@ void BlockGridComponent::gridItemStretchEnded(GridItemComponent* item, int offse
   block->animate();
 }
 
-void BlockGridComponent::ResetDotsVisibility() {
+void BlockGridComponent::resetDotsVisibility() {
   for (auto row : dot_matrix_) {
     for (auto dot : *row) {
       dot->setVisible(true);
@@ -125,7 +125,7 @@ void BlockGridComponent::ResetDotsVisibility() {
 
 void BlockGridComponent::snapItem(GridItemComponent* item, Index index, bool resetBounds) {
   GridComponent::snapItem(item, index, resetBounds);
-  ResetDotsVisibility();
+  resetDotsVisibility();
   auto block = dynamic_cast<BlockComponent*>(item);
   block->animate();
 }
@@ -167,7 +167,7 @@ void BlockGridComponent::hideDotsAroundIndex(GridItemComponent* blockComponent, 
 }
 
 void BlockGridComponent::itemHovered(GridItemComponent* item, bool valid, bool inside, int proposedLength, Index index) {
-  ResetDotsVisibility();
+  resetDotsVisibility();
   auto length = proposedLength;
 
   if (!inside) {
@@ -206,12 +206,12 @@ void BlockGridComponent::gridItemEndedDrag(GridItemComponent* item, const MouseE
 
 void BlockGridComponent::setItemLength(GridItemComponent* item, int length) {
   GridComponent::setItemLength(item, length);
-  ResetDotsVisibility();
+  resetDotsVisibility();
 }
 
 void BlockGridComponent::clear() {
   GridComponent::clear();
-  ResetDotsVisibility();
+  resetDotsVisibility();
 }
 
 void BlockGridComponent::gridItemStartedDrag(GridItemComponent* item, const MouseEvent& mouseEvent) {

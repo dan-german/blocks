@@ -96,7 +96,10 @@ void GridComponent::detachModule(Index index, bool shouldRemove) {
   auto item = itemMatrix[index.column][index.row];
   itemMatrix[index.column][index.row] = {};
 
-  if (shouldRemove) items.remove(items.indexOf(item));
+  if (shouldRemove) { 
+    items.erase(std::remove(items.begin(), items.end(), item), items.end());
+    delete item;
+  }
 }
 
 void GridComponent::clear() {
@@ -137,7 +140,7 @@ GridItemComponent* GridComponent::isSlotTaken(Index index, GridItemComponent* ca
 
 GridItemComponent* GridComponent::isSlotTaken(Index index) {
   for (int i = index.column; i >= 0; i--) {
-    auto candidateIndex = Index(index.row, i);
+    auto candidateIndex = Index(i, index.row);
     auto module = getModuleComponent(candidateIndex);
 
     if (module) {
@@ -157,7 +160,7 @@ void GridComponent::mouseUp(const MouseEvent& event) {
 void GridComponent::addItem(GridItemComponent* item, Index index, bool resetBounds) {
   item->listener = this;
   item->grid = this;
-  items.add(item);
+  items.push_back(item);
   itemMatrix[index.column][index.row] = item;
   snapItem(item, index, resetBounds);
 }
@@ -238,8 +241,7 @@ void GridComponent::gridItemClicked(GridItemComponent* item, const MouseEvent& e
 }
 
 void GridComponent::gridItemIsDragging(GridItemComponent* item, const MouseEvent& mouseEvent) {
-  auto position = getItemPosition(item);
-  auto index = indexForPoint(position);
+  auto index = indexForPoint(getItemPosition(item));
 
   if (previousPlaceholderIndex && *previousPlaceholderIndex == index) { return; }
   if (index.column >= config.columns || index.row >= config.rows || index.column < 0 || index.row < 0) return;
@@ -267,4 +269,18 @@ Point<int> GridComponent::getItemPosition(GridItemComponent* item) {
   auto x = itemPosition.getX() + getModuleBounds().getWidth() / 2; // mid point of the leftmost item
   auto y = itemPosition.getY() + item->getHeight() / 2; // mid y 
   return Point(x, y);
+}
+
+std::vector<GridItemComponent*> GridComponent::getItemsInRectangle(Rectangle<int> rectangle) {
+  std::vector<GridItemComponent*> itemsInRectangle;
+  for (auto item : items) {
+    if (rectangle.intersects(item->getBounds())) {
+      itemsInRectangle.push_back(item);
+    }
+  }
+  return itemsInRectangle;
+}
+
+GridItemComponent* GridComponent::getItemInIndex(Index index) {
+  return itemMatrix[index.column][index.row];
 }
