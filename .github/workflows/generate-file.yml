@@ -12,7 +12,7 @@ jobs:
           name: hello-text
           path: hello.txt
   upload-to-s3:
-    uses: /.github/workflows/upload-to-s3.yml@main
+    uses: ./.github/workflows/upload-to-s3.yml@main
     with: 
       workflow-name: ${{ github.workflow }} 
     # runs-on: ubuntu-latest
