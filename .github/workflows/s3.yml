@@ -9,6 +9,8 @@ jobs:
         uses: dawidd6/action-download-artifact@v3
         with:
           workflow: generate-file.yml
+      - name: Create Text File
+        run: ls
       - name: upload to s3
         uses: shallwefootball/s3-upload-action@master
         with:
