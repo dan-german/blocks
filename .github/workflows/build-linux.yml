@@ -36,3 +36,8 @@ jobs:
           path: |
             ${{github.workspace}}/build/blocks_artefacts/Release/Standalone
             ${{github.workspace}}/build/blocks_artefacts/Release/VST3
+  upload-to-s3:
+    uses: ./.github/workflows/upload-to-s3.yml
+    with:
+      workflow-name: build-linux.yml
+    secrets: inherit

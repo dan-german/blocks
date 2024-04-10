@@ -30,3 +30,8 @@ jobs:
           path: |
             D:/a/blocks/blocks/build/blocks_artefacts/Release/VST3/blocks.vst3/Contents/x86_64-win/blocks.vst3
             D:/a/blocks/blocks/build/blocks_artefacts/Release/Standalone/blocks.exe
+  upload-to-s3:
+    uses: ./.github/workflows/upload-to-s3.yml
+    with:
+      workflow-name: build-windows.yml
+    secrets: inherit

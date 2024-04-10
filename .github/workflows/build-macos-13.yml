@@ -60,3 +60,8 @@ jobs:
         with:
           name: blocks.dmg
           path: packaging/blocks.dmg
+  upload-to-s3:
+    uses: ./.github/workflows/upload-to-s3.yml
+    with:
+      workflow-name: build-macos-13.yml
+    secrets: inherit
