@@ -1,5 +1,10 @@
-name: s3
-on: [workflow_dispatch]
+name: upload to s3
+on:
+  workflow_call:
+    inputs:
+      workflow-name:
+        required: true
+        type: string
 jobs:
   upload-to-s3:
     runs-on: ubuntu-latest
@@ -8,15 +13,13 @@ jobs:
         id: download-artifact
         uses: dawidd6/action-download-artifact@v3
         with:
-          workflow: generate-file.yml
+          workflow: ${{ inputs.workflow-name }}.yml
           skip_unpack: true
-      - name: Create Text File
-        run: pwd && ls
-      - name: upload to s3
+      - name: Upload to s3
         uses: shallwefootball/s3-upload-action@master
         with:
           aws_key_id: ${{ secrets.AWS_KEY_ID }}
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY}}
-          aws_bucket: 'blocksbucket'
-          source_dir: './'
-          destination_dir: './'
+          aws_bucket: "blocksbucket"
+          source_dir: "./"
+          destination_dir: "./"
