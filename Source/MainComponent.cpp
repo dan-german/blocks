@@ -76,6 +76,7 @@ void MainComponent::paint(juce::Graphics& g) {
 }
 
 void MainComponent::inspectorGestureChanged(std::string parameter_name, bool started) {
+  is_adjusting_inspector_ = started;
   std::shared_ptr<model::Module> focusedModule = delegate->getBlock2(focused_grid_item_->index);
 
   // auto isTab = tabGrid.containsItem(focusedGridItem);
@@ -595,6 +596,10 @@ void MainComponent::graphicsTimerCallback(const float secondsSincelastUpdate) {
 }
 
 void MainComponent::mouseDrag(const MouseEvent& event) {
+  // auto relative_position = event.getEventRelativeTo(&inspector_).getPosition();
+  // bool is_mouse_on_inspector = inspector_.contains(relative_position);
+  if (is_adjusting_inspector_) return;
+
   block_grid_.add_button_.setAlpha(0);
   if (event.mods.isLeftButtonDown()) {
     handleSelectionRect(event);

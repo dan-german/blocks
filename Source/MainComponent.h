@@ -88,6 +88,7 @@ private:
   ButtonGridPopup copy_delete_popup_;
   ButtonGridPopup paste_popup_;
   bool multiple_selection_ = false;
+  bool is_adjusting_inspector_ = false;
 
   void setupInspector();
   void clear();
