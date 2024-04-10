@@ -1,4 +1,4 @@
-name: Generate Text File
+name: s3
 on: [workflow_dispatch]
 jobs:
   upload-to-s3:
@@ -14,5 +14,5 @@ jobs:
         with:
           aws_key_id: ${{ secrets.AWS_KEY_ID }}
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY}}
-          aws_bucket: ${{ secrets.AWS_BUCKET }}
+          aws_bucket: 'blocksbucket'
           source_dir: './hello.txt'
