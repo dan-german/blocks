@@ -10,7 +10,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: hello-text
-          # path: hello.txt
+          path: hello.txt
   upload-to-s3:
     uses: dan-german/blocks/.github/workflows/upload-to-s3.yml@main
     with: 
