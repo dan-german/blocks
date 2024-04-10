@@ -11,10 +11,11 @@ jobs:
         with:
           name: hello-text
           # path: hello.txt
-  upload:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Upload to s3
-        uses: dan-german/blocks/.github/workflows/upload-to-s3.yml@main
-        with: 
-          workflow-name: ${{ github.workflow }}
+  upload-to-s3:
+    uses: dan-german/blocks/.github/workflows/upload-to-s3.yml@main
+    # runs-on: ubuntu-latest
+    # steps:
+    #   - name: Upload to s3
+    #     uses: dan-german/blocks/.github/workflows/upload-to-s3.yml@main
+    #     with: 
+    #       workflow-name: ${{ github.workflow }}
