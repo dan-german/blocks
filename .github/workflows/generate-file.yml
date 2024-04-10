@@ -6,4 +6,8 @@ jobs:
     steps:
       - name: Create Text File
         run: echo "hello world" > hello.txt
-      
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: hello-text
+          path: hello.txt
