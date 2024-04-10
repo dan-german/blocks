@@ -10,7 +10,7 @@ jobs:
         with:
           workflow: generate-file.yml
       - name: Create Text File
-        run: ls
+        run: cd hello-text && ls
       - name: upload to s3
         uses: shallwefootball/s3-upload-action@master
         with:
