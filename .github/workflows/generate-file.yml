@@ -1,0 +1,9 @@
+name: Generate Text File
+on: [workflow_dispatch]
+jobs:
+  generate_text_file:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create Text File
+        run: echo "hello world" > hello.txt
+      
