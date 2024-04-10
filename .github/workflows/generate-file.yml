@@ -10,4 +10,4 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: hello-text
-          path: hello.txt
+          # path: hello.txt
