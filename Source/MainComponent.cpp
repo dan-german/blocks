@@ -342,6 +342,7 @@ void MainComponent::mouseUp(const MouseEvent& event) {
 }
 
 void MainComponent::handlePastePopup(const juce::MouseEvent& event) {
+  if (copied_blocks_.size() == 0) return;
   StringArray model { "paste" };
   paste_popup_.setModel(model);
   auto relative_position = event.getEventRelativeTo(this);
@@ -429,7 +430,7 @@ std::shared_ptr<model::Block> MainComponent::addBlock(int code, Index index) {
 }
 
 void MainComponent::setupInspector() {
-  inspector_.addMouseListener(this, true);
+  // inspector_.addMouseListener(this, true);
   inspector_.delegate = this;
   addChildComponent(inspector_);
 }
@@ -660,6 +661,7 @@ void MainComponent::updateInspectorModulationIndicators() {
 }
 
 void MainComponent::clear() {
+  copied_blocks_ = {};
   focused_grid_item_ = nullptr;
   inspector_.setVisible(false);
 
@@ -911,7 +913,6 @@ void MainComponent::visibilityChanged() {
 }
 
 void MainComponent::clickedOnGrid(GridComponent* grid, Index index) {
-  std::cout << "clicked on grid" << std::endl;
   if (grid == &block_grid_) return;
   spawnTabComponent(delegate->editorAddedTab(index.column));
 }
@@ -965,7 +966,7 @@ void MainComponent::gridItemEndedDrag(GridComponent* grid, GridItemComponent* it
 
 void MainComponent::gridItemClicked(GridComponent* grid, GridItemComponent* item, const MouseEvent& event) {
   if (event.mods.isRightButtonDown()) {
-    showCopyPastePopup(event, item);
+    showCopyDeletePopup(event, item);
     return;
   }
 
@@ -976,7 +977,7 @@ void MainComponent::gridItemClicked(GridComponent* grid, GridItemComponent* item
   toggleGridItemSelection(grid, item, !item->isSelected);
 }
 
-void MainComponent::showCopyPastePopup(const juce::MouseEvent& event, GridItemComponent* item) {
+void MainComponent::showCopyDeletePopup(const juce::MouseEvent& event, GridItemComponent* item) {
   auto grid_relative_event = event.getEventRelativeTo(&block_grid_);
   auto index_under_mouse = block_grid_.indexForPoint(grid_relative_event.getPosition());
   auto selected_indices = block_grid_.getSelectedIndices();

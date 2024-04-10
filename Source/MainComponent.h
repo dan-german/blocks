@@ -111,7 +111,7 @@ private:
   void removeBlock(GridItemComponent* block);
   void removeTab(GridItemComponent* tab);
   std::shared_ptr<model::Module> getFocusedModule();
-  void showCopyPastePopup(const juce::MouseEvent& event, GridItemComponent* item);
+  void showCopyDeletePopup(const juce::MouseEvent& event, GridItemComponent* item);
   void removeSelectedItems();
   // Grid Listener
   void clickedOnGrid(GridComponent* grid, Index index) override;

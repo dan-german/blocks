@@ -14,7 +14,7 @@ SelectionRect::~SelectionRect() {
 
 void SelectionRect::resized() {
   stroke_.clear();
-  stroke_.addRectangle(getLocalBounds().toFloat());
+  stroke_.addRectangle(getLocalBounds());
 }
 
 void SelectionRect::paint(juce::Graphics& g) {
