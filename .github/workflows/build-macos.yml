@@ -67,3 +67,4 @@ jobs:
     with:
       workflow-name: build-macos.yml
     secrets: inherit
+    needs: build
