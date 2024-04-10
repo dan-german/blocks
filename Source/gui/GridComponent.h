@@ -65,6 +65,8 @@ public:
   inline void setItemHidden(Index index, bool hidden) { if (auto item = itemMatrix[index.row][index.column]) item->setHidden(hidden); }
   inline void setAllItemsSelected(bool selected, GridItemComponent* ignore = nullptr) { for (auto item : items) if (item != ignore) item->setSelected(selected); }
 
+  std::vector<Index> getSelectedIndices();
+
   /// Checks if the slot is taken and if so returns the parent item
   GridItemComponent* isSlotTaken(Index index, GridItemComponent* candidate);
   GridItemComponent* isSlotTaken(Index index);

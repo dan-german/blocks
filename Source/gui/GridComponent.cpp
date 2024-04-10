@@ -284,3 +284,13 @@ std::vector<GridItemComponent*> GridComponent::getItemsInRectangle(Rectangle<int
 GridItemComponent* GridComponent::getItemInIndex(Index index) {
   return itemMatrix[index.column][index.row];
 }
+
+std::vector<Index> GridComponent::getSelectedIndices() { 
+  std::vector<Index> selected_indices;
+  for (auto item : items) {
+    if (item->isSelected) {
+      selected_indices.push_back(item->index);
+    }
+  }
+  return selected_indices;
+}

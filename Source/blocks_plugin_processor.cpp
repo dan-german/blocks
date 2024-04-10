@@ -748,12 +748,7 @@ void PluginProcessor::editorAdjustedColumn(std::string control, int column, floa
 }
 
 void PluginProcessor::setValue(std::string module_id, std::string parameter_name, float value) {
-  auto m = synth_->getModuleManager().getModule(module_id);
-  auto p = m->parameter_map_[parameter_name];
-  p->value_processor->set(value);
-  // p->paramter_map_[parameter_name]->val->set(value);
-  // parameter->b
-  // parameter->bridge->set
+  synth_->getModuleManager().getModule(module_id)->parameter_map_[parameter_name]->value_processor->set(value);
 }
 
 std::optional<Preset> PluginProcessor::editorNavigatedPreset(bool next) {

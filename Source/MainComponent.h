@@ -34,7 +34,8 @@ class MainComponent final: public Component,
   ModulatorComponent::Listener,
   GridComponent::Listener,
   NoteLogger::Listener,
-  ColumnControlsContainer::Listener {
+  ColumnControlsContainer::Listener,
+  KeyListener {
 public:
   struct Delegate;
   Delegate* delegate;
@@ -55,6 +56,7 @@ protected:
   void mouseDown(const MouseEvent& event) override;
   void mouseUp(const MouseEvent& event) override;
   void handlePastePopup(const juce::MouseEvent& event);
+  bool keyPressed (const KeyPress& key, Component* originatingComponent) override;
 private:
   DarkBackground dark_background_;
   DarkBackground grid_dark_background_;
@@ -66,6 +68,7 @@ private:
   ColumnControlsContainer column_controls_;
   SelectionRect selection_rect_;
   std::vector<model::Block> copied_blocks_;
+  std::vector<GridItemComponent*> currently_selected_items_;
 
   Array<BlockComponent*> blocks;
   GridItemComponent* focused_grid_item_ = nullptr;
@@ -98,8 +101,8 @@ private:
   void setupDarkBackground(DarkBackground* component, int layer);
   void resetDownFlowingDots();
   void copy();
-  std::vector<Index> getSelectedIndices();
 
+  void handleSelectionRect(const juce::MouseEvent& event);
   void toggleGridItemSelection(GridComponent* grid, GridItemComponent* item, bool selected);
   void showBlocksPopup(Index index);
   std::vector<Component*> allPopups();
@@ -107,7 +110,8 @@ private:
   void removeBlock(GridItemComponent* block);
   void removeTab(GridItemComponent* tab);
   std::shared_ptr<model::Module> getFocusedModule();
-
+  void showCopyPastePopup(const juce::MouseEvent& event, GridItemComponent* item);
+  void removeSelectedItems();
   // Grid Listener
   void clickedOnGrid(GridComponent* grid, Index index) override;
   void gridItemRemoved(GridComponent* grid, GridItemComponent* item) override;
@@ -133,7 +137,7 @@ private:
   void graphicsTimerCallback(const float secondsSinceLastUpdate);
   void changeModulePainter(int value);
   PopupMenu spawnModulationMenu(Module& victim);
-  void showPopupAt(ButtonGridPopup& popupWrapper, std::function<void(Index)> callback);
+  void showPopup(ButtonGridPopup& popupWrapper, std::function<void(Index)> callback);
   void updateInspectorModulationIndicators();
   void handleModuleLandedOnInspector(BlockComponent* moduleComponent, const Point<int>& inspectorRelativePosition);
   void refreshInspector();

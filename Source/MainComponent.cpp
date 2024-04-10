@@ -7,7 +7,12 @@
 #include "module_new.h"
 #include "vital/common/synth_constants.h"
 
-MainComponent::MainComponent(juce::MidiKeyboardState& keyboard_state, Delegate* delegate): delegate(delegate), ui_layer_(keyboard_state, this), tab_grid_(GridConfigs::tab), block_grid_(GridConfigs::blocks) {
+MainComponent::MainComponent(juce::MidiKeyboardState& keyboard_state, Delegate* delegate):
+  delegate(delegate),
+  ui_layer_(keyboard_state, this),
+  tab_grid_(GridConfigs::tab),
+  block_grid_(GridConfigs::blocks)
+{
   setWantsKeyboardFocus(false);
 
   setLookAndFeel(&blocks_laf_);
@@ -192,7 +197,7 @@ void MainComponent::setupListeners() {
   ui_layer_.modulators_.plus_button_callback = [this](const juce::MouseEvent& event) {
     auto position = event.eventComponent->getPosition() + ui_layer_.modulators_.getPosition();
     modulators_popup_.setBounds(position.getX(), position.getY(), 72, 54);
-    showPopupAt(modulators_popup_, [this](Index i) { this->clickOnModulatorsPopup(i); });
+    showPopup(modulators_popup_, [this](Index i) { this->clickOnModulatorsPopup(i); });
     //   auto p = component.getBounds().getPosition();
     //   auto position = p + ui_layer_.modulators_.getPosition();
       // auto relative_position = component.getParentComponent()->getPosition();
@@ -272,27 +277,31 @@ void MainComponent::mouseDown(const MouseEvent& event) {
 }
 
 void MainComponent::mouseUp(const MouseEvent& event) {
-  multiple_selection_ = false;
-  auto area = selection_rect_.getBounds();
   selection_rect_.setBounds(Rectangle<int>());
+  auto grid_relative_position = event.getEventRelativeTo(&block_grid_).getPosition();
+  bool is_mouse_on_block_grid = block_grid_.contains(grid_relative_position);
   bool was_dragging = event.getEventRelativeTo(this).getDistanceFromDragStart() > 2;
   if (was_dragging) {
-    block_grid_.setAllItemsSelected(false);
-    auto selectedItems = block_grid_.getItemsInRectangle(area);
+    if (currently_selected_items_.size() == 1) {
+      toggleGridItemSelection(&block_grid_, currently_selected_items_[0], true);
+    } else if (is_mouse_on_block_grid) {
 
-    for (auto item : selectedItems) {
-      if (auto block = dynamic_cast<BlockComponent*>(item)) {
-        block->setSelected(true);
-      }
+      block_grid_.add_button_.setAlpha(1);
     }
-
-    multiple_selection_ = selectedItems.size() > 1;
     return;
+  }
+
+  if (focused_grid_item_) {
+    toggleGridItemSelection(&block_grid_, focused_grid_item_, false);
+  }
+
+  currently_selected_items_ = {};
+  if (multiple_selection_) {
+    block_grid_.setAllItemsSelected(false);
   }
 
   setMouseCursor(MouseCursor::NormalCursor);
   for (auto popup : allPopups()) { popup->setVisible(false); }
-  block_grid_.setAllItemsSelected(false);
 
   if (modulator_drag_mode_) {
     previous_slider_under_mouse_ = {};
@@ -300,24 +309,23 @@ void MainComponent::mouseUp(const MouseEvent& event) {
     return;
   }
 
-  auto mousePosition = event.getEventRelativeTo(&block_grid_).getPosition();
   auto componentName = event.eventComponent->getName();
 
   if (componentName == "ModulatorsPlusButton") {
     auto position = event.eventComponent->getPosition() + ui_layer_.modulators_.getPosition();
     modulators_popup_.setBounds(position.getX(), position.getY(), 72, 54);
-    showPopupAt(modulators_popup_, [this](Index i) { this->clickOnModulatorsPopup(i); });
+    showPopup(modulators_popup_, [this](Index i) { this->clickOnModulatorsPopup(i); });
   } else if (componentName == "PresetMainButton") {
     auto componentY = event.eventComponent->getPosition().getY();
     auto point = event.eventComponent->getPosition().withY(componentY + 8);
-    showPopupAt(presets_popup_, [this](Index i) { this->clickOnModulatorsPopup(i); });
+    showPopup(presets_popup_, [this](Index i) { this->clickOnModulatorsPopup(i); });
   }
 
-  if (block_grid_.contains(mousePosition)) {
+  if (is_mouse_on_block_grid) {
     if (event.mods.isLeftButtonDown()) {
       // can this be moved to the grid component?
       auto mouse_down_position = event.getEventRelativeTo(&block_grid_).getMouseDownPosition();
-      Index index = block_grid_.indexForPoint(mousePosition);
+      Index index = block_grid_.indexForPoint(grid_relative_position);
       bool slot_taken = block_grid_.isSlotTaken(index);
 
       Index starting_index = block_grid_.indexForPoint(mouse_down_position);
@@ -337,7 +345,7 @@ void MainComponent::handlePastePopup(const juce::MouseEvent& event) {
   paste_popup_.setModel(model);
   auto relative_position = event.getEventRelativeTo(this);
   paste_popup_.setBounds(relative_position.getPosition().getX(), relative_position.getPosition().getY(), 56, 40);
-  showPopupAt(paste_popup_, [this, event](Index i) {
+  showPopup(paste_popup_, [this, event](Index i) {
     if (this->copied_blocks_.size() > 0) {
       auto grid_relative_position = event.getEventRelativeTo(&block_grid_);
       Index target = block_grid_.indexForPoint(grid_relative_position.getPosition());
@@ -394,10 +402,10 @@ void MainComponent::showBlocksPopup(Index index) {
     120
   );
 
-  showPopupAt(blocks_popup_, blockSelectionCompletion);
+  showPopup(blocks_popup_, blockSelectionCompletion);
 }
 
-void MainComponent::showPopupAt(ButtonGridPopup& popup, std::function<void(Index)> callback) {
+void MainComponent::showPopup(ButtonGridPopup& popup, std::function<void(Index)> callback) {
   dark_background_.setVisible(true);
   dark_background_.toFront(true);
 
@@ -587,17 +595,40 @@ void MainComponent::graphicsTimerCallback(const float secondsSincelastUpdate) {
 }
 
 void MainComponent::mouseDrag(const MouseEvent& event) {
-  if (event.eventComponent == &ui_layer_.modulators_) {
-    std::cout << "pslsls" << std::endl;
+  block_grid_.add_button_.setAlpha(0);
+  if (event.mods.isLeftButtonDown()) {
+    handleSelectionRect(event);
+  }
+}
+
+void MainComponent::handleSelectionRect(const juce::MouseEvent& event) {
+  if (focused_grid_item_) {
+    toggleGridItemSelection(&block_grid_, focused_grid_item_, false);
+  }
+
+  auto relative_event = event;//.getEventRelativeTo(this);
+  auto area = Rectangle<int>(relative_event.getMouseDownPosition(), relative_event.getPosition());
+  selection_rect_.setBounds(area);
+
+  auto new_selected_items = block_grid_.getItemsInRectangle(area);
+
+  if (new_selected_items == currently_selected_items_) {
     return;
   }
-  // std::cout << "mouse drag: " << name << std::endl;
-  block_grid_.add_button_.setAlpha(0);
-  if (event.mods.isRightButtonDown()) return;
-  auto starting_position = event.getEventRelativeTo(this).getMouseDownPosition();
-  auto current_position = event.getEventRelativeTo(this).getPosition();
-  auto component_under_start = block_grid_.getComponentAt(starting_position);
-  selection_rect_.setBounds(Rectangle<int>(starting_position, current_position).getSmallestIntegerContainer());
+
+  for (auto new_item : new_selected_items) {
+    new_item->setSelected(true);
+  }
+
+  for (auto previously_selected_item : currently_selected_items_) {
+    bool isnt_in_new_selected = std::find(new_selected_items.begin(), new_selected_items.end(), previously_selected_item) == new_selected_items.end();
+    if (isnt_in_new_selected) {
+      previously_selected_item->setSelected(false);
+    }
+  }
+
+  currently_selected_items_ = new_selected_items;
+  multiple_selection_ = currently_selected_items_.size() > 1;
 }
 
 void MainComponent::updateInspectorModulationIndicators() {
@@ -860,7 +891,7 @@ void MainComponent::presetButtonClicked() {
   juce::StringArray presetNames = delegate->editorRequestsPresetNames();
   presets_popup_.setModel({ presetNames });
 
-  showPopupAt(presets_popup_, [this](Index i) { this->loadPreset(i.row); });
+  showPopup(presets_popup_, [this](Index i) { this->loadPreset(i.row); });
 }
 
 void MainComponent::loadPreset(int index) {
@@ -929,20 +960,7 @@ void MainComponent::gridItemEndedDrag(GridComponent* grid, GridItemComponent* it
 
 void MainComponent::gridItemClicked(GridComponent* grid, GridItemComponent* item, const MouseEvent& event) {
   if (event.mods.isRightButtonDown()) {
-    auto e = event.getEventRelativeTo(this);
-    juce::StringArray options = { "copy", "delete" };
-    copy_delete_popup_.setModel(options);
-    copy_delete_popup_.setBounds(e.getPosition().getX(), e.getPosition().getY(), 56, 62);
-    showPopupAt(copy_delete_popup_, [this, item](Index i) {
-      if (i.row == 0) {
-        copy();
-      } else {
-        for (auto index : this->getSelectedIndices()) {
-          auto block_component = block_matrix_[index.column][index.row];
-          removeBlock(block_component);
-        }
-      }
-    });
+    showCopyPastePopup(event, item);
     return;
   }
 
@@ -951,6 +969,37 @@ void MainComponent::gridItemClicked(GridComponent* grid, GridItemComponent* item
     multiple_selection_ = false;
   }
   toggleGridItemSelection(grid, item, !item->isSelected);
+}
+
+void MainComponent::showCopyPastePopup(const juce::MouseEvent& event, GridItemComponent* item) {
+  auto grid_relative_event = event.getEventRelativeTo(&block_grid_);
+  auto index_under_mouse = block_grid_.indexForPoint(grid_relative_event.getPosition());
+  auto selected_indices = block_grid_.getSelectedIndices();
+  bool is_index_under_mouse_selected = std::find(selected_indices.begin(), selected_indices.end(), index_under_mouse) != selected_indices.end();
+  if (!is_index_under_mouse_selected) {
+    block_grid_.setAllItemsSelected(false);
+    toggleGridItemSelection(&block_grid_, item, true);
+  }
+
+  juce::StringArray options = { "copy", "delete" };
+  copy_delete_popup_.setModel(options);
+  auto this_relative_event = event.getEventRelativeTo(this);
+  copy_delete_popup_.setBounds(this_relative_event.getPosition().getX(), this_relative_event.getPosition().getY(), 56, 62);
+  showPopup(copy_delete_popup_, [this, item](Index i) {
+    if (i.row == 0) {
+      copy();
+    } else {
+      removeSelectedItems();
+    }
+  });
+}
+
+void MainComponent::removeSelectedItems() {
+  for (auto index : this->block_grid_.getSelectedIndices()) {
+    auto block_component = block_matrix_[index.column][index.row];
+    removeBlock(block_component);
+  }
+  currently_selected_items_ = {};
 }
 
 void MainComponent::toggleGridItemSelection(GridComponent* grid, GridItemComponent* item, bool selected) {
@@ -1031,13 +1080,15 @@ void MainComponent::copy() {
   }
 }
 
-std::vector<Index> MainComponent::getSelectedIndices() { // should probably move to grid 
-  std::vector<Index> selected_indices;
-  auto items = block_grid_.getItems();
-  for (auto item : items) {
-    if (item->isSelected) {
-      selected_indices.push_back(item->index);
+bool MainComponent::keyPressed(const KeyPress& key, Component* originatingComponent) {
+  // todo - make this work
+  if (key.getKeyCode() == juce::KeyPress::backspaceKey) {
+    for (auto item : block_grid_.getItems()) {
+      if (item->isSelected) {
+        auto block = block_matrix_[item->index.column][item->index.row];
+        removeBlock(block);
+      }
     }
   }
-  return selected_indices;
+  return true;
 }
