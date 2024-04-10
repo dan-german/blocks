@@ -12,6 +12,9 @@ env:
 jobs:
   build:
     runs-on: macos-14
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}
+      cancel-in-progress: true
     steps:
       - uses: actions/checkout@v3
         with:
