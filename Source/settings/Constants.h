@@ -16,8 +16,8 @@ namespace Constants {
 constexpr int blockWidth = 68;
 constexpr int blockHeight = 35;
 constexpr int gridDotSize = 4;
-constexpr int rows = 7;
-constexpr int columns = 5;
+constexpr int rows = 7; // use model::rows instead
+constexpr int columns = 5; // use model::columns instead
 constexpr int gridEdgeSpacing = gridDotSize - 1;
 constexpr int moduleSpacing = 2;
 constexpr int tabHeight = 22;

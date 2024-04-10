@@ -84,6 +84,7 @@ public:
   void editorChangedTabLength(int column, int length) override;
   juce::Array<int> editorRequestsActiveColumns() override;
 
+  std::vector<std::shared_ptr<model::Block>> editorPastedIndices(const std::vector<model::Block> copied_blocks, Index target) override;
   void editorRemovedTab(int column) override;
   void editorRemovedBlock(Index index) override;
   void editorRepositionedBlock(Index from, Index to) override;
@@ -106,22 +107,16 @@ public:
 
   void disconnect(std::shared_ptr<model::Connection>& connection);
 
-  std::shared_ptr<Block> getBlock(Index index) override;
   std::shared_ptr<model::Block> getBlock2(Index index) override;
   std::shared_ptr<Tab> getTab(int column) override;
-  std::shared_ptr<Block> editorAddedBlock(Model::Type code, Index index) override;
   std::shared_ptr<model::Block> editorAddedBlock2(Model::Type code, Index index) override;
   std::shared_ptr<model::Module> editorAddedModulator2(Model::Type code) override;
-  std::shared_ptr<Module> getModulator(int index) override;
   std::shared_ptr<model::Module> getModulator2(int index) override;
-  std::shared_ptr<Module> editorAddedModulator(Model::Type code) override;
   Preset editorChangedPreset(int index) override;
   void clear();
   Preset getStateRepresentation() override;
-  juce::Array<std::shared_ptr<Module>> getModulators() override;
   std::vector<std::shared_ptr<model::Module>> getModulators2() override;
   juce::Array<std::shared_ptr<Modulation>> getConnectionsOfSource(std::shared_ptr<Module> source) override;
-  // juce::Array<std::shared_ptr<model::Modulation>> getModulations() override;
   std::vector<std::shared_ptr<model::Connection>> getModulations() override;
 
   std::pair<float, float> editorRequestsModulatorValue(Index moduleIndex, int parameterIndex, int modulatorIndex) override;
@@ -133,7 +128,7 @@ public:
 private:
   int current_preset_index_ = -1;
   bool editor_ready_ = false;
-  bool block_modified_ = false;
+  std::atomic<int> block_updates_ = 0;
   bool engine_prepared_ = false;
   std::optional<Preset> pending_preset_;
 

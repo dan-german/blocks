@@ -154,7 +154,7 @@ public:
 
   Output note_retriggered_;
 
-  LineGenerator lfo_sources_[kNumLfos];
+  LineGenerator lfo_sources_[model::MAX_MODULES_PER_TYPE];
 
   TriggerRandom* random_;
   RandomLfoModule* random_lfos_[kNumRandomLfos];

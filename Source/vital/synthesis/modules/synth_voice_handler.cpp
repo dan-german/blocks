@@ -151,7 +151,7 @@ void SynthVoiceHandler::createProducers() {
 }
 
 void SynthVoiceHandler::createModulators() {
-  for (int i = 0; i < kNumLfos; ++i) {
+  for (int i = 0; i < model::MAX_MODULES_PER_TYPE; ++i) {
     lfo_sources_[i].setLoop(false);
     lfo_sources_[i].initTriangle();
     std::string prefix = std::string("lfo");
@@ -169,7 +169,7 @@ void SynthVoiceHandler::createModulators() {
     createStatusOutput(prefix + "_frequency", lfo->output(LfoModule::kOscFrequency));
   }
 
-  for (int i = 0; i < kNumEnvelopes; ++i) {
+  for (int i = 0; i < model::MAX_MODULES_PER_TYPE; ++i) {
     // std::string prefix = std::string("env_") + std::to_string(i + 1);
     // EnvelopeModule* envelope = new EnvelopeModule(prefix, i == 0);
     // envelope->plug(retrigger(), EnvelopeModule::kTrigger);
@@ -358,7 +358,7 @@ bool SynthVoiceHandler::shouldAccumulate(Output* output) {
 }
 
 void SynthVoiceHandler::correctToTime(double seconds) {
-  for (int i = 0; i < kNumLfos; ++i)
+  for (int i = 0; i < model::MAX_MODULES_PER_TYPE; ++i)
     lfos_[i]->correctToTime(seconds);
 
   for (int i = 0; i < kNumRandomLfos; ++i)
@@ -366,10 +366,10 @@ void SynthVoiceHandler::correctToTime(double seconds) {
 }
 
 void SynthVoiceHandler::disableUnnecessaryModSources() {
-  for (int i = 0; i < kNumLfos; ++i)
+  for (int i = 0; i < model::MAX_MODULES_PER_TYPE; ++i)
     lfos_[i]->enable(false);
 
-  for (int i = 1; i < kNumEnvelopes; ++i)
+  for (int i = 1; i < model::MAX_MODULES_PER_TYPE; ++i)
     envelopes_[i]->enable(false);
 
   for (int i = 0; i < kNumRandomLfos; ++i)

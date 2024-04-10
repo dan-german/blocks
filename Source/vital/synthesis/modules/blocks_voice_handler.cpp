@@ -62,8 +62,8 @@ BlocksVoiceHandler::BlocksVoiceHandler(Output* beats_per_second):
   midi_offset_output_ = registerControlRateOutput(note_from_reference_->output(), true);
 
   enabled_modulation_processors_.ensureCapacity(kMaxModulationConnections * 2); // * 2 for the default envelope modultion processors. todo - at least calculate the exact amount
-  lfos_.reserve(kNumLfos);
-  envelopes_.reserve(kNumEnvelopes);
+  lfos_.reserve(model::MAX_MODULES_PER_TYPE);
+  envelopes_.reserve(model::MAX_MODULES_PER_TYPE);
 
   int rows = 7;
   int columns = 5;
@@ -454,7 +454,7 @@ void BlocksVoiceHandler::clear() {
 }
 
 void BlocksVoiceHandler::createModulators() {
-  for (int i = 0; i < kNumLfos; ++i) {
+  for (int i = 0; i < model::MAX_MODULES_PER_TYPE; ++i) {
     lfo_sources_[i].setLoop(false);
     lfo_sources_[i].initSin();
     std::string prefix = std::string("lfo");
@@ -474,7 +474,7 @@ void BlocksVoiceHandler::createModulators() {
     createStatusOutput(prefix + "_frequency", lfo->output(LfoModule::kOscFrequency));
   }
 
-  for (int i = 0; i < kNumEnvelopes; ++i) {
+  for (int i = 0; i < model::MAX_MODULES_PER_TYPE; ++i) {
     auto envelope = createEnvelope();
     envelopes_.push_back(envelope);
     processor_pool_["envelope"].push_back(envelope);
@@ -603,7 +603,6 @@ void BlocksVoiceHandler::createVoiceOutput() {
   }
 }
 
-int please = 0;
 void BlocksVoiceHandler::process(int num_samples) {
   poly_mask reset_mask = reset()->trigger_mask;
   if (reset_mask.anyMask())
@@ -659,7 +658,7 @@ bool BlocksVoiceHandler::shouldAccumulate(Output* output) {
 }
 
 void BlocksVoiceHandler::correctToTime(double seconds) {
-  for (int i = 0; i < kNumLfos; ++i)
+  for (int i = 0; i < model::MAX_MODULES_PER_TYPE; ++i)
     lfos_[i]->correctToTime(seconds);
 
   for (int i = 0; i < kNumRandomLfos; ++i)
@@ -668,10 +667,10 @@ void BlocksVoiceHandler::correctToTime(double seconds) {
 
 void BlocksVoiceHandler::disableUnnecessaryModSources() {
   return;
-  for (int i = 0; i < kNumLfos; ++i)
+  for (int i = 0; i < model::MAX_MODULES_PER_TYPE; ++i)
     lfos_[i]->enable(false);
 
-  for (int i = 1; i < kNumEnvelopes; ++i)
+  for (int i = 1; i < model::MAX_MODULES_PER_TYPE; ++i)
     envelopes_[i]->enable(false);
 
   for (int i = 0; i < kNumRandomLfos; ++i)

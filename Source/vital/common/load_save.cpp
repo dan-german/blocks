@@ -122,7 +122,7 @@ json LoadSave::stateToJson(SynthBase* synth, const CriticalSection& critical_sec
 
   // if (synth->getWavetableCreator(0)) {
   //   json wavetables;
-  //   for (int i = 0; i < vital::kNumOscillators; ++i) {
+  //   for (int i = 0; i < model::MAX_MODULES_PER_TYPE; ++i) {
   //     WavetableCreator* wavetable_creator = synth->getWavetableCreator(i);
   //     wavetables.push_back(wavetable_creator->stateToJson());
   //   }
@@ -131,7 +131,7 @@ json LoadSave::stateToJson(SynthBase* synth, const CriticalSection& critical_sec
   // }
 
   // json lfos;
-  // for (int i = 0; i < vital::kNumLfos; ++i) {
+  // for (int i = 0; i < model::MAX_MODULES_PER_TYPE; ++i) {
   //   LineGenerator* lfo_source = synth->getLfoSource(i);
   //   lfos.push_back(lfo_source->stateToJson());
   // }
@@ -316,7 +316,7 @@ json LoadSave::updateFromOldVersion(json state) {
   if (compareVersionStrings(version, "0.2.1") < 0) {
     std::string env_start = "env_";
 
-    for (int i = 0; i < vital::kNumEnvelopes; ++i) {
+    for (int i = 0; i < model::MAX_MODULES_PER_TYPE; ++i) {
       std::string number = std::to_string(i + 1);
       std::string attack_string = env_start + number + "_attack";
       std::string decay_string = env_start + number + "_decay";
@@ -346,7 +346,7 @@ json LoadSave::updateFromOldVersion(json state) {
   if (compareVersionStrings(version, "0.2.5") < 0) {
     std::string env_start = "env_";
 
-    for (int i = 0; i < vital::kNumEnvelopes; ++i) {
+    for (int i = 0; i < model::MAX_MODULES_PER_TYPE; ++i) {
       std::string number = std::to_string(i + 1);
       std::string attack_string = env_start + number + "_attack";
       std::string decay_string = env_start + number + "_decay";
@@ -364,7 +364,7 @@ json LoadSave::updateFromOldVersion(json state) {
   if (compareVersionStrings(version, "0.2.6") < 0) {
     std::string lfo_start = "lfo_";
 
-    for (int i = 0; i < vital::kNumLfos; ++i) {
+    for (int i = 0; i < model::MAX_MODULES_PER_TYPE; ++i) {
       std::string number = std::to_string(i + 1);
       std::string fade_string = lfo_start + number + "_fade_time";
       std::string delay_string = lfo_start + number + "_delay_time";
@@ -452,7 +452,7 @@ json LoadSave::updateFromOldVersion(json state) {
   if (compareVersionStrings(version, "0.3.6") < 0) {
     std::string lfo_start = "lfo_";
 
-    for (int i = 0; i < vital::kNumLfos; ++i) {
+    for (int i = 0; i < model::MAX_MODULES_PER_TYPE; ++i) {
       std::string sync_type_string = lfo_start + std::to_string(i + 1) + "_sync_type";
       if (settings.count(sync_type_string)) {
         float value = settings[sync_type_string];
@@ -802,7 +802,7 @@ json LoadSave::updateFromOldVersion(json state) {
     settings["delay_tempo"] = delay_tempo + 1.0f;
 
     std::string lfo_start = "lfo_";
-    for (int i = 0; i < vital::kNumLfos; ++i) {
+    for (int i = 0; i < model::MAX_MODULES_PER_TYPE; ++i) {
       std::string tempo_string = lfo_start + std::to_string(i + 1) + "_tempo";
       if (settings.count(tempo_string)) {
         float tempo = settings[tempo_string];
@@ -980,7 +980,7 @@ json LoadSave::updateFromOldVersion(json state) {
   }
 
   if (compareVersionStrings(version, "0.8.1") < 0) {
-    for (int i = 0; i < vital::kNumLfos; ++i) {
+    for (int i = 0; i < model::MAX_MODULES_PER_TYPE; ++i) {
       std::string name = "lfo_" + std::to_string(i) + "_smooth_mode";
       settings[name] = 0.0f;
     }

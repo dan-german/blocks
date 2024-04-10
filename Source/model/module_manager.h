@@ -29,6 +29,7 @@ public:
   // void triggerNoteInTabs(Voice* voice);
   // Array<int> getActiveColumns();
 
+  bool slotTaken(Index index) { return blockMatrix[index.column][index.row] != nullptr; }
   std::shared_ptr<model::ColumnControl> getColumnControl(int index) { return pool.column_controls_[index]; }
 
   std::shared_ptr<model::Block> addBlock(std::string type, Index index, int number = -1);

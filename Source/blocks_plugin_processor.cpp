@@ -223,7 +223,7 @@ void PluginProcessor::processBlock(AudioSampleBuffer& buffer, MidiBuffer& midi_m
 }
 
 void PluginProcessor::handleBlockChanges() {
-  if (!block_modified_) return;
+  if (!block_updates_) return;
 
   getVoiceHandler()->unplugAll();
   getVoiceHandler()->connectAll();
@@ -237,7 +237,7 @@ void PluginProcessor::handleBlockChanges() {
   getVoiceHandler()->disconnectAllDefaultEnvs();
   getVoiceHandler()->connectAllDefaultEnvs();
 
-  block_modified_ = false;
+  block_updates_--;
 }
 
 bool PluginProcessor::hasEditor() const {
@@ -375,11 +375,6 @@ void PluginProcessor::editorAdjustedTab(int column, int parameter, float value) 
   // moduleManager.getTab(column)->parameter(parameter)->setValue(value);
 }
 
-#pragma warning(default:4716)
-std::shared_ptr<Module> PluginProcessor::getModulator(int index) {
-  // return moduleManager.getModulator(index);
-}
-
 std::shared_ptr<model::Module> PluginProcessor::getModulator2(int index) {
   return getModuleManager().getModulator(index);
 }
@@ -410,10 +405,6 @@ std::vector<std::shared_ptr<model::Connection>> PluginProcessor::getModulations(
 //   return modulations;
 // }
 
-#pragma warning(default:4716)
-std::shared_ptr<Block> PluginProcessor::getBlock(Index index) {
-}
-
 std::shared_ptr<model::Block> PluginProcessor::getBlock2(Index index) {
   return (index.row == -1 || index.column == -1) ? nullptr : synth_->getModuleManager().getBlock(index);
 }
@@ -437,7 +428,7 @@ void PluginProcessor::editorRepositionedBlock(Index from, Index to) {
   // clearModulations();
   synth_->repositionBlock(from, to);
   auto block = synth_->getModuleManager().getBlock(to);
-  block_modified_ = true;
+  block_updates_++;
 }
 
 void PluginProcessor::editorConnectedModulation(int modulatorIndex, std::string target_name, std::string parameter) {
@@ -502,8 +493,6 @@ void PluginProcessor::loadPreset(Preset preset) {
 
     auto target = synth_->getModuleManager().getModule(presetConnection.target);
     auto model = synth_->getModuleManager().addConnection(modulator, target, presetConnection.parameter, presetConnection.number);
-    model->parameter_name_ = presetConnection.parameter;
-
     model->amount_parameter_->value = presetConnection.amount;
     model->bipolar_parameter_->value = presetConnection.bipolar;
     connectModulationFromModel(model);
@@ -516,12 +505,12 @@ void PluginProcessor::loadPreset(Preset preset) {
     }
   }
 
-  block_modified_ = true;
+  block_updates_++;
   pauseProcessing(false);
 }
 
 void PluginProcessor::clear() {
-  // pauseProcessing(true);
+  pauseProcessing(true);
   // initEngine();
   clearModulations();
 
@@ -543,7 +532,7 @@ void PluginProcessor::clear() {
 
   getModuleManager().clear();
   getVoiceHandler()->clear();
-  // pauseProcessing(false);
+  pauseProcessing(false);
 }
 
 void PluginProcessor::editorRemovedTab(int column) {
@@ -585,11 +574,6 @@ void PluginProcessor::disconnect(std::shared_ptr<model::Connection>& connection)
   getModuleManager().removeConnection(connection);
 }
 
-#pragma warning(default:4716)
-std::shared_ptr<Module> PluginProcessor::editorAddedModulator(Model::Type code) {
-
-}
-
 std::shared_ptr<model::Module> PluginProcessor::editorAddedModulator2(Model::Type code) {
   return synth_->addModulator(code);
 }
@@ -609,16 +593,12 @@ void PluginProcessor::removeBlock(const Index& index) {
   getVoiceHandler()->removeBlock(index, block);
   synth_->getModuleManager().removeBlock(block);
 
-  block_modified_ = true;
-}
-
-std::shared_ptr<Block> PluginProcessor::editorAddedBlock(Model::Type type, Index index) {
-  return nullptr;
+  block_updates_++;
 }
 
 std::shared_ptr<model::Block> PluginProcessor::editorAddedBlock2(Model::Type type, Index index) {
   auto block = synth_->addBlock(type, index);
-  block_modified_ = true;
+  block_updates_++;
   return block;
 }
 
@@ -662,13 +642,6 @@ void PluginProcessor::editorChangedBlockLength(Index index, int length) {
   // } else {
   //   reduce(index, abs(difference));
   // }
-}
-
-juce::Array<std::shared_ptr<Module>> PluginProcessor::getModulators() {
-  return {};
-  // Array<std::shared_ptr<Module>> array;
-  // for (auto modulator : moduleManager.modulators) array.add(modulator);
-  // return array;
 }
 
 void PluginProcessor::editorSavedPreset(std::string name) {
@@ -775,15 +748,10 @@ void PluginProcessor::editorAdjustedColumn(std::string control, int column, floa
 }
 
 void PluginProcessor::setValue(std::string module_id, std::string parameter_name, float value) {
-  auto m = synth_->getModuleManager().getModule(module_id);
-  auto p = m->parameter_map_[parameter_name];
-  p->value_processor->set(value);
-  // p->paramter_map_[parameter_name]->val->set(value);
-  // parameter->b
-  // parameter->bridge->set
+  synth_->getModuleManager().getModule(module_id)->parameter_map_[parameter_name]->value_processor->set(value);
 }
 
-std::optional<Preset> PluginProcessor::editorNavigatedPreset(bool next) { 
+std::optional<Preset> PluginProcessor::editorNavigatedPreset(bool next) {
   if (preset_manager_.presets.size() == 0) return {};
   int previous_index = current_preset_index_;
   if (next) {
@@ -791,9 +759,45 @@ std::optional<Preset> PluginProcessor::editorNavigatedPreset(bool next) {
   } else {
     if (--current_preset_index_ < 0) current_preset_index_ = preset_manager_.presets.size() - 1;
   }
-
   if (current_preset_index_ == previous_index) return {};
   auto preset = preset_manager_.presets[current_preset_index_];
   loadPreset(preset);
   return preset;
+}
+
+std::vector<std::shared_ptr<model::Block>> PluginProcessor::editorPastedIndices(const std::vector<model::Block> copied_blocks, Index target) {
+  Index top_left_index_of_section = copied_blocks[0].index;
+  for (model::Block block : copied_blocks) {
+    auto index = block.index;
+    if (block.index.column < top_left_index_of_section.column) top_left_index_of_section.column = block.index.column;
+    if (block.index.row < top_left_index_of_section.row) top_left_index_of_section.row = block.index.row;
+  }
+  Index delta = target - top_left_index_of_section;
+  std::vector<std::shared_ptr<model::Block>> new_blocks;
+  for (model::Block copied_block : copied_blocks) {
+    Index index = copied_block.index;
+    Index adjusted_index = index + delta;
+    auto new_block = synth_->addBlock(copied_block.id.type, adjusted_index);
+    if (!new_block) continue;
+
+    // block might be moved/modified between copy and paste
+    auto copied_block_now = synth_->getModuleManager().getModule(copied_block.name);
+    if (!copied_block_now) continue;
+
+    for (auto const& [key, val] : copied_block_now->parameter_map_) {
+      new_block->parameter_map_[key]->set(val->value_processor->value());
+    }
+
+    new_blocks.push_back(new_block);
+    for (auto connection : getModuleManager().getConnectionsOfTarget(copied_block_now)) {
+      auto modulator = synth_->getModuleManager().getModule(connection->source->name);
+      auto target = synth_->getModuleManager().getModule(new_block->name);
+      auto model = synth_->getModuleManager().addConnection(modulator, target, connection->parameter_name_);
+      model->amount_parameter_->value = connection->amount_parameter_->value;
+      model->bipolar_parameter_->value = connection->bipolar_parameter_->value;
+      connectModulationFromModel(model);
+    }
+  }
+  block_updates_++;
+  return new_blocks;
 }

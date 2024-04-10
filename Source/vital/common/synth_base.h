@@ -194,7 +194,7 @@ protected:
   std::unique_ptr<MidiManager> midi_manager_;
   std::unique_ptr<MidiKeyboardState> keyboard_state_;
 
-  std::unique_ptr<WavetableCreator> wavetable_creators_[vital::kNumOscillators];
+  std::unique_ptr<WavetableCreator> wavetable_creators_[model::MAX_MODULES_PER_TYPE];
   std::shared_ptr<SynthBase*> self_reference_;
 
   File active_file_;
@@ -213,7 +213,6 @@ protected:
   std::map<std::string, String> save_info_;
   vital::control_map controls_;
   vital::CircularQueue<vital::ModulationConnection*> mod_connections_;
-  moodycamel::ConcurrentQueue<vital::control_change> value_change_queue_;
   moodycamel::ConcurrentQueue<vital::modulation_change> modulation_change_queue_;
   Tuning tuning_;
 

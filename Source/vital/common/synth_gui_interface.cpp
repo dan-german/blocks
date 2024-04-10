@@ -26,7 +26,7 @@ SynthGuiData::SynthGuiData(SynthBase* synth_base): synth(synth_base) {
   mono_modulations = synth->getEngine()->getMonoModulations();
   poly_modulations = synth->getEngine()->getPolyModulations();
   modulation_sources = synth->getEngine()->getModulationSources();
-  for (int i = 0; i < vital::kNumOscillators; ++i)
+  for (int i = 0; i < model::MAX_MODULES_PER_TYPE; ++i)
     wavetable_creators[i] = synth->getWavetableCreator(i);
 }
 
@@ -57,8 +57,8 @@ void SynthGuiInterface::setGuiSize(float scale) { }
 
 SynthGuiInterface::SynthGuiInterface(SynthBase* synth, bool use_gui): synth_(synth) {
   if (use_gui) {
-    // LineGenerator* lfo_sources[vital::kNumLfos];
-    // for (int i = 0; i < vital::kNumLfos; ++i)
+    // LineGenerator* lfo_sources[model::MAX_MODULES_PER_TYPE];
+    // for (int i = 0; i < model::MAX_MODULES_PER_TYPE; ++i)
     //   lfo_sources[i] = synth->getLfoSource(i);
     // SynthGuiData synth_data(synth_);
     // gui_ = std::make_unique<FullInterface>(&synth_data);
