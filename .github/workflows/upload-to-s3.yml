@@ -15,7 +15,7 @@ jobs:
         id: download-artifact
         uses: dawidd6/action-download-artifact@v3
         with:
-          workflow: ${{ inputs.workflow-name }}.yml
+          workflow: ${{ inputs.workflow-name }}
           skip_unpack: true
       - name: ls
         run: ls
