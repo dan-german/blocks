@@ -13,6 +13,8 @@ jobs:
           # path: hello.txt
   upload-to-s3:
     uses: dan-german/blocks/.github/workflows/upload-to-s3.yml@main
+    with: 
+      workflow-name: ${{ github.workflow }} 
     # runs-on: ubuntu-latest
     # steps:
     #   - name: Upload to s3
