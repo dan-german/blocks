@@ -1,11 +1,5 @@
-name: Build all
-on:
-  workflow_dispatch: 
-    inputs:
-      all_workflows:
-        description: 'Run all build workflows'
-        required: false
-        default: 'true'
+name: Build All
+on: [workflow_dispatch]
 jobs:
   run_all:
     runs-on: ubuntu-latest
