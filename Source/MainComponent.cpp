@@ -606,7 +606,7 @@ void MainComponent::handleSelectionRect(const juce::MouseEvent& event) {
     toggleGridItemSelection(&block_grid_, focused_grid_item_, false);
   }
 
-  auto relative_event = event;//.getEventRelativeTo(this);
+  auto relative_event = event.getEventRelativeTo(this);
   auto area = Rectangle<int>(relative_event.getMouseDownPosition(), relative_event.getPosition());
   selection_rect_.setBounds(area);
 

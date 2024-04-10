@@ -177,7 +177,6 @@ void ModulatorComponent::mouseDown(const MouseEvent& event) {
   if (event.eventComponent->getName() == ModulatorComponent::dragComponentIdentifier) {
     modulatorDragComponent.setMouseCursor(MouseCursor::NoCursor);
     delegate_->modulatorStartedDrag(this, event);
-    // deleg
   }
 }
 
