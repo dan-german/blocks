@@ -18,4 +18,4 @@ jobs:
           aws_key_id: ${{ secrets.AWS_KEY_ID }}
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY}}
           aws_bucket: 'blocksbucket'
-          source_dir: './hello-text.zip'
+          source_dir: './'
