@@ -23,7 +23,7 @@ Analytics::Analytics() {
   baseProperties["distinct_id"] = juce::SystemStats::getUniqueDeviceID().toStdString();
   baseProperties["token"] = projectToken;
 
-  baseProperties["ClientVersion"] = "0.1.0"; // TODO - infer dynamically somehow 
+  baseProperties["ClientVersion"] = "0.1.1"; // TODO - infer dynamically somehow 
 }
 
 void Analytics::setProperty(const String& key, const String& value) {
