@@ -11,7 +11,7 @@ jobs:
           workflow: generate-file.yml
           skip_unpack: true
       - name: Create Text File
-        run: cd hello-text && ls && pwd
+        run: pwd
       - name: upload to s3
         uses: shallwefootball/s3-upload-action@master
         with:
