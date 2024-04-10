@@ -11,11 +11,11 @@ jobs:
           workflow: generate-file.yml
           skip_unpack: true
       - name: Create Text File
-        run: pwd
+        run: pwd && ls
       - name: upload to s3
         uses: shallwefootball/s3-upload-action@master
         with:
           aws_key_id: ${{ secrets.AWS_KEY_ID }}
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY}}
           aws_bucket: 'blocksbucket'
-          source_dir: 'hello-text/hello.txt'
+          source_dir: 'hello-text.zip'
