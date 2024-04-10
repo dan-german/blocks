@@ -1,0 +1,20 @@
+name: Build all
+on:
+  workflow_dispatch: 
+    inputs:
+      all_workflows:
+        description: 'Run all build workflows'
+        required: false
+        default: 'true'
+jobs:
+  run_all:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Build Linux
+        uses: ./.github/workflows/build-linux.yml
+      - name: Build macOS 13 (Intel)
+        uses: ./.github/workflows/build-macos-13.yml
+      - name: Build macOS (M1)
+        uses: ./.github/workflows/build-macos.yml
+      - name: Build Windows
+        uses: ./.github/workflows/build-windows.yml
