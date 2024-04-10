@@ -60,5 +60,5 @@ jobs:
         with:
           name: blocks.dmg
           path: packaging/blocks.dmg
-      - name: Upload to s3
-        uses: dan-german/blocks/.github/workflows/upload-to-s3.yml@main
+      # - name: Upload to s3
+      #   uses: dan-german/blocks/.github/workflows/upload-to-s3.yml@main
