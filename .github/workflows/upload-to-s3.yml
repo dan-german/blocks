@@ -14,21 +14,21 @@ jobs:
     steps:
       - name: echo run number
         run: echo ${{ inputs.run-number }} 
-      - name: Download artifact
-        id: download-artifact
-        uses: dawidd6/action-download-artifact@v3
-        with:
-          workflow: ${{ inputs.workflow-name }}
-          skip_unpack: true
-          run_number: ${{ inputs.run-number }}
-          allow_forks: false
-      - name: ls
+      - name: ls 
         run: ls
-      - name: Upload to S3
-        uses: shallwefootball/s3-upload-action@master
-        with:
-          aws_key_id: ${{ secrets.AWS_KEY_ID }}
-          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY}}
-          aws_bucket: "blocksbucket"
-          source_dir: "./"
-          destination_dir: "./"
+      # - name: Download artifact
+      #   id: download-artifact
+      #   uses: dawidd6/action-download-artifact@v3
+      #   with:
+      #     workflow: ${{ inputs.workflow-name }}
+      #     skip_unpack: true
+      #     run_number: ${{ inputs.run-number }}
+      #     allow_forks: false
+      # - name: Upload to S3
+      #   uses: shallwefootball/s3-upload-action@master
+      #   with:
+      #     aws_key_id: ${{ secrets.AWS_KEY_ID }}
+      #     aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY}}
+      #     aws_bucket: "blocksbucket"
+      #     source_dir: "./"
+      #     destination_dir: "./"
