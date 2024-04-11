@@ -66,4 +66,4 @@ jobs:
     secrets: inherit
     with: 
       file-name: blocks.dmg
-      final-file-name: blocks_mac.dmg
+      final-file-name: blocks_mac
