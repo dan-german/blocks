@@ -58,10 +58,8 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v3.1.2
         with:
-          name: blocks.dmg
+          name: blocks_mac.dmg
           path: packaging/blocks.dmg
-      # - name: Upload to s3
-      #   uses: dan-german/blocks/.github/workflows/upload-to-s3.yml@main
   upload-to-s3:
     uses: ./.github/workflows/upload-to-s3.yml
     with:
