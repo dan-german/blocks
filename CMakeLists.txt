@@ -83,8 +83,9 @@ target_sources(blocks
 target_include_directories(blocks PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/Source")
 
 
-configure_file(${CMAKE_SOURCE_DIR}/Source/version_config.h.in ${CMAKE_BINARY_DIR}/generated/version_config.h)
+configure_file(${CMAKE_SOURCE_DIR}/Source/version_config.h.in ${CMAKE_BINARY_DIR}/version_config.h)
 include_directories(${CMAKE_BINARY_DIR}/generated)
+
 # `target_compile_definitions` adds some preprocessor definitions to our target. In a Projucer
 # project, these might be passed in the 'Preprocessor Definitions' field. JUCE modules also make use
 # of compile definitions to switch certain features on/off, so if there's a particular feature you

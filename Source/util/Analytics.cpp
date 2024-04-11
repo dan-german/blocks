@@ -1,7 +1,7 @@
 #include "util/Analytics.h"
 #include "settings/UserSettings.h"
 #include "BinaryData.h"
-#include "generated/version_config.h"
+#include "version_config.h"
 
 Analytics::Analytics() {
   projectToken = String::fromUTF8(BinaryData::mixpanel_project_token_key, BinaryData::mixpanel_project_token_keySize).toStdString();
