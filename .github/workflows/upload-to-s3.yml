@@ -23,7 +23,7 @@ jobs:
       - name: zip
         uses: montudor/action-zip@v1
         with:
-          args: zip -qq -r ${{ inputs.file-name }}.zip ${{ inputs.file-name }}
+          args: zip -qq -r ${{ inputs.final-file-name }}.zip ${{ inputs.final-file-name }}
       - name: Upload to S3
         uses: shallwefootball/s3-upload-action@master
         with:
