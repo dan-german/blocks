@@ -1,8 +1,11 @@
 name: Upload to S3
-on: 
+on:
   workflow_call:
-    inputs: 
-      file-name: 
+    inputs:
+      file-name:
+        required: true
+        type: string
+      final-file-name:
         required: true
         type: string
 jobs:
@@ -13,8 +16,10 @@ jobs:
         run: pwd
       - name: Download build-output artifact
         uses: actions/download-artifact@v4
-      - name: ls
-        run: ls
+      - name: Rename file
+        run: mv ${{ file-name }} ${{ final-file-name }}
+      - name: Delete old file
+        run: rm -f ${{ file-name }}
       - name: zip
         uses: montudor/action-zip@v1
         with:

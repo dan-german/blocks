@@ -58,11 +58,12 @@ jobs:
       - name: Upload built files
         uses: actions/upload-artifact@v4
         with:
-          name: blocks_mac.dmg
+          name: blocks.dmg
           path: packaging/blocks.dmg
   upload-to-s3:
     needs: build
     uses: ./.github/workflows/upload-to-s3.yml
     secrets: inherit
     with: 
-      file-name: blocks_mac.dmg
+      file-name: blocks.dmg
+      final-file-name: blocks_mac.dmg
