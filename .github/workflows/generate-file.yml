@@ -15,6 +15,6 @@ jobs:
     uses: ./.github/workflows/upload-to-s3.yml
     with: 
       workflow-name: generate-file.yml
-      run-id: ${{ github.run_id }}
+      run-id: ${{ github.event.workflow_run.id }}
     secrets: inherit  
     needs: generate_text_file

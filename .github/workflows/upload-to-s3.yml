@@ -31,4 +31,3 @@ jobs:
           aws_bucket: "blocksbucket"
           source_dir: "./"
           destination_dir: "./"
-
