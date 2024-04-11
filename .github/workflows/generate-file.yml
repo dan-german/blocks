@@ -10,7 +10,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: hello.txt
-          path: ./
+          path: please
       - name: echo run id
         run: ls
   upload-to-s3:
