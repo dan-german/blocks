@@ -23,7 +23,7 @@ Analytics::Analytics() {
   baseProperties["session_id"] = sessionID.toStdString();
   baseProperties["distinct_id"] = juce::SystemStats::getUniqueDeviceID().toStdString();
   baseProperties["token"] = projectToken;
-  baseProperties["ClientVersion"] = BLOCKS_VERSION
+  baseProperties["ClientVersion"] = BLOCKS_VERSION;
 }
 
 void Analytics::setProperty(const String& key, const String& value) {
