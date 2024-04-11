@@ -35,3 +35,4 @@ jobs:
     with:
       workflow-name: build-windows.yml
     secrets: inherit
+    needs: build

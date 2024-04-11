@@ -65,3 +65,4 @@ jobs:
     with:
       workflow-name: build-macos-13.yml
     secrets: inherit
+    needs: build
