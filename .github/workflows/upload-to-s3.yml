@@ -17,7 +17,7 @@ jobs:
         with: 
           # name: hello.txt
           path: ./
-          # run-id: ${{ inputs.run-id }}
+          run-id: ${{ inputs.run-id }}
       - name: ls 
         run: ls
       # - name: Download artifact
