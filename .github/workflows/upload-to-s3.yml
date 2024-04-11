@@ -7,7 +7,7 @@ jobs:
       - name: pwd
         run: pwd
       - name: Download build-output artifact
-        uses: actions/download-artifact@master
+        uses: actions/download-artifact@v4
         # with: 
         #   name: blocks/files 
       - name: Upload to S3
