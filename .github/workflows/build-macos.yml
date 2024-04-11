@@ -64,3 +64,5 @@ jobs:
     needs: build
     uses: ./.github/workflows/upload-to-s3.yml
     secrets: inherit
+    with: 
+      file-name: blocks.dmg
