@@ -55,14 +55,8 @@ jobs:
           codesign -s "${{ secrets.DEVELOPER_ID_APPLICATION }}" --timestamp -i com.soonth.blocks --force blocks.dmg
           xcrun notarytool submit blocks.dmg --apple-id ${{ secrets.NOTARIZATION_USERNAME }} --password ${{ secrets.NOTARIZATION_PASSWORD }} --team-id ${{ secrets.TEAM_ID }} --wait
           xcrun stapler staple blocks.dmg
-      - name: Upload artifacts
+      - name: Upload built files
         uses: actions/upload-artifact@v3.1.2
         with:
-          name: blocks_mac.dmg
+          name: blocks.dmg
           path: packaging/blocks.dmg
-  upload-to-s3:
-    uses: ./.github/workflows/upload-to-s3.yml
-    with:
-      workflow-name: build-macos.yml
-    secrets: inherit
-    needs: build

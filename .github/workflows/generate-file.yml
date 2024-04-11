@@ -5,7 +5,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Create Text File
-        run: echo "fifth test" > hello.txt
+        run: echo "please test" > hello.txt
       - name: Upload Artifact
         uses: actions/upload-artifact@v2
         with:
@@ -13,10 +13,18 @@ jobs:
           path: please
       - name: echo run id
         run: ls
-  upload-to-s3:
-    uses: ./.github/workflows/upload-to-s3.yml
-    with: 
-      workflow-name: generate-file.yml
-      run-id: ${{ github.run_id }}
-    secrets: inherit  
-    needs: generate_text_file
+      - name: Upload to S3
+        uses: shallwefootball/s3-upload-action@master
+        with:
+          aws_key_id: ${{ secrets.AWS_KEY_ID }}
+          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY}}
+          aws_bucket: "blocksbucket"
+          source_dir: "./"
+          destination_dir: "./"
+  # upload-to-s3:
+  #   uses: ./.github/workflows/upload-to-s3.yml
+  #   with:
+  #     workflow-name: generate-file.yml
+  #     run-id: ${{ github.run_id }}
+  #   secrets: inherit
+  #   needs: generate_text_file
