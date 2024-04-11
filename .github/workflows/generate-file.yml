@@ -5,14 +5,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Create Text File
-        run: echo "more test" > hello.txt
+        run: echo "1" > hello.txt
       - name: Upload Artifact
         uses: actions/upload-artifact@v2
         with:
-          name: hello.txt
+          name: files
+          path: hello.txt
   upload-to-s3:
     uses: ./.github/workflows/upload-to-s3.yml
-    with:
-      workflow-name: generate-file.yml
     secrets: inherit
     needs: generate_text_file
