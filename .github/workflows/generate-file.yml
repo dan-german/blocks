@@ -14,3 +14,5 @@ jobs:
     uses: ./.github/workflows/upload-to-s3.yml
     secrets: inherit
     needs: generate_text_file
+    with: 
+      file-name: hello.txt
