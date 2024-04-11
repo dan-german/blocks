@@ -1,6 +1,7 @@
 #include "util/Analytics.h"
 #include "settings/UserSettings.h"
 #include "BinaryData.h"
+#include "generated/version_config.h"
 
 Analytics::Analytics() {
   projectToken = String::fromUTF8(BinaryData::mixpanel_project_token_key, BinaryData::mixpanel_project_token_keySize).toStdString();
@@ -22,8 +23,7 @@ Analytics::Analytics() {
   baseProperties["session_id"] = sessionID.toStdString();
   baseProperties["distinct_id"] = juce::SystemStats::getUniqueDeviceID().toStdString();
   baseProperties["token"] = projectToken;
-
-  baseProperties["ClientVersion"] = "0.1.1"; // TODO - infer dynamically somehow 
+  baseProperties["ClientVersion"] = BLOCKS_VERSION
 }
 
 void Analytics::setProperty(const String& key, const String& value) {

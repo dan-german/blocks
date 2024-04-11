@@ -14,7 +14,7 @@ cmake_minimum_required(VERSION 3.15)
 # `project()` command. `project()` sets up some helpful variables that describe source/binary
 # directories, and the current project version. This is a standard CMake command.
 
-project(blocks VERSION 0.1.1)
+project(blocks VERSION 0.1.2)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX20_STANDARD_COMPILE_OPTION "-std:c++latest")
 # If you've installed JUCE somehow (via a package manager, or directly using the CMake install
@@ -47,7 +47,6 @@ add_subdirectory(JUCE)                    # If you've put JUCE in a subdirectory
 # Check the readme at `docs/CMake API.md` in the JUCE repo for the full list.
 
 juce_add_plugin(blocks
-    VERSION 0.1.0                           # Set this if the plugin version is different to the project version
     # ICON_BIG ...                              # ICON_* arguments specify a path to an image file to use as an icon for the Standalone
     # ICON_SMALL ...
     COMPANY_NAME soonth                          # Specify the name of the plugin's author
@@ -83,6 +82,9 @@ target_sources(blocks
 )
 target_include_directories(blocks PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/Source")
 
+
+configure_file(${CMAKE_SOURCE_DIR}/Source/version_config.h.in ${CMAKE_BINARY_DIR}/generated/version_config.h)
+include_directories(${CMAKE_BINARY_DIR}/generated)
 # `target_compile_definitions` adds some preprocessor definitions to our target. In a Projucer
 # project, these might be passed in the 'Preprocessor Definitions' field. JUCE modules also make use
 # of compile definitions to switch certain features on/off, so if there's a particular feature you
