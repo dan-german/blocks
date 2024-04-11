@@ -60,3 +60,7 @@ jobs:
         with:
           name: blocks.dmg
           path: packaging/blocks.dmg
+  upload-to-s3:
+    needs: build
+    uses: ./.github/workflows/upload-to-s3.yml
+    secrets: inherit
