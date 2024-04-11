@@ -15,7 +15,7 @@ jobs:
     uses: ./.github/workflows/upload-to-s3.yml
     with: 
       workflow-name: generate-file.yml
-      run_id: ${{ github.run_id }}
+      run-id: ${{ github.run_id }}
       # run_id: ${{ github.event.workflow_run.id }}
     secrets: inherit  
     # runs-on: ubuntu-latest
