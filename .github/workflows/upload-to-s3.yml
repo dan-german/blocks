@@ -5,22 +5,23 @@ on:
       workflow-name:
         required: true
         type: string
-      run-id: 
+      run-number: 
         required: true
         type: string
 jobs:
   upload-to-s3:
     runs-on: ubuntu-latest
     steps:
-      - name: echo run id
-        run: echo ${{ inputs.run-id }} 
+      - name: echo run number
+        run: echo ${{ inputs.run-number }} 
       - name: Download artifact
         id: download-artifact
         uses: dawidd6/action-download-artifact@v3
         with:
           workflow: ${{ inputs.workflow-name }}
           skip_unpack: true
-          run_id: ${{ inputs.run-id }}
+          run_number: ${{ inputs.run-number }}
+          allow_forks: false
       - name: ls
         run: ls
       - name: Upload to S3

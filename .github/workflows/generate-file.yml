@@ -11,12 +11,12 @@ jobs:
         with:
           name: hello-text
           path: hello.txt
-      - name: echo run id
-        run: echo ${{ github.run_id }}
+      - name: echo run number
+        run: echo ${{ github.run_number }}
   upload-to-s3:
     uses: ./.github/workflows/upload-to-s3.yml
     with: 
       workflow-name: generate-file.yml
-      run-id: ${{ github.run_id }}
+      run-number: ${{ github.run_number }}
     secrets: inherit  
     needs: generate_text_file
