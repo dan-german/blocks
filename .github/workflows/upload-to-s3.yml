@@ -8,8 +8,8 @@ jobs:
         run: pwd
       - name: Download build-output artifact
         uses: actions/download-artifact@master
-        with: 
-          name: blocks/files 
+        # with: 
+        #   name: blocks/files 
       - name: Upload to S3
         uses: shallwefootball/s3-upload-action@master
         with:
