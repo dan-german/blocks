@@ -15,13 +15,11 @@ jobs:
       - name: Download build-output artifact
         uses: actions/download-artifact@master
         with: 
-          name: hello-text.txt
-          run-id: ${{ inputs.run-id }}
+          name: hello-text
+          path: ./
+          # run-id: ${{ inputs.run-id }}
       - name: ls 
         run: ls
-        # with:
-          # name: build-output
-          # path: ./
       # - name: Download artifact
       #   id: download-artifact
       #   uses: dawidd6/action-download-artifact@v3
