@@ -8,9 +8,9 @@ jobs:
         run: echo "1" > hello.txt
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
-        # with:
+        with:
         #   name: files
-        #   path: hello.txt
+          path: hello.txt
   upload-to-s3:
     uses: ./.github/workflows/upload-to-s3.yml
     secrets: inherit
