@@ -5,9 +5,6 @@ on:
       file-name:
         required: true
         type: string
-      final-file-name:
-        required: true
-        type: string
 jobs:
   upload-to-s3:
     runs-on: ubuntu-latest
@@ -16,10 +13,6 @@ jobs:
         run: pwd
       - name: Download build-output artifact
         uses: actions/download-artifact@v4
-      # - name: Rename file
-      #   run: mv ${{ inputs.file-name }} ${{ inputs.final-file-name }}
-      # - name: Delete old file
-      #   run: rm -f ${{ inputs.file-name }}
       - name: zip
         uses: montudor/action-zip@v1
         with:

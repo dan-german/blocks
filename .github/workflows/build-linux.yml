@@ -1,12 +1,10 @@
-# This starter workflow is for a CMake project running on a single platform. There is a different starter workflow if you need cross-platform coverage.
-# See: https://github.com/actions/starter-workflows/blob/main/ci/cmake-multi-platform.yml
 name: Build Linux
 on:
   workflow_dispatch:
   pull_request:
-  # push:
-  #   branches:
-  #     - main
+  push:
+    branches:
+      - main
 env:
   BUILD_TYPE: Release
 jobs:
@@ -36,16 +34,9 @@ jobs:
           path: |
             ${{github.workspace}}/build/blocks_artefacts/Release/Standalone
             ${{github.workspace}}/build/blocks_artefacts/Release/VST3
-  # upload-to-s3:
-  #   uses: ./.github/workflows/upload-to-s3.yml
-  #   with:
-  #     workflow-name: build-linux.yml
-  #   secrets: inherit
-  #   needs: build
   upload-to-s3:
     needs: build
     uses: ./.github/workflows/upload-to-s3.yml
     secrets: inherit
     with: 
       file-name: blocks_linux
-      final-file-name: blocks_linux    

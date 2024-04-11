@@ -1,12 +1,10 @@
-# This starter workflow is for a CMake project running on a single platform. There is a different starter workflow if you need cross-platform coverage.
-# See: https://github.com/actions/starter-workflows/blob/main/ci/cmake-multi-platform.yml
 name: Build macOS 13 (Intel)
 on:
   workflow_dispatch:
   pull_request:
-  # push:
-  #   branches:
-  #     - main
+  push:
+    branches:
+      - main
 env:
   BUILD_TYPE: Release
 jobs:
@@ -51,18 +49,18 @@ jobs:
           mv "/Users/runner/work/blocks/blocks/build/blocks_artefacts/Release/Standalone/blocks.app" packaging/dmg
 
           # Run appdmg to create the .dmg
-          cd packaging && appdmg dmg.json blocks.dmg
-          codesign -s "${{ secrets.DEVELOPER_ID_APPLICATION }}" --timestamp -i com.soonth.blocks --force blocks.dmg
-          xcrun notarytool submit blocks.dmg --apple-id ${{ secrets.NOTARIZATION_USERNAME }} --password ${{ secrets.NOTARIZATION_PASSWORD }} --team-id ${{ secrets.TEAM_ID }} --wait
-          xcrun stapler staple blocks.dmg
+          cd packaging && appdmg dmg.json blocks_mac_intel.dmg
+          codesign -s "${{ secrets.DEVELOPER_ID_APPLICATION }}" --timestamp -i com.soonth.blocks --force blocks_mac_intel.dmg
+          xcrun notarytool submit blocks_mac_intel.dmg --apple-id ${{ secrets.NOTARIZATION_USERNAME }} --password ${{ secrets.NOTARIZATION_PASSWORD }} --team-id ${{ secrets.TEAM_ID }} --wait
+          xcrun stapler staple blocks_mac_intel.dmg
       - name: Upload built files
         uses: actions/upload-artifact@v3.1.2
         with:
-          name: blocks.dmg
-          path: packaging/blocks.dmg
+          name: blocks_mac_intel.dmg
+          path: packaging/blocks_mac_intel.dmg
   upload-to-s3:
     uses: ./.github/workflows/upload-to-s3.yml
-    with:
-      workflow-name: build-macos-13.yml
     secrets: inherit
     needs: build
+    with:
+      file-name: blocks_mac_intel.dmg

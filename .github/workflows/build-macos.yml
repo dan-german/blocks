@@ -4,9 +4,9 @@ name: Build macOS (M1)
 on:
   workflow_dispatch:
   pull_request:
-  # push:
-  #   branches:
-  #     - main
+  push:
+    branches:
+      - main
 env:
   BUILD_TYPE: Release
 jobs:
@@ -66,4 +66,3 @@ jobs:
     secrets: inherit
     with: 
       file-name: blocks_mac.dmg
-      final-file-name: blocks_mac
