@@ -14,8 +14,13 @@ jobs:
     steps:
       - name: echo run number
         run: echo ${{ inputs.run-number }} 
+      - name: Download build-output artifact
+        uses: actions/download-artifact@master
       - name: ls 
         run: ls
+        # with:
+          # name: build-output
+          # path: ./
       # - name: Download artifact
       #   id: download-artifact
       #   uses: dawidd6/action-download-artifact@v3
