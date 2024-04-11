@@ -13,9 +13,9 @@ jobs:
         run: pwd
       - name: Download build-output artifact
         uses: actions/download-artifact@v4
-        with: 
-          path: files
-          name: ${{ inputs.file-name }}
+        # with: 
+        #   path: files
+        #   name: ${{ inputs.file-name }}
       - name: zip
         uses: montudor/action-zip@v1
         with:
