@@ -5,7 +5,7 @@ on:
       workflow-name:
         required: true
         type: string
-      run-number: 
+      run-id: 
         required: true
         type: string
 jobs:
