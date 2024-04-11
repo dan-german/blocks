@@ -17,7 +17,7 @@ jobs:
         #   path: files
         #   name: ${{ inputs.file-name }}
       - name: ls
-        uses: 
+        run: ls
       - name: zip
         uses: montudor/action-zip@v1
         with:
