@@ -5,7 +5,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Create Text File
-        run: echo "please please" > hello.txt
+        run: echo "second test" > hello.txt
       - name: Upload Artifact
         uses: actions/upload-artifact@v2
         with:
@@ -16,11 +16,5 @@ jobs:
     with: 
       workflow-name: generate-file.yml
       run-id: ${{ github.run_id }}
-      # run_id: ${{ github.event.workflow_run.id }}
     secrets: inherit  
-    # runs-on: ubuntu-latest
-    # steps:
-    #   - name: Upload to s3
-    #     uses: dan-german/blocks/.github/workflows/upload-to-s3.yml@main
-    #     with: 
-    #       workflow-name: ${{ github.workflow }}
+    needs: generate_text_file
