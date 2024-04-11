@@ -9,6 +9,7 @@ jobs:
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
+          name: files
           path: hello.txt
   upload-to-s3:
     uses: ./.github/workflows/upload-to-s3.yml
