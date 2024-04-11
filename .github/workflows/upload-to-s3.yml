@@ -16,14 +16,14 @@ jobs:
         run: pwd
       - name: Download build-output artifact
         uses: actions/download-artifact@v4
-      - name: Rename file
-        run: mv ${{ inputs.file-name }} ${{ inputs.final-file-name }}
-      - name: Delete old file
-        run: rm -f ${{ inputs.file-name }}
+      # - name: Rename file
+      #   run: mv ${{ inputs.file-name }} ${{ inputs.final-file-name }}
+      # - name: Delete old file
+      #   run: rm -f ${{ inputs.file-name }}
       - name: zip
         uses: montudor/action-zip@v1
         with:
-          args: zip -qq -r ${{ inputs.final-file-name }}.zip ${{ inputs.final-file-name }}
+          args: zip -qq -r ${{ inputs.file-name }}.zip ${{ inputs.file-name }}
       - name: Upload to S3
         uses: shallwefootball/s3-upload-action@master
         with:

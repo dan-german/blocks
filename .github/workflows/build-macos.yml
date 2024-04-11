@@ -51,19 +51,19 @@ jobs:
           mv "/Users/runner/work/blocks/blocks/build/blocks_artefacts/Release/Standalone/blocks.app" packaging/dmg
 
           # Run appdmg to create the .dmg
-          cd packaging && appdmg dmg.json blocks.dmg
-          codesign -s "${{ secrets.DEVELOPER_ID_APPLICATION }}" --timestamp -i com.soonth.blocks --force blocks.dmg
-          xcrun notarytool submit blocks.dmg --apple-id ${{ secrets.NOTARIZATION_USERNAME }} --password ${{ secrets.NOTARIZATION_PASSWORD }} --team-id ${{ secrets.TEAM_ID }} --wait
-          xcrun stapler staple blocks.dmg
+          cd packaging && appdmg dmg.json blocks_mac.dmg
+          codesign -s "${{ secrets.DEVELOPER_ID_APPLICATION }}" --timestamp -i com.soonth.blocks --force blocks_mac.dmg
+          xcrun notarytool submit blocks_mac.dmg --apple-id ${{ secrets.NOTARIZATION_USERNAME }} --password ${{ secrets.NOTARIZATION_PASSWORD }} --team-id ${{ secrets.TEAM_ID }} --wait
+          xcrun stapler staple blocks_mac.dmg
       - name: Upload built files
         uses: actions/upload-artifact@v4
         with:
-          name: blocks.dmg
-          path: packaging/blocks.dmg
+          name: blocks_mac.dmg
+          path: packaging/blocks_mac.dmg
   upload-to-s3:
     needs: build
     uses: ./.github/workflows/upload-to-s3.yml
     secrets: inherit
     with: 
-      file-name: blocks.dmg
+      file-name: blocks_mac.dmg
       final-file-name: blocks_mac
