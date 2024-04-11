@@ -9,9 +9,7 @@ jobs:
   upload-to-s3:
     runs-on: ubuntu-latest
     steps:
-      - name: pwd
-        run: pwd
-      - name: Download build-output artifact
+      - name: Download build
         uses: actions/download-artifact@v4
       - name: zip
         uses: montudor/action-zip@v1

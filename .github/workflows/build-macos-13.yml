@@ -54,7 +54,7 @@ jobs:
           xcrun notarytool submit blocks_mac_intel.dmg --apple-id ${{ secrets.NOTARIZATION_USERNAME }} --password ${{ secrets.NOTARIZATION_PASSWORD }} --team-id ${{ secrets.TEAM_ID }} --wait
           xcrun stapler staple blocks_mac_intel.dmg
       - name: Upload built files
-        uses: actions/upload-artifact@v3.1.2
+        uses: actions/upload-artifact@v4
         with:
           name: blocks_mac_intel.dmg
           path: packaging/blocks_mac_intel.dmg
