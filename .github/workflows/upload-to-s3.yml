@@ -13,9 +13,6 @@ jobs:
         run: pwd
       - name: Download build-output artifact
         uses: actions/download-artifact@v4
-        # with: 
-        #   path: files
-        #   name: ${{ inputs.file-name }}
       - name: ls
         run: ls
       - name: zip
