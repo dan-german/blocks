@@ -9,7 +9,7 @@ jobs:
       - name: Upload Artifact
         uses: actions/upload-artifact@v2
         with:
-          name: hello.txt
+          # name: hello.txt
           path: ./
       - name: echo run id
         run: ls
