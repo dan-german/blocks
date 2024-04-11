@@ -1,33 +1,11 @@
 name: Upload to S3
-on:
-  workflow_call:
-    inputs:
-      workflow-name:
-        required: true
-        type: string
-      run-id: 
-        required: true
-        type: string
+on: workflow_call
 jobs:
   upload-to-s3:
     runs-on: ubuntu-latest
     steps:
       - name: Download build-output artifact
         uses: actions/download-artifact@master
-        with: 
-          # name: hello.txt
-          path: please
-          # run-id: ${{ inputs.run-id }}
-      - name: ls 
-        run: ls
-      # - name: Download artifact
-      #   id: download-artifact
-      #   uses: dawidd6/action-download-artifact@v3
-      #   with:
-      #     workflow: ${{ inputs.workflow-name }}
-      #     skip_unpack: true
-      #     run_number: ${{ inputs.run-number }}
-      #     allow_forks: false
       - name: Upload to S3
         uses: shallwefootball/s3-upload-action@master
         with:
