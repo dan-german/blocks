@@ -5,17 +5,17 @@ on:
       workflow-name:
         required: true
         type: string
-      run-number: 
+      run-id: 
         required: true
         type: string
 jobs:
   upload-to-s3:
     runs-on: ubuntu-latest
     steps:
-      - name: echo run number
-        run: echo ${{ inputs.run-number }} 
       - name: Download build-output artifact
         uses: actions/download-artifact@master
+        with: 
+          run-id: ${{ inputs.run-id }}
       - name: ls 
         run: ls
         # with:
