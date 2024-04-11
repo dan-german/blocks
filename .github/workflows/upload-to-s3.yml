@@ -15,7 +15,7 @@ jobs:
       - name: Download build-output artifact
         uses: actions/download-artifact@master
         with: 
-          name: hello-text
+          name: hello.txt
           path: ./
           # run-id: ${{ inputs.run-id }}
       - name: ls 
