@@ -1,4 +1,4 @@
-name: upload to s3
+name: Upload to S3
 on:
   workflow_call:
     inputs:
@@ -19,7 +19,7 @@ jobs:
           skip_unpack: true
       - name: ls
         run: ls
-      - name: Upload to s3
+      - name: Upload to S3
         uses: shallwefootball/s3-upload-action@master
         with:
           aws_key_id: ${{ secrets.AWS_KEY_ID }}
