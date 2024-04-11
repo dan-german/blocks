@@ -479,6 +479,8 @@ void MainComponent::removeBlock(GridItemComponent* block) {
 
   delegate->editorRemovedBlock(index);
   ui_layer_.setConnections(delegate->getModulations());
+  block_grid_.setAllItemsSelected(false);
+  currently_selected_items_ = {};
   // resetDownFlowingDots();
 }
 

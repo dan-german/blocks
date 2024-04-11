@@ -39,6 +39,7 @@ public:
   void gridItemStartedDrag(GridItemComponent* item, const MouseEvent& event) override;
 
   GridComponent(Config config);
+  ~GridComponent() override;  
   void paint(Graphics&) override;
 
   Rectangle<int> boundsForItem(GridItemComponent* item, bool resetBounds = false);

@@ -28,6 +28,10 @@ GridComponent::GridComponent(Config config) {
   setInterceptsMouseClicks(true, true);
 }
 
+GridComponent::~GridComponent() {
+  clear();
+}
+
 void GridComponent::snapItem(GridItemComponent* item, Index index, bool resetBounds) {
   item->index = index;
   auto bounds = boundsForItem(item, resetBounds);
