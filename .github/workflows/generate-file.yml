@@ -5,7 +5,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Create Text File
-        run: echo "second test" > hello.txt
+        run: echo "third test" > hello.txt
       - name: Upload Artifact
         uses: actions/upload-artifact@v2
         with:
