@@ -20,7 +20,7 @@ jobs:
         with:
           workflow: ${{ inputs.workflow-name }}
           skip_unpack: true
-          run_id: $ {{ inputs.run-id }}
+          run_id: ${{ inputs.run-id }}
       - name: ls
         run: ls
       - name: Upload to S3
