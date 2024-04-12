@@ -24,5 +24,4 @@ public:
   void handleLaunch(String wrapperType);
   void initProfileIfNeeded();
   void sendPOST(const juce::String& urlString, const json& bodyData);
-  std::string sendGET(const juce::String& urlString);
 };
