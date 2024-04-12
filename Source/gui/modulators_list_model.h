@@ -9,11 +9,11 @@
 */
 
 #pragma once
-#include "model/Module.h"
+// #include "model/Module.h"
 #include "gui/ModulatorComponent.h"
 #include "module_new.h"
 
-using Module = Model::Module;
+// using Module = Model::Module;
 
 class ModulatorsListModel: public ListBoxModel {
 private:

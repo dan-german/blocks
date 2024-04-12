@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include "model/Module.h"
+// #include "model/Module.h"
 
 namespace model {
 const StringArray waveforms { "sine", "was", "saw", "square", "triangle" };

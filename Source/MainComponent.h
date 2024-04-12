@@ -1,9 +1,7 @@
 #pragma once
 
 #include "gui/InspectorComponent.h"
-#include "model/Module.h"
 #include "gui/BlocksLookAndFeel.h"
-#include "model/Modulation.h"
 #include "gui/ColourPool.h"
 #include "gui/UILayer.h"
 #include "model/PresetInfo.h"
@@ -23,10 +21,6 @@
 #include "gui/column_controls_container.h"
 #include "selection_rect.h"
 #include "gui/controls/SavePopup.h"
-
-using Modulation = Model::Modulation;
-using Block = Model::Block;
-using Tab = Model::Tab;
 
 class MainComponent final: public Component,
   InspectorComponent::Listener,
@@ -135,10 +129,10 @@ private:
 
   void dismissPopup(ButtonGridPopup& popup);
   void spawnBlockComponent(std::shared_ptr<model::Block> block);
-  void spawnTabComponent(std::shared_ptr<Tab> tab);
+  // void spawnTabComponent(std::shared_ptr<Tab> tab);
   void graphicsTimerCallback(const float secondsSinceLastUpdate);
   void changeModulePainter(int value);
-  PopupMenu spawnModulationMenu(Module& victim);
+  // PopupMenu spawnModulationMenu(Module& victim);
   void showPopup(ButtonGridPopup& popupWrapper, std::function<void(Index)> callback);
   void updateInspectorModulationIndicators();
   void handleModuleLandedOnInspector(BlockComponent* moduleComponent, const Point<int>& inspectorRelativePosition);
@@ -160,7 +154,7 @@ private:
 
   void presentModulationOptionsMenu(int modulatorIndex, Index& indexUnderMouse, BlockComponent* block);
   void updateDotPosition(const Point<int> position);
-  void addModulator(Model::Type code);
+  void addModulator(std::string code);
   void enterModulatorDragMode(Colour colour);
   void connectionDeleted(ConnectionComponent* component) override;
 
@@ -181,7 +175,7 @@ private:
 };
 
 struct MainComponent::Delegate {
-  virtual std::shared_ptr<Tab> editorAddedTab(int column) = 0;
+  // virtual std::shared_ptr<Tab> editorAddedTab(int column) = 0;
   virtual void editorRepositionedTab(int oldColumn, int newColumn) = 0;
   virtual void editorChangedTabLength(int column, int times) = 0;
   virtual void editorRemovedTab(int column) = 0;
@@ -214,15 +208,15 @@ struct MainComponent::Delegate {
 
   virtual std::pair<float, float> editorRequestsModulatorValue(Index moduleIndex, int parameterIndex, int modulatorIndex) = 0;
   virtual std::pair<float, float> editorRequestsModulatorValue(int modulationConnectionIndex) = 0;
-  virtual std::shared_ptr<Tab> getTab(int column) = 0;
+  // virtual std::shared_ptr<Tab> getTab(int column) = 0;
   virtual std::shared_ptr<model::Module> getModulator2(int index) = 0;
-  virtual std::shared_ptr<model::Module> editorAddedModulator2(Model::Type code) = 0;
+  virtual std::shared_ptr<model::Module> editorAddedModulator2(std::string code) = 0;
   virtual std::shared_ptr<model::Block> getBlock2(Index index) = 0;
-  virtual std::shared_ptr<model::Block> editorAddedBlock2(Model::Type code, Index index) = 0;
+  virtual std::shared_ptr<model::Block> editorAddedBlock2(std::string code, Index index) = 0;
   virtual Array<int> editorRequestsActiveColumns() = 0;
   virtual std::vector<std::shared_ptr<model::Module>> getModulators2() = 0;
   virtual std::vector<std::shared_ptr<model::Connection>> getModulations() = 0;
-  virtual Array<std::shared_ptr<Modulation>> getConnectionsOfSource(std::shared_ptr<Module> source) = 0;
+  // virtual Array<std::shared_ptr<Modulation>> getConnectionsOfSource(std::shared_ptr<Module> source) = 0;
   virtual const vital::StatusOutput* editorRequestsStatusOutput(std::string name) = 0;
 
   virtual ~Delegate() = default;

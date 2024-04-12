@@ -153,7 +153,7 @@ void ModuleManager::clear() {
 //   return activeColumns;
 // }
 
-// std::shared_ptr<Tab> ModuleManager::addTab(Model::Type type, int column, int number) {
+// std::shared_ptr<Tab> ModuleManager::addTab(std::string type, int column, int number) {
 //   auto tab = pool.getTab(type, number);
 //   if (tab == nullptr) return nullptr;
 //   tab->column = column;

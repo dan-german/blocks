@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include "model/ModuleFactory.h"
+// #include "model/ModuleFactory.h"
 #include "gui/ColourPool.h"
 #include "gui/Tab.h"
 #include "ModuleContainer.h"

@@ -9,7 +9,7 @@
 */
 
 #include "gui/modulators_list_model.h"
-#include "model/ModuleParameter.h"
+// #include "model/ModuleParameter.h"
 #include "lfo_module_new.h"
 #include "module_new.h"
 #include "ui_utils.h"
@@ -43,7 +43,7 @@ void ModulatorsListModel::setupModulatorComponent(std::shared_ptr<model::Module>
   component.delegate_ = modulator_listener;
   component.setColour(model->colour.colour);
 
-  if (model->id.type == Model::Types::lfo) {
+  if (model->id.type == "lfo") {
     component.oscillatorPainter.setVisible(true);
     component.envelopePath.setVisible(false);
   } else {
@@ -52,11 +52,11 @@ void ModulatorsListModel::setupModulatorComponent(std::shared_ptr<model::Module>
   }
 
   // todo: update the skew only after rate value changes... atm it looks weird
-  if (model->id.type == Model::Types::lfo) {
+  if (model->id.type == "lfo") {
     component.onSliderValueChange = [model, &component, this](int index, float value) {
       this->onLFOParameterChange(model, component, index, value);
     };
-  } else if (model->id.type == Model::Types::adsr) {
+  } else if (model->id.type == "adsr") {
     component.onSliderValueChange = [&component, &model](int index, float value) {
       // auto normalizedValue = model.parameters[index]->audioParameter->convertTo0to1(value);
       // switch (index) {
@@ -99,7 +99,7 @@ void ModulatorsListModel::setupModulatorComponent(std::shared_ptr<model::Module>
     slider->box_slider_.slider.setValue(value, dontSendNotification);
     slider->box_slider_.valueLabel.setText(slider->box_slider_.slider.getTextFromValue(value), dontSendNotification);
 
-    if (model->id.type == Model::Types::lfo) {
+    if (model->id.type == "lfo") {
       onLFOParameterChange(model, component, i, value);
     }
   }

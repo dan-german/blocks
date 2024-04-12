@@ -32,7 +32,7 @@ struct LFOModule: public Module {
     std::function<String(double)> textFromValueFunction = [range, sync](double value) {
       if (sync->audioParameter->getValue() == 0) {
         float floatValue = static_cast<float>(value);
-        std::stringstream stream;
+        std::stringtream stream;
         stream << std::fixed << std::setprecision(2) << floatValue;
         std::string s = stream.str();
         return String(s);

@@ -10,7 +10,7 @@
 
 
 #include "gui/BlockComponent.h"
-#include "model/ModuleParameter.h"
+// #include "model/ModuleParameter.h"
 #include "gui/ThemeManager.h"
 #include "BinaryData.h"
 
@@ -168,14 +168,14 @@ BlockComponent* BlockComponent::create(std::shared_ptr<model::Block> block) {
   component->length = block->length;
   component->colour = block->colour.colour;
 
-  if (block->id.type == Model::Types::osc) {
+  if (block->id.type == "osc") {
     float waveformFloat = block->parameters_[0]->value_processor->value();  
     int waveformInt = static_cast<int>(waveformFloat);
     auto painter = new OscillatorPainter();
     painter->setWaveformType(getWaveformType(waveformInt));
     painter->thickness = 2.0f;
     component->setPainter(painter);
-  } else if (block->id.type == Model::Types::noise) {
+  } else if (block->id.type == "noise") {
     auto painter = new OscillatorPainter();
     painter->setWaveformType(OscillatorPainter::WaveformType::noise);
     painter->thickness = 2.0f;

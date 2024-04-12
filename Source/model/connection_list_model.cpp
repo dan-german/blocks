@@ -9,9 +9,9 @@
 */
 
 #include "model/connection_list_model.h"
-#include "model/ModuleParameter.h"
-#include "model/Module.h"
-#include "OscillatorModule.h"
+// #include "model/ModuleParameter.h"
+// #include "model/Module.h"
+// #include "OscillatorModule.h"
 
 int ModulationsListBoxModel::getNumRows() { return connections_.size(); }
 

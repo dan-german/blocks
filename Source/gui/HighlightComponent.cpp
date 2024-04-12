@@ -9,7 +9,7 @@
 */
 
 #include "HighlightComponent.h"
-#include "dsp/BasicWaveforms.h"
+// #include "dsp/BasicWaveforms.h"
 using namespace juce;
 
 HighlightComponent::~HighlightComponent() { }

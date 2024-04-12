@@ -9,7 +9,7 @@
 */
 
 #include "gui/InspectorComponent.h"
-#include "model/ModuleParameter.h"
+// #include "model/ModuleParameter.h"
 #include "module_new.h"
 #include "ui_utils.h"
 #include "vital/synth_strings.h"

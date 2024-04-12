@@ -10,12 +10,12 @@
 
 #pragma once
 
-#include "model/Module.h"
+// #include "model/Module.h"
 #include "InspectorSlider.h"
 #include "module_new.h"
 #include "vital/common/synth_parameters.h"
 
-using namespace Model;
+// using namespace Model;
 
 class InspectorComponent: public Component, Slider::Listener {
 public:

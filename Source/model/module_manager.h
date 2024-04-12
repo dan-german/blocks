@@ -22,7 +22,7 @@ public:
 
   ~ModuleManager();
 
-  // std::shared_ptr<Tab> addTab(Model::Type type, int column, int number = 1);
+  // std::shared_ptr<Tab> addTab(std::string type, int column, int number = 1);
   // std::shared_ptr<Tab> getTab(int column);
   // Array<std::shared_ptr<Tab>> getTabs() { return tabs; }
   // void removeTab(std::shared_ptr<Tab> tab);
