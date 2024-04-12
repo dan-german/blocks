@@ -22,6 +22,7 @@
 #include "vital/synthesis/framework/synth_module.h"
 #include "gui/column_controls_container.h"
 #include "selection_rect.h"
+#include "gui/controls/SavePopup.h"
 
 using Modulation = Model::Modulation;
 using Block = Model::Block;

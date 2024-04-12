@@ -39,7 +39,7 @@ Analytics* Analytics::shared() {
   return instance;
 }
 
-void Analytics::sendHTTPRequest(const juce::String& urlString, const json& bodyData) {
+void Analytics::sendPOST(const juce::String& urlString, const json& bodyData) {
   auto options = juce::URL::InputStreamOptions(juce::URL::ParameterHandling::inAddress).withExtraHeaders("Content-Type: application/json");
   juce::URL(urlString).withPOSTData(bodyData.dump()).createInputStream(options);
 }
@@ -97,7 +97,7 @@ void Analytics::initProfileIfNeeded() {
     json array;
     array.push_back(body);
 
-    sendHTTPRequest("https://api.mixpanel.com/engage#profile-set-once", array);
+    sendPOST("https://api.mixpanel.com/engage#profile-set-once", array);
     UserSettings::shared()->set("ProfileInitialized", juce::String("true"));
   };
 
@@ -121,7 +121,7 @@ void Analytics::sendEvent(const String& eventName, std::optional<std::string> cu
     json array;
     array.push_back(event);
 
-    sendHTTPRequest("https://api.mixpanel.com/track", array);
+    sendPOST("https://api.mixpanel.com/track", array);
   };
 
   juce::Thread::launch(req);

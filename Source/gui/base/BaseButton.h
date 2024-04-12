@@ -20,14 +20,13 @@ public:
   std::function<void()> on_click_;
 
   Colour colour;
-
   BaseButton();
 
-  virtual void setButtonColour(Colour colour) = 0;
 protected:
   void mouseEnter(const juce::MouseEvent& event) override;
   void mouseExit(const juce::MouseEvent& event) override;
   void mouseUp(const juce::MouseEvent& event) override;
+  virtual void setButtonColour(Colour colour) = 0;
 
   void paint(juce::Graphics&) override;
   void resized() override;

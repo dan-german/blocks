@@ -8,12 +8,12 @@ public:
   LabelButton saveButton;
   TextEditor textEditor;
 
+  ~SavePopup() override { }
+
   SavePopup() {
     cornerRadius = 13.0f;
-
     addAndMakeVisible(saveButton);
     addAndMakeVisible(textEditor);
-
     saveButton.text.setText("save", dontSendNotification);
   }
 
@@ -25,19 +25,15 @@ public:
     }
   }
 
-  ~SavePopup() override { }
-
   void resized() override {
     auto inset = 8.0f;
     auto buttonWidth = 37.0f;
-
     textEditor.setBounds(
       inset,
       inset,
       getWidth() - buttonWidth - inset * 3,
       getHeight() - inset * 2
     );
-
     saveButton.setBounds(
       textEditor.getRight(),
       textEditor.getY() - 2,

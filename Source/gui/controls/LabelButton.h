@@ -12,10 +12,9 @@ public:
   LabelButton();
   ~LabelButton() override;
 
-  DrawablePath content;
+  Component content;
 
   Label text;
-  Path p;
   float fontSize = 15.0f;
   float selectedFontSize = 16.5f;
 
