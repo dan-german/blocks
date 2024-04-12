@@ -202,7 +202,7 @@ struct MainComponent::Delegate {
   virtual std::optional<Preset> editorNavigatedPreset(bool next) = 0;
 
   virtual Array<MPENote> editorRequestsCurrentlyPlayingNotes() = 0;
-  virtual StringArray editorRequestsPresetNames() = 0;
+  virtual std::vector<std::string> editorRequestsPresetNames() = 0;
   virtual Preset editorChangedPreset(int index) = 0;
   virtual Preset getStateRepresentation() = 0;
 

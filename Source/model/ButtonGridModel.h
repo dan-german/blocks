@@ -9,10 +9,10 @@ using namespace juce;
 class ButtonGridModel: public ListBoxModel {
 public:
   int column = 0;
-  StringArray texts;
+  std::vector<std::string> texts;
   std::function<void(Index)> onClick;
 
-  ButtonGridModel(StringArray texts, int column);
+  ButtonGridModel(std::vector<std::string> texts, int column);
   void paintListBoxItem(int rowNumber, Graphics& g, int width, int height, bool rowIsSelected) override;
   int getNumRows() override;
   Component* refreshComponentForRow(int rowNumber, bool isRowSelected, Component* existingComponentToUpdate) override;

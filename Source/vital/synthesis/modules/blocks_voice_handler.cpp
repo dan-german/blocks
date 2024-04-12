@@ -31,7 +31,7 @@
 #include "module_new.h"
 #include "oscillator_module_new.h"
 #include "filter_module_new.h"
-#include "lfo_module_new.h"
+#include "model/lfo_model.h"
 #include "blocks_voice_handler.h"
 #include "vital/synthesis/modules/reverb_module.h"
 #include "vital/synthesis/modules/delay_module.h"
@@ -490,9 +490,8 @@ void BlocksVoiceHandler::createModulators() {
   random_->plug(retrigger());
   addProcessor(random_);
 
-  for (int i = 0; i < kNumRandomLfos; ++i) {
-    std::string name = "random";
-    random_lfos_[i] = new RandomLfoModule(name, beats_per_second_);
+  for (int i = 0; i < model::MAX_MODULES_PER_TYPE; ++i) {
+    random_lfos_[i] = new RandomLfoModule("random", beats_per_second_);
     random_lfos_[i]->plug(retrigger(), RandomLfoModule::kNoteTrigger);
     random_lfos_[i]->plug(bent_midi_, RandomLfoModule::kMidi);
     addSubmodule(random_lfos_[i]);

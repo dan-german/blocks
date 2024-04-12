@@ -11,7 +11,7 @@
 #include "module_pool.h"
 #include "oscillator_module_new.h"
 #include "filter_module_new.h"
-#include "lfo_module_new.h"
+#include "lfo_model.h"
 #include "adsr_module_new.h"
 #include "reverb_module_new.h"
 #include "delay_module_new.h"

@@ -28,12 +28,12 @@ void ButtonGrid::resized() {
   }
 }
 
-void ButtonGrid::setModel(Array<StringArray> models) {
+void ButtonGrid::setModel(std::vector<std::vector<std::string>> models) {
   listBoxModels.clear();
   listBoxes.clear();
 
   for (int i = 0; i < models.size(); i++) {
-    auto model = models.getUnchecked(i);
+    auto model = models[i];
     auto listBoxModel = std::make_unique<ButtonGridModel>(model, i);
     listBoxModel->onClick = [this](Index index) { this->onClick(index); };
 
@@ -50,7 +50,7 @@ void ButtonGrid::setModel(Array<StringArray> models) {
     listBoxModels.push_back(std::move(listBoxModel));
     listBoxes.push_back(std::move(listBox));
 
-    numberOfRows = std::max(numberOfRows, model.size());
+    numberOfRows = std::max(numberOfRows, int(model.size()));
   }
 
   numberOfColumns = models.size();

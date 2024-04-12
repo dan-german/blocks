@@ -10,7 +10,7 @@
 
 #include "gui/modulators_list_model.h"
 // #include "model/ModuleParameter.h"
-#include "lfo_module_new.h"
+#include "model/lfo_model.h"
 #include "module_new.h"
 #include "ui_utils.h"
 
