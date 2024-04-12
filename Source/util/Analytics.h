@@ -23,5 +23,5 @@ public:
   void handleQuit();
   void handleLaunch(String wrapperType);
   void initProfileIfNeeded();
-  void sendHTTPRequest(const juce::String& urlString, const json& bodyData);
+  void sendPOST(const juce::String& urlString, const json& bodyData);
 };

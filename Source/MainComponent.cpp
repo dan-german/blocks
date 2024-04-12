@@ -6,6 +6,7 @@
 #include "settings/UserSettings.h"
 #include "module_new.h"
 #include "vital/common/synth_constants.h"
+#include "version_config.h"
 
 MainComponent::MainComponent(juce::MidiKeyboardState& keyboard_state, Delegate* delegate):
   delegate(delegate),
@@ -53,6 +54,14 @@ MainComponent::MainComponent(juce::MidiKeyboardState& keyboard_state, Delegate* 
   // ui_layer_.setConnections(delegate->getModulations());
   // auto osc_block2 = addBlock(0, { 0, 0 });
   // spawnBlockComponent(osc_block2);
+
+  auto req = [this] {
+    auto options = juce::URL::InputStreamOptions(juce::URL::ParameterHandling::inAddress);
+    auto version = juce::URL("https://blocksbucket.s3.us-east-2.amazonaws.com/version").createInputStream(options)->readEntireStreamAsString().toStdString();
+    juce::MessageManager::callAsync([this, version] { ui_layer_.update_button_.setVisible(version != BLOCKS_VERSION);});
+  };
+
+  juce::Thread::launch(req);
 }
 
 void MainComponent::updateDotPosition(const Point<int> position) {

@@ -23,7 +23,6 @@
 #include "gui/controls/ButtonGridPopup.h"
 #include <juce_gui_basics/juce_gui_basics.h>
 #include "gui/controls/SVGButton.h"
-#include "gui/controls/SavePopup.h"
 #include "connection.h"
 
 using Modulation = Model::Modulation;
@@ -43,6 +42,7 @@ public:
   std::unique_ptr<SVGButton> theme_button_;
 
   std::unique_ptr<ModulatorsButton> modulatorsButton;
+  LabelButton update_button_;
 
   ModulationsListBoxModel connections_list_box_model_;
 

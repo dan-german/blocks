@@ -34,6 +34,9 @@ UILayer::UILayer(juce::MidiKeyboardState& keyboard_state, Slider::Listener* list
   connections_list_box_model_.slider_listener_ = listener;
   setInterceptsMouseClicks(false, true);
   setOpaque(false);
+  update_button_.text.setText("update", dontSendNotification);
+  addChildComponent(update_button_);
+  update_button_.on_click_ = [this]() { juce::URL("https://www.soonth.com").launchInDefaultBrowser(); };
 }
 
 void UILayer::addSVGButton(std::unique_ptr<SVGButton>& button, const char* rawData, size_t size) {
@@ -104,6 +107,10 @@ void UILayer::resizeSaveAndNewButtons() {
   int newPresetX = preset_button_.getX() - verticalSpacing - buttonSize / 2;
   newPresetButton->setBounds(0, 0, buttonSize, buttonSize);
   newPresetButton->setCentrePosition(newPresetX, preset_button_.getBounds().getCentreY());
+
+  int update_button_width = 50;
+  update_button_.setBounds(0, 0, update_button_width, 23);
+  update_button_.setCentrePosition(saveButton->getRight() + verticalSpacing + update_button_width / 2, preset_button_.getBounds().getCentreY());
 }
 
 void UILayer::resizeSettingsButton() {

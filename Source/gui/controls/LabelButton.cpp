@@ -7,16 +7,12 @@ LabelButton::~LabelButton() {
 LabelButton::LabelButton() {
   hoverBrightness = 8.0f;
   orbit = false;
-
   addAndMakeVisible(content);
-
   text.setJustificationType(Justification::centred);
   text.setFont(Font(fontSize));
   text.setInterceptsMouseClicks(false, false);
-  text.setColour(Label::ColourIds::textColourId, colour);
-
   content.addAndMakeVisible(text);
-
+  content.setInterceptsMouseClicks(false, false);
   ThemeManager::shared()->addListener(this);
   themeChanged(ThemeManager::shared()->getCurrent());
 }
@@ -53,8 +49,8 @@ void LabelButton::selectedCompletion() {
 }
 
 void LabelButton::resized() {
+  BaseButton::resized();
   text.setBounds(getLocalBounds());
-  content.setBounds(getLocalBounds().reduced(1));
 }
 
 void LabelButton::themeChanged(Theme theme) {
