@@ -321,7 +321,7 @@ juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter() {
 void PluginProcessor::editorAdjustedModulator(std::string parameter_name, int index, float value) {
   auto modulator = synth_->getModuleManager().getModulator(index);
 
-  if (modulator->id.type == "lfo" && parameter_name == "tempo") {
+  if (modulator->id.type != "envelope" && parameter_name == "tempo") {
     bool is_changing_seconds = modulator->parameter_map_["sync"]->value_processor->value() == 0.0f;
     parameter_name = is_changing_seconds ? "frequency" : "tempo";
     modulator->parameter_map_[parameter_name]->set(value);

@@ -65,7 +65,6 @@ void LfoModule::correctToTime(double seconds) {
 
 void LfoModule::setModule(std::shared_ptr<model::Module> module) {
   SynthModule::setModule(module);
-
   module->parameter_map_["wave"]->value_processor = control_map_["wave"];
   module->parameter_map_["tempo"]->value_processor = control_map_["tempo"];
   module->parameter_map_["frequency"]->value_processor = control_map_["frequency"];

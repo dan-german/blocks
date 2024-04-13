@@ -34,25 +34,6 @@ MainComponent::MainComponent(juce::MidiKeyboardState& keyboard_state, Delegate* 
   note_logger_.listener = this;
   ThemeManager::shared()->set(UserSettings::shared()->getInt("theme", 0));
 
-  // "osc", "filter", "drive", "flanger", "comp", "reverb", "delay", "chorus", "phaser", "eq"
-  // add 2 envs, add one lfo, crash
-  // for (int i = 0; i < 1000; i++) {
-  //   addModulator(std::string::lfo);
-  //   auto osc_block = addBlock(0, { 0, 0 });
-  //   spawnBlockComponent(osc_block);
-  //   delegate->editorConnectedModulation(0, "osc_1", "tune");
-  //   delegate->editorChangedPreset(-1);
-  //   clear();
-  // }
-
-  // addModulator(std::string::lfo);
-  // auto osc_block = addBlock(0, { 0, 0 });
-  // spawnBlockComponent(osc_block);
-  // delegate->editorConnectedModulation(0, "osc_1", "tune");
-  // ui_layer_.setConnections(delegate->getModulations());
-  // auto osc_block2 = addBlock(0, { 0, 0 });
-  // spawnBlockComponent(osc_block2);
-
   auto req = [this] {
     auto options = juce::URL::InputStreamOptions(juce::URL::ParameterHandling::inAddress);
     auto version = juce::URL("https://blocksbucket.s3.us-east-2.amazonaws.com/version").createInputStream(options)->readEntireStreamAsString().toStdString();
@@ -189,28 +170,10 @@ void MainComponent::setupListeners() {
     save_popup_.setVisible(false);
   };
 
-  // ui_layer_.modulators_.plus_button_callback = [this](juce::MouseEvent& event) {
-    // auto position = event.eventComponent->getPosition() + ui_layer_.modulators_.getPosition();
-    // modulators_popup_.setBounds(position.getX(), position.getY(), 72, 54);
-    // showPopupAt(modulators_popup_, [this](Index i) { this->clickOnModulatorsPopup(i); });
-
-    // dark_background_.setVisible(true);
-    // dark_background_.toFront(true);
-    // auto position = ui_layer_.modulators_.plusComponent.getBounds().getPosition() + ui_layer_.modulators_.getPosition();
-    // modulators_popup_.setBounds(position.getX(), position.getY(), 72, 54);
-    // modulators_popup_.present();
-
-  // };
-
   ui_layer_.modulators_.plus_button_callback = [this](const juce::MouseEvent& event) {
     auto position = event.eventComponent->getPosition() + ui_layer_.modulators_.getPosition();
-    modulators_popup_.setBounds(position.getX(), position.getY(), 72, 54);
+    modulators_popup_.setBounds(position.getX(), position.getY(), 74, 76);
     showPopup(modulators_popup_, [this](Index i) { this->clickOnModulatorsPopup(i); });
-    //   auto p = component.getBounds().getPosition();
-    //   auto position = p + ui_layer_.modulators_.getPosition();
-      // auto relative_position = component.getParentComponent()->getPosition();
-    //   modulators_popup_.setBounds(position.getX(), position.getY(), 72, 54);
-    //   showPopupAt(modulators_popup_, [this](Index i) { this->clickOnModulatorsPopup(i); });
   };
 
   ui_layer_.newPresetButton->on_click_ = [this]() {
@@ -323,9 +286,9 @@ void MainComponent::mouseUp(const MouseEvent& event) {
   auto componentName = event.eventComponent->getName();
 
   if (componentName == "ModulatorsPlusButton") {
-    auto position = event.eventComponent->getPosition() + ui_layer_.modulators_.getPosition();
-    modulators_popup_.setBounds(position.getX(), position.getY(), 72, 54);
-    showPopup(modulators_popup_, [this](Index i) { this->clickOnModulatorsPopup(i); });
+    // auto position = event.eventComponent->getPosition() + ui_layer_.modulators_.getPosition();
+    // modulators_popup_.setBounds(position.getX(), position.getY(), 74, 74);
+    // showPopup(modulators_popup_, [this](Index i) { this->clickOnModulatorsPopup(i); });
   } else if (componentName == "PresetMainButton") {
     auto componentY = event.eventComponent->getPosition().getY();
     auto point = event.eventComponent->getPosition().withY(componentY + 8);
@@ -370,8 +333,7 @@ void MainComponent::handlePastePopup(const juce::MouseEvent& event) {
 }
 
 void MainComponent::clickOnModulatorsPopup(Index index) {
-  auto code = index.row == 0 ? "lfo" : "adsr";
-  addModulator(code);
+  addModulator(model::modulators[index.row]);
   dark_background_.setVisible(false);
 }
 

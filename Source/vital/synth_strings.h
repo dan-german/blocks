@@ -109,6 +109,7 @@ const std::string kCombStyleNames[] = {
   "Band Spread Flange-"
 };
 
+const std::string kStereo[] { "off", "on" };
 const std::string kFrequencySyncNames[] = {
   "seconds",
   "tempo",
@@ -232,6 +233,13 @@ const std::string kRandomNames[] = {
   "Sample & Hold",
   "Sine Interpolate",
   "Lorenz Attractor",
+};
+
+const std::string kRandomNamesShort[] = {
+  "noise",
+  "steps",
+  "sine",
+  "lorenz",
 };
 
 const std::string kPaintPatternNames[] = {

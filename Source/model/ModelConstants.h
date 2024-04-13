@@ -14,7 +14,7 @@
 
 namespace model {
 const StringArray waveforms { "sine", "was", "saw", "square", "triangle" };
-const std::vector<std::string> modulators { "lfo", "adsr", "rand" };
+const std::vector<std::string> modulators { "lfo", "envelope", "random" };
 const StringArray effects { "filter", "drive", "reverb", "delay", "chorus", "flanger", "phaser", "comp" };
 const StringArray tabs { "oscillator", "modulator", "effect" };
 const int rows = 7;
