@@ -131,6 +131,7 @@ private:
   void spawnBlockComponent(std::shared_ptr<model::Block> block);
   // void spawnTabComponent(std::shared_ptr<Tab> tab);
   void graphicsTimerCallback(const float secondsSinceLastUpdate);
+  void updateConnectionIndicators();
   void changeModulePainter(int value);
   // PopupMenu spawnModulationMenu(Module& victim);
   void showPopup(ButtonGridPopup& popupWrapper, std::function<void(Index)> callback);

@@ -17,7 +17,6 @@ BoxSlider::BoxSlider() {
   slider.addListener(this);
   slider.setName("modulatorSlider");
   setupLabel();
-  // slider.setInterceptsMouseClicks(true, true);  
   slider.addMouseListener(this, false);
   ThemeManager::shared()->addListener(this);
   themeChanged(ThemeManager::shared()->getCurrent());

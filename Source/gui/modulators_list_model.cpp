@@ -9,7 +9,6 @@
 */
 
 #include "gui/modulators_list_model.h"
-// #include "model/ModuleParameter.h"
 #include "model/lfo_model.h"
 #include "module_new.h"
 #include "ui_utils.h"
@@ -55,7 +54,7 @@ void ModulatorsListModel::setupModulatorComponent(std::shared_ptr<model::Module>
 
   if (model->id.type == "envelope") {
     component.onSliderValueChange = [&component, model, this](int index, float value) {
-      this->onEnvelopeParameterChanged(model, index, component);
+      this->onEnvelopeParameterChanged(value, model, index, component);
     };
   } else {
     component.onSliderValueChange = [model, &component, this](int index, float value) {
@@ -94,16 +93,16 @@ void ModulatorsListModel::setupModulatorComponent(std::shared_ptr<model::Module>
     slider->box_slider_.valueLabel.setText(slider->box_slider_.slider.getTextFromValue(value), dontSendNotification);
 
     if (model->id.type == "envelope") {
-      onEnvelopeParameterChanged(model, i, component);
+      onEnvelopeParameterChanged(value, model, i, component);
     } else {
       onLFOParameterChange(model, component, i, value);
     }
   }
 }
 
-void ModulatorsListModel::onEnvelopeParameterChanged(std::shared_ptr<model::Module> model, int index, ModulatorComponent& component) const {
+void ModulatorsListModel::onEnvelopeParameterChanged(float value, std::shared_ptr<model::Module> model, int index, ModulatorComponent& component) const {
   auto parameter = model->parameters_[index];
-  auto normalized_value = juce::jmap(parameter->value, parameter->min, parameter->max, 0.0f, 1.0f);
+  auto normalized_value = juce::jmap(value, parameter->min, parameter->max, 0.0f, 1.0f);
   switch (index) {
   case 0: component.envelopePath.setAttack(normalized_value); break;
   case 1: component.envelopePath.setDecay(normalized_value); break;

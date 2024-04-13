@@ -549,28 +549,23 @@ void MainComponent::spawnBlockComponent(std::shared_ptr<model::Block> block) {
 // }
 
 void MainComponent::graphicsTimerCallback(const float secondsSincelastUpdate) {
-  // auto statusOutput = delegate->editorRequestsStatusOutput("osc 1");
-  // return;
-  // auto currently_playing_notes = delegate->editorRequestsCurrentlyPlayingNotes();
-  // note_logger_.log(currently_playing_notes);
-
   if (ui_layer_.connections.isVisible()) {
-    auto modulationConnections = delegate->getModulations();
-
-    for (int i = 0; i < modulationConnections.size(); i++) {
-      if (auto mc = dynamic_cast<ConnectionComponent*>(ui_layer_.connections.listBox.getComponentForRowNumber(i))) {
-        auto source = delegate->editorRequestsStatusOutput("modulation_amount_" + std::to_string(i + 1));
-        // auto amount = delegate->editorRequestsStatusOutput("modulation_amount_" + std::to_string(i + 1));
-        // auto source = delegate->editorRequestsStatusOutput("modulation_amount_" + std::to_string(i + 1));
-        mc->indicator.setCurrentValue(source->value()[0]);
-        // mc->indicator.repaint();
-      }
-    }
+    updateConnectionIndicators();
   }
 
   // if (focused_grid_item_ != nullptr) {
   //   updateInspectorModulationIndicators(); // todo - fix
   // }
+}
+
+void MainComponent::updateConnectionIndicators() {
+  auto modulationConnections = delegate->getModulations();
+  for (int i = 0; i < modulationConnections.size(); i++) {
+    if (auto mc = dynamic_cast<ConnectionComponent*>(ui_layer_.connections.listBox.getComponentForRowNumber(i))) {
+      auto source = delegate->editorRequestsStatusOutput("modulation_amount_" + std::to_string(i + 1));
+      mc->indicator.setCurrentValue(source->value()[0]);
+    }
+  }
 }
 
 void MainComponent::mouseDrag(const MouseEvent& event) {
@@ -802,10 +797,9 @@ void MainComponent::modulatorEndedDrag(ModulatorComponent* modulator_component, 
     delegate->editorConnectedModulation(modulator_component->row, focused_module->name, parameter_name);
     ui_layer_.setConnections(delegate->getModulations());
     refreshInspector();
-
-    // auto modulator = delegate->getModulator(modulatorIndex);
     auto focused_block = block_matrix_[focused_grid_item_->index.column][focused_grid_item_->index.row];
     focused_block->setConfig(focused_module, delegate->getModulations());
+    ui_layer_.connections.setVisible(true);
   }
 }
 
