@@ -25,6 +25,7 @@ public:
   ModulatorsListModel modulators_list_model_;
   PlusComponent plus_button;
   ModulatorsSideMenu();
+  ~ModulatorsSideMenu();
   std::function<void(int)> on_added_modulator_;
   std::function<void(const juce::MouseEvent& event)> plus_button_callback;
 

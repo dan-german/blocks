@@ -11,6 +11,7 @@
 #include "gui/ModulatorsSideMenu.h"
 
 ModulatorsSideMenu::ModulatorsSideMenu(): button("ModulatorsPlusButton", Colours::transparentBlack, Colours::transparentBlack, Colours::transparentBlack) { setup(); }
+ModulatorsSideMenu::~ModulatorsSideMenu() { listBox.setModel(nullptr); }
 
 void ModulatorsSideMenu::setup() {
   setupAddButton();
