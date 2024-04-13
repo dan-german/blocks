@@ -18,7 +18,7 @@ namespace Model {
 struct MixerModule: public Block {
   enum Parameters { pGain, pPan };
 
-  MixerModule(int moduleNumber): Block(Model::Types::mixer, moduleNumber) {
+  MixerModule(int moduleNumber): Block(std::string::mixer, moduleNumber) {
     category = Module::Category::effect;
 
     createFloatParameter({ .name = "gain", .defaultValue = 0.0f });

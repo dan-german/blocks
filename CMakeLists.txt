@@ -14,7 +14,7 @@ cmake_minimum_required(VERSION 3.15)
 # `project()` command. `project()` sets up some helpful variables that describe source/binary
 # directories, and the current project version. This is a standard CMake command.
 
-project(blocks VERSION 0.1.3)
+project(blocks VERSION 0.1.4)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX20_STANDARD_COMPILE_OPTION "-std:c++latest")
 # If you've installed JUCE somehow (via a package manager, or directly using the CMake install

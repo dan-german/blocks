@@ -9,6 +9,9 @@
 using ValueScale = vital::ValueDetails::ValueScale;
 
 namespace model {
+
+
+
 class Module {
 public:
   ID id;

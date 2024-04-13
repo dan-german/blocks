@@ -1,6 +1,4 @@
 #include "MainComponent.h"
-#include "ModuleProcessorFactory.h"
-#include "model/ModuleFactory.h"
 #include "settings/GridConfigs.h"
 #include "gui/ThemeManager.h"
 #include "settings/UserSettings.h"
@@ -35,25 +33,6 @@ MainComponent::MainComponent(juce::MidiKeyboardState& keyboard_state, Delegate* 
   column_controls_.listener = this;
   note_logger_.listener = this;
   ThemeManager::shared()->set(UserSettings::shared()->getInt("theme", 0));
-
-  // "osc", "filter", "drive", "flanger", "comp", "reverb", "delay", "chorus", "phaser", "eq"
-  // add 2 envs, add one lfo, crash
-  // for (int i = 0; i < 1000; i++) {
-  //   addModulator(Model::Types::lfo);
-  //   auto osc_block = addBlock(0, { 0, 0 });
-  //   spawnBlockComponent(osc_block);
-  //   delegate->editorConnectedModulation(0, "osc_1", "tune");
-  //   delegate->editorChangedPreset(-1);
-  //   clear();
-  // }
-
-  // addModulator(Model::Types::lfo);
-  // auto osc_block = addBlock(0, { 0, 0 });
-  // spawnBlockComponent(osc_block);
-  // delegate->editorConnectedModulation(0, "osc_1", "tune");
-  // ui_layer_.setConnections(delegate->getModulations());
-  // auto osc_block2 = addBlock(0, { 0, 0 });
-  // spawnBlockComponent(osc_block2);
 
   auto req = [this] {
     auto options = juce::URL::InputStreamOptions(juce::URL::ParameterHandling::inAddress);
@@ -191,28 +170,10 @@ void MainComponent::setupListeners() {
     save_popup_.setVisible(false);
   };
 
-  // ui_layer_.modulators_.plus_button_callback = [this](juce::MouseEvent& event) {
-    // auto position = event.eventComponent->getPosition() + ui_layer_.modulators_.getPosition();
-    // modulators_popup_.setBounds(position.getX(), position.getY(), 72, 54);
-    // showPopupAt(modulators_popup_, [this](Index i) { this->clickOnModulatorsPopup(i); });
-
-    // dark_background_.setVisible(true);
-    // dark_background_.toFront(true);
-    // auto position = ui_layer_.modulators_.plusComponent.getBounds().getPosition() + ui_layer_.modulators_.getPosition();
-    // modulators_popup_.setBounds(position.getX(), position.getY(), 72, 54);
-    // modulators_popup_.present();
-
-  // };
-
   ui_layer_.modulators_.plus_button_callback = [this](const juce::MouseEvent& event) {
     auto position = event.eventComponent->getPosition() + ui_layer_.modulators_.getPosition();
-    modulators_popup_.setBounds(position.getX(), position.getY(), 72, 54);
+    modulators_popup_.setBounds(position.getX(), position.getY(), 74, 76);
     showPopup(modulators_popup_, [this](Index i) { this->clickOnModulatorsPopup(i); });
-    //   auto p = component.getBounds().getPosition();
-    //   auto position = p + ui_layer_.modulators_.getPosition();
-      // auto relative_position = component.getParentComponent()->getPosition();
-    //   modulators_popup_.setBounds(position.getX(), position.getY(), 72, 54);
-    //   showPopupAt(modulators_popup_, [this](Index i) { this->clickOnModulatorsPopup(i); });
   };
 
   ui_layer_.newPresetButton->on_click_ = [this]() {
@@ -238,7 +199,10 @@ void MainComponent::setupListeners() {
   };
 
   ui_layer_.modulators_.modulators_list_model_.modulator_listener = this;
-  ui_layer_.modulators_.on_added_modulator_ = [this](int index) { addModulator(Model::Types::all[index]); };
+
+  ui_layer_.modulators_.on_added_modulator_ = [this](int index) {
+    addModulator(model::modulators[index]);
+  };
   ui_layer_.preset_button_.on_click_ = [this]() { presetButtonClicked(); };
   ui_layer_.theme_button_->on_click_ = [this]() {
     UserSettings::shared()->set("theme", ThemeManager::shared()->next());
@@ -246,7 +210,7 @@ void MainComponent::setupListeners() {
   };
 }
 
-void MainComponent::addModulator(Model::Type code) {
+void MainComponent::addModulator(std::string code) {
   auto module = delegate->editorAddedModulator2(code);
   if (module == nullptr) return;
   ui_layer_.setModulators(delegate->getModulators2());
@@ -322,9 +286,9 @@ void MainComponent::mouseUp(const MouseEvent& event) {
   auto componentName = event.eventComponent->getName();
 
   if (componentName == "ModulatorsPlusButton") {
-    auto position = event.eventComponent->getPosition() + ui_layer_.modulators_.getPosition();
-    modulators_popup_.setBounds(position.getX(), position.getY(), 72, 54);
-    showPopup(modulators_popup_, [this](Index i) { this->clickOnModulatorsPopup(i); });
+    // auto position = event.eventComponent->getPosition() + ui_layer_.modulators_.getPosition();
+    // modulators_popup_.setBounds(position.getX(), position.getY(), 74, 74);
+    // showPopup(modulators_popup_, [this](Index i) { this->clickOnModulatorsPopup(i); });
   } else if (componentName == "PresetMainButton") {
     auto componentY = event.eventComponent->getPosition().getY();
     auto point = event.eventComponent->getPosition().withY(componentY + 8);
@@ -352,7 +316,7 @@ void MainComponent::mouseUp(const MouseEvent& event) {
 
 void MainComponent::handlePastePopup(const juce::MouseEvent& event) {
   if (copied_blocks_.size() == 0) return;
-  StringArray model { "paste" };
+  std::vector<std::vector<std::string>> model { { "paste" } };
   paste_popup_.setModel(model);
   auto relative_position = event.getEventRelativeTo(this);
   paste_popup_.setBounds(relative_position.getPosition().getX(), relative_position.getPosition().getY(), 56, 40);
@@ -369,8 +333,7 @@ void MainComponent::handlePastePopup(const juce::MouseEvent& event) {
 }
 
 void MainComponent::clickOnModulatorsPopup(Index index) {
-  auto code = index.row == 0 ? Types::lfo : Types::adsr;
-  addModulator(code);
+  addModulator(model::modulators[index.row]);
   dark_background_.setVisible(false);
 }
 
@@ -432,10 +395,16 @@ void MainComponent::showPopup(ButtonGridPopup& popup, std::function<void(Index)>
 
 std::shared_ptr<model::Block> MainComponent::addBlock(int code, Index index) {
   std::shared_ptr<model::Block> block = nullptr;
-  StringArray all;
-  all.addArray(model::block_popup_column_one);
-  all.addArray(model::block_popup_column_two);
-  return delegate->editorAddedBlock2(all[code].toStdString(), index);
+  std::vector<std::string> all;
+
+  // add the model::block_popup_column_one string array to all
+  for (auto s : model::block_popup_column_one) all.push_back(s);
+  for (auto s : model::block_popup_column_two) all.push_back(s);
+
+
+  // all.pu(model::block_popup_column_one);
+  // all.addArray(model::block_popup_column_two);
+  return delegate->editorAddedBlock2(all[code], index);
 }
 
 void MainComponent::setupInspector() {
@@ -511,22 +480,22 @@ void MainComponent::inspectorChangedParameter(int sliderIndex, float value) {
 }
 
 void MainComponent::updateModuleComponentVisuals(int sliderIndex, float value, std::shared_ptr<model::Module> module) {
-  if (module->id.type == Model::Types::osc) {
+  if (module->id.type == "osc") {
     if (module->parameters_[sliderIndex]->name == "wave") {
       changeModulePainter((int)value);
     }
     return;
 
-    switch (OscillatorModule::Parameters(sliderIndex)) {
-    case OscillatorModule::pWave:
+    switch (sliderIndex) {
+    case 0:
       changeModulePainter((int)value);
       break;
-    case OscillatorModule::pUnison: {
-      // auto module_component = block_matrix_[block->index.row][block->index.column];
-      // if (auto painter = module_component->getPainter())
-      //   painter->setUnison(static_cast<int>(value));
-      break;
-    }
+      // case OscillatorModule::pUnison: {
+      //   // auto module_component = block_matrix_[block->index.row][block->index.column];
+      //   // if (auto painter = module_component->getPainter())
+      //   //   painter->setUnison(static_cast<int>(value));
+      //   break;
+      // }
     default:
       break;
     }
@@ -547,16 +516,13 @@ void MainComponent::refreshInspector() {
   ResizeInspector();
 }
 
-PopupMenu MainComponent::spawnModulationMenu(Module& target) {
-  PopupMenu modulateMenu;
-
-  modulateMenu.setLookAndFeel(&blocks_laf_);
-
-  for (int i = 0; i < target.parameters.size(); i++)
-    modulateMenu.addItem(i + 1, target.parameters[i]->id);
-
-  return modulateMenu;
-}
+// PopupMenu MainComponent::spawnModulationMenu(Module& target) {
+//   PopupMenu modulateMenu;
+//   modulateMenu.setLookAndFeel(&blocks_laf_);
+//   for (int i = 0; i < target.parameters.size(); i++)
+//     modulateMenu.addItem(i + 1, target.parameters[i]->id);
+//   return modulateMenu;
+// }
 
 void MainComponent::spawnBlockComponent(std::shared_ptr<model::Block> block) {
   auto blockComponent = BlockComponent::create(block);
@@ -571,40 +537,35 @@ void MainComponent::spawnBlockComponent(std::shared_ptr<model::Block> block) {
   // ResetDownFlowingDots();
 }
 
-void MainComponent::spawnTabComponent(std::shared_ptr<Tab> tab) {
-  auto tabComponent = TabComponent::create(*tab, &tab_grid_);
-  addAndMakeVisible(tabComponent, 5);
-  tabComponent->toFront(false);
-  tab_grid_.addItem(tabComponent, { 0, tab->column }, true);
-  if (tab->length > 1) tab_grid_.setItemLength(tabComponent, tab->length);
+// void MainComponent::spawnTabComponent(std::shared_ptr<Tab> tab) {
+//   auto tabComponent = TabComponent::create(*tab, &tab_grid_);
+//   addAndMakeVisible(tabComponent, 5);
+//   tabComponent->toFront(false);
+//   tab_grid_.addItem(tabComponent, { 0, tab->column }, true);
+//   if (tab->length > 1) tab_grid_.setItemLength(tabComponent, tab->length);
 
-  for (auto glowIndicator : tab_grid_.glowIndicators)
-    glowIndicator->toFront(false);
-}
+//   for (auto glowIndicator : tab_grid_.glowIndicators)
+//     glowIndicator->toFront(false);
+// }
 
 void MainComponent::graphicsTimerCallback(const float secondsSincelastUpdate) {
-  // auto statusOutput = delegate->editorRequestsStatusOutput("osc 1");
-  // return;
-  // auto currently_playing_notes = delegate->editorRequestsCurrentlyPlayingNotes();
-  // note_logger_.log(currently_playing_notes);
-
   if (ui_layer_.connections.isVisible()) {
-    auto modulationConnections = delegate->getModulations();
-
-    for (int i = 0; i < modulationConnections.size(); i++) {
-      if (auto mc = dynamic_cast<ConnectionComponent*>(ui_layer_.connections.listBox.getComponentForRowNumber(i))) {
-        auto source = delegate->editorRequestsStatusOutput("modulation_amount_" + std::to_string(i + 1));
-        // auto amount = delegate->editorRequestsStatusOutput("modulation_amount_" + std::to_string(i + 1));
-        // auto source = delegate->editorRequestsStatusOutput("modulation_amount_" + std::to_string(i + 1));
-        mc->indicator.setCurrentValue(source->value()[0]);
-        // mc->indicator.repaint();
-      }
-    }
+    updateConnectionIndicators();
   }
 
   // if (focused_grid_item_ != nullptr) {
   //   updateInspectorModulationIndicators(); // todo - fix
   // }
+}
+
+void MainComponent::updateConnectionIndicators() {
+  auto modulationConnections = delegate->getModulations();
+  for (int i = 0; i < modulationConnections.size(); i++) {
+    if (auto mc = dynamic_cast<ConnectionComponent*>(ui_layer_.connections.listBox.getComponentForRowNumber(i))) {
+      auto source = delegate->editorRequestsStatusOutput("modulation_amount_" + std::to_string(i + 1));
+      mc->indicator.setCurrentValue(source->value()[0]);
+    }
+  }
 }
 
 void MainComponent::mouseDrag(const MouseEvent& event) {
@@ -753,10 +714,10 @@ void MainComponent::loadState(Preset preset) {
     spawnBlockComponent(block);
   }
 
-  for (auto presetTab : preset.tabs) {
-    auto tab = delegate->getTab(presetTab.column);
-    spawnTabComponent(tab);
-  }
+  // for (auto presetTab : preset.tabs) {
+  //   auto tab = delegate->getTab(presetTab.column);
+  //   spawnTabComponent(tab);
+  // }
 
   for (auto column_control : preset.column_controls) {
     int index = column_control.id.number - 1;
@@ -836,10 +797,9 @@ void MainComponent::modulatorEndedDrag(ModulatorComponent* modulator_component, 
     delegate->editorConnectedModulation(modulator_component->row, focused_module->name, parameter_name);
     ui_layer_.setConnections(delegate->getModulations());
     refreshInspector();
-
-    // auto modulator = delegate->getModulator(modulatorIndex);
     auto focused_block = block_matrix_[focused_grid_item_->index.column][focused_grid_item_->index.row];
     focused_block->setConfig(focused_module, delegate->getModulations());
+    ui_layer_.connections.setVisible(true);
   }
 }
 
@@ -887,7 +847,9 @@ void MainComponent::setupPopupMenus() {
   addChildComponent(blocks_popup_);
   blocks_popup_.setModel({ model::block_popup_column_one, model::block_popup_column_two });
   addChildComponent(modulators_popup_);
-  modulators_popup_.setModel(model::modulators);
+
+  modulators_popup_.setModel({ model::modulators });
+
   addChildComponent(save_popup_);
   addChildComponent(copy_delete_popup_);
   addChildComponent(paste_popup_);
@@ -906,7 +868,7 @@ void MainComponent::presetButtonClicked() {
   auto height = std::clamp(desiredHeight, desiredHeight, maxHeight);
   presets_popup_.setBounds(x, y, width, height);
 
-  juce::StringArray presetNames = delegate->editorRequestsPresetNames();
+  std::vector<std::string> presetNames = delegate->editorRequestsPresetNames();
   presets_popup_.setModel({ presetNames });
 
   showPopup(presets_popup_, [this](Index i) { this->loadPreset(i.row); });
@@ -925,7 +887,7 @@ void MainComponent::visibilityChanged() {
 
 void MainComponent::clickedOnGrid(GridComponent* grid, Index index) {
   if (grid == &block_grid_) return;
-  spawnTabComponent(delegate->editorAddedTab(index.column));
+  // spawnTabComponent(delegate->editorAddedTab(index.column));
 }
 
 void MainComponent::gridItemRemoved(GridComponent* grid, GridItemComponent* item) {
@@ -998,8 +960,7 @@ void MainComponent::showCopyDeletePopup(const juce::MouseEvent& event, GridItemC
     toggleGridItemSelection(&block_grid_, item, true);
   }
 
-  juce::StringArray options = { "copy", "delete" };
-  copy_delete_popup_.setModel(options);
+  copy_delete_popup_.setModel({ { "copy", "delete" } });
   auto this_relative_event = event.getEventRelativeTo(this);
   copy_delete_popup_.setBounds(this_relative_event.getPosition().getX(), this_relative_event.getPosition().getY(), 56, 62);
   showPopup(copy_delete_popup_, [this, item](Index i) {
@@ -1044,7 +1005,7 @@ void MainComponent::resetDownFlowingDots() {
   std::set<int> columns_with_blocks;
   for (auto block_component : blocks) {
     auto block_model = delegate->getBlock2(block_component->index);
-    if (block_model->id.type != Model::Types::osc) continue;
+    if (block_model->id.type != "osc") continue;
     columns_with_blocks.insert(block_component->index.column);
   }
 

@@ -27,10 +27,10 @@ RandomLfoModule::RandomLfoModule(const std::string& prefix, const Output* beats_
 }
 
 void RandomLfoModule::init() {
-  Output* free_frequency = createPolyModControl(prefix_ + "_frequency");
-  Value* style = createBaseControl(prefix_ + "_style");
-  Value* stereo = createBaseControl(prefix_ + "_stereo");
-  Value* sync_type = createBaseControl(prefix_ + "_sync_type");
+  Output* free_frequency = createPolyModControl2({ .name = "frequency", .value_scale = ValueScale::kExponential, .min = -7.0f, .max = 9.0f, .default_value = 1.0f });
+  Value* style = createBaseControl2({ .name = "style", .max = RandomLfo::kNumStyles - 1 });
+  Value* stereo = createBaseControl2({ .name = "stereo" });
+  Value* sync_type = createBaseControl2({ .name = "sync" });
 
   Output* frequency = createTempoSyncSwitch(prefix_, free_frequency->owner, beats_per_second_, true, input(kMidi));
   lfo_->useInput(input(kNoteTrigger), RandomLfo::kReset);

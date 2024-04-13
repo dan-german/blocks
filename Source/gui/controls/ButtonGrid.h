@@ -20,7 +20,7 @@ public:
 
   int getNumberOfColumns();
   int getNumberOfRows();
-  void setModel(Array<StringArray> models);
+  void setModel(std::vector<std::vector<std::string>> models);
   void resized() override;
   void present(std::function<void(Index)> callback);
 

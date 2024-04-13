@@ -9,9 +9,6 @@
 */
 
 #include "model/connection_list_model.h"
-#include "model/ModuleParameter.h"
-#include "model/Module.h"
-#include "OscillatorModule.h"
 
 int ModulationsListBoxModel::getNumRows() { return connections_.size(); }
 
@@ -48,13 +45,7 @@ Component* ModulationsListBoxModel::refreshComponentForRow(int rowNumber, bool i
   component->slider.addListener(this->slider_listener_);
   component->delegate = delegate_;
   component->indicator.setColour(connection->source->colour.colour);
-
-  // auto source_display_name = connection->source->display_name + " " + std::to_string(connection->source->id.number);
   component->source.setText(connection->source->display_name , dontSendNotification);
-
-
-  // using Parameters = Model::OscillatorModule::Parameters;
-
   component->row = rowNumber;
 
   return component;

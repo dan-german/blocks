@@ -9,8 +9,7 @@
 */
 
 #include "gui/modulators_list_model.h"
-#include "model/ModuleParameter.h"
-#include "lfo_module_new.h"
+#include "model/lfo_model.h"
 #include "module_new.h"
 #include "ui_utils.h"
 
@@ -29,6 +28,7 @@ Component* ModulatorsListModel::refreshComponentForRow(int rowNumber, bool isRow
   else
     component = new ModulatorComponent();
 
+  component->onSliderValueChange = {};
   if (modulators.size() == 0) return component;
   if (rowNumber >= modulators.size()) return component;
 
@@ -43,29 +43,22 @@ void ModulatorsListModel::setupModulatorComponent(std::shared_ptr<model::Module>
   component.delegate_ = modulator_listener;
   component.setColour(model->colour.colour);
 
-  if (model->id.type == Model::Types::lfo) {
-    component.oscillatorPainter.setVisible(true);
-    component.envelopePath.setVisible(false);
-  } else {
+  if (model->id.type == "envelope") {
     component.oscillatorPainter.setVisible(false);
     component.envelopePath.setVisible(true);
+  } else {
+    component.oscillatorPainter.setVisible(true);
+    component.envelopePath.setVisible(false);
+    if (model->id.type == "random") component.oscillatorPainter.setWaveformType(OscillatorPainter::WaveformType::noise);
   }
 
-  // todo: update the skew only after rate value changes... atm it looks weird
-  if (model->id.type == Model::Types::lfo) {
+  if (model->id.type == "envelope") {
+    component.onSliderValueChange = [&component, model, this](int index, float value) {
+      this->onEnvelopeParameterChanged(value, model, index, component);
+    };
+  } else {
     component.onSliderValueChange = [model, &component, this](int index, float value) {
       this->onLFOParameterChange(model, component, index, value);
-    };
-  } else if (model->id.type == Model::Types::adsr) {
-    component.onSliderValueChange = [&component, &model](int index, float value) {
-      // auto normalizedValue = model.parameters[index]->audioParameter->convertTo0to1(value);
-      // switch (index) {
-      // case 0: component.envelopePath.setAttack(normalizedValue); break;
-      // case 1: component.envelopePath.setDecay(normalizedValue); break;
-      // case 2: component.envelopePath.setSustain(normalizedValue); break;
-      // case 3: component.envelopePath.setRelease(normalizedValue); break;
-      // default: break;
-      // }
     };
   }
 
@@ -93,15 +86,29 @@ void ModulatorsListModel::setupModulatorComponent(std::shared_ptr<model::Module>
     if (parameter->string_lookup) {
       slider->box_slider_.slider.textFromValueFunction = [parameter](double value) { return juce::String(parameter->string_lookup[(int)value]); };
     } else {
-      slider->box_slider_.slider.textFromValueFunction = [parameter](double value) { return UIUtils::getSliderTextFromValue(value, *parameter ); };
+      slider->box_slider_.slider.textFromValueFunction = [parameter](double value) { return UIUtils::getSliderTextFromValue(value, *parameter); };
     }
 
     slider->box_slider_.slider.setValue(value, dontSendNotification);
     slider->box_slider_.valueLabel.setText(slider->box_slider_.slider.getTextFromValue(value), dontSendNotification);
 
-    if (model->id.type == Model::Types::lfo) {
+    if (model->id.type == "envelope") {
+      onEnvelopeParameterChanged(value, model, i, component);
+    } else {
       onLFOParameterChange(model, component, i, value);
     }
+  }
+}
+
+void ModulatorsListModel::onEnvelopeParameterChanged(float value, std::shared_ptr<model::Module> model, int index, ModulatorComponent& component) const {
+  auto parameter = model->parameters_[index];
+  auto normalized_value = juce::jmap(value, parameter->min, parameter->max, 0.0f, 1.0f);
+  switch (index) {
+  case 0: component.envelopePath.setAttack(normalized_value); break;
+  case 1: component.envelopePath.setDecay(normalized_value); break;
+  case 2: component.envelopePath.setSustain(normalized_value); break;
+  case 3: component.envelopePath.setRelease(normalized_value); break;
+  default: break;
   }
 }
 
@@ -121,7 +128,7 @@ void ModulatorsListModel::onLFOParameterChange(std::shared_ptr<model::Module> mo
     } else {
       setSliderAsTempo(module, rate_slider);
     }
-  } else if (is_changing_wave) { 
+  } else if (is_changing_wave && module->id.type != "random") {
     auto wave = int(value);
     component.oscillatorPainter.waveformType = static_cast<OscillatorPainter::WaveformType>(wave);
   }

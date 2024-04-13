@@ -13,7 +13,7 @@ public:
   ButtonGridPopup();
   int calculateHeight(int itemCount);
 
-  void setModel(Array<StringArray> stringArrays);
+  void setModel(std::vector<std::vector<std::string>> stringArrays);
   void resized() override;
   void present(std::function<void(Index)> callback);
 private:

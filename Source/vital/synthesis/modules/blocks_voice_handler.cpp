@@ -31,7 +31,7 @@
 #include "module_new.h"
 #include "oscillator_module_new.h"
 #include "filter_module_new.h"
-#include "lfo_module_new.h"
+#include "model/lfo_model.h"
 #include "blocks_voice_handler.h"
 #include "vital/synthesis/modules/reverb_module.h"
 #include "vital/synthesis/modules/delay_module.h"
@@ -84,10 +84,8 @@ void BlocksVoiceHandler::removeModulator(int index, std::string type, std::strin
 
 void BlocksVoiceHandler::addModulator(std::shared_ptr<model::Module> modulator) {
   auto type = modulator->id.type;
-
   SynthModule* processor = processor_pool_[type][0];
   processor_pool_[type].erase(processor_pool_[type].begin());
-
   processor->setModule(modulator);
   active_modulators_.push_back(processor);
   active_modulators_map_[modulator->name] = processor;
@@ -107,11 +105,9 @@ void BlocksVoiceHandler::connectAll() {
         if (current) {
           processor->plug(current);
         }
-
         current = processor;
       }
     }
-
     if (current) {
       column_nodes_[column]->plug(current);
     }
@@ -128,21 +124,6 @@ vital::Processor* BlocksVoiceHandler::findProcessorAbove(Index index) {
   }
   return nullptr;
 }
-
-// void BlocksVoiceHandler::unplugAll() {
-//   for (int column = 0; column < processor_matrix_.size(); column++) {
-//     for (int row = 0; row < processor_matrix_[column].size(); row++) {
-//       auto processor = processor_matrix_[column][row];
-//       if (processor != nullptr) {
-//         column_nodes_[column]->unplug(processor.get());
-
-//         if (auto processor_above = findProcessorAbove({ row, column })) {
-//           processor->unplug(processor_above.get());
-//         }
-//       }
-//     }
-//   }
-// }
 
 void BlocksVoiceHandler::unplugAll() {
   for (auto processor : active_processors_) {
@@ -490,11 +471,11 @@ void BlocksVoiceHandler::createModulators() {
   random_->plug(retrigger());
   addProcessor(random_);
 
-  for (int i = 0; i < kNumRandomLfos; ++i) {
-    std::string name = "random";
-    random_lfos_[i] = new RandomLfoModule(name, beats_per_second_);
+  for (int i = 0; i < model::MAX_MODULES_PER_TYPE; ++i) {
+    random_lfos_[i] = new RandomLfoModule("random", beats_per_second_);
     random_lfos_[i]->plug(retrigger(), RandomLfoModule::kNoteTrigger);
     random_lfos_[i]->plug(bent_midi_, RandomLfoModule::kMidi);
+    processor_pool_["random"].push_back(random_lfos_[i]);
     addSubmodule(random_lfos_[i]);
     addProcessor(random_lfos_[i]);
   }

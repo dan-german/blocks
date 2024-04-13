@@ -4,7 +4,7 @@
 #include "gui/ThemeManager.h"
 
 using namespace juce;
-using Tab = Model::Tab;
+// using Tab = Model::Tab;
 
 class TabComponent: public BaseTabComponent {
 public:
@@ -14,7 +14,7 @@ public:
 
   void resized() override;
   void paint(juce::Graphics& g) override;
-  static TabComponent* create(Tab& tab, TabContainerComponent* container);
+  // static TabComponent* create(Tab& tab, TabContainerComponent* container);
 
   bool stretchable = true;
 

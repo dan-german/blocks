@@ -15,9 +15,9 @@ LabeledSlider::LabeledSlider() {
   addAndMakeVisible(box_slider_);
   label.setText("attack", dontSendNotification);
   label.setJustificationType(Justification::centredLeft);
-
   label.setFont(Font(14));
   ThemeManager::shared()->addListener(this);
+  themeChanged(ThemeManager::shared()->getCurrent());
 }
 
 LabeledSlider::~LabeledSlider() {
