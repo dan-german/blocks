@@ -71,6 +71,7 @@ void ColumnControlsContainer::themeChanged(Theme theme) {
 }
 
 void ColumnControlsContainer::sliderValueChanged(Slider* slider) {
+  if (!listener) return;
   auto column = slider->getProperties().getWithDefault("column", 0).toString().getIntValue();
   if (slider->getProperties().getWithDefault("tag", "") == "level") {
     listener->columnControlAdjusted(ControlType::level, column, slider->getValue());
