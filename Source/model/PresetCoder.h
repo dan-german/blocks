@@ -11,11 +11,20 @@
 #pragma once
 #include "util/json.hpp"
 #include "model/PresetInfo.h"
+#include "model/ModuleParameter.h"
+#include "model/Modulation.h"
+#include "model/Block.h"
 #include <vector>
 #include "model/PresetManager.h"
 
 using json = nlohmann::json;
+using Module = Model::Module;
+using Block = Model::Block;
+using ModuleParameter = Model::ModuleParameter;
+using Modulation = Model::Modulation;
+
 class PresetManager;
+
 class PresetCoder {
 public:
   std::string encode(Preset presetData);

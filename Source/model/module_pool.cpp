@@ -11,7 +11,7 @@
 #include "module_pool.h"
 #include "oscillator_module_new.h"
 #include "filter_module_new.h"
-#include "lfo_model.h"
+#include "lfo_module_new.h"
 #include "adsr_module_new.h"
 #include "reverb_module_new.h"
 #include "delay_module_new.h"
@@ -21,7 +21,6 @@
 #include "phaser_model.h"  
 #include "column_control_model.h"
 #include "noise_model.h"
-#include "rand_model.h"
 
 namespace model {
 // Module
@@ -50,7 +49,6 @@ ModulePool::ModulePool() {
 
   modulators.spawn({ "lfo" }, [](std::string type, int number) { return std::make_shared<model::LFOModule>(number); });
   modulators.spawn({ "envelope" }, [](std::string type, int number) { return std::make_shared<model::ADSRModule>(number); });
-  modulators.spawn({ "random" }, [](std::string type, int number) { return std::make_shared<model::RandModel>(number); });
 
   for (int i = 1; i <= 40; i++) connections.push_back(std::make_shared<Connection>(i));
   for (int i = 1; i <= Constants::columns; i++) column_controls_.push_back(std::make_shared<ColumnControl>(i));

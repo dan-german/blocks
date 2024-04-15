@@ -13,15 +13,20 @@
 #include "gui/ModulatorsButton.h"
 #include "gui/controls/BlocksButton.h"
 #include "gui/SideMenu.h"
+#include "model/Modulation.h"
 #include "gui/controls/PresetButtonComponent.h"
 #include "gui/KeyboardComponent.h"
 #include "gui/ValueAnimator.h"
+#include "model/Module.h"
 #include "gui/modulators_list_model.h"
 #include "gui/ModulatorsSideMenu.h"
 #include "gui/controls/ButtonGridPopup.h"
 #include <juce_gui_basics/juce_gui_basics.h>
 #include "gui/controls/SVGButton.h"
 #include "connection.h"
+
+using Modulation = Model::Modulation;
+using Module = Model::Module;
 
 class UILayer: public juce::Component, ComponentMovementWatcher {
 public:

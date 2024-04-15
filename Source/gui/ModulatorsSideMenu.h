@@ -13,7 +13,7 @@
 #include "gui/SideMenu.h"
 #include "gui/PlusComponent.h"
 #include "gui/modulators_list_model.h"
-// #include "model/Module.h"
+#include "model/Module.h"
 #include "gui/controls/ButtonGridPopup.h"
 #include "gui/controls/LabelButton.h"
 

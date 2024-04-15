@@ -1,7 +1,8 @@
 #pragma once
 #include <map>
 #include "model/ModelConstants.h"
-#include "model/id.h"
+
+using namespace Model;
 
 template <class M>
 struct ModuleContainer {

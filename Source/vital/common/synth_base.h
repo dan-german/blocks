@@ -91,7 +91,7 @@ public:
   std::vector<vital::ModulationConnection*> getDestinationConnections(const std::string& destination);
 
   std::shared_ptr<model::Block> addBlock(std::string type, Index index, int number = -1);
-  std::shared_ptr<model::Module> addModulator(std::string type, int number = -1, int colour_id = -1);
+  std::shared_ptr<model::Module> addModulator(Model::Type tpye, int number = -1, int colour_id = -1);
   void repositionBlock(Index from, Index to);
 
   const vital::StatusOutput* getStatusOutput(const std::string& name);

@@ -1,6 +1,6 @@
 #include "model/ButtonGridModel.h"
 
-ButtonGridModel::ButtonGridModel(std::vector<std::string> texts, int column): texts(texts), column(column) { }
+ButtonGridModel::ButtonGridModel(StringArray texts, int column): texts(texts), column(column) { }
 void ButtonGridModel::paintListBoxItem(int rowNumber, Graphics& g, int width, int height, bool rowIsSelected) { }
 int ButtonGridModel::getNumRows() { return texts.size(); }
 

@@ -36,15 +36,6 @@ public:
   virtual Processor* clone() const override { return new RandomLfoModule(*this); }
   void correctToTime(double seconds) override;
 
-  void setModule(std::shared_ptr<model::Module> module) override {
-    SynthModule::setModule(module);
-    module->parameter_map_["style"]->value_processor = control_map_["style"];
-    module->parameter_map_["stereo"]->value_processor = control_map_["stereo"];
-    module->parameter_map_["tempo"]->value_processor = control_map_["tempo"];
-    module->parameter_map_["frequency"]->value_processor = control_map_["frequency"];
-    module->parameter_map_["sync"]->value_processor = control_map_["sync"];
-  }
-
 protected:
   std::string prefix_;
   RandomLfo* lfo_;

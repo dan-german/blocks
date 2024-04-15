@@ -27,7 +27,7 @@ public:
 
   Label label;
   void paint(juce::Graphics&) override;
-  void setStrings(std::vector<std::string> strings);
+  void setStrings(StringArray strings);
   void setButtonColour(Colour colour) override;
   void mouseUp(const juce::MouseEvent& event) override;
   Component* getContent() override;

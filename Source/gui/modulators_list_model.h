@@ -9,17 +9,16 @@
 */
 
 #pragma once
-// #include "model/Module.h"
+#include "model/Module.h"
 #include "gui/ModulatorComponent.h"
 #include "module_new.h"
 
-// using Module = Model::Module;
+using Module = Model::Module;
 
 class ModulatorsListModel: public ListBoxModel {
 private:
   std::vector<std::shared_ptr<model::Module>> modulators;
   void setupModulatorComponent(std::shared_ptr<model::Module> model, ModulatorComponent& component) const;
-  void onEnvelopeParameterChanged(float value, std::shared_ptr<model::Module> model, int index, ModulatorComponent& component) const;
   void onLFOParameterChange(std::shared_ptr<model::Module> module, ModulatorComponent& component, int index, float value) const;
   void setSliderAsFrequency(std::shared_ptr<model::Module> module, LabeledSlider* slider) const;
   void setSliderAsTempo(std::shared_ptr<model::Module> module, LabeledSlider* slider) const;

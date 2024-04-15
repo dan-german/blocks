@@ -10,11 +10,11 @@
 
 #pragma once
 
-// #include "model/Modulation.h"
+#include "model/Modulation.h"
 #include "gui/ConnectionComponent.h"
 #include "connection.h"
 
-// using Modulation = Model::Modulation;
+using Modulation = Model::Modulation;
 
 class ModulationsListBoxModel: public ListBoxModel {
 public:

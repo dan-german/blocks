@@ -10,7 +10,14 @@
 
 #pragma once
 #include "model/PresetInfo.h"
+#include "model/Module.h"
+#include "model/Block.h"
+#include "model/Modulation.h"
 #include "BinaryData.h"
+
+using Module = Model::Module;
+using Block = Model::Block;
+using Modulation = Model::Modulation;
 
 class PresetCoder;
 class PresetManager {

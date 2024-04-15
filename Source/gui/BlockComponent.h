@@ -15,7 +15,7 @@
 #include "gui/OscillatorPainter.h"
 #include "gui/EasingAnimator.h"
 #include "gui/EnvelopePath.h"
-// #include "model/Block.h"
+#include "model/Block.h"
 #include "gui/ThemeListener.h"
 #include "gui/CircleIndicatorList.h"
 #include "gui/CircleIndicators.h"
@@ -23,8 +23,8 @@
 #include "connection.h"
 
 class BlockComponent;
-// using Block = Model::Block;
-// using Module = Model::Module;
+using Block = Model::Block;
+using Module = Model::Module;
 
 class BlockComponent final: public GridItemComponent, ThemeListener {
 public:

@@ -46,13 +46,13 @@ void TabComponent::drawStretchIndicator(juce::Graphics& g) {
   }
 }
 
-// TabComponent* TabComponent::create(Tab& tab, TabContainerComponent* container) {
-//   const auto tabComponent = new TabComponent(tab.column, container->getConfig().itemWidth, container);
-//   tabComponent->label.setText(tab.name, juce::NotificationType::dontSendNotification);
-//   tabComponent->listener = container;
-//   tabComponent->length = tab.length;
-//   return tabComponent;
-// }
+TabComponent* TabComponent::create(Tab& tab, TabContainerComponent* container) {
+  const auto tabComponent = new TabComponent(tab.column, container->getConfig().itemWidth, container);
+  tabComponent->label.setText(tab.name, juce::NotificationType::dontSendNotification);
+  tabComponent->listener = container;
+  tabComponent->length = tab.length;
+  return tabComponent;
+}
 
 void TabComponent::setHidden(bool hidden) {
   this->isHidden = hidden;

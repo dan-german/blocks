@@ -1,4 +1,6 @@
 #include "MainComponent.h"
+#include "ModuleProcessorFactory.h"
+#include "model/ModuleFactory.h"
 #include "settings/GridConfigs.h"
 #include "gui/ThemeManager.h"
 #include "settings/UserSettings.h"
@@ -199,10 +201,7 @@ void MainComponent::setupListeners() {
   };
 
   ui_layer_.modulators_.modulators_list_model_.modulator_listener = this;
-
-  ui_layer_.modulators_.on_added_modulator_ = [this](int index) {
-    addModulator(model::modulators[index]);
-  };
+  ui_layer_.modulators_.on_added_modulator_ = [this](int index) { addModulator(Model::Types::all[index]); };
   ui_layer_.preset_button_.on_click_ = [this]() { presetButtonClicked(); };
   ui_layer_.theme_button_->on_click_ = [this]() {
     UserSettings::shared()->set("theme", ThemeManager::shared()->next());
@@ -316,7 +315,7 @@ void MainComponent::mouseUp(const MouseEvent& event) {
 
 void MainComponent::handlePastePopup(const juce::MouseEvent& event) {
   if (copied_blocks_.size() == 0) return;
-  std::vector<std::vector<std::string>> model { { "paste" } };
+  StringArray model { "paste" };
   paste_popup_.setModel(model);
   auto relative_position = event.getEventRelativeTo(this);
   paste_popup_.setBounds(relative_position.getPosition().getX(), relative_position.getPosition().getY(), 56, 40);
@@ -333,7 +332,9 @@ void MainComponent::handlePastePopup(const juce::MouseEvent& event) {
 }
 
 void MainComponent::clickOnModulatorsPopup(Index index) {
-  addModulator(model::modulators[index.row]);
+  juce::String code = model::modulators[index.row];
+  juce::String adjusted = code == "adsr" ? "envelope" : code;
+  addModulator(adjusted.toStdString());
   dark_background_.setVisible(false);
 }
 
@@ -395,16 +396,10 @@ void MainComponent::showPopup(ButtonGridPopup& popup, std::function<void(Index)>
 
 std::shared_ptr<model::Block> MainComponent::addBlock(int code, Index index) {
   std::shared_ptr<model::Block> block = nullptr;
-  std::vector<std::string> all;
-
-  // add the model::block_popup_column_one string array to all
-  for (auto s : model::block_popup_column_one) all.push_back(s);
-  for (auto s : model::block_popup_column_two) all.push_back(s);
-
-
-  // all.pu(model::block_popup_column_one);
-  // all.addArray(model::block_popup_column_two);
-  return delegate->editorAddedBlock2(all[code], index);
+  StringArray all;
+  all.addArray(model::block_popup_column_one);
+  all.addArray(model::block_popup_column_two);
+  return delegate->editorAddedBlock2(all[code].toStdString(), index);
 }
 
 void MainComponent::setupInspector() {
@@ -847,9 +842,7 @@ void MainComponent::setupPopupMenus() {
   addChildComponent(blocks_popup_);
   blocks_popup_.setModel({ model::block_popup_column_one, model::block_popup_column_two });
   addChildComponent(modulators_popup_);
-
-  modulators_popup_.setModel({ model::modulators });
-
+  modulators_popup_.setModel(model::modulators);
   addChildComponent(save_popup_);
   addChildComponent(copy_delete_popup_);
   addChildComponent(paste_popup_);
@@ -868,7 +861,7 @@ void MainComponent::presetButtonClicked() {
   auto height = std::clamp(desiredHeight, desiredHeight, maxHeight);
   presets_popup_.setBounds(x, y, width, height);
 
-  std::vector<std::string> presetNames = delegate->editorRequestsPresetNames();
+  juce::StringArray presetNames = delegate->editorRequestsPresetNames();
   presets_popup_.setModel({ presetNames });
 
   showPopup(presets_popup_, [this](Index i) { this->loadPreset(i.row); });
@@ -960,7 +953,8 @@ void MainComponent::showCopyDeletePopup(const juce::MouseEvent& event, GridItemC
     toggleGridItemSelection(&block_grid_, item, true);
   }
 
-  copy_delete_popup_.setModel({ { "copy", "delete" } });
+  juce::StringArray options = { "copy", "delete" };
+  copy_delete_popup_.setModel(options);
   auto this_relative_event = event.getEventRelativeTo(this);
   copy_delete_popup_.setBounds(this_relative_event.getPosition().getX(), this_relative_event.getPosition().getY(), 56, 62);
   showPopup(copy_delete_popup_, [this, item](Index i) {

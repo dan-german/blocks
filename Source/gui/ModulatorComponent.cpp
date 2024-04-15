@@ -37,7 +37,6 @@ ModulatorComponent::ModulatorComponent() {
   setupTitle();
 
   ThemeManager::shared()->addListener(this);
-  themeChanged(ThemeManager::shared()->getCurrent()); 
 }
 
 void ModulatorComponent::setupRemoveButton() {

@@ -19,7 +19,7 @@ PresetButtonComponent::PresetButtonComponent() {
 Component* PresetButtonComponent::getContent() { return &content; }
 PresetButtonComponent::~PresetButtonComponent() {}
 void PresetButtonComponent::paint(juce::Graphics& g) {}
-void PresetButtonComponent::setStrings(std::vector<std::string> strings) {}
+void PresetButtonComponent::setStrings(StringArray strings) {}
 void PresetButtonComponent::setButtonColour(Colour colour) {}
 
 void PresetButtonComponent::mouseUp(const juce::MouseEvent& event) {

@@ -12,7 +12,7 @@
 
 #include "gui/controls/ExitButton.h"
 #include "model/connection_list_model.h"
-// #include "model/Modulation.h"
+#include "model/Modulation.h"
 
 class SideMenu: public Component {
 public:

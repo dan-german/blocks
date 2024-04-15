@@ -321,7 +321,7 @@ juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter() {
 void PluginProcessor::editorAdjustedModulator(std::string parameter_name, int index, float value) {
   auto modulator = synth_->getModuleManager().getModulator(index);
 
-  if (modulator->id.type != "envelope" && parameter_name == "tempo") {
+  if (modulator->id.type == "lfo" && parameter_name == "tempo") {
     bool is_changing_seconds = modulator->parameter_map_["sync"]->value_processor->value() == 0.0f;
     parameter_name = is_changing_seconds ? "frequency" : "tempo";
     modulator->parameter_map_[parameter_name]->set(value);
@@ -379,9 +379,10 @@ std::shared_ptr<model::Module> PluginProcessor::getModulator2(int index) {
   return getModuleManager().getModulator(index);
 }
 
-// juce::Array<std::shared_ptr<Modulation>> PluginProcessor::getConnectionsOfSource(std::shared_ptr<Module> source) {
-//   return juce::Array<std::shared_ptr<Modulation>>();
-// }
+juce::Array<std::shared_ptr<Modulation>> PluginProcessor::getConnectionsOfSource(std::shared_ptr<Module> source) {
+  return juce::Array<std::shared_ptr<Modulation>>();
+  // return moduleManager.getConnectionsOfSource(source);
+}
 
 std::vector<std::shared_ptr<model::Connection>> PluginProcessor::getModulations() {
   return synth_->getModuleManager().getConnections();
@@ -408,10 +409,10 @@ std::shared_ptr<model::Block> PluginProcessor::getBlock2(Index index) {
   return (index.row == -1 || index.column == -1) ? nullptr : synth_->getModuleManager().getBlock(index);
 }
 
-// #pragma warning(default:4716)
-// std::shared_ptr<Tab> PluginProcessor::getTab(int column) {
+#pragma warning(default:4716)
+std::shared_ptr<Tab> PluginProcessor::getTab(int column) {
   // return moduleManager.getTab(column);
-// }
+}
 
 #pragma warning(default:4716)
 juce::Array<MPENote> PluginProcessor::editorRequestsCurrentlyPlayingNotes() {
@@ -539,12 +540,12 @@ void PluginProcessor::editorRemovedTab(int column) {
   // removeTab(column);
 }
 
-// #pragma warning(default:4716)
-// std::shared_ptr<Tab> PluginProcessor::editorAddedTab(int column) {
+#pragma warning(default:4716)
+std::shared_ptr<Tab> PluginProcessor::editorAddedTab(int column) {
   // auto type = Model::Types::noteTab;
   // Analytics::shared()->countAction(type + " Tab Added");
   // return moduleManager.addTab(type, column, -1);
-// }
+}
 
 void PluginProcessor::editorRemovedModulator(int index) {
   removeModulator(index);
@@ -573,7 +574,7 @@ void PluginProcessor::disconnect(std::shared_ptr<model::Connection>& connection)
   getModuleManager().removeConnection(connection);
 }
 
-std::shared_ptr<model::Module> PluginProcessor::editorAddedModulator2(std::string code) {
+std::shared_ptr<model::Module> PluginProcessor::editorAddedModulator2(Model::Type code) {
   return synth_->addModulator(code);
 }
 
@@ -595,7 +596,7 @@ void PluginProcessor::removeBlock(const Index& index) {
   block_updates_++;
 }
 
-std::shared_ptr<model::Block> PluginProcessor::editorAddedBlock2(std::string type, Index index) {
+std::shared_ptr<model::Block> PluginProcessor::editorAddedBlock2(Model::Type type, Index index) {
   auto block = synth_->addBlock(type, index);
   block_updates_++;
   return block;
@@ -706,9 +707,12 @@ Preset PluginProcessor::getStateRepresentation() {
   return current_state;
 }
 
-std::vector<std::string> PluginProcessor::editorRequestsPresetNames() {
-  std::vector<std::string> result;
-  for (auto preset : preset_manager_.presets) result.push_back(preset.name);
+juce::StringArray PluginProcessor::editorRequestsPresetNames() {
+  StringArray result;
+
+  for (auto preset : preset_manager_.presets)
+    result.add(preset.name);
+
   return result;
 }
 

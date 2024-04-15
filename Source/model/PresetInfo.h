@@ -9,7 +9,7 @@
 */
 
 #pragma once
-// #include "model/Block.h"
+#include "model/Block.h"
 #include "gui/Tab.h"
 #include "connection.h"
 #include "model/column_control_model.h"
@@ -27,6 +27,11 @@ public:
   };
 
   struct Modulator: public Preset::Module { int colour; };
+
+  // struct Column: Module { 
+  //   float pan;
+  //   float level;
+  // };
 
   struct Connection {
     std::string source;

@@ -9,7 +9,8 @@
 */
 
 #include "model/PresetInfo.h"
-// #include "model/ModuleParameter.h"
+#include "model/PresetManager.h"
+#include "model/ModuleParameter.h"
 #include "module_new.h"
 #include "gui/Tab.h"
 

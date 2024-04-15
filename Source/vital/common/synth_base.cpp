@@ -888,7 +888,7 @@ std::shared_ptr<model::Block> SynthBase::addBlock(std::string type, Index index,
   return block;
 }
 
-std::shared_ptr<model::Module> SynthBase::addModulator(std::string type, int number, int colour_id) {
+std::shared_ptr<model::Module> SynthBase::addModulator(Model::Type type, int number, int colour_id) {
   auto modulator = module_manager_.addModulator(type, number, colour_id);
   getVoiceHandler()->addModulator(modulator);
   return modulator;

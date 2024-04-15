@@ -79,7 +79,7 @@ public:
   void removeBlock(const Index& index);
 
   // MainComponent::Delegate
-  // std::shared_ptr<Tab> editorAddedTab(int column) override;
+  std::shared_ptr<Tab> editorAddedTab(int column) override;
   void editorRepositionedTab(int oldColumn, int newColumn) override;
   void editorChangedTabLength(int column, int length) override;
   juce::Array<int> editorRequestsActiveColumns() override;
@@ -108,20 +108,20 @@ public:
   void disconnect(std::shared_ptr<model::Connection>& connection);
 
   std::shared_ptr<model::Block> getBlock2(Index index) override;
-  // std::shared_ptr<Tab> getTab(int column) override;
-  std::shared_ptr<model::Block> editorAddedBlock2(std::string code, Index index) override;
-  std::shared_ptr<model::Module> editorAddedModulator2(std::string code) override;
+  std::shared_ptr<Tab> getTab(int column) override;
+  std::shared_ptr<model::Block> editorAddedBlock2(Model::Type code, Index index) override;
+  std::shared_ptr<model::Module> editorAddedModulator2(Model::Type code) override;
   std::shared_ptr<model::Module> getModulator2(int index) override;
   Preset editorChangedPreset(int index) override;
   void clear();
   Preset getStateRepresentation() override;
   std::vector<std::shared_ptr<model::Module>> getModulators2() override;
-  // juce::Array<std::shared_ptr<Modulation>> getConnectionsOfSource(std::shared_ptr<Module> source) override;
+  juce::Array<std::shared_ptr<Modulation>> getConnectionsOfSource(std::shared_ptr<Module> source) override;
   std::vector<std::shared_ptr<model::Connection>> getModulations() override;
 
   std::pair<float, float> editorRequestsModulatorValue(Index moduleIndex, int parameterIndex, int modulatorIndex) override;
   std::pair<float, float> editorRequestsModulatorValue(int modulationConnectionIndex) override;
-  std::vector<std::string> editorRequestsPresetNames() override;
+  juce::StringArray editorRequestsPresetNames() override;
   juce::Array<juce::MPENote> editorRequestsCurrentlyPlayingNotes() override;
   const vital::StatusOutput* editorRequestsStatusOutput(std::string name) override;
   // *********************************************************
