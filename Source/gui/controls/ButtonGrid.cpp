@@ -28,7 +28,7 @@ void ButtonGrid::resized() {
   }
 }
 
-void ButtonGrid::setModel(std::vector<std::vector<std::string>> models) {
+void ButtonGrid::setModel(Array<StringArray> models) {
   listBoxModels.clear();
   listBoxes.clear();
 

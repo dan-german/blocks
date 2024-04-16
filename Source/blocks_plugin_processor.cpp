@@ -706,9 +706,9 @@ Preset PluginProcessor::getStateRepresentation() {
   return current_state;
 }
 
-std::vector<std::string> PluginProcessor::editorRequestsPresetNames() {
-  std::vector<std::string> result;
-  for (auto preset : preset_manager_.presets) result.push_back(preset.name);
+StringArray PluginProcessor::editorRequestsPresetNames() {
+  StringArray result;
+  for (auto preset : preset_manager_.presets) result.add(preset.name);
   return result;
 }
 

@@ -9,7 +9,7 @@ int ButtonGridPopup::calculateHeight(int itemCount) {
   return itemCount * itemHeight + borderSize * 2;
 }
 
-void ButtonGridPopup::setModel(std::vector<std::vector<std::string>> stringArrays) {
+void ButtonGridPopup::setModel(Array<StringArray> stringArrays) {
   setBackgroundColour(ThemeManager::shared()->getCurrent().background.brighter(0.3f));
   menu.setModel(stringArrays);
 }

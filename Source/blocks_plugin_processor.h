@@ -121,7 +121,7 @@ public:
 
   std::pair<float, float> editorRequestsModulatorValue(Index moduleIndex, int parameterIndex, int modulatorIndex) override;
   std::pair<float, float> editorRequestsModulatorValue(int modulationConnectionIndex) override;
-  std::vector<std::string> editorRequestsPresetNames() override;
+  StringArray editorRequestsPresetNames() override;
   juce::Array<juce::MPENote> editorRequestsCurrentlyPlayingNotes() override;
   const vital::StatusOutput* editorRequestsStatusOutput(std::string name) override;
   // *********************************************************
