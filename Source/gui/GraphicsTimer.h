@@ -24,7 +24,7 @@ private:
   juce::Time lastUpdateTime;
   void timerCallback() override;
   int getMillisecondsSinceLastUpdate() const noexcept;
-  int fps = 120;
+  int fps = 60;
 protected:
   virtual void update(const float secondsSinceLastUpdate) {};
 };

@@ -340,6 +340,8 @@ LineGenerator* SynthBase::getLfoSource(int index) {
 
 json SynthBase::saveToJson() {
   // return LoadSave::stateToJson(this, getCriticalSection());
+  json j;
+  return j;
 }
 
 int SynthBase::getSampleRate() {

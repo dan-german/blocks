@@ -346,8 +346,9 @@ void PluginProcessor::editorAdjustedBlock(Index index, int parameter, float valu
     }
   }
 
-  if (block->id.type == "delay" || block->id.type == "phaser" || block->id.type == "chorus") {
-    if (parameter == 3) {
+  bool is_changing_delay_tempo = block->id.type == "delay" && parameter == 4;
+  bool is_changing_mod_tempo = (block->id.type == "phaser" || block->id.type == "chorus" || block->id.type == "flanger") && parameter == 3;
+  if (is_changing_delay_tempo || is_changing_mod_tempo) {
       auto sync = block->parameter_map_["sync"]->value_processor->value();
       bool is_changing_seconds = block->parameter_map_["sync"]->value_processor->value() == 0.0f;
       if (is_changing_seconds) {
@@ -356,7 +357,6 @@ void PluginProcessor::editorAdjustedBlock(Index index, int parameter, float valu
         block->parameter_map_["tempo"]->value_processor->set(value);
       }
       return;
-    }
   }
 
   block->parameters_[parameter]->set(value);

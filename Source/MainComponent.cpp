@@ -328,6 +328,7 @@ void MainComponent::handlePastePopup(const juce::MouseEvent& event) {
       for (auto block : new_blocks) {
         spawnBlockComponent(block);
       }
+      ui_layer_.setConnections(delegate->getModulations());
     }
   });
 }
@@ -751,15 +752,15 @@ void MainComponent::modulatorIsDragging(ModulatorComponent* modulatorComponent, 
 
     auto target = getFocusedModule();
 
-    // if (target->parameters[sliderIndexUnderMouse]->isModulatable) {
-    auto slider = inspector_.getSliders()[sliderIndexUnderMouse];
-    slider->setHighlighted(true, modulatorComponent->getColour());
-    // }
-  // } else {
-    // if (previousSliderUnderMouse.has_value()) {
-    //   inspector.getSliders()[*previousSliderUnderMouse]->setHighlighted(false);
-    //   previousSliderUnderMouse = {};
-    // }
+    if (target->parameters_[sliderIndexUnderMouse]->modulatable) {
+      auto slider = inspector_.getSliders()[sliderIndexUnderMouse];
+      slider->setHighlighted(true, modulatorComponent->getColour());
+    }
+    // } else {
+      // if (previousSliderUnderMouse.has_value()) {
+      //   inspector.getSliders()[*previousSliderUnderMouse]->setHighlighted(false);
+      //   previousSliderUnderMouse = {};
+      // }
   }
 }
 
@@ -791,8 +792,9 @@ void MainComponent::modulatorEndedDrag(ModulatorComponent* modulator_component, 
     auto focused_module = getFocusedModule();
     if (focused_module == nullptr) return;
 
-    // auto isModulatable = focusedModule->parameters[parameterIndex]->isModulatable;
-    // if (!isModulatable) return;
+    auto is_modulatable = focused_module->parameters_[parameter_index]->modulatable;
+    if (!is_modulatable) return;
+
     auto parameter_name = focused_module->getParameterName(parameter_index);
     delegate->editorConnectedModulation(modulator_component->row, focused_module->name, parameter_name);
     ui_layer_.setConnections(delegate->getModulations());
@@ -960,7 +962,8 @@ void MainComponent::showCopyDeletePopup(const juce::MouseEvent& event, GridItemC
     toggleGridItemSelection(&block_grid_, item, true);
   }
 
-  copy_delete_popup_.setModel({ { "copy", "delete" } });
+  StringArray model { "copy", "delete" };
+  copy_delete_popup_.setModel(model);
   auto this_relative_event = event.getEventRelativeTo(this);
   copy_delete_popup_.setBounds(this_relative_event.getPosition().getX(), this_relative_event.getPosition().getY(), 56, 62);
   showPopup(copy_delete_popup_, [this, item](Index i) {

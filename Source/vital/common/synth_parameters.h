@@ -57,6 +57,7 @@ struct ValueDetails {
   mono_float value;
   int decimal_places = 2;
   bool hidden = false;
+  bool modulatable = true;
   void set(mono_float value) { 
     this->value = value;
     this->value_processor->set(value);
