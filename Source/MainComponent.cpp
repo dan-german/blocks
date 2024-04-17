@@ -45,6 +45,7 @@ MainComponent::MainComponent(juce::MidiKeyboardState& keyboard_state, Delegate* 
 
 void MainComponent::updateDotPosition(const Point<int> position) {
   cursor.setBounds(position.getX(), position.getY(), cursor.size, cursor.size);
+  repaint();
 }
 
 void MainComponent::modulatorStartedAdjusting(ModulatorComponent* modulatorComponent, int index) {
@@ -576,11 +577,11 @@ void MainComponent::mouseDrag(const MouseEvent& event) {
 
   block_grid_.add_button_.setAlpha(0);
   if (event.mods.isLeftButtonDown()) {
-    handleSelectionRect(event);
+    resizeSelectionRect(event);
   }
 }
 
-void MainComponent::handleSelectionRect(const juce::MouseEvent& event) {
+void MainComponent::resizeSelectionRect(const juce::MouseEvent& event) {
   if (focused_grid_item_) {
     toggleGridItemSelection(&block_grid_, focused_grid_item_, false);
   }
@@ -588,6 +589,7 @@ void MainComponent::handleSelectionRect(const juce::MouseEvent& event) {
   auto relative_event = event.getEventRelativeTo(this);
   auto area = Rectangle<int>(relative_event.getMouseDownPosition(), relative_event.getPosition());
   selection_rect_.setBounds(area);
+  repaint();
 
   auto new_selected_items = block_grid_.getItemsInRectangle(area);
 
@@ -635,6 +637,7 @@ void MainComponent::updateInspectorModulationIndicators() {
 
 void MainComponent::clear() {
   copied_blocks_ = {};
+  currently_selected_items_ = {};
   focused_grid_item_ = nullptr;
   inspector_.setVisible(false);
 
@@ -920,6 +923,8 @@ void MainComponent::gridItemLengthChanged(GridComponent* grid, GridItemComponent
 void MainComponent::gridItemHovered(GridComponent* grid, GridItemComponent* item, Index index) {
   if (grid == &tab_grid_) {
     block_grid_.highlightColumn(index.column, index.column + item->length);
+  } else { 
+    repaint();
   }
 }
 

@@ -98,7 +98,7 @@ private:
   void resetDownFlowingDots();
   void copy();
 
-  void handleSelectionRect(const juce::MouseEvent& event);
+  void resizeSelectionRect(const juce::MouseEvent& event);
   void toggleGridItemSelection(GridComponent* grid, GridItemComponent* item, bool selected);
   void showBlocksPopup(Index index);
   std::vector<Component*> allPopups();
