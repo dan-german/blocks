@@ -3,7 +3,8 @@
 #include "gui/BoxSliderLooksAndFeel.h"
 #include <juce_gui_basics/juce_gui_basics.h>
 #include "gui/ThemeListener.h"
-
+#include "gui/ValueAnimator.h"
+#include "gui/HighlightComponent.h"
 using namespace juce;
 
 class BoxSlider: public juce::Component, juce::Slider::Listener, ThemeListener {
@@ -22,7 +23,12 @@ public:
   Slider slider;
   Label valueLabel;
   float default_value_ = 0.0f;
+  void paint(juce::Graphics& g) override; 
+  void highlight(bool shouldHighlight, Colour color);
+  bool modulatable = true;
 private:
+  ValueAnimator animator_;
+  DrawablePath drawable_path_;
   void mouseDown(const MouseEvent& event) override;
   BoxSliderLooksAndFeel lnf;
   void setupLabel();

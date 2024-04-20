@@ -97,6 +97,7 @@ private:
   void setupDarkBackground(DarkBackground* component, int layer);
   void resetDownFlowingDots();
   void copy();
+  void highlightModulatableSliders(bool highlight, Colour color);
 
   void resizeSelectionRect(const juce::MouseEvent& event);
   void toggleGridItemSelection(GridComponent* grid, GridItemComponent* item, bool selected);

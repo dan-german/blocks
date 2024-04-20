@@ -21,7 +21,6 @@ public:
 
   Colour colour;
   BaseButton();
-
 protected:
   void mouseEnter(const juce::MouseEvent& event) override;
   void mouseExit(const juce::MouseEvent& event) override;

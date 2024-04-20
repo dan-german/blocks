@@ -1,5 +1,4 @@
 #include "gui/base/BaseButton.h"
-
 #include "gui/ThemeManager.h"
 
 BaseButton::BaseButton() {

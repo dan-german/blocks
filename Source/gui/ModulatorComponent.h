@@ -23,10 +23,10 @@ private:
   Component modulatorDragComponent;
   Component slidersContainer;
   Rectangle<int> bounds;
-  const int sliderHeight = 19;
+  const int sliderHeight = 23;
   const int dragIndicatorHeight = 21;
   const int dragIndicatorBottomSpacing = 6;
-  const int sliderSpacing = 6;
+  const int sliderSpacing = 2;
   const int columns = 2;
   const int topSpacing = 16;
   const int sliderHorizontalSpacing = 3;
@@ -76,6 +76,12 @@ public:
   void drawBottomLine(Graphics& g) const;
   void resizeEnvelopePath();
   void themeChanged(Theme theme) override;
+
+  void highlightSliders(bool shouldHighlight, Colour color) { 
+    for (auto slider : sliders) {
+      slider->box_slider_.highlight(shouldHighlight, color);
+    }
+  };
 };
 
 struct ModulatorComponent::Listener {

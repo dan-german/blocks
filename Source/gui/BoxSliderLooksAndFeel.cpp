@@ -25,11 +25,13 @@ void BoxSliderLooksAndFeel::drawLinearSlider(juce::Graphics& g,
   juce::Slider& slider)
 {
   g.setColour(ThemeManager::shared()->getCurrent().one);
-  const float cornerRadius = 4.5f;
+  const float corner_radius = height / 4.5f;
+  auto bounds = slider.getBounds();
+  bounds.reduce(2, 2);
   Path clipArea;
-  clipArea.addRoundedRectangle(slider.getBounds().toFloat(), cornerRadius);
+  clipArea.addRoundedRectangle(bounds.toFloat(), corner_radius);
   g.reduceClipRegion(clipArea);
-  g.fillRoundedRectangle(slider.getBounds().toFloat(), cornerRadius);
+  g.fillRoundedRectangle(bounds.toFloat(), corner_radius);
 
   g.setColour(slider.findColour(Slider::trackColourId));
   if (slider.getProperties()["isCenter"].equals(true)) {
@@ -47,7 +49,6 @@ void BoxSliderLooksAndFeel::drawCenter(juce::Graphics& g, float sliderPos, int x
     g.fillRect(sliderPos, 0.0f, (float)x + (float)width * 0.5f - sliderPos, (float)slider.getHeight()); 
   }
 }
-
 
 void BoxSliderLooksAndFeel::drawNormal(juce::Graphics& g, juce::Slider& slider, float sliderPos) {
   g.fillRect(0.0f, 0.0f, sliderPos, (float)slider.getHeight());

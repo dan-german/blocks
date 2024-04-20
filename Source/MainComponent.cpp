@@ -236,7 +236,7 @@ void MainComponent::resized() {
 }
 
 void MainComponent::resizeColumnControls() {
-  auto bounds = block_grid_.getBounds().withHeight(38).withY(block_grid_.getY() + block_grid_.getHeight() + 19);
+  auto bounds = block_grid_.getBounds().withHeight(42).withY(block_grid_.getY() + block_grid_.getHeight() + 19);
   column_controls_.setBounds(bounds);
 }
 
@@ -545,10 +545,18 @@ void MainComponent::spawnBlockComponent(std::shared_ptr<model::Block> block) {
 //   tabComponent->toFront(false);
 //   tab_grid_.addItem(tabComponent, { 0, tab->column }, true);
 //   if (tab->length > 1) tab_grid_.setItemLength(tabComponent, tab->length);
-
 //   for (auto glowIndicator : tab_grid_.glowIndicators)
 //     glowIndicator->toFront(false);
 // }
+
+void MainComponent::highlightModulatableSliders(bool highlight, Colour color = Colours::red) {
+  auto modulators = delegate->getModulators2();
+  for (int i = 0; i < modulators.size(); i++) {
+    if (auto mc = dynamic_cast<ModulatorComponent*>(ui_layer_.modulators_.listBox.getComponentForRowNumber(i))) {
+      mc->highlightSliders(highlight, color);
+    }
+  }
+}
 
 void MainComponent::graphicsTimerCallback(const float secondsSincelastUpdate) {
   if (ui_layer_.connections.isVisible()) {
@@ -812,6 +820,7 @@ void MainComponent::exitModulatorDragMode() {
   setMouseCursor(MouseCursor::NormalCursor);
   dark_background_.setVisible(false);
   cursor.setVisible(false);
+  highlightModulatableSliders(false);
 }
 
 void MainComponent::presentModulationOptionsMenu(int modulatorIndex, Index& indexUnderMouse, BlockComponent* block) {
@@ -835,6 +844,8 @@ void MainComponent::enterModulatorDragMode(Colour colour) {
   inspector_.setAlwaysOnTop(true);
   cursor.setAlwaysOnTop(true);
   modulator_drag_mode_ = true;
+  highlightModulatableSliders(true, colour);
+  // ui_layer_.modulators_.mode
 }
 
 void MainComponent::modulatorRemoved(ModulatorComponent* component) {
@@ -923,7 +934,7 @@ void MainComponent::gridItemLengthChanged(GridComponent* grid, GridItemComponent
 void MainComponent::gridItemHovered(GridComponent* grid, GridItemComponent* item, Index index) {
   if (grid == &tab_grid_) {
     block_grid_.highlightColumn(index.column, index.column + item->length);
-  } else { 
+  } else {
     repaint();
   }
 }

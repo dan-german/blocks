@@ -43,9 +43,10 @@ std::unique_ptr<BoxSlider> ColumnControlsContainer::createSlider(std::string tit
 
 void ColumnControlsContainer::resized() {
   auto config = GridConfigs::blocks;
-  int vertical_margin = 6;
+  int vertical_margin = 2;
   auto slider_height = getHeight() / 2 - vertical_margin / 2;
-  auto slider_width = config.itemWidth / 1.085f;
+  auto slider_width = config.itemWidth / 1.045f;
+  // auto slider_width = config.itemWidth;
   for (int i = 0; i < Constants::columns; i++) {
     auto x = GridComponent::xForColumn(i, config);
     auto bounds = Rectangle<int>(x, 0, slider_width, slider_height);
