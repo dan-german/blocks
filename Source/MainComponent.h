@@ -64,6 +64,8 @@ private:
   SelectionRect selection_rect_;
   std::vector<model::Block> copied_blocks_;
   std::vector<GridItemComponent*> currently_selected_items_;
+  BoxSlider slider;
+  bool is_modulator_adjusting_ = false;
 
   Array<BlockComponent*> blocks;
   GridItemComponent* focused_grid_item_ = nullptr;
@@ -149,8 +151,8 @@ private:
   void modulatorEndedDrag(ModulatorComponent* modulatorComponent, const MouseEvent& event) override;
   void modulatorIsDragging(ModulatorComponent* modulatorComponent, const MouseEvent& event) override;
   void modulatorStartedDrag(ModulatorComponent* component, const MouseEvent& event) override;
-  void modulatorStartedAdjusting(ModulatorComponent* modulatorComponent, int index) override;
-  void modulatorEndedAdjusting(ModulatorComponent* modulatorComponent, int index) override;
+  // void modulatorStartedAdjusting(ModulatorComponent* modulatorComponent, int index) override;
+  // void modulatorEndedAdjusting(ModulatorComponent* modulatorComponent, int index) override;
   void modulatorIsAdjusting(ModulatorComponent* component, std::string parameter_name, float value) override;
   void modulatorGestureChanged(ModulatorComponent* modulatorComponent, std::string parameter_name, bool started) override;
 

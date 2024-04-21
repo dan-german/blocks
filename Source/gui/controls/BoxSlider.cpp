@@ -11,6 +11,7 @@ BoxSlider::~BoxSlider() {
 }
 
 BoxSlider::BoxSlider() {
+  setName("BoxSlider");
   addChildComponent(drawable_path_);
   slider.setLookAndFeel(&lnf);
   slider.setTextBoxStyle(Slider::NoTextBox, false, 0, 0);
@@ -56,6 +57,7 @@ void BoxSlider::setupLabel() {
   valueLabel.setInterceptsMouseClicks(false, false);
   valueLabel.setColour(Label::ColourIds::textColourId, Colour(200, 200, 200));
   valueLabel.setFont(Font(13));
+  valueLabel.setName("asdf");
 }
 
 void BoxSlider::themeChanged(Theme theme) {

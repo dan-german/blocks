@@ -21,6 +21,7 @@ MainComponent::MainComponent(juce::MidiKeyboardState& keyboard_state, Delegate* 
   setupListeners();
   addAndMakeVisible(block_placeholder_);
   addChildComponent(cursor, 1000);
+  cursor.setInterceptsMouseClicks(false, false);
   setupPresetMenu();
   setupDarkBackground(&grid_dark_background_, 3);
   addChildComponent(ui_layer_.modulators_);
@@ -41,6 +42,10 @@ MainComponent::MainComponent(juce::MidiKeyboardState& keyboard_state, Delegate* 
   };
 
   juce::Thread::launch(req);
+  // slider.setInterceptsMouseClicks(false, false);
+  addAndMakeVisible(slider);
+  slider.setName("slider");
+  slider.addMouseListener(this, true);
 }
 
 void MainComponent::updateDotPosition(const Point<int> position) {
@@ -48,13 +53,15 @@ void MainComponent::updateDotPosition(const Point<int> position) {
   repaint();
 }
 
-void MainComponent::modulatorStartedAdjusting(ModulatorComponent* modulatorComponent, int index) {
+// void MainComponent::modulatorStartedAdjusting(ModulatorComponent* modulatorComponent, int index) {
+//   is_modulator_adjusting_ = true;
   // delegate->editorParameterGestureChanged(delegate->getModulator(modulatorComponent->row)->name, index, true);
-}
+// }
 
-void MainComponent::modulatorEndedAdjusting(ModulatorComponent* modulatorComponent, int index) {
+// void MainComponent::modulatorEndedAdjusting(ModulatorComponent* modulatorComponent, int index) {
+//   is_modulator_adjusting_ = false;
   // delegate->editorParameterGestureChanged(delegate->getModulator(modulatorComponent->row)->name, index, false);
-}
+// }
 
 void MainComponent::modulatorIsAdjusting(ModulatorComponent* component, std::string parameter_name, float value) {
   delegate->editorAdjustedModulator(parameter_name, component->row, value);
@@ -141,6 +148,7 @@ void MainComponent::setupBlockGrid() {
 void MainComponent::setupUI() {
   // uiLayer.presetButton.setStrings(delegate->editorRequestsPresetNames());
   ui_layer_.connections_list_box_model_.delegate_ = this;
+  ui_layer_.modulators_.addMouseListener(this, true);
   // ui_layer_.modulators_.addMouseListener(this, true);
   addAndMakeVisible(ui_layer_, 2);
 }
@@ -233,6 +241,7 @@ void MainComponent::resized() {
     bounds.removeFromTop(20);
     glowIndicator->setBounds(bounds);
   }
+  slider.setBounds(block_grid_.getBounds().withY(block_grid_.getY() + block_grid_.getHeight() + 100).withHeight(20).withWidth(40));
 }
 
 void MainComponent::resizeColumnControls() {
@@ -247,11 +256,25 @@ void MainComponent::resizeTabContainer() {
 }
 
 void MainComponent::mouseDown(const MouseEvent& event) {
+  auto relative_event = event.getEventRelativeTo(this);
+  // auto detectedComponent = getComponentAt(relative_event.getPosition());
+  // printf("x: %d, y: %d\n", relative_event.getPosition().getX(), relative_event.getPosition().getY());
+  // if (detectedComponent != nullptr) {
+  //   printf("Component at point: %s\n", detectedComponent->getName().toStdString().c_str());
+  // } else {
+  //   printf("No component at point\n");
+  // }
   if (auto* module = dynamic_cast<GridComponent*>(event.eventComponent))
     return;
 }
 
 void MainComponent::mouseUp(const MouseEvent& event) {
+    if (modulator_drag_mode_) {
+    previous_slider_under_mouse_ = {};
+    modulator_drag_mode_ = false;
+    return;
+  }
+
   selection_rect_.setBounds(Rectangle<int>());
   auto grid_relative_position = event.getEventRelativeTo(&block_grid_).getPosition();
   bool is_mouse_on_block_grid = block_grid_.contains(grid_relative_position);
@@ -260,7 +283,6 @@ void MainComponent::mouseUp(const MouseEvent& event) {
     if (currently_selected_items_.size() == 1) {
       toggleGridItemSelection(&block_grid_, currently_selected_items_[0], true);
     } else if (is_mouse_on_block_grid) {
-
       block_grid_.add_button_.setAlpha(1);
     }
     return;
@@ -277,12 +299,6 @@ void MainComponent::mouseUp(const MouseEvent& event) {
 
   setMouseCursor(MouseCursor::NormalCursor);
   for (auto popup : allPopups()) { popup->setVisible(false); }
-
-  if (modulator_drag_mode_) {
-    previous_slider_under_mouse_ = {};
-    modulator_drag_mode_ = false;
-    return;
-  }
 
   auto componentName = event.eventComponent->getName();
 
@@ -579,9 +595,7 @@ void MainComponent::updateConnectionIndicators() {
 }
 
 void MainComponent::mouseDrag(const MouseEvent& event) {
-  // auto relative_position = event.getEventRelativeTo(&inspector_).getPosition();
-  // bool is_mouse_on_inspector = inspector_.contains(relative_position);
-  if (is_adjusting_inspector_) return;
+  if (is_adjusting_inspector_ || modulator_drag_mode_ || is_modulator_adjusting_) return;
 
   block_grid_.add_button_.setAlpha(0);
   if (event.mods.isLeftButtonDown()) {
@@ -745,33 +759,74 @@ void MainComponent::loadState(Preset preset) {
 }
 
 void MainComponent::modulatorIsDragging(ModulatorComponent* modulatorComponent, const MouseEvent& event) {
+
+  auto relative_event = event.getEventRelativeTo(this);
+  auto component_under_mouse = getComponentAt(relative_event.getPosition());
+  if (component_under_mouse != nullptr) {
+    auto parent = component_under_mouse->getParentComponent()->getName().toStdString();
+    printf("Component at point: %s parent: %s\n", component_under_mouse->getName().toStdString().c_str(), parent.c_str());
+  } else {
+    printf("No component at point\n");
+  }
+
   updateDotPosition(event.getEventRelativeTo(this).getPosition());
 
-  if (!inspector_.isVisible()) return;
+  if (inspector_.isVisible()) {
+    auto relativePosition = event.getEventRelativeTo(&inspector_).getPosition();
+    bool draggingInsideInspector = inspector_.contains(relativePosition);
 
-  auto relativePosition = event.getEventRelativeTo(&inspector_).getPosition();
-  bool draggingInsideInspector = inspector_.contains(relativePosition);
+    if (draggingInsideInspector) {
+      int sliderIndexUnderMouse = (int)ceilf(relativePosition.getX() / inspector_.sliderWidth);
+      if (sliderIndexUnderMouse == previous_slider_under_mouse_) return;
 
-  if (draggingInsideInspector) {
-    int sliderIndexUnderMouse = (int)ceilf(relativePosition.getX() / inspector_.sliderWidth);
-    if (sliderIndexUnderMouse == previous_slider_under_mouse_) return;
+      if (previous_slider_under_mouse_.has_value())
+        inspector_.getSliders()[*previous_slider_under_mouse_]->setHighlighted(false);
 
-    if (previous_slider_under_mouse_.has_value())
-      inspector_.getSliders()[*previous_slider_under_mouse_]->setHighlighted(false);
+      previous_slider_under_mouse_ = sliderIndexUnderMouse;
 
-    previous_slider_under_mouse_ = sliderIndexUnderMouse;
+      auto target = getFocusedModule();
 
-    auto target = getFocusedModule();
-
-    if (target->parameters_[sliderIndexUnderMouse]->modulatable) {
-      auto slider = inspector_.getSliders()[sliderIndexUnderMouse];
-      slider->setHighlighted(true, modulatorComponent->getColour());
+      if (target->parameters_[sliderIndexUnderMouse]->modulatable) {
+        auto slider = inspector_.getSliders()[sliderIndexUnderMouse];
+        slider->setHighlighted(true, modulatorComponent->getColour());
+      }
+      // } else {
+        // if (previousSliderUnderMouse.has_value()) {
+        //   inspector.getSliders()[*previousSliderUnderMouse]->setHighlighted(false);
+        //   previousSliderUnderMouse = {};
+        // }
     }
-    // } else {
-      // if (previousSliderUnderMouse.has_value()) {
-      //   inspector.getSliders()[*previousSliderUnderMouse]->setHighlighted(false);
-      //   previousSliderUnderMouse = {};
+  }
+
+  auto pos = event.getEventRelativeTo(&ui_layer_.modulators_.listBox).getPosition();
+
+  // std::cout << "x: " << pos.getX() << " y: " << pos.getY() << std::endl;
+  // auto component_under_mouse = getComponentAt
+
+  bool dragging_inside_modulators = ui_layer_.modulators_.listBox.contains(pos);
+  if (dragging_inside_modulators) {
+    if (ui_layer_.modulators_.modulators_list_model_.getNumRows() == 0) return;
+    int itemHeight = ui_layer_.modulators_.listBox.getRowHeight();
+    int index = (int)ceilf(pos.getY() / itemHeight);
+    if (auto modulator_at_index = dynamic_cast<ModulatorComponent*>(ui_layer_.modulators_.listBox.getComponentForRowNumber(index))) {
+      auto component_under_mouse = modulator_at_index->getComponentAt(pos);
+      // std::cout << "component under mouse: " << component_under_mouse << std::endl;
+      if (auto slider = dynamic_cast<BoxSlider*>(component_under_mouse)) {
+        std::cout << "slider name: " << slider << std::endl;
+        // auto parameter_name = modulator_at_index->getParameterName(slider->getName().getIntValue());
+        // modulatorIsAdjusting(modulatorComponent, parameter_name, slider->getValue());
+      }
+      // auto 
+      // std::cout << "sup" << std::endl;
+      // modulator_at_index->sliders
+      // auto relative_pos = event.getEventRelativeTo(modulator_at_index).getPosition();
+      // auto slider_at_pos = modulator_at_index->getComponentAt(relative_pos);
+      // if (auto slider = dynamic_cast<LabeledSlider*>(slider_at_pos)) {
+      //   std::cout << "slider name: " << slider->label.getText() << std::endl;
+        // auto parameter_name = modulator_at_index->getParameterName(slider->getName().getIntValue());
+        // modulatorIsAdjusting(modulatorComponent, parameter_name, slider->getValue());
       // }
+    }
   }
 }
 
@@ -1062,6 +1117,7 @@ void MainComponent::columnControlEndedAdjusting(ColumnControlsContainer::Control
 }
 
 void MainComponent::modulatorGestureChanged(ModulatorComponent* modulatorComponent, std::string parameter_name, bool started) {
+  is_modulator_adjusting_ = started;
   auto modulator = delegate->getModulator2(modulatorComponent->row);
   delegate->editorParameterGestureChanged(modulator->name, parameter_name, started);
 }

@@ -89,8 +89,6 @@ struct ModulatorComponent::Listener {
   virtual void modulatorEndedDrag(ModulatorComponent* modulatorComponent, const MouseEvent& event) = 0;
   virtual void modulatorIsDragging(ModulatorComponent* modulatorComponent, const MouseEvent& event) = 0;
   virtual void modulatorStartedDrag(ModulatorComponent* modulatorComponent, const MouseEvent& event) = 0;
-  virtual void modulatorStartedAdjusting(ModulatorComponent* modulatorComponent, int index) = 0;
-  virtual void modulatorEndedAdjusting(ModulatorComponent* modulatorComponent, int index) = 0;
   virtual void modulatorIsAdjusting(ModulatorComponent* modulatorComponent, std::string parameter_name, float value) = 0;
   virtual void modulatorRemoved(ModulatorComponent* modulatorComponent) = 0;
   virtual void modulatorGestureChanged(ModulatorComponent* modulatorComponent, std::string paramter_name, bool started) = 0;

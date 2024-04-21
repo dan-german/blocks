@@ -11,6 +11,7 @@
 #include "gui/controls/LabeledSlider.h"
 
 LabeledSlider::LabeledSlider() {
+  setName("LabeledSlider");
   addAndMakeVisible(label);
   addAndMakeVisible(box_slider_);
   label.setText("attack", dontSendNotification);
