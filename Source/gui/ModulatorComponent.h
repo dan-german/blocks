@@ -79,7 +79,7 @@ public:
 
   void highlightSliders(bool shouldHighlight, Colour color) { 
     for (auto slider : sliders) {
-      slider->box_slider_.highlight(shouldHighlight, color);
+      slider->box_slider_.setIndicationHighlight(shouldHighlight, color);
     }
   };
 };

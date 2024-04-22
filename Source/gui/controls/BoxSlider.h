@@ -4,6 +4,7 @@
 #include <juce_gui_basics/juce_gui_basics.h>
 #include "gui/ThemeListener.h"
 #include "gui/ValueAnimator.h"
+#include "gui/EasingAnimator.h"
 #include "gui/HighlightComponent.h"
 #include "model/id.h"
 using namespace juce;
@@ -13,6 +14,7 @@ public:
   enum Type { tString, tFloat };
 
   BoxSlider();
+  void setupIndicationAnimator();
   ~BoxSlider() override;
 
   void themeChanged(Theme theme) override;
@@ -25,14 +27,19 @@ public:
   Label valueLabel;
   float default_value_ = 0.0f;
   void paint(juce::Graphics& g) override; 
-  void highlight(bool shouldHighlight, Colour color);
+  void setIndicationHighlight(bool shouldHighlight, Colour color);
   bool modulatable = true;
   ID module_id_;
   std::string parameter_name_;
 private:
-  ValueAnimator animator_;
-  DrawablePath drawable_path_;
+  ValueAnimator value_animator_;
+  DrawablePath modulation_indication_highlight_;
+  DrawableRectangle modulation_selection_highlight_;
+  EasingAnimator easing_animator_;
+
   void mouseDown(const MouseEvent& event) override;
+  void mouseEnter(const MouseEvent& event) override;  
+  void mouseExit(const MouseEvent& event) override;
   BoxSliderLooksAndFeel lnf;
   void setupLabel();
   void sliderValueChanged(Slider* slider) override;

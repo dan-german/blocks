@@ -46,7 +46,6 @@ void ColumnControlsContainer::resized() {
   int vertical_margin = 2;
   auto slider_height = getHeight() / 2 - vertical_margin / 2;
   auto slider_width = config.itemWidth / 1.045f;
-  // auto slider_width = config.itemWidth;
   for (int i = 0; i < Constants::columns; i++) {
     auto x = GridComponent::xForColumn(i, config);
     auto bounds = Rectangle<int>(x, 0, slider_width, slider_height);
@@ -101,4 +100,9 @@ void ColumnControlsContainer::sliderDragEnded(Slider* slider) {
 void ColumnControlsContainer::reset() {
   for (auto& slider : level_sliders_) { slider->slider.setValue(1.0f); }
   for (auto& slider : pan_sliders_) { slider->slider.setValue(0.0f); }
+}
+
+void ColumnControlsContainer::highlight(bool highlight, Colour color) {
+  for (auto& slider : level_sliders_) { slider->setIndicationHighlight(highlight, color); }
+  for (auto& slider : pan_sliders_) { slider->setIndicationHighlight(highlight, color); }
 }

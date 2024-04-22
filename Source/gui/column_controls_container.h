@@ -22,6 +22,7 @@ public:
   std::vector<std::unique_ptr<BoxSlider>> pan_sliders_;
   void resized() override;
   void reset();
+  void highlight(bool highlight, Colour color);
   // Colour colour = Colour(66, 66, 66);
 private:
 

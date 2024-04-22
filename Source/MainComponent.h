@@ -64,7 +64,6 @@ private:
   SelectionRect selection_rect_;
   std::vector<model::Block> copied_blocks_;
   std::vector<GridItemComponent*> currently_selected_items_;
-  BoxSlider slider;
   bool is_modulator_adjusting_ = false;
 
   Array<BlockComponent*> blocks;

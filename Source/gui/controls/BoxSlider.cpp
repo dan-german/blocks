@@ -12,7 +12,10 @@ BoxSlider::~BoxSlider() {
 
 BoxSlider::BoxSlider() {
   setName("BoxSlider");
-  addChildComponent(drawable_path_);
+
+  modulation_indication_highlight_.setFill(juce::FillType(Colour(134, 118, 177)));
+  addChildComponent(modulation_indication_highlight_);
+
   slider.setLookAndFeel(&lnf);
   slider.setTextBoxStyle(Slider::NoTextBox, false, 0, 0);
   addAndMakeVisible(slider);
@@ -23,16 +26,25 @@ BoxSlider::BoxSlider() {
   ThemeManager::shared()->addListener(this);
   themeChanged(ThemeManager::shared()->getCurrent());
 
-  drawable_path_.setFill(juce::FillType(Colour(134, 118, 177)));
-  animator_.waveType = ValueAnimator::WaveType::triangle;
-  animator_.repeating = true;
-  animator_.speed = 1.3f;
-  animator_.valueAnimatorCallback = [this](float value) {
-    auto mapped = juce::jmap(value, 0.0f, 1.0f, 0.2f, 1.0f);
-    drawable_path_.setAlpha(mapped);
+  setupIndicationAnimator();
+
+  // easing_animator_.callback = [this](float value) {
+
+  // };
+
+  modulation_selection_highlight_.setFill(juce::FillType(Colour(255, 222, 161)));
+  addAndMakeVisible(modulation_selection_highlight_);
+}
+
+void BoxSlider::setupIndicationAnimator() {
+  value_animator_.waveType = ValueAnimator::WaveType::triangle;
+  value_animator_.repeating = true;
+  value_animator_.speed = 1.3f;
+  value_animator_.valueAnimatorCallback = [this](float value) {
+    auto mapped = juce::jmap(value, 0.0f, 1.0f, 0.2f, 1.4f);
+    modulation_indication_highlight_.setAlpha(mapped);
     repaint();
   };
-  animator_.start();
 }
 
 void BoxSlider::paint(juce::Graphics& g) {
@@ -44,9 +56,10 @@ void BoxSlider::resized() {
   valueLabel.setBounds(getLocalBounds());
   // highlight.setBounds(getLocalBounds());
   Path p;
-  float corner_radius = getHeight() / 3.5f;
+  float corner_radius = getHeight() / 3.0f;
   p.addRoundedRectangle(getLocalBounds().toFloat(), corner_radius);
-  drawable_path_.setPath(p);
+  modulation_indication_highlight_.setPath(p);
+  modulation_selection_highlight_.setBounds(getBounds());
   // drawh
 }
 
@@ -71,35 +84,35 @@ void BoxSlider::mouseDown(const MouseEvent& event) {
   }
 }
 
-void BoxSlider::highlight(bool shouldHighlight, Colour color) {
+// void BoxSlider::enableModulationSelectionHighlight(bool shouldHighlight) { // tdo : better name
+  // easing_n
+// }
+
+void BoxSlider::setIndicationHighlight(bool shouldHighlight, Colour color) {
   if (!modulatable) return;
-  drawable_path_.setVisible(shouldHighlight);
-  drawable_path_.setFill(juce::FillType(color));
-  animator_.reset();
+  modulation_indication_highlight_.setVisible(shouldHighlight);
+  // drawable_path_.setFill(juce::FillType(Colour(255, 222, 161)));
+  modulation_indication_highlight_.setFill(juce::FillType(Colour(255, 237, 174)));
+  modulation_indication_highlight_.setAlpha(0.2f);
+  value_animator_.reset();
   if (shouldHighlight) {
-    animator_.start();
+    value_animator_.start();
   } else {
-    animator_.stop();
-    // drawable_path_.setAlpha(1.0f);
+    value_animator_.stop();
   }
-  // highlight
-  // highlight.setVisible(shouldHighlight);
 }
 
-// void BaseButton::startSelectedAnimation() {
-//   if (getContent() == nullptr) return;
+void BoxSlider::mouseEnter(const MouseEvent& event) {
+  // setIndicationHighlight(true, Colour(255, 222, 161));
+  auto expanded_bounds = getLocalBounds().expanded(2);
+  std::cout << "expand: " << expanded_bounds.toString().toStdString() << std::endl;
+  setBounds(expanded_bounds);
+}
 
-//   EasingAnimator::AnimateInput input;
-//   input.animation = [this](float value, float progress) { selectedAnimation(value, progress); };
-//   input.completion = [this]() { selectedCompletion(); };
-
-//   float rangeValues[] = { 0.95f, 1.0f };
-//   std::copy(std::begin(rangeValues), std::end(rangeValues), std::begin(input.range));
-
-//   float pointsValues[] = { 0.50f, 0.75f, 0.30f, 1.20f };
-//   std::copy(std::begin(pointsValues), std::end(pointsValues), std::begin(input.points));
-
-//   input.seconds = 0.06f;
-
-//   animator.animate(input);
-
+void BoxSlider::mouseExit(const MouseEvent& event) {
+  auto reduced_bounds = getLocalBounds().reduced(2);
+  std::cout << "expand: " << reduced_bounds.toString().toStdString() << std::endl;
+  setBounds(reduced_bounds);
+  // setIndicationHighlight(false, Colour(255, 222, 161));
+  printf("exit\n");
+}

@@ -42,10 +42,6 @@ MainComponent::MainComponent(juce::MidiKeyboardState& keyboard_state, Delegate* 
   };
 
   juce::Thread::launch(req);
-  // slider.setInterceptsMouseClicks(false, false);
-  addAndMakeVisible(slider);
-  slider.setName("slider");
-  slider.addMouseListener(this, true);
 }
 
 void MainComponent::updateDotPosition(const Point<int> position) {
@@ -241,7 +237,6 @@ void MainComponent::resized() {
     bounds.removeFromTop(20);
     glowIndicator->setBounds(bounds);
   }
-  slider.setBounds(block_grid_.getBounds().withY(block_grid_.getY() + block_grid_.getHeight() + 100).withHeight(20).withWidth(40));
 }
 
 void MainComponent::resizeColumnControls() {
@@ -257,18 +252,14 @@ void MainComponent::resizeTabContainer() {
 
 void MainComponent::mouseDown(const MouseEvent& event) {
   auto relative_event = event.getEventRelativeTo(this);
-  // auto detectedComponent = getComponentAt(relative_event.getPosition());
-  // printf("x: %d, y: %d\n", relative_event.getPosition().getX(), relative_event.getPosition().getY());
-  // if (detectedComponent != nullptr) {
-  //   printf("Component at point: %s\n", detectedComponent->getName().toStdString().c_str());
-  // } else {
-  //   printf("No component at point\n");
-  // }
   if (auto* module = dynamic_cast<GridComponent*>(event.eventComponent))
     return;
 }
 
 void MainComponent::mouseUp(const MouseEvent& event) {
+  auto component_name = event.eventComponent->getName();
+  if (component_name == "ModulatorsPlusButton") return;
+
   if (modulator_drag_mode_) {
     previous_slider_under_mouse_ = {};
     modulator_drag_mode_ = false;
@@ -300,13 +291,7 @@ void MainComponent::mouseUp(const MouseEvent& event) {
   setMouseCursor(MouseCursor::NormalCursor);
   for (auto popup : allPopups()) { popup->setVisible(false); }
 
-  auto componentName = event.eventComponent->getName();
-
-  if (componentName == "ModulatorsPlusButton") {
-    // auto position = event.eventComponent->getPosition() + ui_layer_.modulators_.getPosition();
-    // modulators_popup_.setBounds(position.getX(), position.getY(), 74, 74);
-    // showPopup(modulators_popup_, [this](Index i) { this->clickOnModulatorsPopup(i); });
-  } else if (componentName == "PresetMainButton") {
+  if (component_name == "PresetMainButton") {
     auto componentY = event.eventComponent->getPosition().getY();
     auto point = event.eventComponent->getPosition().withY(componentY + 8);
     showPopup(presets_popup_, [this](Index i) { this->clickOnModulatorsPopup(i); });
@@ -572,6 +557,7 @@ void MainComponent::highlightModulatableSliders(bool highlight, Colour color = C
       mc->highlightSliders(highlight, color);
     }
   }
+  column_controls_.highlight(highlight, color);
 }
 
 void MainComponent::graphicsTimerCallback(const float secondsSincelastUpdate) {
@@ -769,8 +755,10 @@ void MainComponent::modulatorIsDragging(ModulatorComponent* modulatorComponent, 
       return;
     }
     last_hovered_slider_ = component_under_mouse;
+    printf("set glow\n");
     if (auto box_slider = dynamic_cast<BoxSlider*>(component_under_mouse->getParentComponent())) {
-      delegate->editorConnectedModulation(modulatorComponent->row, box_slider->module_id_.getName(), box_slider->parameter_name_);
+      // box_slider->
+      // delegate->editorConnectedModulation(modulatorComponent->row, box_slider->module_id_.getName(), box_slider->parameter_name_);
       // delegate
     }
     auto parent = component_under_mouse->getParentComponent()->getName().toStdString();

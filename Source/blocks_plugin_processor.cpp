@@ -431,8 +431,6 @@ void PluginProcessor::editorRepositionedBlock(Index from, Index to) {
 }
 
 void PluginProcessor::editorConnectedModulation(int modulatorIndex, std::string target_name, std::string parameter) {
-  // if (target_name == "") return;
-
   synth_->connectModulation(modulatorIndex, target_name, parameter);
   // Analytics::shared()->countAction("Modulation Connected");
   // connect(modulatorIndex, targetName, parameter);

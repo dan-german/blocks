@@ -51,6 +51,8 @@ void BoxSliderLooksAndFeel::drawCenter(juce::Graphics& g, float sliderPos, int x
 }
 
 void BoxSliderLooksAndFeel::drawNormal(juce::Graphics& g, juce::Slider& slider, float sliderPos) {
+  // auto position = slider.getBounds().getPosition().toFloat();
+  // g.fillRect(position.getX(), position.getY(), sliderPos, (float)slider.getHeight());
   g.fillRect(0.0f, 0.0f, sliderPos, (float)slider.getHeight());
 }
 
