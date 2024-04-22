@@ -36,8 +36,10 @@ MainComponent::MainComponent(juce::MidiKeyboardState& keyboard_state, Delegate* 
 
   auto req = [this] {
     auto options = juce::URL::InputStreamOptions(juce::URL::ParameterHandling::inAddress);
-    auto version = juce::URL("https://blocksbucket.s3.us-east-2.amazonaws.com/version").createInputStream(options)->readEntireStreamAsString().toStdString();
-    juce::MessageManager::callAsync([this, version] { ui_layer_.update_button_.setVisible(version != BLOCKS_VERSION);});
+    if (auto inputStream = juce::URL("https://blocksbucket.s3.us-east-2.amazonaws.com/version").createInputStream(options); inputStream != nullptr) {
+      const auto version = inputStream->readEntireStreamAsString();
+      juce::MessageManager::callAsync([this, version] { ui_layer_.update_button_.setVisible(version != BLOCKS_VERSION);});
+    }
   };
 
   juce::Thread::launch(req);
