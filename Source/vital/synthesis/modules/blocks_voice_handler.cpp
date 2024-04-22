@@ -89,6 +89,7 @@ void BlocksVoiceHandler::addModulator(std::shared_ptr<model::Module> modulator) 
   processor->setModule(modulator);
   active_modulators_.push_back(processor);
   active_modulators_map_[modulator->name] = processor;
+  active_processor_map_[modulator->name] = processor;
 }
 
 void BlocksVoiceHandler::repositionBlock(Index from, Index to) {
@@ -379,6 +380,7 @@ void BlocksVoiceHandler::removeBlock(Index index, std::shared_ptr<model::Block> 
 
   processor_pool_[block->id.type].push_back(processor);
   processor_matrix_[index.column][index.row] = nullptr;
+  active_processor_map_[block->name] = nullptr;
 }
 
 void BlocksVoiceHandler::addBlock(std::shared_ptr<model::Block> block) {

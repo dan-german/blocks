@@ -269,7 +269,7 @@ void MainComponent::mouseDown(const MouseEvent& event) {
 }
 
 void MainComponent::mouseUp(const MouseEvent& event) {
-    if (modulator_drag_mode_) {
+  if (modulator_drag_mode_) {
     previous_slider_under_mouse_ = {};
     modulator_drag_mode_ = false;
     return;
@@ -759,17 +759,25 @@ void MainComponent::loadState(Preset preset) {
 }
 
 void MainComponent::modulatorIsDragging(ModulatorComponent* modulatorComponent, const MouseEvent& event) {
+  updateDotPosition(event.getEventRelativeTo(this).getPosition());
 
   auto relative_event = event.getEventRelativeTo(this);
   auto component_under_mouse = getComponentAt(relative_event.getPosition());
-  if (component_under_mouse != nullptr) {
+  if (component_under_mouse && component_under_mouse->getName() == "blocks_core_slider") {
+    if (component_under_mouse == last_hovered_slider_) {
+      printf("pls pls return\n");
+      return;
+    }
+    last_hovered_slider_ = component_under_mouse;
+    if (auto box_slider = dynamic_cast<BoxSlider*>(component_under_mouse->getParentComponent())) {
+      delegate->editorConnectedModulation(modulatorComponent->row, box_slider->module_id_.getName(), box_slider->parameter_name_);
+      // delegate
+    }
     auto parent = component_under_mouse->getParentComponent()->getName().toStdString();
-    printf("Component at point: %s parent: %s\n", component_under_mouse->getName().toStdString().c_str(), parent.c_str());
+    // printf("Component at point: %s parent: %s\n", component_under_mouse->getName().toStdString().c_str(), parent.c_str());
   } else {
-    printf("No component at point\n");
+    // printf("No component at point\n");
   }
-
-  updateDotPosition(event.getEventRelativeTo(this).getPosition());
 
   if (inspector_.isVisible()) {
     auto relativePosition = event.getEventRelativeTo(&inspector_).getPosition();
@@ -798,24 +806,24 @@ void MainComponent::modulatorIsDragging(ModulatorComponent* modulatorComponent, 
     }
   }
 
-  auto pos = event.getEventRelativeTo(&ui_layer_.modulators_.listBox).getPosition();
+  // auto pos = event.getEventRelativeTo(&ui_layer_.modulators_.listBox).getPosition();
 
   // std::cout << "x: " << pos.getX() << " y: " << pos.getY() << std::endl;
   // auto component_under_mouse = getComponentAt
 
-  bool dragging_inside_modulators = ui_layer_.modulators_.listBox.contains(pos);
-  if (dragging_inside_modulators) {
-    if (ui_layer_.modulators_.modulators_list_model_.getNumRows() == 0) return;
-    int itemHeight = ui_layer_.modulators_.listBox.getRowHeight();
-    int index = (int)ceilf(pos.getY() / itemHeight);
-    if (auto modulator_at_index = dynamic_cast<ModulatorComponent*>(ui_layer_.modulators_.listBox.getComponentForRowNumber(index))) {
-      auto component_under_mouse = modulator_at_index->getComponentAt(pos);
-      // std::cout << "component under mouse: " << component_under_mouse << std::endl;
-      if (auto slider = dynamic_cast<BoxSlider*>(component_under_mouse)) {
-        std::cout << "slider name: " << slider << std::endl;
+  // bool dragging_inside_modulators = ui_layer_.modulators_.listBox.contains(pos);
+  // if (dragging_inside_modulators) {
+  //   if (ui_layer_.modulators_.modulators_list_model_.getNumRows() == 0) return;
+  //   int itemHeight = ui_layer_.modulators_.listBox.getRowHeight();
+  //   int index = (int)ceilf(pos.getY() / itemHeight);
+  //   if (auto modulator_at_index = dynamic_cast<ModulatorComponent*>(ui_layer_.modulators_.listBox.getComponentForRowNumber(index))) {
+  //     auto component_under_mouse = modulator_at_index->getComponentAt(pos);
+  //     // std::cout << "component under mouse: " << component_under_mouse << std::endl;
+  //     if (auto slider = dynamic_cast<BoxSlider*>(component_under_mouse)) {
+  //       std::cout << "slider name: " << slider << std::endl;
         // auto parameter_name = modulator_at_index->getParameterName(slider->getName().getIntValue());
         // modulatorIsAdjusting(modulatorComponent, parameter_name, slider->getValue());
-      }
+      // }
       // auto 
       // std::cout << "sup" << std::endl;
       // modulator_at_index->sliders
@@ -826,8 +834,8 @@ void MainComponent::modulatorIsDragging(ModulatorComponent* modulatorComponent, 
         // auto parameter_name = modulator_at_index->getParameterName(slider->getName().getIntValue());
         // modulatorIsAdjusting(modulatorComponent, parameter_name, slider->getValue());
       // }
-    }
-  }
+  //   }
+  // }
 }
 
 std::shared_ptr<model::Module> MainComponent::getFocusedModule() {
@@ -876,6 +884,7 @@ void MainComponent::exitModulatorDragMode() {
   dark_background_.setVisible(false);
   cursor.setVisible(false);
   highlightModulatableSliders(false);
+  last_hovered_slider_ = nullptr;
 }
 
 void MainComponent::presentModulationOptionsMenu(int modulatorIndex, Index& indexUnderMouse, BlockComponent* block) {

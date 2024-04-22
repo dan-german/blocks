@@ -747,7 +747,7 @@ Output* SynthModule::createTempoSyncSwitch2(AddControlInput input, Processor* fr
   Output* tempo = nullptr;
   if (poly)
     tempo = createPolyModControl2(input);
-  else 
+  else
     tempo = createMonoModControl2(input);
 
   cr::Value* sync = new cr::Value(1.0f);
@@ -764,12 +764,14 @@ Output* SynthModule::createTempoSyncSwitch2(AddControlInput input, Processor* fr
   if (midi) {
     Output* keytrack_transpose = nullptr;
     Output* keytrack_tune = nullptr;
+    AddControlInput keytrack_transpose_input = { .name = "tempo_keytrack_transpose", .value_scale = ValueDetails::kIndexed , .min = -60.0, .max = 36.0, .default_value = -12.0 };
+    AddControlInput keytrack_tune_input = { .name = "tempo_keytrack_tune", .min = -1.0, .max = 1.0 };  
     if (poly) {
-      keytrack_transpose = createPolyModControl(name + "_keytrack_transpose");
-      keytrack_tune = createPolyModControl(name + "_keytrack_tune");
+      keytrack_transpose = createPolyModControl2(keytrack_transpose_input);
+      keytrack_tune = createPolyModControl2(keytrack_tune_input);
     } else {
-      keytrack_transpose = createMonoModControl(name + "_keytrack_transpose");
-      keytrack_tune = createMonoModControl(name + "_keytrack_tune");
+      keytrack_transpose = createMonoModControl2(keytrack_transpose_input);
+      keytrack_tune = createMonoModControl2(keytrack_tune_input);
     }
 
     tempo_chooser->plug(keytrack_transpose, TempoChooser::kKeytrackTranspose);

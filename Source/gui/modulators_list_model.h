@@ -24,6 +24,8 @@ private:
   void setSliderAsFrequency(std::shared_ptr<model::Module> module, LabeledSlider* slider) const;
   void setSliderAsTempo(std::shared_ptr<model::Module> module, LabeledSlider* slider) const;
 public:
+  // ID module_name_;
+  // string parameter_name_;
   ~ModulatorsListModel() override = default;
   Component* refreshComponentForRow(int rowNumber, bool isRowSelected, Component* existingComponentToUpdate) override;
   Slider::Listener* sliderListener;

@@ -71,6 +71,8 @@ void ModulatorsListModel::setupModulatorComponent(std::shared_ptr<model::Module>
     auto value = parameter->value_processor->value();
     labeled_slider->label.setText(parameter->display_name, dontSendNotification);
     labeled_slider->box_slider_.modulatable = parameter->modulatable;
+    labeled_slider->box_slider_.module_id_ = model->id;
+    labeled_slider->box_slider_.parameter_name_ = parameter->name;
 
     double interval = 0.0;
     if (parameter->value_scale == ValueScale::kLinear) {
@@ -145,7 +147,7 @@ void ModulatorsListModel::onLFOParameterChange(std::shared_ptr<model::Module> mo
 }
 
 void ModulatorsListModel::setSliderAsFrequency(std::shared_ptr<model::Module> module, LabeledSlider* slider) const {
-  slider->label.setText("seconds", dontSendNotification);
+  slider->label.setText("secs", dontSendNotification);
 
   auto frequency_parameter = module->parameter_map_["frequency"];
   slider->box_slider_.slider.textFromValueFunction = [frequency_parameter, module](double value) {

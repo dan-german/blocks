@@ -84,6 +84,8 @@ private:
   ButtonGridPopup presets_popup_;
   ButtonGridPopup copy_delete_popup_;
   ButtonGridPopup paste_popup_;
+  ID last_hovered_slider_id_;
+  Component* last_hovered_slider_; // todo: figure out memory management
   bool multiple_selection_ = false;
   bool is_adjusting_inspector_ = false;
 
@@ -150,6 +152,7 @@ private:
 
   void modulatorEndedDrag(ModulatorComponent* modulatorComponent, const MouseEvent& event) override;
   void modulatorIsDragging(ModulatorComponent* modulatorComponent, const MouseEvent& event) override;
+  // void NewFunction(const juce::MouseEvent& event, bool& retFlag);
   void modulatorStartedDrag(ModulatorComponent* component, const MouseEvent& event) override;
   // void modulatorStartedAdjusting(ModulatorComponent* modulatorComponent, int index) override;
   // void modulatorEndedAdjusting(ModulatorComponent* modulatorComponent, int index) override;

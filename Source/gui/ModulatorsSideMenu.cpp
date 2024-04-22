@@ -16,8 +16,6 @@ ModulatorsSideMenu::~ModulatorsSideMenu() { listBox.setModel(nullptr); }
 void ModulatorsSideMenu::setup() {
   setupAddButton();
   setupListBox();
-  // plus_button.addMouseListener(this, false);
-  // addMouseListener(&button, false);
   button.addMouseListener(this, false); 
 }
 

@@ -821,7 +821,7 @@ void SynthBase::connectModulationFromModel(std::shared_ptr<model::Connection> co
   bool is_env_to_osc_level = connection_model->source->id.type == "envelope" && connection_model->target->id.type == "osc" && connection_model->parameter_name_ == "level";
   std::string parameter_name = is_env_to_osc_level ? "amp env destination" : connection_model->parameter_name_;
 
-    if (is_env_to_osc_level) {
+  if (is_env_to_osc_level) {
     getVoiceHandler()->setDefaultAmpEnvState(connection_model->target->name, false);
   }
 
@@ -838,6 +838,10 @@ std::shared_ptr<model::Connection> SynthBase::createConnectionModel(int modulato
 }
 
 void SynthBase::connectModulation(int modulator_index, std::string target_name, std::string parameter_name) {
+  if (target_name.find("lfo") == 0) {
+    bool is_seconds = module_manager_.getModule(target_name)->parameter_map_["sync"]->value_processor->value() == 0.0f;
+    parameter_name = is_seconds ? "frequency" : "tempo";
+  }
   auto connection_model = createConnectionModel(modulator_index, target_name, parameter_name);
   if (!connection_model) return;
   std::cout << "connecting " << connection_model->source->name << " to " << connection_model->target->name << " " << connection_model->parameter_name_ << std::endl;

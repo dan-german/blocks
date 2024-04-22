@@ -17,7 +17,7 @@ BoxSlider::BoxSlider() {
   slider.setTextBoxStyle(Slider::NoTextBox, false, 0, 0);
   addAndMakeVisible(slider);
   slider.addListener(this);
-  slider.setName("modulatorSlider");
+  slider.setName("blocks_core_slider"); // find a better name
   setupLabel();
   slider.addMouseListener(this, false);
   ThemeManager::shared()->addListener(this);

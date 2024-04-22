@@ -24,6 +24,9 @@ public:
   void resized() override;
   Label label;
   BoxSlider box_slider_;
+  ID model_id_;
+  std::string paramter_name_;
+  // ValueDetails
   void themeChanged(Theme theme) override;
 private:
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(LabeledSlider)

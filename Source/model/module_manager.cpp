@@ -76,13 +76,11 @@ void ModuleManager::repositionBlock(Index oldIndex, Index newIndex) {
 
 std::shared_ptr<Connection> ModuleManager::addConnection(std::shared_ptr<Module> source, std::shared_ptr<Module> target, std::string parameter_name, int number) {
   if (connectionExists(parameter_name, source, target)) return nullptr;
-
   auto connection = pool.getConnection(number);
   connection->parameter_name_ = parameter_name;
   connection->source = source;
   connection->target = target;
   connections.push_back(connection);
-  // target->parameters[parameterIndex]->connections.push_back(connection);
   return connection;
 }
 

@@ -221,7 +221,6 @@ void ModulatorComponent::sliderDragStarted(Slider* slider) {
       currentSliderIndex = i;
       break;
     }
-
   delegate_->modulatorGestureChanged(this, slider_parameter_name_map_[slider], true);
 }
 

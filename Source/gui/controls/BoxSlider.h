@@ -5,6 +5,7 @@
 #include "gui/ThemeListener.h"
 #include "gui/ValueAnimator.h"
 #include "gui/HighlightComponent.h"
+#include "model/id.h"
 using namespace juce;
 
 class BoxSlider: public juce::Component, juce::Slider::Listener, ThemeListener {
@@ -26,6 +27,8 @@ public:
   void paint(juce::Graphics& g) override; 
   void highlight(bool shouldHighlight, Colour color);
   bool modulatable = true;
+  ID module_id_;
+  std::string parameter_name_;
 private:
   ValueAnimator animator_;
   DrawablePath drawable_path_;
