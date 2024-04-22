@@ -4,12 +4,14 @@
 BaseButton::BaseButton() {
   timer.callback = [this](float) { if (orbit) this->updateOrbitEffect(); };
   timer.start();
+  setName("BaseButton");
+  setMouseCursor(MouseCursor::PointingHandCursor);
 }
 
 void BaseButton::mouseEnter(const juce::MouseEvent& event) {
   isMouseHovering = true;
   startSelectedAnimation();
-  setMouseCursor(MouseCursor::PointingHandCursor);
+  // setMouseCursor(MouseCursor::PointingHandCursor);
 }
 
 void BaseButton::mouseUp(const juce::MouseEvent& event) {
@@ -17,13 +19,14 @@ void BaseButton::mouseUp(const juce::MouseEvent& event) {
 }
 
 void BaseButton::mouseExit(const juce::MouseEvent& event) {
+  std::cout << "exit" << std::endl;
   isMouseHovering = false;
   startDeselectedAnimation();
-  setMouseCursor(MouseCursor::NormalCursor);
+  // setMouseCursor(MouseCursor::NormalCursor);
 }
 
 void BaseButton::resized() {
-  getContent()->setBounds(getLocalBounds().reduced(borderSize));
+  getContent()->setBounds(getLocalBounds().reduced(reduction_));
 }
 
 void BaseButton::startSelectedAnimation() {
@@ -94,7 +97,7 @@ void BaseButton::selectedCompletion() {
 }
 
 void BaseButton::deselectedCompletion() {
-  getContent()->setBounds(getLocalBounds().reduced(1));
+  getContent()->setBounds(getLocalBounds().reduced(reduction_));
   setButtonColour(colour.brighter());
 }
 

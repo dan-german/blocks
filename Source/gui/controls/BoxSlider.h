@@ -7,9 +7,11 @@
 #include "gui/EasingAnimator.h"
 #include "gui/HighlightComponent.h"
 #include "model/id.h"
+#include "gui/base/BaseButton.h"
+
 using namespace juce;
 
-class BoxSlider: public juce::Component, juce::Slider::Listener, ThemeListener {
+class BoxSlider: public BaseButton, juce::Slider::Listener, ThemeListener {
 public:
   enum Type { tString, tFloat };
 
@@ -26,19 +28,28 @@ public:
   Slider slider;
   Label valueLabel;
   float default_value_ = 0.0f;
-  void paint(juce::Graphics& g) override; 
   void setIndicationHighlight(bool shouldHighlight, Colour color);
   bool modulatable = true;
   ID module_id_;
   std::string parameter_name_;
+  void setButtonColour(Colour colour) override {};
+  Component slider_parent;
+
+  Component* getContent() override { return &slider_parent; }
+protected:
+  void selectedAnimation(float value, float progress) override;
+  void deselectedAnimation(float value, float progress) override;
+  void selectedCompletion() override;
+  void deselectedCompletion() override;
+  void mouseDown(const MouseEvent& event) override;
 private:
   ValueAnimator value_animator_;
   DrawablePath modulation_indication_highlight_;
   DrawableRectangle modulation_selection_highlight_;
   EasingAnimator easing_animator_;
+  bool is_mouse_inside_ = false;
 
-  void mouseDown(const MouseEvent& event) override;
-  void mouseEnter(const MouseEvent& event) override;  
+  void mouseEnter(const MouseEvent& event) override;
   void mouseExit(const MouseEvent& event) override;
   BoxSliderLooksAndFeel lnf;
   void setupLabel();

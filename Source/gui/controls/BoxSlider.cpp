@@ -18,10 +18,15 @@ BoxSlider::BoxSlider() {
 
   slider.setLookAndFeel(&lnf);
   slider.setTextBoxStyle(Slider::NoTextBox, false, 0, 0);
-  addAndMakeVisible(slider);
+  slider_parent.addAndMakeVisible(slider);
+  slider_parent.setMouseCursor(MouseCursor::PointingHandCursor);
+  slider.setMouseCursor(MouseCursor::PointingHandCursor);
+  slider_parent.setInterceptsMouseClicks(false, true);
   slider.addListener(this);
   slider.setName("blocks_core_slider"); // find a better name
+  addAndMakeVisible(slider_parent);
   setupLabel();
+
   slider.addMouseListener(this, false);
   ThemeManager::shared()->addListener(this);
   themeChanged(ThemeManager::shared()->getCurrent());
@@ -29,7 +34,6 @@ BoxSlider::BoxSlider() {
   setupIndicationAnimator();
 
   // easing_animator_.callback = [this](float value) {
-
   // };
 
   modulation_selection_highlight_.setFill(juce::FillType(Colour(255, 222, 161)));
@@ -47,20 +51,19 @@ void BoxSlider::setupIndicationAnimator() {
   };
 }
 
-void BoxSlider::paint(juce::Graphics& g) {
+// void BoxSlider::paint(juce::Graphics& g) {
   // g.setColour(Colours::red);
-}
+// }
 
 void BoxSlider::resized() {
-  slider.setBounds(getLocalBounds());
+  BaseButton::resized();
+  slider.setBounds(getContent()->getLocalBounds());
   valueLabel.setBounds(getLocalBounds());
-  // highlight.setBounds(getLocalBounds());
   Path p;
   float corner_radius = getHeight() / 3.0f;
   p.addRoundedRectangle(getLocalBounds().toFloat(), corner_radius);
   modulation_indication_highlight_.setPath(p);
   modulation_selection_highlight_.setBounds(getBounds());
-  // drawh
 }
 
 void BoxSlider::setupLabel() {
@@ -70,7 +73,7 @@ void BoxSlider::setupLabel() {
   valueLabel.setInterceptsMouseClicks(false, false);
   valueLabel.setColour(Label::ColourIds::textColourId, Colour(200, 200, 200));
   valueLabel.setFont(Font(13));
-  valueLabel.setName("asdf");
+  // valueLabel.setName("asdf");
 }
 
 void BoxSlider::themeChanged(Theme theme) {
@@ -88,10 +91,29 @@ void BoxSlider::mouseDown(const MouseEvent& event) {
   // easing_n
 // }
 
+void BoxSlider::selectedCompletion() {
+  BaseButton::selectedCompletion();
+  slider.setBounds(getContent()->getLocalBounds());
+}
+
+void BoxSlider::deselectedCompletion() {
+  BaseButton::deselectedCompletion();
+  slider.setBounds(getContent()->getLocalBounds());
+}
+
+void BoxSlider::selectedAnimation(float value, float progress) {
+  BaseButton::selectedAnimation(value, progress);
+  slider.setBounds(getContent()->getLocalBounds());
+}
+
+void BoxSlider::deselectedAnimation(float value, float progress) {
+  BaseButton::deselectedAnimation(value, progress);
+  slider.setBounds(getContent()->getLocalBounds());
+}
+
 void BoxSlider::setIndicationHighlight(bool shouldHighlight, Colour color) {
   if (!modulatable) return;
   modulation_indication_highlight_.setVisible(shouldHighlight);
-  // drawable_path_.setFill(juce::FillType(Colour(255, 222, 161)));
   modulation_indication_highlight_.setFill(juce::FillType(Colour(255, 237, 174)));
   modulation_indication_highlight_.setAlpha(0.2f);
   value_animator_.reset();
@@ -103,16 +125,15 @@ void BoxSlider::setIndicationHighlight(bool shouldHighlight, Colour color) {
 }
 
 void BoxSlider::mouseEnter(const MouseEvent& event) {
-  // setIndicationHighlight(true, Colour(255, 222, 161));
-  auto expanded_bounds = getLocalBounds().expanded(2);
-  std::cout << "expand: " << expanded_bounds.toString().toStdString() << std::endl;
-  setBounds(expanded_bounds);
+  if (is_mouse_inside_) return;
+  
+  is_mouse_inside_ = true;
+  BaseButton::mouseEnter(event);
+  setMouseCursor(MouseCursor::PointingHandCursor);
 }
 
 void BoxSlider::mouseExit(const MouseEvent& event) {
-  auto reduced_bounds = getLocalBounds().reduced(2);
-  std::cout << "expand: " << reduced_bounds.toString().toStdString() << std::endl;
-  setBounds(reduced_bounds);
-  // setIndicationHighlight(false, Colour(255, 222, 161));
-  printf("exit\n");
+  if (contains(event.getPosition())) return;
+  is_mouse_inside_ = false;
+  BaseButton::mouseExit(event);
 }

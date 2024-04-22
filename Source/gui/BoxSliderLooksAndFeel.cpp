@@ -27,7 +27,7 @@ void BoxSliderLooksAndFeel::drawLinearSlider(juce::Graphics& g,
   g.setColour(ThemeManager::shared()->getCurrent().one);
   const float corner_radius = height / 4.5f;
   auto bounds = slider.getBounds();
-  bounds.reduce(2, 2);
+  bounds.reduce(1, 1);
   Path clipArea;
   clipArea.addRoundedRectangle(bounds.toFloat(), corner_radius);
   g.reduceClipRegion(clipArea);
