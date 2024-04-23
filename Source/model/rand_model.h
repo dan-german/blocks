@@ -14,6 +14,14 @@ public:
     add({ .name = "stereo", .value_scale = ValueScale::kIndexed, .string_lookup = strings::kStereo, .modulatable = false });
     add({ .name = "frequency", .min = -7.0, .max = 9.0, .value_scale = ValueScale::kExponential, .display_invert = true, .display_name = "rate", .decimal_places = 3, .hidden = true, .modulatable = false });
   }
+
+  std::string getParameterName(std::string name) override {
+    if (name == "tempo") {
+      bool is_changing_seconds = parameter_map_["sync"]->value_processor->value() == 0.0f;
+      return is_changing_seconds ? "frequency" : "tempo";
+    }
+    return Module::getParameterName(name);
+  };
 };
 }
 

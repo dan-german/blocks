@@ -35,3 +35,5 @@ void LabeledSlider::resized() {
 void LabeledSlider::themeChanged(Theme theme) {
   label.setColour(Label::ColourIds::textColourId, theme.two);
 }
+
+// void 

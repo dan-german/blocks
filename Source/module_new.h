@@ -35,6 +35,7 @@ public:
   }
 
   virtual std::string getParameterName(int index) { return parameters_[index]->name; }
+  virtual std::string getParameterName(std::string name) { return name; }
 
   void add(vital::ValueDetails parameter) {
     parameter.display_name = parameter.display_name != "" ? parameter.display_name : parameter.name;

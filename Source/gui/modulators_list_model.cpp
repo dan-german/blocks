@@ -66,7 +66,7 @@ void ModulatorsListModel::setupModulatorComponent(std::shared_ptr<model::Module>
     auto parameter = model->parameters_[i];
     if (parameter->hidden) continue;
     auto labeled_slider = component.sliders[i];
-    component.slider_parameter_name_map_[&labeled_slider->box_slider_.slider] = parameter->name;
+    component.slider_parameter_name_map_[&labeled_slider->box_slider_.slider_] = parameter->name;
 
     auto value = parameter->value_processor->value();
     labeled_slider->label.setText(parameter->display_name, dontSendNotification);
@@ -76,24 +76,24 @@ void ModulatorsListModel::setupModulatorComponent(std::shared_ptr<model::Module>
 
     double interval = 0.0;
     if (parameter->value_scale == ValueScale::kLinear) {
-      labeled_slider->box_slider_.slider.setNumDecimalPlacesToDisplay(3);
+      labeled_slider->box_slider_.slider_.setNumDecimalPlacesToDisplay(3);
     } else if (parameter->value_scale == ValueScale::kExponential) {
       // slider->boxSlider.slider.setSkewFactor(4, false);
     } else if (parameter->value_scale == ValueScale::kIndexed) {
       interval = 1.0;
-      labeled_slider->box_slider_.slider.setNumDecimalPlacesToDisplay(0);
+      labeled_slider->box_slider_.slider_.setNumDecimalPlacesToDisplay(0);
     }
 
-    labeled_slider->box_slider_.slider.setRange(parameter->min, parameter->max, interval);
+    labeled_slider->box_slider_.slider_.setRange(parameter->min, parameter->max, interval);
 
     if (parameter->string_lookup) {
-      labeled_slider->box_slider_.slider.textFromValueFunction = [parameter](double value) { return juce::String(parameter->string_lookup[(int)value]); };
+      labeled_slider->box_slider_.slider_.textFromValueFunction = [parameter](double value) { return juce::String(parameter->string_lookup[(int)value]); };
     } else {
-      labeled_slider->box_slider_.slider.textFromValueFunction = [parameter](double value) { return UIUtils::getSliderTextFromValue(value, *parameter); };
+      labeled_slider->box_slider_.slider_.textFromValueFunction = [parameter](double value) { return UIUtils::getSliderTextFromValue(value, *parameter); };
     }
 
-    labeled_slider->box_slider_.slider.setValue(value, dontSendNotification);
-    labeled_slider->box_slider_.valueLabel.setText(labeled_slider->box_slider_.slider.getTextFromValue(value), dontSendNotification);
+    labeled_slider->box_slider_.slider_.setValue(value, dontSendNotification);
+    labeled_slider->box_slider_.value_label_.setText(labeled_slider->box_slider_.slider_.getTextFromValue(value), dontSendNotification);
 
     if (model->id.type == "envelope") {
       onEnvelopeParameterChanged(value, model, i, component);
@@ -137,12 +137,12 @@ void ModulatorsListModel::onLFOParameterChange(std::shared_ptr<model::Module> mo
   }
 
   bool is_changing_tempo = index == 1;
-  bool is_not_seconds = int(component.sliders[2]->box_slider_.slider.getValue()) != 0;
+  bool is_not_seconds = int(component.sliders[2]->box_slider_.slider_.getValue()) != 0;
   if (is_changing_tempo && is_not_seconds) {
-    auto value = component.sliders[1]->box_slider_.slider.getValue();
+    auto value = component.sliders[1]->box_slider_.slider_.getValue();
     std::string value_string = std::to_string(value);
     auto integer_part_length = value_string.substr(0, value_string.find(".")).size();
-    component.sliders[1]->box_slider_.slider.setNumDecimalPlacesToDisplay(4 - integer_part_length);
+    component.sliders[1]->box_slider_.slider_.setNumDecimalPlacesToDisplay(4 - integer_part_length);
   }
 }
 
@@ -150,21 +150,21 @@ void ModulatorsListModel::setSliderAsFrequency(std::shared_ptr<model::Module> mo
   slider->label.setText("secs", dontSendNotification);
 
   auto frequency_parameter = module->parameter_map_["frequency"];
-  slider->box_slider_.slider.textFromValueFunction = [frequency_parameter, module](double value) {
+  slider->box_slider_.slider_.textFromValueFunction = [frequency_parameter, module](double value) {
     return UIUtils::getSliderTextFromValue(value, *frequency_parameter);
   };
 
-  slider->box_slider_.slider.setRange(frequency_parameter->min, frequency_parameter->max);
+  slider->box_slider_.slider_.setRange(frequency_parameter->min, frequency_parameter->max);
   auto value = frequency_parameter->value_processor->value();
-  slider->box_slider_.slider.setValue(value, dontSendNotification);
-  slider->box_slider_.valueLabel.setText(slider->box_slider_.slider.getTextFromValue(value), dontSendNotification);
+  slider->box_slider_.slider_.setValue(value, dontSendNotification);
+  slider->box_slider_.value_label_.setText(slider->box_slider_.slider_.getTextFromValue(value), dontSendNotification);
 }
 
 void ModulatorsListModel::setSliderAsTempo(std::shared_ptr<model::Module> module, LabeledSlider* slider) const {
   slider->label.setText("tempo", dontSendNotification);
-  slider->box_slider_.slider.textFromValueFunction = [](double value) { return strings::kSyncedFrequencyNames[int(value)]; };
-  slider->box_slider_.slider.setRange(0.0, 12.0, 1.0);
+  slider->box_slider_.slider_.textFromValueFunction = [](double value) { return strings::kSyncedFrequencyNames[int(value)]; };
+  slider->box_slider_.slider_.setRange(0.0, 12.0, 1.0);
   auto value = module->parameter_map_["tempo"]->value_processor->value();
-  slider->box_slider_.slider.setValue(value, dontSendNotification);
-  slider->box_slider_.valueLabel.setText(slider->box_slider_.slider.getTextFromValue(value), dontSendNotification);
+  slider->box_slider_.slider_.setValue(value, dontSendNotification);
+  slider->box_slider_.value_label_.setText(slider->box_slider_.slider_.getTextFromValue(value), dontSendNotification);
 }

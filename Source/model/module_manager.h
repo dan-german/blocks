@@ -11,7 +11,7 @@ namespace model {
 class ModuleManager {
 private:
   std::shared_ptr<model::Block> blockMatrix[Constants::columns][Constants::rows];
-  std::map<std::string, std::shared_ptr<model::Module>> nameToModuleMap;
+  std::map<std::string, std::shared_ptr<model::Module>> name_module_map_;
   std::vector<std::shared_ptr<model::Connection>> connections;
   std::vector<std::shared_ptr<model::Block>> blocks;
   ColourPool colourPool;
@@ -45,13 +45,14 @@ public:
 
   std::shared_ptr<model::Connection> addConnection(std::shared_ptr<Module> source, std::shared_ptr<Module> target, std::string parameter_name, int number = -1);
   std::shared_ptr<model::Connection> getConnection(int index) { return connections[index]; }
+  std::shared_ptr<model::Connection> getConnection(int modulator_index, std::string target_name, std::string parameter);
   std::vector<std::shared_ptr<model::Connection>> getConnectionsOfSource(std::shared_ptr<Module> source);
   std::vector<std::shared_ptr<model::Connection>> getConnectionsOfTarget(std::shared_ptr<Module> target);
   std::vector<std::shared_ptr<model::Connection>> getConnections();
   void removeConnection(int index);
   void removeConnection(std::shared_ptr<model::Connection> connection);
   bool connectionExists(std::string parameter_name, std::shared_ptr<model::Module> source, std::shared_ptr<model::Module> target);
-  std::shared_ptr<model::Module> getModule(std::string name) { return nameToModuleMap[name]; }
+  std::shared_ptr<model::Module> getModule(std::string name) { return pool.name_module_map_[name]; }
   void clear();
 };
 } // namespace model

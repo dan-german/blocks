@@ -29,17 +29,18 @@ public:
   std::vector<std::shared_ptr<model::ColumnControl>> column_controls_;
   // ModuleContainer<Tab> tabs;
 
+  std::unordered_map<std::string, std::shared_ptr<model::Module>> name_module_map_;
   std::vector<std::shared_ptr<model::Module>> all_modules_;
-  std::vector<std::shared_ptr<model::Module>> parameterToModuleMap;
   std::vector<std::shared_ptr<model::Connection>> connections;
 
   ModulePool();
   ~ModulePool();
 
   // std::shared_ptr<Tab> getTab(std::string code, int number);
-  std::shared_ptr<model::Block> getBlock(std::string code, int number);
-  std::shared_ptr<model::Module> getModulator(std::string code, int number, int colourId);
-  std::shared_ptr<model::Connection> getConnection(int number = -1);
+  std::shared_ptr<model::Block> acquire_block(std::string code, int number);
+  std::shared_ptr<model::Module> acquire_modulator(std::string code, int number, int colourId);
+  std::shared_ptr<model::Connection> aquire_connection(int number = -1);
+  std::shared_ptr<model::Module> get(std::string name) { return name_module_map_[name]; }
 
   void retire(std::shared_ptr<model::Connection> modulationConnection);
   void retire(std::shared_ptr<model::Block> block);

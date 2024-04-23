@@ -19,7 +19,6 @@ void BaseButton::mouseUp(const juce::MouseEvent& event) {
 }
 
 void BaseButton::mouseExit(const juce::MouseEvent& event) {
-  std::cout << "exit" << std::endl;
   isMouseHovering = false;
   startDeselectedAnimation();
   // setMouseCursor(MouseCursor::NormalCursor);
@@ -30,6 +29,7 @@ void BaseButton::resized() {
 }
 
 void BaseButton::startSelectedAnimation() {
+  // printf("startSelectedAnimation\n");
   if (getContent() == nullptr) return;
 
   EasingAnimator::AnimateInput input;

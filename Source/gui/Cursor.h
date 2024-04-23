@@ -20,6 +20,12 @@ public:
   Colour colour;
   void paint(juce::Graphics&) override;
   int size = 9;
+  bool is_selecting_ = false;
+  void setSelectionMode(bool isSelecting) {
+    is_selecting_ = isSelecting;
+    // colour = isSelecting ? Colours::black : Colours::white;
+    repaint();
+  }
 private:
   ValueAnimator valueAnimator;
   float alpha = 1.0f;

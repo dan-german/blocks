@@ -35,8 +35,8 @@ public:
   struct Delegate;
   Delegate* delegate;
   MainComponent(juce::MidiKeyboardState& keyboard_state, Delegate* delegate);
+  void setupColumnControls();
   ~MainComponent() override;
-  void mouseDrag(const MouseEvent& event) override;
 
   BlocksLookAndFeel blocks_laf_;
   UILayer ui_layer_;
@@ -50,8 +50,10 @@ protected:
   // MouseListener
   void mouseDown(const MouseEvent& event) override;
   void mouseUp(const MouseEvent& event) override;
+  void mouseDrag(const MouseEvent& event) override;
+
   void handlePastePopup(const juce::MouseEvent& event);
-  bool keyPressed (const KeyPress& key, Component* originatingComponent) override;
+  bool keyPressed(const KeyPress& key, Component* originatingComponent) override;
 private:
   DarkBackground dark_background_;
   DarkBackground grid_dark_background_;
@@ -84,9 +86,14 @@ private:
   ButtonGridPopup copy_delete_popup_;
   ButtonGridPopup paste_popup_;
   ID last_hovered_slider_id_;
-  Component* last_hovered_slider_; // todo: figure out memory management
+  Component* last_hovered_slider_ = nullptr; // todo: figure out memory management
   bool multiple_selection_ = false;
   bool is_adjusting_inspector_ = false;
+
+  void stopPreviousModulationAnimation(const ModulatorComponent* modulator_component);
+  void startModulationAnimationIfNeeded(const ModulatorComponent* modulator_component);
+  void handleNoComponentFound(const ModulatorComponent* modulator_component);
+  void handleModulatings(const ModulatorComponent* modulator_component, const juce::MouseEvent& event);
 
   void setupInspector();
   void clear();
@@ -192,14 +199,15 @@ struct MainComponent::Delegate {
   virtual void editorAdjustedTab(int column, int parameterIndex, float value) = 0;
   virtual void editorAdjustedModulator(std::string parameter_name, int index, float value) = 0;
   virtual void editorConnectedModulation(int modulator_index, std::string target_name, std::string parameter) = 0;
+  virtual void editorChangedModulationMagnitude(int modulationConnectionIndex, float magnitude) = 0;
+  virtual void editorChangedModulationPolarity(int index, bool bipolar) = 0;
+  virtual void editorDisconnectedModulation(int index) = 0;
+  virtual void editorDisconnectedModulation(int modulator_index, std::string target_name, std::string paramter) = 0;
 
   virtual void editorStartedAdjustingColumn(std::string control, int column) = 0;
   virtual void editorEndedAdjustingColumn(std::string control, int column) = 0;
   virtual void editorAdjustedColumn(std::string contorl, int column, float value) = 0;
 
-  virtual void editorChangedModulationMagnitude(int modulationConnectionIndex, float magnitude) = 0;
-  virtual void editorChangedModulationPolarity(int index, bool bipolar) = 0;
-  virtual void editorDisconnectedModulation(int index) = 0;
   virtual void editorParameterGestureChanged(std::string module_name, std::string paramter_name, bool started) = 0;
   virtual void editorRemovedModulator(int index) = 0;
   virtual void editorChangedBlockLength(Index index, int times) = 0;

@@ -51,7 +51,7 @@ void ModulatorComponent::setupSliders() {
     sliders.add(slider);
     addAndMakeVisible(slidersContainer);
     slidersContainer.addAndMakeVisible(slider);
-    slider->box_slider_.slider.addListener(this);
+    slider->box_slider_.slider_.addListener(this);
   }
 }
 
@@ -212,12 +212,12 @@ void ModulatorComponent::setColour(Colour colour) {
   envelopePath.colour = colour;
 
   for (auto slider : sliders)
-    slider->box_slider_.slider.setColour(Slider::ColourIds::trackColourId, colour.darker(0.9f));
+    slider->box_slider_.slider_.setColour(Slider::ColourIds::trackColourId, colour.darker(0.9f));
 }
 
 void ModulatorComponent::sliderDragStarted(Slider* slider) {
   for (int i = 0; i < sliders.size(); i++)
-    if (&sliders[i]->box_slider_.slider == slider) {
+    if (&sliders[i]->box_slider_.slider_ == slider) {
       currentSliderIndex = i;
       break;
     }

@@ -28,7 +28,7 @@ namespace model {
 ModulePool::~ModulePool() { }
 
 // std::shared_ptr<Tab> ModulePool::getTab(Type type, int number) { return tabs.get({ type, number }); }
-std::shared_ptr<Block> ModulePool::getBlock(std::string type, int number = -1) { return blocks.get({ type, number }); }
+std::shared_ptr<Block> ModulePool::acquire_block(std::string type, int number = -1) { return blocks.get({ type, number }); }
 void ModulePool::retire(std::shared_ptr<Block> block) { blocks.retire(block); }
 // void ModulePool::Retire(std::shared_ptr<Tab> tab) { tabs.retire(tab); }
 
@@ -58,6 +58,7 @@ ModulePool::ModulePool() {
   all_modules_.insert(all_modules_.end(), blocks.all.begin(), blocks.all.end());
   all_modules_.insert(all_modules_.end(), modulators.all.begin(), modulators.all.end());
   all_modules_.insert(all_modules_.end(), column_controls_.begin(), column_controls_.end());
+  for (auto module : all_modules_) name_module_map_[module->name] = module;
 }
 
 void ModulePool::retire(std::shared_ptr<model::Connection> modulationConnection) {
@@ -65,13 +66,13 @@ void ModulePool::retire(std::shared_ptr<model::Connection> modulationConnection)
   connections.push_back(modulationConnection);
 }
 
-std::shared_ptr<model::Module> ModulePool::getModulator(std::string code, int number, int colourId) {
+std::shared_ptr<model::Module> ModulePool::acquire_modulator(std::string code, int number, int colourId) {
   auto modulator = modulators.get({ code, number });
   if (modulator) modulator->colour = colourPool.get(colourId);
   return modulator;
 }
 
-std::shared_ptr<Connection> ModulePool::getConnection(int number) {
+std::shared_ptr<Connection> ModulePool::aquire_connection(int number) {
   int index = 0;
   for (int i = 0; i < connections.size(); i++) {
     if (connections[i]->number == number) {

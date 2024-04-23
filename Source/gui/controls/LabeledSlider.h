@@ -21,6 +21,7 @@ public:
   void paint(juce::Graphics& g) override { 
     // g.fillAll(Colours::red);
   };
+
   void resized() override;
   Label label;
   BoxSlider box_slider_;

@@ -97,7 +97,7 @@ public:
   std::vector<SynthModule*> active_modulators_;
   std::map<std::string, SynthModule*> active_modulators_map_;
   std::vector<SynthModule*> active_processors_;
-  std::map<std::string, SynthModule*> active_processor_map_;
+  std::map<std::string, SynthModule*> active_processor_map_; // todo - this needs to be "all" processor map or something... 
 
   EnvelopeModule* default_amp_env_;
   void disconnectAllDefaultEnvs();
@@ -139,7 +139,7 @@ private:
   std::vector<OscillatorModule*> oscillators_;
   std::vector<SynthModule*> processors_with_default_env;
 public:
-  std::vector<ColumnMasterModule*> column_nodes_;
+  std::vector<ColumnMasterModule*> column_controls_;
   void setDefaultAmpEnvState(std::string target_name, bool enable);
   std::map<SynthModule*, ModulationConnectionProcessor*> processor_default_env_mp_map_;
 
