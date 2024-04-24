@@ -90,9 +90,8 @@ void InspectorComponent::resetInspector() {
   parameterSliders.clear(true);
 }
 
-void InspectorComponent::updateSize() {
+void InspectorComponent::updateSize() { 
   setBounds(getX(), getY(), calculateWidth(), getHeight());
-
   for (int i = 0; i < parameterSliders.size(); i++)
     parameterSliders[i]->setBounds(i * sliderWidth, 0, sliderWidth, getHeight());
 }

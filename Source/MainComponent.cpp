@@ -6,6 +6,7 @@
 #include "vital/common/synth_constants.h"
 #include "version_config.h"
 
+using namespace gui;
 MainComponent::MainComponent(juce::MidiKeyboardState& keyboard_state, Delegate* delegate):
   delegate(delegate),
   ui_layer_(keyboard_state, this),
@@ -237,7 +238,7 @@ void MainComponent::resized() {
   ui_layer_.setBounds(getLocalBounds());
   resizeGrid();
   resizeColumnControls();
-  ResizeInspector();
+  resizeInspector();
   resizeTabContainer();
   dark_background_.path.addRectangle(getLocalBounds());
   dark_background_.setBounds(getLocalBounds());
@@ -423,15 +424,16 @@ std::shared_ptr<model::Block> MainComponent::addBlock(int code, Index index) {
 
 void MainComponent::setupInspector() {
   // inspector_.addMouseListener(this, true);
-  inspector_.delegate = this;
-  addChildComponent(inspector_);
+  // inspector_.delegate = this;
+  addChildComponent(inspector_v2_);
 }
 
-void MainComponent::ResizeInspector() {
-  auto gridY = block_grid_.getY() + block_grid_.getHeight();
-  auto gridCenterX = block_grid_.getX() + block_grid_.getWidth() / 2;
-  int inspectorX = gridCenterX - inspector_.calculateWidth() / 2;
-  inspector_.setBounds(inspectorX, gridY + 60, 1, 220);
+void MainComponent::resizeInspector() {
+  int width = inspector_v2_.calculateWidth();
+  int height = inspector_v2_.calculateHeight();
+  int x = gridCenterX - width / 2;
+  int y = gridY + 130;
+  inspector_v2_.setBounds(x, y, width, height);
 }
 
 void MainComponent::dismissPopup(ButtonGridPopup& popup) {
@@ -527,7 +529,7 @@ void MainComponent::refreshInspector() {
   // }
 
   inspector_.setConfiguration(focused_module);
-  ResizeInspector();
+  resizeInspector();
 }
 
 // PopupMenu MainComponent::spawnModulationMenu(Module& target) {
@@ -1142,7 +1144,7 @@ void MainComponent::removeSelectedItems() {
 }
 
 void MainComponent::toggleGridItemSelection(GridComponent* grid, GridItemComponent* item, bool selected) {
-  inspector_.setVisible(selected);
+  inspector_v2_.setVisible(selected);
 
   if (selected) {
     bool is_other_module_currently_chosen = focused_grid_item_ != nullptr;

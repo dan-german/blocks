@@ -21,7 +21,9 @@
 #include "gui/column_controls_container.h"
 #include "selection_rect.h"
 #include "gui/controls/SavePopup.h"
+#include "gui/slider_container.h"
 
+namespace gui {
 class MainComponent final: public Component,
   InspectorComponent::Listener,
   Slider::Listener,
@@ -60,6 +62,7 @@ private:
   BlockGridComponent block_grid_;
   TabContainerComponent tab_grid_;
   InspectorComponent inspector_;
+  SliderContainer inspector_v2_;
   SavePopup save_popup_;
   GraphicsTimer timer_;
   ColumnControlsContainer column_controls_;
@@ -99,7 +102,7 @@ private:
   void clear();
   void resizeGrid();
   void resizeTabContainer();
-  void ResizeInspector();
+  void resizeInspector();
   void clickOnModulatorsPopup(Index index);
   void loadPreset(int index);
   void setupPopupMenus();
@@ -235,3 +238,4 @@ struct MainComponent::Delegate {
 
   virtual ~Delegate() = default;
 };
+}

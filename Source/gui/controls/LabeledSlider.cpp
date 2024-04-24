@@ -26,7 +26,7 @@ LabeledSlider::~LabeledSlider() {
 }
 
 void LabeledSlider::resized() {
-  int label_width = getWidth() / 2.25f;
+  int label_width = getWidth() / 2.5f;
   label.setBounds(0, 0, label_width, getHeight());
   int slider_width = getWidth() - label_width;
   box_slider_.setBounds(label_width, 0, slider_width, getHeight());
@@ -35,5 +35,3 @@ void LabeledSlider::resized() {
 void LabeledSlider::themeChanged(Theme theme) {
   label.setColour(Label::ColourIds::textColourId, theme.two);
 }
-
-// void 

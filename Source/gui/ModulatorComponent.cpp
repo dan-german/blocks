@@ -37,7 +37,7 @@ ModulatorComponent::ModulatorComponent() {
   setupTitle();
 
   ThemeManager::shared()->addListener(this);
-  themeChanged(ThemeManager::shared()->getCurrent()); 
+  themeChanged(ThemeManager::shared()->getCurrent());
 }
 
 void ModulatorComponent::setupRemoveButton() {
@@ -144,9 +144,14 @@ void ModulatorComponent::resizeSliders() const {
   int yOffset = dragIndicatorComponent.getY() + dragIndicatorComponent.getHeight() + dragIndicatorBottomSpacing;
   int sliderWidth = slidersContainer.getWidth() / 2 - 4;
   int acc = 0; // uhh bad name sorry
+  int pls = 0;
 
   for (int row = 0; row < rows; row++) {
     for (int column = 0; column < columns; column++) {
+      int index2 = row + column + acc;
+
+      printf("%d %d\n", pls, row + column + acc);
+      pls++;
       auto slider = sliders[row + column + acc];
       int x = column * sliderWidth + sliderHorizontalSpacing;
       int y = row * sliderHeight + sliderSpacing * row;

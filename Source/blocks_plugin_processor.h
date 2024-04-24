@@ -28,7 +28,7 @@
 
 class ValueBridge;
 
-class PluginProcessor: public SynthBase, public juce::AudioProcessor, public ValueBridge::Listener, public MainComponent::Delegate, public SynthGuiInterface {
+class PluginProcessor: public SynthBase, public juce::AudioProcessor, public ValueBridge::Listener, public gui::MainComponent::Delegate, public SynthGuiInterface {
 public:
   static constexpr int kSetProgramWaitMilliseconds = 500;
 
@@ -136,7 +136,7 @@ private:
   ValueBridge* bypass_parameter_;
   double last_seconds_time_;
   MidiKeyboardState keyboard_state_;
-  MainComponent* main_component_;
+  gui::MainComponent* main_component_;
   PresetManager preset_manager_;
   void loadPreset(Preset preset);
   void setValue(std::string module_id, std::string parameter, float value);
