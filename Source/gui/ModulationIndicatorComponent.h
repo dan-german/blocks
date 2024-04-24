@@ -7,6 +7,7 @@ using namespace juce;
 class ModulationIndicatorComponent: public juce::Component {
 public:
   DrawablePath currentValuePointPath;
+  DrawablePath line_;
   ModulationIndicatorComponent(float magnitude, Colour colour);
   ~ModulationIndicatorComponent() override;
   void resized() override;

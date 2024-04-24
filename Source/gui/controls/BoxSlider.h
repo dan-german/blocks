@@ -7,6 +7,7 @@
 #include "gui/HighlightComponent.h"
 #include "model/id.h"
 #include "gui/base/BaseButton.h"
+#include "gui/modulation_indicator.h"
 
 using namespace juce;
 

@@ -572,6 +572,10 @@ void MainComponent::highlightModulatableSliders(bool highlight, Colour color = C
 }
 
 void MainComponent::graphicsTimerCallback(const float secondsSincelastUpdate) {
+  if (ui_layer_.modulators_.isVisible()) {
+    // updateModulatorIndicators();
+  }
+
   if (ui_layer_.connections.isVisible()) {
     updateConnectionIndicators();
   }
@@ -580,6 +584,16 @@ void MainComponent::graphicsTimerCallback(const float secondsSincelastUpdate) {
   //   updateInspectorModulationIndicators(); // todo - fix
   // }
 }
+
+// void MainComponent::updateModulatorIndicators() {
+//   auto modulators = delegate->getModulators2();
+//   for (int i = 0; i < modulators.size(); i++) {
+//     if (auto mc = dynamic_cast<ModulatorComponent*>(ui_layer_.modulators_.listBox.getComponentForRowNumber(i))) {
+//       auto source = delegate->editorRequestsStatusOutput("modulator_amount_" + std::to_string(i + 1));
+//       mc->indicator.setCurrentValue(source->value()[0]);
+//     }
+//   }
+// }
 
 void MainComponent::updateConnectionIndicators() {
   auto modulationConnections = delegate->getModulations();
