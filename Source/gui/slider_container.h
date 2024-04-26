@@ -1,4 +1,5 @@
 #include "controls/LabeledSlider.h"
+#include "ui_utils.h"
 namespace gui {
 class SliderContainer: public juce::Component {
 private:
@@ -10,25 +11,19 @@ private:
   const int horizontal_spacing = 3;
   const int offset = 0;
   const int rows = 3;
+  BlocksSlider::Listener* slider_listener_;
 public:
-  SliderContainer() {
-    // for (int i = 0; i < 2; i++) {
-    //   auto slider = new LabeledSlider();
-    //   sliders.push_back(slider);
-    //   addAndMakeVisible(slider);
-    // }
-  }
 
-  void paint(juce::Graphics& g) override {
-    // g.fillAll(juce::Colours::blue);
-  }
+  SliderContainer(BlocksSlider::Listener* slider_listener): slider_listener_(slider_listener) { }
+
+  // void paint(juce::Graphics& g) override { }
 
   void resized() override {
     resizeSliders();
   }
 
   int calculateWidth() {
-    int columns = std::min(max_columns, sliders_.size());
+    int columns = std::min(max_columns, (int)sliders_.size());
     int combined_horizontal_spacing = (columns - 1) * horizontal_spacing;
     int combined_sliders_width = columns * slider_width;
     return combined_sliders_width + combined_horizontal_spacing;
@@ -51,56 +46,62 @@ public:
     for (int row = 0; row < rows; row++) {
       for (int column = 0; column < max_columns; column++) {
         if (next_slider_index == sliders_.size()) return;
-        auto slider = sliders_[next_slider_index++];
         int x = column * slider_width + horizontal_spacing;
         int y = row * slider_height + vertical_spacing * row;
-        slider->setBounds(x, y, slider_width - horizontal_spacing * 2, slider_height);
+        sliders_[next_slider_index++]->setBounds(x, y, slider_width - horizontal_spacing * 2, slider_height);
       }
     }
   }
 
   void setModule(std::shared_ptr<model::Module> module) {
+    // for (auto slider : sliders) slider->removeListener(this);
     sliders_.clear();
     for (auto parameter : module->parameters_) spawnSlider(*parameter, module);
-    // updateSize();
+    resizeSliders();
   }
 
   void spawnSlider(vital::ValueDetails parameter, std::shared_ptr<model::Module> module) {
     if (parameter.hidden) return;
-    auto slider = new InspectorSlider();
-    double interval = 0.0;
-    if (parameter.value_scale == ValueScale::kIndexed) {
-      interval = 1.0;
-    }
-    slider->slider.setRange(parameter.min, parameter.max, interval);
-    slider->slider.addListener(this);
-    slider->slider.setNumDecimalPlacesToDisplay(parameter.decimal_places);
-    slider->slider.textFromValueFunction = [this, parameter, module, slider](double value) {
-      if (module->id.type == "delay") {
-        onDelayAdjusted(module, parameter, value);
-      } else if (module->id.type == "phaser" || module->id.type == "chorus" || module->id.type == "flanger") {
-        bool is_changing_sync = parameter.name == "sync";
-        if (is_changing_sync) {
-          auto frequency_slider = getSliders()[3];
-          bool is_seconds = int(value) == 0;
-          if (is_seconds) {
-            setSliderAsFrequency(module, frequency_slider, "frequency");
-          } else {
-            setSliderAsTempo(module, frequency_slider, "tempo");
-          }
-        }
-      }
+    auto labeled_slider = std::make_unique<LabeledSlider>(slider_listener_);
+    addAndMakeVisible(labeled_slider.get());
 
-      return UIUtils::getSliderTextFromValue(value, parameter);
-    };
-    slider->titleLabel.setText(parameter.display_name, dontSendNotification);
-    parameterSliders.add(slider);
-    slider_to_parameter_name_map_[&slider->slider] = parameter.name;
-    addAndMakeVisible(slider);
     auto value = parameter.value_processor->value();
-    slider->slider.setValue(value, dontSendNotification);
+    labeled_slider->label.setText(parameter.display_name, dontSendNotification);
+    labeled_slider->box_slider_.modulatable = parameter.modulatable;
+    labeled_slider->box_slider_.module_id_ = module->id;
+    labeled_slider->box_slider_.parameter_name_ = parameter.name;
+
+    double interval = 0.0;
+    if (parameter.value_scale == ValueScale::kLinear) {
+      labeled_slider->box_slider_.slider_.setNumDecimalPlacesToDisplay(3);
+    } else if (parameter.value_scale == ValueScale::kExponential) {
+      // slider->boxSlider.slider.setSkewFactor(4, false);
+    } else if (parameter.value_scale == ValueScale::kIndexed) {
+      interval = 1.0;
+      labeled_slider->box_slider_.slider_.setNumDecimalPlacesToDisplay(0);
+    }
+
+    labeled_slider->box_slider_.slider_.setRange(parameter.min, parameter.max, interval);
+
+    if (parameter.string_lookup) {
+      labeled_slider->box_slider_.slider_.textFromValueFunction = [parameter](double value) { return juce::String(parameter.string_lookup[(int)value]); };
+    } else {
+      labeled_slider->box_slider_.slider_.textFromValueFunction = [parameter](double value) { return UIUtils::getSliderTextFromValue(value, parameter); };
+    }
+
+    labeled_slider->box_slider_.slider_.setValue(value, dontSendNotification);
+    labeled_slider->box_slider_.value_label_.setText(labeled_slider->box_slider_.slider_.getTextFromValue(value), dontSendNotification);
+
+    sliders_.push_back(std::move(labeled_slider));
   }
+
+  // void BlocksSlider::sliderValueChanged(Slider* slider) {
+  //   float value = static_cast<float>(slider->getValue());
+  //   if (onSliderValueChange) onSliderValueChange(currentSliderIndex, value);
+  //   auto name = slider_parameter_name_map_[slider];
+  //   delegate_->modulatorIsAdjusting(this, name, value);
+  // }
 
   std::vector<std::unique_ptr<LabeledSlider>> sliders_;
 };
-}
+} // namespace gui

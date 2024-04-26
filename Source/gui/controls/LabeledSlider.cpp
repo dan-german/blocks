@@ -10,7 +10,7 @@
 
 #include "gui/controls/LabeledSlider.h"
 
-LabeledSlider::LabeledSlider() {
+LabeledSlider::LabeledSlider(BlocksSlider::Listener* blocks_slider_listener): box_slider_(blocks_slider_listener) {
   setName("LabeledSlider");
   addAndMakeVisible(label);
   addAndMakeVisible(box_slider_);

@@ -11,7 +11,7 @@
 
 using namespace juce;
 
-class BoxSlider: public BaseButton, juce::Slider::Listener, ThemeListener {
+class BlocksSlider: public BaseButton, juce::Slider::Listener, ThemeListener {
 public:
   enum Type { tString, tFloat };
   Colour current;
@@ -28,11 +28,17 @@ public:
   std::string parameter_name_;
   Component slider_container_;
 
-  BoxSlider();
+  class Listener;
+  Listener* listener_;
+
+  BlocksSlider(Listener* listener);
+  ~BlocksSlider() override;
+
+  void sliderDragStarted(Slider* slider) override;
+  void sliderDragEnded(Slider* slider) override;
   void setupSliderContainer();
   void setupSlider();
   void setupIndicationAnimator();
-  ~BoxSlider() override;
 
   void themeChanged(Theme theme) override;
   void resized() override;
@@ -44,7 +50,6 @@ public:
   void startModulationSelectionAnimation();
   void stopModulationSelectionAnimation();
 protected:
-  // void startSelectedAnimation() override;
   void selectedAnimation(float value, float progress) override;
   void deselectedAnimation(float value, float progress) override;
   void selectedCompletion() override;
@@ -61,5 +66,10 @@ private:
   BoxSliderLooksAndFeel lnf;
   void setupLabel();
   void sliderValueChanged(Slider* slider) override;
-  JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(BoxSlider)
+  JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(BlocksSlider)
+};
+
+struct BlocksSlider::Listener {
+  virtual void sliderAdjusted(BlocksSlider* slider, float value) = 0;
+  virtual void sliderGestureChanged(BlocksSlider* slider, bool started) = 0;
 };

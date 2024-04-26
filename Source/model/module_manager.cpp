@@ -44,10 +44,7 @@ std::vector<std::shared_ptr<Connection>> ModuleManager::getConnectionsOfSource(s
   return sourceConnections;
 }
 
-std::shared_ptr<model::Connection> ModuleManager::getConnection(int modulator_index, std::string target_name, std::string parameter) { 
-  // auto target = pool.get(target_name);
-  // auto parameter_name = target->getParameterName(parameter);
-  // std::cout << "disconnectiong parameter name: " << parameter_name << std::endl;
+std::shared_ptr<model::Connection> ModuleManager::getConnection(int modulator_index, std::string target_name, std::string parameter) {
   for (auto connection : connections) {
     if (connection->target->name == target_name && connection->target->getParameterName(parameter) == connection->parameter_name_) {
       return connection;

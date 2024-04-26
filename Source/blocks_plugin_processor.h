@@ -100,13 +100,16 @@ public:
   void editorChangedBlockLength(Index index, int length) override;
   void editorAdjustedModulator(std::string parameter_name, int modulator, float value) override;
   void editorRemovedModulator(int index) override;
-  std::optional<Preset> editorNavigatedPreset(bool next) override; 
+  std::optional<Preset> editorNavigatedPreset(bool next) override;
 
   void editorStartedAdjustingColumn(std::string control, int column) override;
   void editorEndedAdjustingColumn(std::string control, int column) override;
   void editorAdjustedColumn(std::string contorl, int column, float value) override;
 
   void disconnect(std::shared_ptr<model::Connection>& connection);
+
+  void editorStartedAdjustingParameter(ID& id, std::string& parameter_name, bool started) override;
+  void editorAdjustedParameter(ID& id, std::string& parameter_name, float value) override;
 
   std::shared_ptr<model::Block> getBlock2(Index index) override;
   // std::shared_ptr<Tab> getTab(int column) override;

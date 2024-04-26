@@ -30,6 +30,7 @@ public:
   // ModuleContainer<Tab> tabs;
 
   std::unordered_map<std::string, std::shared_ptr<model::Module>> name_module_map_;
+  // std::unordered_map<model::, std::shared_ptr<model::Module>> name_module_map_;
   std::vector<std::shared_ptr<model::Module>> all_modules_;
   std::vector<std::shared_ptr<model::Connection>> connections;
 

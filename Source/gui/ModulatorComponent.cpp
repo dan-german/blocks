@@ -47,7 +47,7 @@ void ModulatorComponent::setupRemoveButton() {
 
 void ModulatorComponent::setupSliders() {
   for (int i = 0; i < 4; i++) {
-    auto slider = new LabeledSlider();
+    auto slider = new LabeledSlider(blocks_slider_listener);
     sliders.add(slider);
     addAndMakeVisible(slidersContainer);
     slidersContainer.addAndMakeVisible(slider);

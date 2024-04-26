@@ -53,6 +53,7 @@ public:
   void removeConnection(std::shared_ptr<model::Connection> connection);
   bool connectionExists(std::string parameter_name, std::shared_ptr<model::Module> source, std::shared_ptr<model::Module> target);
   std::shared_ptr<model::Module> getModule(std::string name) { return pool.name_module_map_[name]; }
+  std::shared_ptr<model::Module> getModule(ID& id) { return pool.name_module_map_[id.getName()]; }
   void clear();
 };
 } // namespace model

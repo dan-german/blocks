@@ -32,6 +32,7 @@ class MainComponent final: public Component,
   GridComponent::Listener,
   NoteLogger::Listener,
   ColumnControlsContainer::Listener,
+  BlocksSlider::Listener,
   KeyListener {
 public:
   struct Delegate;
@@ -137,6 +138,10 @@ private:
   void notesStarted(Array<int> notes) override;
   void notesEnded(Array<int> notes) override;
 
+  // BlocksSlider::Listener
+  void sliderAdjusted(BlocksSlider* slider, float value) override;
+  void sliderGestureChanged(BlocksSlider* slider, bool started) override;
+
   // InspectorComponent::Listener
   void inspectorChangedParameter(int sliderIndex, float value) override;
   void inspectorGestureChanged(std::string parameter_name, bool started) override;
@@ -206,6 +211,9 @@ struct MainComponent::Delegate {
   virtual void editorChangedModulationPolarity(int index, bool bipolar) = 0;
   virtual void editorDisconnectedModulation(int index) = 0;
   virtual void editorDisconnectedModulation(int modulator_index, std::string target_name, std::string paramter) = 0;
+  
+  virtual void editorStartedAdjustingParameter(ID& id, std::string& parameter_name, bool started) = 0;
+  virtual void editorAdjustedParameter(ID& id, std::string& parameter_name, float value) = 0;
 
   virtual void editorStartedAdjustingColumn(std::string control, int column) = 0;
   virtual void editorEndedAdjustingColumn(std::string control, int column) = 0;

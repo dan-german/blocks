@@ -11,7 +11,9 @@ MainComponent::MainComponent(juce::MidiKeyboardState& keyboard_state, Delegate* 
   delegate(delegate),
   ui_layer_(keyboard_state, this),
   tab_grid_(GridConfigs::tab),
-  block_grid_(GridConfigs::blocks)
+  block_grid_(GridConfigs::blocks),
+  column_controls_(this), // should this be a SliderContainer?
+  inspector_v2_(this)
 {
   setWantsKeyboardFocus(false);
 
@@ -431,8 +433,9 @@ void MainComponent::setupInspector() {
 void MainComponent::resizeInspector() {
   int width = inspector_v2_.calculateWidth();
   int height = inspector_v2_.calculateHeight();
-  int x = gridCenterX - width / 2;
-  int y = gridY + 130;
+  int x = block_grid_.getBounds().getCentreX() - width / 2;
+  // int y = block_grid_.getBounds().getCentreY() + 130;
+  int y = column_controls_.getBounds().getY() + 100;
   inspector_v2_.setBounds(x, y, width, height);
 }
 
@@ -528,7 +531,8 @@ void MainComponent::refreshInspector() {
   focused_module = delegate->getBlock2(focused_grid_item_->index);
   // }
 
-  inspector_.setConfiguration(focused_module);
+  // inspector_.setConfiguration(focused_module);
+  inspector_v2_.setModule(focused_module);
   resizeInspector();
 }
 
@@ -816,7 +820,7 @@ void MainComponent::modulatorIsDragging(ModulatorComponent* modulator_component,
   //   if (auto modulator_at_index = dynamic_cast<ModulatorComponent*>(ui_layer_.modulators_.listBox.getComponentForRowNumber(index))) {
   //     auto component_under_mouse = modulator_at_index->getComponentAt(pos);
   //     // std::cout << "component under mouse: " << component_under_mouse << std::endl;
-  //     if (auto slider = dynamic_cast<BoxSlider*>(component_under_mouse)) {
+  //     if (auto slider = dynamic_cast<BlocksSlider*>(component_under_mouse)) {
   //       std::cout << "slider name: " << slider << std::endl;
         // auto parameter_name = modulator_at_index->getParameterName(slider->getName().getIntValue());
         // modulatorIsAdjusting(modulatorComponent, parameter_name, slider->getValue());
@@ -846,7 +850,7 @@ void MainComponent::modulatorIsDragging(ModulatorComponent* modulator_component,
 //     }
 
 //     if (last_hovered_slider_) {
-//       if (auto previous_box_slider = dynamic_cast<BoxSlider*>(last_hovered_slider_->getParentComponent()->getParentComponent())) {
+//       if (auto previous_box_slider = dynamic_cast<BlocksSlider*>(last_hovered_slider_->getParentComponent()->getParentComponent())) {
 //         if (auto previous_box_slider = dynamic_cast<BoxSlider*>(last_hovered_slider_->getParentComponent()->getParentComponent())) {
 //           previous_box_slider->stopModulationSelectionAnimation();
 //         }
@@ -855,7 +859,7 @@ void MainComponent::modulatorIsDragging(ModulatorComponent* modulator_component,
 
 //     last_hovered_slider_ = component_under_mouse;
 
-//     if (auto box_slider = dynamic_cast<BoxSlider*>(component_under_mouse->getParentComponent()->getParentComponent())) {
+//     if (auto box_slider = dynamic_cast<BlocksSlider*>(component_under_mouse->getParentComponent()->getParentComponent())) {
 //       if (box_slider->modulatable) {
 //         box_slider->startModulationSelectionAnimation();
 //       }
@@ -892,10 +896,10 @@ void MainComponent::handleNoComponentFound(const ModulatorComponent* modulator_c
 
 void MainComponent::stopPreviousModulationAnimation(const ModulatorComponent* modulator_component) {
   if (last_hovered_slider_) {
-    auto last_box_slider = dynamic_cast<BoxSlider*>(last_hovered_slider_->getParentComponent()->getParentComponent());
+    auto last_box_slider = dynamic_cast<BlocksSlider*>(last_hovered_slider_->getParentComponent()->getParentComponent());
     if (last_box_slider && last_box_slider->modulatable) {
       delegate->editorDisconnectedModulation(modulator_component->row, last_box_slider->module_id_.getName(), last_box_slider->parameter_name_);
-        
+
       std::cout << "exit" << std::endl;
       last_box_slider->stopModulationSelectionAnimation();
       cursor.setSelectionMode(false);
@@ -904,7 +908,7 @@ void MainComponent::stopPreviousModulationAnimation(const ModulatorComponent* mo
 }
 
 void MainComponent::startModulationAnimationIfNeeded(const ModulatorComponent* modulator_component) {
-  auto box_slider = dynamic_cast<BoxSlider*>(last_hovered_slider_->getParentComponent()->getParentComponent());
+  auto box_slider = dynamic_cast<BlocksSlider*>(last_hovered_slider_->getParentComponent()->getParentComponent());
   if (box_slider && box_slider->modulatable) {
     std::cout << "start" << std::endl;
     delegate->editorConnectedModulation(modulator_component->row, box_slider->module_id_.getName(), box_slider->parameter_name_);
@@ -957,7 +961,7 @@ void MainComponent::exitModulatorDragMode() {
   cursor.setVisible(false);
   highlightModulatableSliders(false);
   if (last_hovered_slider_) {
-    if (auto box_slider = dynamic_cast<BoxSlider*>(last_hovered_slider_->getParentComponent()->getParentComponent())) {
+    if (auto box_slider = dynamic_cast<BlocksSlider*>(last_hovered_slider_->getParentComponent()->getParentComponent())) {
       if (box_slider->modulatable) {
         box_slider->stopModulationSelectionAnimation();
         box_slider->setIndicationHighlight(false, {});
@@ -1233,4 +1237,12 @@ bool MainComponent::keyPressed(const KeyPress& key, Component* originatingCompon
     }
   }
   return true;
+}
+
+void MainComponent::sliderAdjusted(BlocksSlider* slider, float value) {
+  delegate->editorAdjustedParameter(slider->module_id_, slider->parameter_name_, value);
+}
+
+void MainComponent::sliderGestureChanged(BlocksSlider* slider, bool started) {
+
 }

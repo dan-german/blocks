@@ -4,9 +4,9 @@
 #include "settings/GridConfigs.h"
 #include "gui/ThemeManager.h" 
 
-ColumnControlsContainer::ColumnControlsContainer() {
+ColumnControlsContainer::ColumnControlsContainer(BlocksSlider::Listener* listener) {
   for (int i = 0; i < Constants::columns; i++) {
-    auto slider = createSlider("level", i);
+    auto slider = createSlider("level", i, listener);
     slider->default_value_ = 1.0f;
     slider->slider_.setValue(1.0f);
     slider->slider_.setRange(0.0f, 1.0f);
@@ -14,7 +14,7 @@ ColumnControlsContainer::ColumnControlsContainer() {
   }
 
   for (int i = 0; i < Constants::columns; i++) {
-    auto slider = createSlider("pan", i);
+    auto slider = createSlider("pan", i, listener);
     slider->slider_.getProperties().set("isCenter", true);
     slider->slider_.setRange(-1.0f, 1.0f);
     slider->default_value_ = 0.0f;
@@ -29,8 +29,8 @@ ColumnControlsContainer::~ColumnControlsContainer() {
   ThemeManager::shared()->removeListener(this);
 }
 
-std::unique_ptr<BoxSlider> ColumnControlsContainer::createSlider(std::string title, int column) {
-  auto slider = std::make_unique<BoxSlider>();
+std::unique_ptr<BlocksSlider> ColumnControlsContainer::createSlider(std::string title, int column, BlocksSlider::Listener* listener) {
+  auto slider = std::make_unique<BlocksSlider>(listener);
   slider->setAlpha(0.5f);
   slider->slider_.getProperties().set("tag", String(title));
   slider->slider_.getProperties().set("column", column);

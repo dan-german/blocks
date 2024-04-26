@@ -33,6 +33,7 @@ private:
   const int offset = 0;
   int sliderHorizontalInsets = 6;
   Colour colour;
+  BlocksSlider::Listener* blocks_slider_listener;
 
   void sliderValueChanged(Slider* slider) override;
   void sliderDragStarted(Slider* slider) override;
@@ -89,7 +90,7 @@ struct ModulatorComponent::Listener {
   virtual void modulatorEndedDrag(ModulatorComponent* modulatorComponent, const MouseEvent& event) = 0;
   virtual void modulatorIsDragging(ModulatorComponent* modulatorComponent, const MouseEvent& event) = 0;
   virtual void modulatorStartedDrag(ModulatorComponent* modulatorComponent, const MouseEvent& event) = 0;
-  virtual void modulatorIsAdjusting(ModulatorComponent* modulatorComponent, std::string parameter_name, float value) = 0;
   virtual void modulatorRemoved(ModulatorComponent* modulatorComponent) = 0;
+  virtual void modulatorIsAdjusting(ModulatorComponent* modulatorComponent, std::string parameter_name, float value) = 0;
   virtual void modulatorGestureChanged(ModulatorComponent* modulatorComponent, std::string paramter_name, bool started) = 0;
 };
