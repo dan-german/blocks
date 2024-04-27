@@ -32,8 +32,8 @@ Component* ModulatorsListModel::refreshComponentForRow(int rowNumber, bool isRow
   if (modulators.size() == 0) return component;
   if (rowNumber >= modulators.size()) return component;
 
-  setupModulatorComponent(modulators[rowNumber], *component);
   component->row = rowNumber;
+  component->slider_container_.setModule(modulators[rowNumber]);
 
   return component;
 }

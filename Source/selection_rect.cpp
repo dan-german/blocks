@@ -1,7 +1,6 @@
 #include "selection_rect.h"
 #include "settings/Constants.h"
 #include "gui/GridComponent.h"
-#include "settings/GridConfigs.h"
 #include "gui/ThemeManager.h" 
 
 SelectionRect::SelectionRect() {

@@ -1,5 +1,4 @@
 #include "MainComponent.h"
-#include "settings/GridConfigs.h"
 #include "gui/ThemeManager.h"
 #include "settings/UserSettings.h"
 #include "module_new.h"
@@ -10,10 +9,10 @@ using namespace gui;
 MainComponent::MainComponent(juce::MidiKeyboardState& keyboard_state, Delegate* delegate):
   delegate(delegate),
   ui_layer_(keyboard_state, this),
-  tab_grid_(GridConfigs::tab),
-  block_grid_(GridConfigs::blocks),
+  tab_grid_(GridComponent::tab_config),
+  block_grid_(GridComponent::blocks_config),
   column_controls_(this), // should this be a SliderContainer?
-  inspector_v2_(this)
+  inspector_v2_(this, SliderContainer::inspector_config)
 {
   setWantsKeyboardFocus(false);
 
@@ -1176,7 +1175,7 @@ void MainComponent::resetDownFlowingDots() {
     columns_with_blocks.insert(block_component->index.column);
   }
 
-  for (int column = 0; column < GridConfigs::blocks.columns; column++) {
+  for (int column = 0; column < GridComponent::blocks_config.columns; column++) {
     block_grid_.setDownFlowingHighlight(column, false);
   }
 

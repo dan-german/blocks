@@ -15,20 +15,14 @@
 
 class LabeledSlider: public juce::Component, ThemeListener {
 public:
+  Label label;
+  BlocksSlider box_slider_;
+
   LabeledSlider(BlocksSlider::Listener* blocks_slider_listener);
   ~LabeledSlider() override;
-
+  void resized() override;
+  void themeChanged(Theme theme) override;
   void paint(juce::Graphics& g) override { 
     // g.fillAll(Colours::red);
   };
-
-  void resized() override;
-  Label label;
-  BlocksSlider box_slider_;
-  ID model_id_;
-  std::string paramter_name_;
-  // ValueDetails
-  void themeChanged(Theme theme) override;
-private:
-  // JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(LabeledSlider)
 };

@@ -15,12 +15,13 @@
 #include "gui/EnvelopePath.h"
 #include "gui/controls/ExitButton.h"
 #include "gui/ThemeManager.h"
+#include "gui/slider_container.h"
 
 class ModulatorComponent: public Component, Slider::Listener, ThemeListener {
 private:
   ExitButton exitButton;
-  DragIndicatorComponent dragIndicatorComponent;
-  Component modulatorDragComponent;
+  DragIndicatorComponent drag_indicator_;
+  Component drag_hitbox_;
   Component slidersContainer;
   Rectangle<int> bounds;
   const int sliderHeight = 23;
@@ -41,6 +42,7 @@ private:
 
   int currentSliderIndex = -1;
 public:
+  gui::SliderContainer slider_container_;
   std::map<Slider*, std::string> slider_parameter_name_map_;
   struct Listener;
   Listener* delegate_;
@@ -57,7 +59,7 @@ public:
   int calculateHeight();
   void paint(Graphics& g) override;
   void resized() override;
-  void resizeSliders() const;
+  void resizeSliders();
   void resizeTitle();
   void setupTitle();
   void setupSliders();

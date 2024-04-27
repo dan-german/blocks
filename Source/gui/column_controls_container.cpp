@@ -1,7 +1,6 @@
 #include "column_controls_container.h"
 #include "settings/Constants.h"
 #include "gui/GridComponent.h"
-#include "settings/GridConfigs.h"
 #include "gui/ThemeManager.h" 
 
 ColumnControlsContainer::ColumnControlsContainer(BlocksSlider::Listener* listener) {
@@ -44,7 +43,7 @@ std::unique_ptr<BlocksSlider> ColumnControlsContainer::createSlider(std::string 
 }
 
 void ColumnControlsContainer::resized() {
-  auto config = GridConfigs::blocks;
+  auto config = GridComponent::blocks_config;
   int vertical_margin = 2;
   auto slider_height = getHeight() / 2 - vertical_margin / 2;
   auto slider_width = config.itemWidth / 1.045f;
