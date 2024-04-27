@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include "gui/controls/BoxSlider.h"
+#include "gui/controls/blocks_slider.h"
 #include "gui/ThemeManager.h"
 
 class LabeledSlider: public juce::Component, ThemeListener {
