@@ -64,7 +64,6 @@ private:
   TabContainerComponent tab_grid_;
   InspectorComponent inspector_;
   SliderContainer inspector_v2_;
-  SliderContainer column_controls_v2_;
   SavePopup save_popup_;
   GraphicsTimer timer_;
   ColumnControlsContainer column_controls_;

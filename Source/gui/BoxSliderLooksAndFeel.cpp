@@ -24,7 +24,11 @@ void BoxSliderLooksAndFeel::drawLinearSlider(juce::Graphics& g,
   const juce::Slider::SliderStyle style,
   juce::Slider& slider)
 {
-  g.setColour(ThemeManager::shared()->getCurrent().one);
+  auto theme = ThemeManager::shared()->getCurrent();
+  // Colour track_colour = theme.dark ? theme.two : theme.two.brighter(0.40f);
+  Colour track_colour = theme.dark ? ThemeManager::shared()->getCurrent().one : theme.two.brighter(0.40f);
+  // g.setColour(ThemeManager::shared()->getCurrent().one);
+  g.setColour(track_colour);
   const float corner_radius = height / 4.5f;
   auto bounds = slider.getBounds();
   bounds.reduce(1, 1);
@@ -46,13 +50,11 @@ void BoxSliderLooksAndFeel::drawCenter(juce::Graphics& g, float sliderPos, int x
   if (isOnRight) {
     g.fillRect((float)x + (float)width * 0.5f, 0.0f, sliderPos - width * 0.5f, (float)slider.getHeight());
   } else {
-    g.fillRect(sliderPos, 0.0f, (float)x + (float)width * 0.5f - sliderPos, (float)slider.getHeight()); 
+    g.fillRect(sliderPos, 0.0f, (float)x + (float)width * 0.5f - sliderPos, (float)slider.getHeight());
   }
 }
 
 void BoxSliderLooksAndFeel::drawNormal(juce::Graphics& g, juce::Slider& slider, float sliderPos) {
-  // auto position = slider.getBounds().getPosition().toFloat();
-  // g.fillRect(position.getX(), position.getY(), sliderPos, (float)slider.getHeight());
   g.fillRect(0.0f, 0.0f, sliderPos, (float)slider.getHeight());
 }
 

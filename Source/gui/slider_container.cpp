@@ -10,7 +10,7 @@ SliderContainer::SliderContainer(BlocksSlider::Listener* slider_listener, Config
 {}
 
 void SliderContainer::paint(juce::Graphics& g) {
-  g.fillAll(juce::Colours::red);
+  // g.fillAll(juce::Colours::red);
 }
 
 void SliderContainer::resized() {
@@ -84,6 +84,10 @@ void SliderContainer::spawnSlider(vital::ValueDetails parameter, std::shared_ptr
 
   labeled_slider->box_slider_.juce_slider_.setRange(parameter.min, parameter.max, interval);
 
+  if (parameter.min < 0) { 
+    labeled_slider->box_slider_.juce_slider_.getProperties().set("isCenter", true);
+  }
+
   if (parameter.string_lookup) {
     labeled_slider->box_slider_.juce_slider_.textFromValueFunction = [parameter](double value) { return juce::String(parameter.string_lookup[(int)value]); };
   } else {
@@ -139,6 +143,7 @@ void SliderContainer::setSliderAsTempo(LabeledSlider* slider) const {
 
 void SliderContainer::setSlidersColour(Colour& colour) {
   for (auto& slider : sliders_) {
+    slider->box_slider_.custom_track_colour_ = true;
     slider->box_slider_.juce_slider_.setColour(Slider::ColourIds::trackColourId, colour.darker(0.9f));
   }
 }

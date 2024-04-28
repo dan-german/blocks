@@ -102,5 +102,6 @@ void BaseButton::deselectedCompletion() {
 }
 
 void BaseButton::paint(juce::Graphics& g) {
-  colour = ThemeManager::shared()->getCurrent().one;
+  auto current = ThemeManager::shared()->getCurrent();
+  colour = current.dark ? current.one.brighter(0.2f) : current.one.brighter(0.8f);
 }

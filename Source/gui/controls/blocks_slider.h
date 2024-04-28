@@ -28,8 +28,7 @@ public:
   ID module_id_;
   std::string parameter_name_;
   Component slider_container_;
-  // std::function<void(BlocksSlider*) on_adjusted_;
-
+  bool custom_track_colour_ = false;
 
   BlocksSlider(Listener* listener);
   ~BlocksSlider() override;

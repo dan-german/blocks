@@ -33,7 +33,9 @@ void PresetButtonContent::setupLabel(Label& label, String text, Colour color, fl
 }
 
 void PresetButtonContent::paint(juce::Graphics& g) {
-  g.setColour(ThemeManager::shared()->getCurrent().one);
+  auto current = ThemeManager::shared()->getCurrent();
+  Colour colour = current.dark ? current.one.brighter(0.2f) : current.one.brighter(0.8f);
+  g.setColour(colour);
   g.fillRoundedRectangle(getLocalBounds().toFloat(), getHeight() / 2.0f);
 }
 

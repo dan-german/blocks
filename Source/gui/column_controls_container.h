@@ -3,7 +3,7 @@
 #include "gui/controls/blocks_slider.h"
 #include "gui/ThemeListener.h"
 
-class ColumnControlsContainer: public juce::Component, ThemeListener, Slider::Listener {
+class ColumnControlsContainer: public juce::Component {
 public:
   enum class ControlType {
     level,
@@ -23,14 +23,8 @@ public:
   void resized() override;
   void reset();
   void highlight(bool highlight, Colour color);
-  // Colour colour = Colour(66, 66, 66);
 private:
-
-  void sliderValueChanged(Slider* slider) override;
-  void sliderDragStarted(Slider* slider) override;
-  void sliderDragEnded(Slider* slider) override;
-
-  void themeChanged(Theme theme) override;
+  // void themeChanged(Theme theme) override;
   std::unique_ptr<BlocksSlider> createSlider(std::string title, int column, BlocksSlider::Listener* listener);
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ColumnControlsContainer)
 };

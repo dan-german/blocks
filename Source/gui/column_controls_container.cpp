@@ -9,6 +9,7 @@ ColumnControlsContainer::ColumnControlsContainer(BlocksSlider::Listener* listene
     slider->default_value_ = 1.0f;
     slider->juce_slider_.setValue(1.0f);
     slider->juce_slider_.setRange(0.0f, 1.0f);
+    slider->parameter_name_ = "level";
     level_sliders_.push_back(std::move(slider));
   }
 
@@ -18,26 +19,24 @@ ColumnControlsContainer::ColumnControlsContainer(BlocksSlider::Listener* listene
     slider->juce_slider_.setRange(-1.0f, 1.0f);
     slider->default_value_ = 0.0f;
     slider->juce_slider_.setValue(0.0f);
+    slider->parameter_name_ = "pan";
     pan_sliders_.push_back(std::move(slider));
   }
 
-  ThemeManager::shared()->addListener(this);
+  // ThemeManager::shared()->addListener(this);
 }
 
 ColumnControlsContainer::~ColumnControlsContainer() {
-  ThemeManager::shared()->removeListener(this);
+  // ThemeManager::shared()->removeListener(this);
 }
 
 std::unique_ptr<BlocksSlider> ColumnControlsContainer::createSlider(std::string title, int column, BlocksSlider::Listener* listener) {
   auto slider = std::make_unique<BlocksSlider>(listener);
-  slider->setAlpha(0.5f);
-  slider->juce_slider_.getProperties().set("tag", String(title));
-  slider->juce_slider_.getProperties().set("column", column);
   slider->juce_slider_.textFromValueFunction = [title](double value) { return title; };
   slider->value_label_.setText(title, juce::dontSendNotification);
-  slider->juce_slider_.addListener(this);
   slider->parameter_name_ = title;
   slider->module_id_ = { "column control", column + 1 };
+  slider->module_id_.type = "column control";
   addAndMakeVisible(slider.get());
   return slider;
 }
@@ -52,7 +51,6 @@ void ColumnControlsContainer::resized() {
     auto bounds = Rectangle<int>(x, 0, slider_width, slider_height);
     auto width_delta = config.itemWidth - slider_width;
     bounds = bounds.withWidth(slider_width).withX(bounds.getX() + width_delta / 2);
-
     level_sliders_[i]->setBounds(bounds);
     pan_sliders_[i]->setBounds(bounds.withY(slider_height + vertical_margin));
   }
@@ -62,41 +60,14 @@ void ColumnControlsContainer::paint(juce::Graphics& g) {
   // g.fillAll(juce::Colours::red);
 }
 
-void ColumnControlsContainer::themeChanged(Theme theme) {
-  for (auto& slider : level_sliders_) {
-    slider->juce_slider_.setColour(Slider::ColourIds::trackColourId, theme.two.withAlpha(0.45f));
-  }
-  for (auto& slider : pan_sliders_) {
-    slider->juce_slider_.setColour(Slider::ColourIds::trackColourId, theme.two.withAlpha(0.45f));
-  }
-}
-
-void ColumnControlsContainer::sliderValueChanged(Slider* slider) {
-  auto column = slider->getProperties().getWithDefault("column", 0).toString().getIntValue();
-  if (slider->getProperties().getWithDefault("tag", "") == "level") {
-    listener->columnControlAdjusted(ControlType::level, column, slider->getValue());
-  } else {
-    listener->columnControlAdjusted(ControlType::pan, column, slider->getValue());
-  }
-}
-
-void ColumnControlsContainer::sliderDragStarted(Slider* slider) {
-  auto column = slider->getProperties().getWithDefault("column", 0).toString().getIntValue();
-  if (slider->getProperties().getWithDefault("tag", "") == "level") {
-    listener->columnControlStartedAdjusting(ControlType::level, column);
-  } else {
-    listener->columnControlStartedAdjusting(ControlType::pan, column);
-  }
-}
-
-void ColumnControlsContainer::sliderDragEnded(Slider* slider) {
-  auto column = slider->getProperties().getWithDefault("column", 0).toString().getIntValue();
-  if (slider->getProperties().getWithDefault("tag", "") == "level") {
-    listener->columnControlEndedAdjusting(ControlType::level, column);
-  } else {
-    listener->columnControlEndedAdjusting(ControlType::pan, column);
-  }
-}
+// void ColumnControlsContainer::themeChanged(Theme theme) {
+//   for (auto& slider : level_sliders_) {
+//     slider->juce_slider_.setColour(Slider::ColourIds::trackColourId, theme.two);
+//   }
+//   for (auto& slider : pan_sliders_) {
+//     slider->juce_slider_.setColour(Slider::ColourIds::trackColourId, theme.two);
+//   }
+// }
 
 void ColumnControlsContainer::reset() {
   for (auto& slider : level_sliders_) { slider->juce_slider_.setValue(1.0f); }
