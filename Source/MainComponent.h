@@ -64,6 +64,7 @@ private:
   TabContainerComponent tab_grid_;
   InspectorComponent inspector_;
   SliderContainer inspector_v2_;
+  SliderContainer column_controls_v2_;
   SavePopup save_popup_;
   GraphicsTimer timer_;
   ColumnControlsContainer column_controls_;
@@ -234,6 +235,7 @@ struct MainComponent::Delegate {
 
   virtual std::pair<float, float> editorRequestsModulatorValue(Index moduleIndex, int parameterIndex, int modulatorIndex) = 0;
   virtual std::pair<float, float> editorRequestsModulatorValue(int modulationConnectionIndex) = 0;
+  // virtual std::shared_ptr<model::Module>& editorRequestsColumnControls() = 0;
   // virtual std::shared_ptr<Tab> getTab(int column) = 0;
   virtual std::shared_ptr<model::Module> getModulator2(int index) = 0;
   virtual std::shared_ptr<model::Module> editorAddedModulator2(std::string code) = 0;

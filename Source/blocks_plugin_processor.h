@@ -110,6 +110,7 @@ public:
 
   void editorStartedAdjustingParameter(ID& id, std::string& parameter_name, bool started) override;
   void editorAdjustedParameter(ID& id, std::string& parameter_name, float value) override;
+  // std::shared_ptr<model::Module>& editorRequestsColumnControls() override;
 
   std::shared_ptr<model::Block> getBlock2(Index index) override;
   // std::shared_ptr<Tab> getTab(int column) override;

@@ -801,3 +801,7 @@ void PluginProcessor::editorStartedAdjustingParameter(ID& id, std::string& param
 void PluginProcessor::editorAdjustedParameter(ID& id, std::string& parameter_name, float value) {
   getModuleManager().getModule(id)->parameter_map_[parameter_name]->value_processor->set(value);
 }
+
+// std::shared_ptr<model::Module>& PluginProcessor::editorRequestsColumnControls() { 
+//   return getModuleManager().pool.column_controls_;
+// }

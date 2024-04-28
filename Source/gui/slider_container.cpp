@@ -10,7 +10,7 @@ SliderContainer::SliderContainer(BlocksSlider::Listener* slider_listener, Config
 {}
 
 void SliderContainer::paint(juce::Graphics& g) {
-  // g.fillAll(juce::Colours::red);
+  g.fillAll(juce::Colours::red);
 }
 
 void SliderContainer::resized() {

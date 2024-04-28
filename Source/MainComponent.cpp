@@ -12,6 +12,7 @@ MainComponent::MainComponent(juce::MidiKeyboardState& keyboard_state, Delegate* 
   tab_grid_(GridComponent::tab_config),
   block_grid_(GridComponent::blocks_config),
   column_controls_(this), // should this be a SliderContainer?
+  column_controls_v2_(this, SliderContainer::inspector_config), 
   inspector_v2_(this, SliderContainer::inspector_config)
 {
   setWantsKeyboardFocus(false);
@@ -24,7 +25,6 @@ MainComponent::MainComponent(juce::MidiKeyboardState& keyboard_state, Delegate* 
   addAndMakeVisible(block_placeholder_);
   addChildComponent(cursor, 1000);
   cursor.setInterceptsMouseClicks(false, false);
-  // cursor.add
   setupPresetMenu();
   setupDarkBackground(&grid_dark_background_, 3);
   addChildComponent(ui_layer_.modulators_);
@@ -47,15 +47,18 @@ MainComponent::MainComponent(juce::MidiKeyboardState& keyboard_state, Delegate* 
 }
 
 void MainComponent::setupColumnControls() {
+  // addAndMakeVisible(column_controls_v2_);
+  // auto column_
+
+  // 
+
+  // addAndMakeV
   addAndMakeVisible(column_controls_);
   column_controls_.listener = this;
-  for (auto& slider : column_controls_.level_sliders_) {
-    // slider->addMouseListener(this, true);
-    // slider->hit_area_.addMouseListener(this, true);
-  }
-  for (auto& slider : column_controls_.pan_sliders_) {
-    // slider->hit_area_.addMouseListener(this, true);
-  }
+  // for (auto& slider : column_controls_.level_sliders_) {
+  // }
+  // for (auto& slider : column_controls_.pan_sliders_) {
+  // }
 }
 
 void MainComponent::updateDotPosition(const Point<int> position) {
@@ -256,6 +259,7 @@ void MainComponent::resized() {
 void MainComponent::resizeColumnControls() {
   auto bounds = block_grid_.getBounds().withHeight(42).withY(block_grid_.getY() + block_grid_.getHeight() + 19);
   column_controls_.setBounds(bounds);
+  column_controls_v2_.setBounds(bounds.withY(bounds.getY() + 44));
 }
 
 void MainComponent::resizeTabContainer() {
