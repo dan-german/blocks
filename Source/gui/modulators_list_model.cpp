@@ -16,9 +16,8 @@
 int ModulatorsListModel::getNumRows() { return modulators_.size(); }
 void ModulatorsListModel::listBoxItemDoubleClicked(int row, const MouseEvent& event) { ListBoxModel::listBoxItemDoubleClicked(row, event); }
 var ModulatorsListModel::getDragSourceDescription(const SparseSet<int>& rowsToDescribe) { return ListBoxModel::getDragSourceDescription(rowsToDescribe); }
-void ModulatorsListModel::remove(int index) {
-  modulators_.erase(modulators_.begin() + index);
-}
+void ModulatorsListModel::remove(int index) { modulators_.erase(modulators_.begin() + index); }
+ModulatorsListModel::ModulatorsListModel(BlocksSlider::Listener* listener): slider_listener_(listener) { }
 
 Component* ModulatorsListModel::refreshComponentForRow(int rowNumber, bool isRowSelected, Component* existingComponentToUpdate) {
   ModulatorComponent* component;
@@ -28,15 +27,15 @@ Component* ModulatorsListModel::refreshComponentForRow(int rowNumber, bool isRow
   else
     component = new ModulatorComponent(this);
 
-  component->onSliderValueChange = {};
   if (modulators_.size() == 0) return component;
   if (rowNumber >= modulators_.size()) return component;
 
   component->row = rowNumber;
   auto model = modulators_[rowNumber];
-  setModelToComponent(model, *component);
   component->slider_container_.setModule(model);
   modulator_component_map_[model->id.getName()] = component;
+  setModelToComponent(model, *component);
+  component->slider_container_.addSliderListener(slider_listener_); 
 
   return component;
 }
@@ -57,11 +56,18 @@ void ModulatorsListModel::setModelToComponent(std::shared_ptr<model::Module> mod
   if (model->id.type == "envelope") {
     component.oscillatorPainter.setVisible(false);
     component.envelopePath.setVisible(true);
-    // onEnvelopeParameterChanged(value, model, i, component);
+    for (auto parameter : model->parameters_) {
+      onEnvelopeAdjusted(model, parameter->name, parameter->value_processor->value());
+    }
   } else {
     component.oscillatorPainter.setVisible(true);
     component.envelopePath.setVisible(false);
-    if (model->id.type == "random") component.oscillatorPainter.setWaveformType(OscillatorPainter::WaveformType::noise);
+    if (model->id.type == "random") {
+      component.oscillatorPainter.setWaveformType(OscillatorPainter::WaveformType::noise);
+    } else if (model->id.type == "lfo") {
+      auto wave_parameter = model->parameter_map_["wave"];
+      onLFOAdjusted(model, wave_parameter->name, wave_parameter->value_processor->value());
+    }
   }
 }
 
@@ -69,7 +75,7 @@ void ModulatorsListModel::onEnvelopeAdjusted(std::shared_ptr<model::Module> mode
   auto parameter = model->parameter_map_[parameter_name];
   auto normalized_value = juce::jmap(value, parameter->min, parameter->max, 0.0f, 1.0f);
   auto modulator_component = modulator_component_map_.at(model->id.getName());
-  if (parameter_name == "attack") { 
+  if (parameter_name == "attack") {
     modulator_component->envelopePath.setAttack(normalized_value);
   } else if (parameter_name == "decay") {
     modulator_component->envelopePath.setDecay(normalized_value);
@@ -78,14 +84,6 @@ void ModulatorsListModel::onEnvelopeAdjusted(std::shared_ptr<model::Module> mode
   } else if (parameter_name == "release") {
     modulator_component->envelopePath.setRelease(normalized_value);
   }
-
-  // switch (index) {
-  // case 0: component.envelopePath.setAttack(normalized_value); break;
-  // case 1: component.envelopePath.setDecay(normalized_value); break;
-  // case 2: component.envelopePath.setSustain(normalized_value); break;
-  // case 3: component.envelopePath.setRelease(normalized_value); break;
-  // default: break;
-  // }
 }
 
 void ModulatorsListModel::setModulators(std::vector<std::shared_ptr<model::Module>> modulators) {
@@ -103,15 +101,6 @@ void ModulatorsListModel::onLFOAdjusted(std::shared_ptr<model::Module> module, s
     auto component = modulator_component_map_.at(module->id.getName());
     component->oscillatorPainter.waveformType = static_cast<OscillatorPainter::WaveformType>(int(value));
   }
-
-  // bool is_changing_tempo = index == 1;
-  // bool is_not_seconds = int(component.sliders[2]->box_slider_.juce_slider_.getValue()) != 0;
-  // if (is_changing_tempo && is_not_seconds) {
-  //   auto value = component.sliders[1]->box_slider_.juce_slider_.getValue();
-  //   std::string value_string = std::to_string(value);
-  //   auto integer_part_length = value_string.substr(0, value_string.find(".")).size();
-  //   component.sliders[1]->box_slider_.juce_slider_.setNumDecimalPlacesToDisplay(4 - integer_part_length);
-  // }
 }
 
 void ModulatorsListModel::setSliderAsFrequency(std::shared_ptr<model::Module> module, LabeledSlider* slider) const {

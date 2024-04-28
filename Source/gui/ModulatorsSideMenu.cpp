@@ -10,13 +10,18 @@
 
 #include "gui/ModulatorsSideMenu.h"
 
-ModulatorsSideMenu::ModulatorsSideMenu(): button("ModulatorsPlusButton", Colours::transparentBlack, Colours::transparentBlack, Colours::transparentBlack) { setup(); }
+ModulatorsSideMenu::ModulatorsSideMenu(BlocksSlider::Listener* listener):
+  button("ModulatorsPlusButton", Colours::transparentBlack, Colours::transparentBlack, Colours::transparentBlack),
+  modulators_list_model_(listener)
+  {
+  setup();
+}
 ModulatorsSideMenu::~ModulatorsSideMenu() { listBox.setModel(nullptr); }
 
 void ModulatorsSideMenu::setup() {
   setupAddButton();
   setupListBox();
-  button.addMouseListener(this, false); 
+  button.addMouseListener(this, false);
 }
 
 void ModulatorsSideMenu::setupListBox() {

@@ -14,8 +14,11 @@
 #include "BinaryData.h"
 #include "module_new.h"
 
-UILayer::UILayer(juce::MidiKeyboardState& keyboard_state, Slider::Listener* listener):
-  keyboard(keyboard_state, MidiKeyboardComponent::Orientation::horizontalKeyboard), ComponentMovementWatcher(this) {
+UILayer::UILayer(juce::MidiKeyboardState& keyboard_state, BlocksSlider::Listener* listener):
+  ComponentMovementWatcher(this),
+  keyboard(keyboard_state, MidiKeyboardComponent::Orientation::horizontalKeyboard),
+  modulators_(listener)
+{
   addModulatorsButton();
   addAndMakeVisible(preset_button_);
 
@@ -31,7 +34,7 @@ UILayer::UILayer(juce::MidiKeyboardState& keyboard_state, Slider::Listener* list
   matrixButton->on_click_ = [this]() { connections.setVisible(true); };
 
   setupKeyboard();
-  connections_list_box_model_.slider_listener_ = listener;
+  // connections_list_box_model_.slider_listener_ = listener;
   setInterceptsMouseClicks(false, true);
   setOpaque(false);
   update_button_.text.setText("update", dontSendNotification);

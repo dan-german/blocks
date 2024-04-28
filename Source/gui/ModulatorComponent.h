@@ -50,7 +50,7 @@ public:
   Label title;
   EnvelopePath envelopePath;
   OscillatorPainter oscillatorPainter;
-  std::function<void(int, float)> onSliderValueChange;
+  // std::function<void(int, float)> onSliderValueChange;
   int row = -1;
 
   ModulatorComponent(BlocksSlider::Listener* listener);
@@ -79,12 +79,6 @@ public:
   void drawBottomLine(Graphics& g) const;
   void resizeEnvelopePath();
   void themeChanged(Theme theme) override;
-
-  void highlightSliders(bool shouldHighlight, Colour color) { 
-    for (auto slider : sliders) {
-      slider->box_slider_.setIndicationHighlight(shouldHighlight, color);
-    }
-  };
 };
 
 struct ModulatorComponent::Listener {

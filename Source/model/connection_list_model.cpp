@@ -42,7 +42,7 @@ Component* ModulationsListBoxModel::refreshComponentForRow(int rowNumber, bool i
 
   component->target.setText(target_name + " " + parameter_name, dontSendNotification);
   component->slider.setNumDecimalPlacesToDisplay(3);
-  component->slider.addListener(this->slider_listener_);
+  // component->slider.addListener(this->slider_listener_);
   component->delegate = delegate_;
   component->indicator.setColour(connection->source->colour.colour);
   component->source.setText(connection->source->display_name , dontSendNotification);

@@ -41,7 +41,7 @@ public:
 
   ModulationsListBoxModel connections_list_box_model_;
 
-  UILayer(juce::MidiKeyboardState& keyboard_state, Slider::Listener* listener);
+  UILayer(juce::MidiKeyboardState& keyboard_state, BlocksSlider::Listener* listener);
   ~UILayer() override;
 
   void resized() override;

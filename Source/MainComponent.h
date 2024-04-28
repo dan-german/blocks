@@ -71,6 +71,7 @@ private:
   std::vector<model::Block> copied_blocks_;
   std::vector<GridItemComponent*> currently_selected_items_;
   bool is_modulator_adjusting_ = false;
+  bool is_parameter_adjusting = false;
 
   Array<BlockComponent*> blocks;
   GridItemComponent* focused_grid_item_ = nullptr;

@@ -28,6 +28,9 @@ public:
   inline static Config inspector_config = { .max_columns = 3, .slider_width = 130, .slider_height = 23 };
   inline static Config modulator_config = { .max_columns = 2, .slider_width = 130, .slider_height = 23 };
 
+  std::vector<std::unique_ptr<LabeledSlider>> sliders_;
+  std::unordered_map<std::string, LabeledSlider*> slider_map_;
+
   SliderContainer(BlocksSlider::Listener* slider_listener, Config& config);
 
   void paint(juce::Graphics& g) override;
@@ -38,7 +41,6 @@ public:
 
   int rowsForSliderCount(int slider_count) const;
 
-  // void onEnvelopeParameterChanged(float value, std::shared_ptr<model::Module> model, int index) const;
   void onLFOAdjusted(BlocksSlider* slider) const;
   void setSliderAsTempo(LabeledSlider* slider) const;
   void setSliderAsFrequency(LabeledSlider* slider) const;
@@ -46,9 +48,8 @@ public:
   void resizeSliders() const;
   void setModule(std::shared_ptr<model::Module> module);
   void spawnSlider(vital::ValueDetails parameter, std::shared_ptr<model::Module> module);
-  std::vector<std::unique_ptr<LabeledSlider>> sliders_;
-  std::unordered_map<std::string, LabeledSlider*> slider_map_;
+  void setSlidersColour(Colour& colour);
+  void addSliderListener(BlocksSlider::Listener* listener);
+  void highlightModulationIndication(bool should_highlight, Colour colour);
 };
-
-
 } // namespace gui

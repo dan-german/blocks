@@ -29,9 +29,13 @@ private:
   void sliderAdjusted(BlocksSlider* slider, float value) override;
 public:
   ~ModulatorsListModel() override = default;
+  ModulatorsListModel(BlocksSlider::Listener* listener);
   Component* refreshComponentForRow(int rowNumber, bool isRowSelected, Component* existingComponentToUpdate) override;
-  Slider::Listener* sliderListener;
+
+  // Slider::Listener* sliderListener;
   ModulatorComponent::Listener* modulator_listener;
+  BlocksSlider::Listener* slider_listener_;
+
 
   int getNumRows() override;
   void remove(int index);

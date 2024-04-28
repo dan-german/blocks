@@ -136,3 +136,21 @@ void SliderContainer::setSliderAsTempo(LabeledSlider* slider) const {
   slider->box_slider_.juce_slider_.setValue(value, dontSendNotification);
   slider->box_slider_.value_label_.setText(slider->box_slider_.juce_slider_.getTextFromValue(value), dontSendNotification);
 }
+
+void SliderContainer::setSlidersColour(Colour& colour) {
+  for (auto& slider : sliders_) {
+    slider->box_slider_.juce_slider_.setColour(Slider::ColourIds::trackColourId, colour.darker(0.9f));
+  }
+}
+
+void SliderContainer::addSliderListener(BlocksSlider::Listener* listener) {
+  for (auto& slider : sliders_) {
+    slider->box_slider_.addListener(listener);
+  }
+}
+
+void SliderContainer::highlightModulationIndication(bool should_highlight, Colour colour) {
+  for (auto& slider : sliders_) {
+    slider->box_slider_.setIndicationHighlight(should_highlight, colour);
+  }
+}

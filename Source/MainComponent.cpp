@@ -570,10 +570,11 @@ void MainComponent::highlightModulatableSliders(bool highlight, Colour color = C
   auto modulators = delegate->getModulators2();
   for (int i = 0; i < modulators.size(); i++) {
     if (auto mc = dynamic_cast<ModulatorComponent*>(ui_layer_.modulators_.listBox.getComponentForRowNumber(i))) {
-      mc->highlightSliders(highlight, color);
+      mc->slider_container_.highlightModulationIndication(highlight, color);
     }
   }
   column_controls_.highlight(highlight, color);
+  if (inspector_v2_.isVisible()) inspector_v2_.highlightModulationIndication(highlight, color);
 }
 
 void MainComponent::graphicsTimerCallback(const float secondsSincelastUpdate) {
@@ -611,8 +612,7 @@ void MainComponent::updateConnectionIndicators() {
 }
 
 void MainComponent::mouseDrag(const MouseEvent& event) {
-  if (is_adjusting_inspector_ || modulator_drag_mode_ || is_modulator_adjusting_) return;
-
+  if (modulator_drag_mode_ || is_parameter_adjusting) return;
   block_grid_.add_button_.setAlpha(0);
   if (event.mods.isLeftButtonDown()) {
     resizeSelectionRect(event);
@@ -1243,5 +1243,8 @@ void MainComponent::sliderAdjusted(BlocksSlider* slider, float value) {
 }
 
 void MainComponent::sliderGestureChanged(BlocksSlider* slider, bool started) {
-
+  printf("gesture changed\n");
+  is_parameter_adjusting = started;
+  // auto modulator = delegate->getModulator2(modulatorComponent->row);
+  // delegate->editorParameterGestureChanged(modulator->name, parameter_name, started);
 }
