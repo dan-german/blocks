@@ -19,7 +19,7 @@ ModulatorComponent::~ModulatorComponent() {
   ThemeManager::shared()->removeListener(this);
 }
 
-ModulatorComponent::ModulatorComponent(): slider_container_(nullptr, gui::SliderContainer::modulator_config) {
+ModulatorComponent::ModulatorComponent(BlocksSlider::Listener* listener): slider_container_(listener, gui::SliderContainer::modulator_config) {
   addAndMakeVisible(drag_indicator_);
 
   addAndMakeVisible(drag_hitbox_);
@@ -52,7 +52,7 @@ void ModulatorComponent::setupSliders() {
     sliders.add(slider);
     // addAndMakeVisible(slidersContainer);
     slidersContainer.addAndMakeVisible(slider);
-    slider->box_slider_.slider_.addListener(this);
+    slider->box_slider_.juce_slider_.addListener(this);
   }
 }
 
@@ -220,12 +220,12 @@ void ModulatorComponent::setColour(Colour colour) {
   envelopePath.colour = colour;
 
   for (auto slider : sliders)
-    slider->box_slider_.slider_.setColour(Slider::ColourIds::trackColourId, colour.darker(0.9f));
+    slider->box_slider_.juce_slider_.setColour(Slider::ColourIds::trackColourId, colour.darker(0.9f));
 }
 
 void ModulatorComponent::sliderDragStarted(Slider* slider) {
   for (int i = 0; i < sliders.size(); i++)
-    if (&sliders[i]->box_slider_.slider_ == slider) {
+    if (&sliders[i]->box_slider_.juce_slider_ == slider) {
       currentSliderIndex = i;
       break;
     }

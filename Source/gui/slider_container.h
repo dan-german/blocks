@@ -4,7 +4,7 @@
 #include "module_new.h"
 
 namespace gui {
-class SliderContainer: public juce::Component, juce::Slider::Listener {
+class SliderContainer: public juce::Component, BlocksSlider::Listener {
 private:
   const int slider_width = 130;
   const int slider_height = 23;
@@ -14,6 +14,9 @@ private:
   const int offset = 0;
   int max_columns_ = 3;
   BlocksSlider::Listener* slider_listener_;
+  std::shared_ptr<model::Module> module_;
+
+  void sliderAdjusted(BlocksSlider* slider, float value) override;
 public:
   struct Config {
     int max_columns;
@@ -32,14 +35,13 @@ public:
   int calculateWidth();
   int calculateHeight();
 
-  void sliderValueChanged(juce::Slider* slider) override;
 
   int rowsForSliderCount(int slider_count) const;
 
-  void onEnvelopeParameterChanged(float value, std::shared_ptr<model::Module> model, int index) const;
-  void onLFOParameterChange(std::shared_ptr<model::Module> module, int index, float value) const;
-  void setSliderAsTempo(std::shared_ptr<model::Module> module, LabeledSlider* slider) const;
-  void setSliderAsFrequency(std::shared_ptr<model::Module> module, LabeledSlider* slider) const;
+  // void onEnvelopeParameterChanged(float value, std::shared_ptr<model::Module> model, int index) const;
+  void onLFOAdjusted(BlocksSlider* slider) const;
+  void setSliderAsTempo(LabeledSlider* slider) const;
+  void setSliderAsFrequency(LabeledSlider* slider) const;
 
   void resizeSliders() const;
   void setModule(std::shared_ptr<model::Module> module);

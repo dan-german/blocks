@@ -53,7 +53,7 @@ public:
   std::function<void(int, float)> onSliderValueChange;
   int row = -1;
 
-  ModulatorComponent();
+  ModulatorComponent(BlocksSlider::Listener* listener);
   ~ModulatorComponent() override;
 
   int calculateHeight();

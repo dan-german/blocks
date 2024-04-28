@@ -1,26 +1,13 @@
 #include "gui/controls/blocks_slider.h"
 #include "gui/ThemeManager.h"
 
-void BlocksSlider::sliderValueChanged(Slider* slider) {
-  float value = slider->getValue();
-  value_label_.setText(slider->getTextFromValue(value), dontSendNotification);
-  if (listener_) listener_->sliderAdjusted(this, value);
-}
-
-void BlocksSlider::sliderDragStarted(Slider* slider) {
-  if (listener_)listener_->sliderGestureChanged(this, true);
-}
-
-void BlocksSlider::sliderDragEnded(Slider* slider) {
-  if (listener_)listener_->sliderGestureChanged(this, false);
-}
-
 BlocksSlider::~BlocksSlider() {
-  slider_.setLookAndFeel(nullptr);
+  juce_slider_.setLookAndFeel(nullptr);
   ThemeManager::shared()->removeListener(this);
 }
 
-BlocksSlider::BlocksSlider(Listener* listener): listener_(listener) {
+BlocksSlider::BlocksSlider(Listener* listener) {
+  listeners_.push_back(listener);
   setName("BoxSlider");
   modulation_indication_highlight_.setFill(juce::FillType(Colour(134, 118, 177)));
   addChildComponent(modulation_indication_highlight_);
@@ -31,15 +18,34 @@ BlocksSlider::BlocksSlider(Listener* listener): listener_(listener) {
   modulation_selection_highlight_.setFill(juce::FillType(Colour(255, 222, 161)));
   setupLabel();
 
-  slider_.addMouseListener(this, false);
+  juce_slider_.addMouseListener(this, false);
   ThemeManager::shared()->addListener(this);
   themeChanged(ThemeManager::shared()->getCurrent());
 
   setupIndicationAnimator();
 }
 
+void BlocksSlider::sliderValueChanged(Slider* slider) {
+  float value = slider->getValue();
+  value_label_.setText(slider->getTextFromValue(value), dontSendNotification);
+
+  for (auto listener : listeners_) {
+    if (listener) listener->sliderAdjusted(this, value);
+  }
+}
+
+void BlocksSlider::sliderDragStarted(Slider* slider) {
+  for (auto listener : listeners_)
+    if (listener) listener->sliderGestureChanged(this, true);
+}
+
+void BlocksSlider::sliderDragEnded(Slider* slider) {
+  for (auto listener : listeners_)
+    if (listener) listener->sliderGestureChanged(this, false);
+}
+
 void BlocksSlider::setupSliderContainer() {
-  slider_container_.addAndMakeVisible(slider_);
+  slider_container_.addAndMakeVisible(juce_slider_);
   slider_container_.addChildComponent(modulation_selection_highlight_);
   slider_container_.setMouseCursor(MouseCursor::PointingHandCursor);
   slider_container_.setInterceptsMouseClicks(false, true);
@@ -47,11 +53,11 @@ void BlocksSlider::setupSliderContainer() {
 }
 
 void BlocksSlider::setupSlider() {
-  slider_.setLookAndFeel(&lnf);
-  slider_.setTextBoxStyle(Slider::NoTextBox, false, 0, 0);
-  slider_.setMouseCursor(MouseCursor::PointingHandCursor);
-  slider_.addListener(this);
-  slider_.setName("blocks_core_slider"); // find a better name
+  juce_slider_.setLookAndFeel(&lnf);
+  juce_slider_.setTextBoxStyle(Slider::NoTextBox, false, 0, 0);
+  juce_slider_.setMouseCursor(MouseCursor::PointingHandCursor);
+  juce_slider_.addListener(this);
+  juce_slider_.setName("blocks_core_slider"); // find a better name
 }
 
 void BlocksSlider::setupIndicationAnimator() {
@@ -71,7 +77,7 @@ void BlocksSlider::setupIndicationAnimator() {
 
 void BlocksSlider::resized() {
   BaseButton::resized();
-  slider_.setBounds(getContent()->getLocalBounds());
+  juce_slider_.setBounds(getContent()->getLocalBounds());
   value_label_.setBounds(getLocalBounds());
   float corner_radius = getHeight() / 3.25f;
   Path indication_path;
@@ -102,31 +108,31 @@ void BlocksSlider::themeChanged(Theme theme) {
 void BlocksSlider::mouseDown(const MouseEvent& event) {
   auto isRightClick = event.mods.isRightButtonDown();
   if (isRightClick) {
-    slider_.setValue(default_value_, dontSendNotification);
+    juce_slider_.setValue(default_value_, dontSendNotification);
   }
 }
 
 void BlocksSlider::selectedCompletion() {
   BaseButton::selectedCompletion();
-  slider_.setBounds(getContent()->getLocalBounds());
+  juce_slider_.setBounds(getContent()->getLocalBounds());
   resizeSelectionHighlight();
 }
 
 void BlocksSlider::deselectedCompletion() {
   BaseButton::deselectedCompletion();
-  slider_.setBounds(getContent()->getLocalBounds());
+  juce_slider_.setBounds(getContent()->getLocalBounds());
   resizeSelectionHighlight();
 }
 
 void BlocksSlider::selectedAnimation(float value, float progress) {
   BaseButton::selectedAnimation(value, progress);
-  slider_.setBounds(getContent()->getLocalBounds());
+  juce_slider_.setBounds(getContent()->getLocalBounds());
   resizeSelectionHighlight();
 }
 
 void BlocksSlider::deselectedAnimation(float value, float progress) {
   BaseButton::deselectedAnimation(value, progress);
-  slider_.setBounds(getContent()->getLocalBounds());
+  juce_slider_.setBounds(getContent()->getLocalBounds());
   resizeSelectionHighlight();
 }
 
@@ -162,7 +168,7 @@ void BlocksSlider::startModulationSelectionAnimation() {
   modulation_selection_highlight_.setVisible(true);
   modulation_indication_highlight_.setVisible(false);
   value_label_.setColour(Label::ColourIds::textColourId, current);
-  slider_.setAlpha(0.1f);
+  juce_slider_.setAlpha(0.1f);
   startSelectedAnimation();
 }
 
@@ -170,6 +176,6 @@ void BlocksSlider::stopModulationSelectionAnimation() {
   value_label_.setColour(Label::ColourIds::textColourId, ThemeManager::shared()->getCurrent().two.brighter(0.4f));
   modulation_selection_highlight_.setVisible(false);
   modulation_indication_highlight_.setVisible(true);
-  slider_.setAlpha(1.0f);
+  juce_slider_.setAlpha(1.0f);
   startDeselectedAnimation();
 }

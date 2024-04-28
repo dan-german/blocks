@@ -763,8 +763,8 @@ void MainComponent::loadState(Preset preset) {
 
   for (auto column_control : preset.column_controls) {
     int index = column_control.id.number - 1;
-    column_controls_.pan_sliders_[index]->slider_.setValue(column_control.parameters["pan"]);
-    column_controls_.level_sliders_[index]->slider_.setValue(column_control.parameters["level"]);
+    column_controls_.pan_sliders_[index]->juce_slider_.setValue(column_control.parameters["pan"]);
+    column_controls_.level_sliders_[index]->juce_slider_.setValue(column_control.parameters["level"]);
   }
 
   ui_layer_.setConnections(delegate->getModulations());

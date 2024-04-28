@@ -13,13 +13,14 @@ using namespace juce;
 
 class BlocksSlider: public BaseButton, juce::Slider::Listener, ThemeListener {
 public:
+  class Listener;
   enum Type { tString, tFloat };
   Colour current;
   float value = 0.0f;
   float sensitivity = 0.010f;
   juce::String suffix = "";
   juce::StringArray choices;
-  Slider slider_;
+  Slider juce_slider_;
   Label value_label_;
   float default_value_ = 0.0f;
 
@@ -27,9 +28,8 @@ public:
   ID module_id_;
   std::string parameter_name_;
   Component slider_container_;
+  // std::function<void(BlocksSlider*) on_adjusted_;
 
-  class Listener;
-  Listener* listener_;
 
   BlocksSlider(Listener* listener);
   ~BlocksSlider() override;
@@ -49,6 +49,7 @@ public:
   Component* getContent() override { return &slider_container_; }
   void startModulationSelectionAnimation();
   void stopModulationSelectionAnimation();
+  inline void addListener(Listener* listener) { listeners_.push_back(listener); }
 protected:
   void selectedAnimation(float value, float progress) override;
   void deselectedAnimation(float value, float progress) override;
@@ -56,6 +57,7 @@ protected:
   void deselectedCompletion() override;
   void mouseDown(const MouseEvent& event) override;
 private:
+  std::vector<Listener*> listeners_;
   ValueAnimator value_animator_;
   DrawablePath modulation_indication_highlight_;
   DrawablePath modulation_selection_highlight_;
@@ -71,5 +73,5 @@ private:
 
 struct BlocksSlider::Listener {
   virtual void sliderAdjusted(BlocksSlider* slider, float value) = 0;
-  virtual void sliderGestureChanged(BlocksSlider* slider, bool started) = 0;
+  virtual void sliderGestureChanged(BlocksSlider* slider, bool started) {};
 };
