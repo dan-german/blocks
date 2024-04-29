@@ -103,12 +103,9 @@ void BlocksSlider::setupLabel() {
 
 void BlocksSlider::themeChanged(Theme theme) {
   Colour value_label_colour = theme.dark ? theme.two.brighter(0.7f) : theme.background.brighter(0.4);
-  // Colour value_label_colour = theme.two.brighter(0.7f);
   value_label_.setColour(Label::ColourIds::textColourId, value_label_colour);
 
   if (!custom_track_colour_) {
-    // Colour track_colour = theme.dark ? theme.two : theme.two.brighter(0.40f) ;
-    // Colour track_colour = theme.dark ? theme.two : theme.two.brighter(0.10f) ;
     Colour track_colour = theme.two;
     juce_slider_.setColour(Slider::ColourIds::trackColourId, track_colour);
   }

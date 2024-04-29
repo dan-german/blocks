@@ -30,11 +30,11 @@ public:
   PresetButtonComponent preset_button_;
   KeyboardComponent keyboard;
 
-  std::unique_ptr<SVGButton> settingsButton;
-  std::unique_ptr<SVGButton> matrixButton;
-  std::unique_ptr<SVGButton> saveButton;
-  std::unique_ptr<SVGButton> newPresetButton;
-  std::unique_ptr<SVGButton> theme_button_;
+  SVGButton settingsButton;
+  SVGButton matrixButton;
+  SVGButton saveButton;
+  SVGButton newPresetButton;
+  SVGButton theme_button_;
 
   std::unique_ptr<ModulatorsButton> modulatorsButton;
   LabelButton update_button_;
@@ -51,7 +51,7 @@ public:
   void componentPeerChanged() override {};
   void componentVisibilityChanged() override {};
 private:
-  void addSVGButton(std::unique_ptr<SVGButton>& button, const char* rawData, size_t size);
+  void addSVGButton(SVGButton& button, const char* rawData, size_t size);
   void resizePresetButton();
   void setupSideMenus();
   void setupKeyboard();

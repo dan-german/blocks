@@ -839,10 +839,6 @@ std::shared_ptr<model::Connection> SynthBase::createConnectionModel(int modulato
 }
 
 void SynthBase::connectModulation(int modulator_index, std::string target_name, std::string parameter_name) {
-  // if (target_name.find("lfo") == 0 && parameter_name == "frequency") {
-  //   bool is_seconds = module_manager_.getModule(target_name)->parameter_map_["sync"]->value_processor->value() == 0.0f;
-  //   parameter_name = is_seconds ? "frequency" : "tempo";
-  // }
   auto connection_model = createConnectionModel(modulator_index, target_name, parameter_name);
   if (!connection_model) return;
   std::cout << "connecting " << connection_model->source->name << " to " << connection_model->target->name << " " << connection_model->parameter_name_ << std::endl;

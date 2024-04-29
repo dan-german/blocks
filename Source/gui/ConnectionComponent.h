@@ -13,9 +13,10 @@
 #include "gui/controls/BlocksButton.h"
 #include "gui/ModulationIndicatorComponent.h"
 #include "gui/controls/ExitButton.h"
+#include "gui/controls/blocks_slider.h"
 
 #include "gui/ThemeManager.h"
-class ConnectionComponent: public juce::Component, public ThemeListener {
+class ConnectionComponent: public juce::Component, public ThemeListener, public BlocksSlider::Listener {
 public:
   struct Listener;
   Listener* delegate;
@@ -27,7 +28,7 @@ public:
   void handleOscGainEnvelope();
   void reset();
 
-  Slider slider;
+  BlocksSlider slider;
   Label source;
   Label target;
   BlocksButton bipolarButton;
@@ -37,12 +38,16 @@ public:
 
   void themeChanged(Theme theme) override;
 private:
-  int horizontalInsets = 3;
+  Label value_label_;
+  int horizontalInsets = 6;
   void resizeBipolarButton();
   void setupBipolarButton();
   void resizeExitButton();
   void resizeIndicator();
   void resizeSlider();
+
+  void setupLabel(juce::Label& label, const juce::Justification& justification);
+  void sliderAdjusted(BlocksSlider* slider, float value) override;
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ConnectionComponent)
 };

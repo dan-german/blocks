@@ -181,13 +181,14 @@ void MainComponent::setupListeners() {
     save_popup_.setVisible(false);
   };
 
-  ui_layer_.modulators_.plus_button_callback = [this](const juce::MouseEvent& event) {
-    auto position = event.eventComponent->getPosition() + ui_layer_.modulators_.getPosition();
+  ui_layer_.modulators_.plus_button_.on_click_ = [this]() {
+    auto relative_position = ui_layer_.modulators_.plus_button_.getBounds().getCentre();
+    auto position = relative_position + ui_layer_.modulators_.getPosition();
     modulators_popup_.setBounds(position.getX(), position.getY(), 74, 76);
     showPopup(modulators_popup_, [this](Index i) { this->clickOnModulatorsPopup(i); });
   };
 
-  ui_layer_.newPresetButton->on_click_ = [this]() {
+  ui_layer_.newPresetButton.on_click_ = [this]() {
     delegate->editorChangedPreset(-1);
     clear();
   };
@@ -199,13 +200,13 @@ void MainComponent::setupListeners() {
     }
   };
 
-  ui_layer_.saveButton->on_click_ = [this]() {
+  ui_layer_.saveButton.on_click_ = [this]() {
     this->dark_background_.setVisible(true);
     this->dark_background_.toFront(true);
     this->save_popup_.setBounds(0, 0, 210, 37);
 
     int y = this->getHeight() / 12;
-    this->save_popup_.setCentrePosition(ui_layer_.saveButton->getBounds().getCentre().x, y);
+    this->save_popup_.setCentrePosition(ui_layer_.saveButton.getBounds().getCentre().x, y);
     this->save_popup_.present();
   };
 
@@ -215,7 +216,7 @@ void MainComponent::setupListeners() {
     addModulator(model::modulators[index].toStdString());
   };
   ui_layer_.preset_button_.on_click_ = [this]() { presetButtonClicked(); };
-  ui_layer_.theme_button_->on_click_ = [this]() {
+  ui_layer_.theme_button_.on_click_ = [this]() {
     UserSettings::shared()->set("theme", ThemeManager::shared()->next());
     repaint();
   };
@@ -264,7 +265,8 @@ void MainComponent::mouseDown(const MouseEvent& event) {
 
 void MainComponent::mouseUp(const MouseEvent& event) {
   auto component_name = event.eventComponent->getName();
-  if (component_name == "ModulatorsPlusButton") return;
+  if (event.eventComponent == &ui_layer_.modulators_.plus_button_) return;
+  // if (component_name == "ModulatorsPlusButton") return;
 
   if (modulator_drag_mode_) {
     previous_slider_under_mouse_ = {};

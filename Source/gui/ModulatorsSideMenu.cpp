@@ -9,20 +9,13 @@
 */
 
 #include "gui/ModulatorsSideMenu.h"
+#include "BinaryData.h"
 
-ModulatorsSideMenu::ModulatorsSideMenu(BlocksSlider::Listener* listener):
-  button("ModulatorsPlusButton", Colours::transparentBlack, Colours::transparentBlack, Colours::transparentBlack),
-  modulators_list_model_(listener)
-  {
-  setup();
+ModulatorsSideMenu::ModulatorsSideMenu(BlocksSlider::Listener* listener): modulators_list_model_(listener) {
+  setupSVGButton(plus_button_, BinaryData::plus_svg, BinaryData::plus_svgSize);
+  setupListBox();
 }
 ModulatorsSideMenu::~ModulatorsSideMenu() { listBox.setModel(nullptr); }
-
-void ModulatorsSideMenu::setup() {
-  setupAddButton();
-  setupListBox();
-  button.addMouseListener(this, false);
-}
 
 void ModulatorsSideMenu::setupListBox() {
   int row_height = 106;
@@ -30,31 +23,10 @@ void ModulatorsSideMenu::setupListBox() {
   listBox.setModel(&modulators_list_model_);
 }
 
-void ModulatorsSideMenu::setupAddButton() {
-  addAndMakeVisible(plus_button);
-  addAndMakeVisible(button);
-  // addAndMakeVisible(plus_button2);
-}
-
 void ModulatorsSideMenu::resized() {
   SideMenu::resized();
-  resizeAddButton();
-}
-
-void ModulatorsSideMenu::mouseUp(const MouseEvent& event) {
-  auto relative_position = event.getEventRelativeTo(this).getPosition();
-  if (button.getBounds().contains(relative_position)) {
-    if (plus_button_callback) {
-      plus_button_callback(event);
-    }
-  }
-}
-
-void ModulatorsSideMenu::resizeAddButton() {
-  int addButtonSize = 12;
-  int x = exitButton.getX() + exitButton.getWidth() + 12;
-  plus_button.setAlpha(1.0f);
-  plus_button.plusLineLength = 11;
-  plus_button.setBounds(x, exitButton.getY(), addButtonSize, addButtonSize);
-  button.setBounds(plus_button.getBounds().expanded(4));
+  int x = exit_button_.getRight() + 6;
+  int y = exit_button_.getY() - 1;
+  int size = exit_button_.getHeight() + 2;
+  plus_button_.setBounds(x, y, size, size);
 }

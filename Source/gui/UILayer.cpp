@@ -31,7 +31,7 @@ UILayer::UILayer(juce::MidiKeyboardState& keyboard_state, BlocksSlider::Listener
 
   setupSideMenus();
 
-  matrixButton->on_click_ = [this]() { connections.setVisible(true); };
+  matrixButton.on_click_ = [this]() { connections.setVisible(true); };
 
   setupKeyboard();
   // connections_list_box_model_.slider_listener_ = listener;
@@ -42,10 +42,9 @@ UILayer::UILayer(juce::MidiKeyboardState& keyboard_state, BlocksSlider::Listener
   update_button_.on_click_ = [this]() { juce::URL("https://www.soonth.com").launchInDefaultBrowser(); };
 }
 
-void UILayer::addSVGButton(std::unique_ptr<SVGButton>& button, const char* rawData, size_t size) {
-  button.reset(new SVGButton());
-  button->setSVG(rawData, size);
-  addAndMakeVisible(*button);
+void UILayer::addSVGButton(SVGButton& button, const char* rawData, size_t size) {
+  button.setSVG(rawData, size);
+  addAndMakeVisible(button);
 }
 
 void UILayer::addModulatorsButton() {
@@ -58,7 +57,7 @@ void UILayer::addModulatorsButton() {
 void UILayer::setupSettingsButton() {
   addSVGButton(settingsButton, BinaryData::settings_svg, BinaryData::settings_svgSize);
 
-  settingsButton->on_click_ = []() {
+  settingsButton.on_click_ = []() {
     if (auto holder = juce::StandalonePluginHolder::getInstance()) {
       holder->showAudioSettingsDialog();
     }
@@ -81,7 +80,7 @@ void UILayer::resized() {
 
   resizePresetButton();
   int sidePanelWidth = 260;
-  connections.setBounds(0, 0, sidePanelWidth, getHeight() - keyboardHeight);
+  connections.setBounds(0, 0, sidePanelWidth - 20, getHeight() - keyboardHeight);
   modulators_.setBounds(getWidth() - sidePanelWidth, 0, sidePanelWidth, getHeight() - keyboardHeight);
 
   resizeSaveAndNewButtons();
@@ -90,13 +89,13 @@ void UILayer::resized() {
 
   auto newSize = 22;
   auto newY = preset_button_.getY() + (preset_button_.getHeight() / 2) - newSize / 2;
-  matrixButton->setBounds(edgeMargin, newY, 24, 24);
+  matrixButton.setBounds(edgeMargin, newY, 24, 24);
 
   resizeModulatorsButton();
 
   int themeButtonSize = 24;
   int y = keyboard.getY() - themeButtonSize - edgeMargin;
-  theme_button_->setBounds(edgeMargin, y, themeButtonSize, themeButtonSize);
+  theme_button_.setBounds(edgeMargin, y, themeButtonSize, themeButtonSize);
 }
 
 void UILayer::resizeSaveAndNewButtons() {
@@ -104,23 +103,23 @@ void UILayer::resizeSaveAndNewButtons() {
   int verticalSpacing = 12;
   int saveButtonX = preset_button_.getRight() + verticalSpacing + buttonSize / 2;
 
-  saveButton->setBounds(0, 0, buttonSize, buttonSize);
-  saveButton->setCentrePosition(saveButtonX, preset_button_.getBounds().getCentreY());
+  saveButton.setBounds(0, 0, buttonSize, buttonSize);
+  saveButton.setCentrePosition(saveButtonX, preset_button_.getBounds().getCentreY());
 
   int newPresetX = preset_button_.getX() - verticalSpacing - buttonSize / 2;
-  newPresetButton->setBounds(0, 0, buttonSize, buttonSize);
-  newPresetButton->setCentrePosition(newPresetX, preset_button_.getBounds().getCentreY());
+  newPresetButton.setBounds(0, 0, buttonSize, buttonSize);
+  newPresetButton.setCentrePosition(newPresetX, preset_button_.getBounds().getCentreY());
 
   int update_button_width = 50;
   update_button_.setBounds(0, 0, update_button_width, 23);
-  update_button_.setCentrePosition(saveButton->getRight() + verticalSpacing + update_button_width / 2, preset_button_.getBounds().getCentreY());
+  update_button_.setCentrePosition(saveButton.getRight() + verticalSpacing + update_button_width / 2, preset_button_.getBounds().getCentreY());
 }
 
 void UILayer::resizeSettingsButton() {
   int settingsButtonSize = 25;
   int settingsY = keyboard.getY() - settingsButtonSize - edgeMargin;
   int settingsX = getWidth() - settingsButtonSize - edgeMargin;
-  settingsButton->setBounds(settingsX, settingsY, settingsButtonSize, settingsButtonSize);
+  settingsButton.setBounds(settingsX, settingsY, settingsButtonSize, settingsButtonSize);
 }
 
 void UILayer::resizeModulatorsButton() {
