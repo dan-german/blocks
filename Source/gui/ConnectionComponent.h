@@ -12,8 +12,8 @@
 
 #include "gui/controls/BlocksButton.h"
 #include "gui/ModulationIndicatorComponent.h"
-#include "gui/controls/ExitButton.h"
 #include "gui/controls/blocks_slider.h"
+#include "gui/controls/SVGButton.h"
 
 #include "gui/ThemeManager.h"
 class ConnectionComponent: public juce::Component, public ThemeListener, public BlocksSlider::Listener {
@@ -33,7 +33,7 @@ public:
   Label target;
   BlocksButton bipolarButton;
   ModulationIndicatorComponent indicator;
-  ExitButton exitButton;
+  SVGButton exit_button_;
   int row = -1;
 
   void themeChanged(Theme theme) override;

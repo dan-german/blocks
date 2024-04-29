@@ -58,6 +58,7 @@ ModulePool::ModulePool() {
   all_modules_.insert(all_modules_.end(), blocks.all.begin(), blocks.all.end());
   all_modules_.insert(all_modules_.end(), modulators.all.begin(), modulators.all.end());
   all_modules_.insert(all_modules_.end(), column_controls_.begin(), column_controls_.end());
+  // all_modules_.insert(all_modules_.end(), column_controls_.begin(), column_controls_.end());
   for (auto module : all_modules_) name_module_map_[module->name] = module;
 }
 

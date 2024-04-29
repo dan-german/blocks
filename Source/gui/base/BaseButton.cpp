@@ -15,13 +15,14 @@ void BaseButton::mouseEnter(const juce::MouseEvent& event) {
 }
 
 void BaseButton::mouseUp(const juce::MouseEvent& event) {
+  bool is_outside = !getLocalBounds().contains(event.getPosition());
+  if (is_outside) return;
   if (on_click_) on_click_();
 }
 
 void BaseButton::mouseExit(const juce::MouseEvent& event) {
   isMouseHovering = false;
   startDeselectedAnimation();
-  // setMouseCursor(MouseCursor::NormalCursor);
 }
 
 void BaseButton::resized() {

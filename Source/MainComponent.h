@@ -95,8 +95,8 @@ private:
   bool multiple_selection_ = false;
   bool is_adjusting_inspector_ = false;
 
-  void stopPreviousModulationAnimation(const ModulatorComponent* modulator_component);
-  void startModulationAnimationIfNeeded(const ModulatorComponent* modulator_component);
+  void handleModulationHoverEnd(const ModulatorComponent* modulator_component);
+  void handleModulationHover(const ModulatorComponent* modulator_component);
   void handleNoComponentFound(const ModulatorComponent* modulator_component);
   void handleModulatings(const ModulatorComponent* modulator_component, const juce::MouseEvent& event);
 

@@ -40,14 +40,18 @@ Component* ModulationsListBoxModel::refreshComponentForRow(int rowNumber, bool i
   }
 
   auto parameter_name = connection->parameter_name_;
+  auto parameter_display_name = connection->target->parameter_map_[parameter_name]->display_name;
   auto target_name = connection->target->display_name;
 
-  component->target.setText(target_name + " " + parameter_name, dontSendNotification);
+  component->target.setText(target_name + " " + parameter_display_name, dontSendNotification);
   component->delegate = delegate_;
   component->indicator.setColour(connection->source->colour.colour);
   component->source.setText(connection->source->display_name, dontSendNotification);
   component->row = rowNumber;
   component->source.setColour(Label::ColourIds::textColourId, connection->source->colour.colour);
+  component->slider.module_id_.number = connection->id;
+  component->slider.module_id_.type = "modulation";
+  component->slider.parameter_name_ = "amount";
 
   return component;
 }

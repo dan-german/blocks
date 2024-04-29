@@ -25,10 +25,6 @@ public:
   bool isChild = false;
   int length = 1;
 
-  inline bool isModulator() { return category == Category::modulator; }
-  inline bool isEnvelope() { return id.type == "envelope"; }
-  inline bool isOscillator() { return id.type == "osc"; }
-
   Module(std::string prefix, int number): name(prefix + " " + std::to_string(number)) {
     id = { prefix, number };
     display_name = prefix + " " + std::to_string(number);

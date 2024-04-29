@@ -11,6 +11,7 @@
 #include "gui/ConnectionComponent.h"
 #include "settings/Constants.h"
 #include "ui_utils.h"
+#include "BinaryData.h"
 
 void ConnectionComponent::paint(juce::Graphics& g) {
   // g.fillAll(Colours::transparentBlack); 
@@ -40,8 +41,9 @@ ConnectionComponent::ConnectionComponent():
 
   setupBipolarButton();
 
-  addAndMakeVisible(exitButton);
-  exitButton.onClick = [this]() { delegate->connectionDeleted(this); };
+  addAndMakeVisible(exit_button_);
+  exit_button_.setSVG(BinaryData::x_svg, BinaryData::x_svgSize);
+  exit_button_.on_click_ = [this]() { delegate->connectionDeleted(this); };
 
   ThemeManager::shared()->addListener(this);
   themeChanged(ThemeManager::shared()->getCurrent());
@@ -68,15 +70,14 @@ void ConnectionComponent::setupBipolarButton() {
 
 void ConnectionComponent::resized() {
   int y = 8;
-  source.setBounds(horizontalInsets * 2, y, 100, 20);
-  target.setBounds(getWidth() - 100 - horizontalInsets * 2, y, 100, 20);
-
+  source.setBounds(slider.getX() - 2, y, 100, 20);
+  int target_width = 100;
+  target.setBounds(getWidth() - target_width - 7, y, target_width, 20);
 
   resizeIndicator();
   resizeSlider();
-  // resizeBipolarButton();
-  // resizeExitButton();
-
+  resizeBipolarButton();
+  resizeExitButton();
   int value_label_width = 80;
   value_label_.setBounds(getWidth() / 2 - value_label_width / 2, slider.getBottom() + 6, value_label_width, 12);
 }
@@ -89,25 +90,23 @@ void ConnectionComponent::resizeSlider() {
 
 void ConnectionComponent::resizeIndicator() {
   int horizontalOffset = static_cast<int>(slider.juce_slider_.getPositionOfValue(-1.0f));
-  indicator.setBounds(horizontalOffset, slider.getY() - 8, getWidth() - horizontalOffset * 2, 8);
+  indicator.setBounds(horizontalOffset, slider.getY() - 10, getWidth() - horizontalOffset * 2, 8);
 }
 
 void ConnectionComponent::resizeBipolarButton() {
   int width = 52;
-  int height = 18;
-  bipolarButton.setBounds(10, slider.getBottom() - 18, width, height);
+  int height = 12;
+  bipolarButton.setBounds(slider.getX() - 4, value_label_.getY() - 1, width, height);
 }
 
 void ConnectionComponent::resizeExitButton() {
-  int size = 12;
+  int size = 16;
   int y = bipolarButton.getY() + (bipolarButton.getHeight() / 2) - size / 2;
-  exitButton.setBounds(getWidth() - size - 12, y, size, size);
+  exit_button_.setBounds(getWidth() - size - 10, y, size, size);
 }
 
 void ConnectionComponent::handleOscGainEnvelope() {
   bipolarButton.setVisible(false);
-  // slider.getProperties().set("disabled", true);
-  // slider.setEnabled(false);
 }
 
 void ConnectionComponent::reset() {
