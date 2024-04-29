@@ -32,19 +32,15 @@ public:
   std::unordered_map<std::string, LabeledSlider*> slider_map_;
 
   SliderContainer(BlocksSlider::Listener* slider_listener, Config& config);
-
   void paint(juce::Graphics& g) override;
   void resized() override;
   int calculateWidth();
   int calculateHeight();
-
-
   int rowsForSliderCount(int slider_count) const;
-
+  void onDelayAdjusted(BlocksSlider* slider) const;
   void onLFOAdjusted(BlocksSlider* slider) const;
-  void setSliderAsTempo(LabeledSlider* slider) const;
-  void setSliderAsFrequency(LabeledSlider* slider) const;
-
+  void setSliderAsTempo(LabeledSlider* slider, std::string parameter_name = "tempo") const;
+  void setSliderAsFrequency(LabeledSlider* slider, std::string parameter_name = "frequency") const;
   void resizeSliders() const;
   void setModule(std::shared_ptr<model::Module> module);
   void spawnSlider(vital::ValueDetails parameter, std::shared_ptr<model::Module> module);

@@ -58,7 +58,7 @@ ModulePool::ModulePool() {
   all_modules_.insert(all_modules_.end(), blocks.all.begin(), blocks.all.end());
   all_modules_.insert(all_modules_.end(), modulators.all.begin(), modulators.all.end());
   all_modules_.insert(all_modules_.end(), column_controls_.begin(), column_controls_.end());
-  // all_modules_.insert(all_modules_.end(), column_controls_.begin(), column_controls_.end());
+  all_modules_.insert(all_modules_.end(), connections.begin(), connections.end());
   for (auto module : all_modules_) name_module_map_[module->name] = module;
 }
 
@@ -76,7 +76,7 @@ std::shared_ptr<model::Module> ModulePool::acquire_modulator(std::string code, i
 std::shared_ptr<Connection> ModulePool::aquire_connection(int number) {
   int index = 0;
   for (int i = 0; i < connections.size(); i++) {
-    if (connections[i]->number == number) {
+    if (connections[i]->id.number == number) {
       index = 0;
     }
   }

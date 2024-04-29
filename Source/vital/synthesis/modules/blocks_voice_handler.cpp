@@ -172,7 +172,7 @@ void BlocksVoiceHandler::init() {
     ModulationConnectionProcessor* processor = modulation_bank_.atIndex(i)->modulation_processor;
     processor->plug(reset(), ModulationConnectionProcessor::kReset);
     std::string number = std::to_string(i + 1);
-    std::string amount_name = "modulation_" + number + "_amount";
+    std::string amount_name = "modulation " + number + " amount";
     Output* modulation_amount = createPolyModControl2({ .name = "amount", .min = -1.0f });
     processor->plug(modulation_amount, ModulationConnectionProcessor::kModulationAmount);
     processor->initializeBaseValue(data_->controls[amount_name]);
@@ -218,7 +218,7 @@ void BlocksVoiceHandler::init() {
   createStatusOutput("num_voices", &num_voices_);
 
   std::string modulation_source_prefix = "modulation_source_";
-  std::string modulation_amount_prefix = "modulation_amount_";
+  std::string modulation_amount_prefix = "modulation amount ";
   for (int i = 0; i < vital::kMaxModulationConnections; ++i) {
     ModulationConnectionProcessor* processor = modulation_bank_.atIndex(i)->modulation_processor;
     std::string number = std::to_string(i + 1);

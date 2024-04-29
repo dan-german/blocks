@@ -847,6 +847,12 @@ void SynthBase::connectModulation(int modulator_index, std::string target_name, 
   auto destination_scale = parameter->max - parameter->min;
 
   bool is_env_to_osc_level = connection_model->source->id.type == "envelope" && connection_model->target->id.type == "osc" && connection_model->parameter_name_ == "level";
+  
+  if (is_env_to_osc_level) {
+    parameter_name = "amp env destination";
+  }  else if (connection_model->target->id.type == "modulation") {
+    // parameter_name = "modulation destination";
+  }
   parameter_name = is_env_to_osc_level ? "amp env destination" : parameter_name;
 
   if (is_env_to_osc_level) {

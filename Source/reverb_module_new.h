@@ -8,8 +8,8 @@ public:
     add({ .name = "time", .min = -6.0, .max = 6.0, .value_scale = ValueScale::kExponential, .display_units = "s" });
     add({ .name = "size", .default_value = 0.5, .display_multiply = 100.0, .display_units = "%" });
     add({ .name = "delay", .max = 0.3, .default_value = 0.0, .display_units = "s" });
-    add({ .name = "high cut", .max = 128.0, .default_value = 110.0, .display_name = "hi cut" });
-    add({ .name = "low cut", .max = 128.0, .default_value = 0.0 });
+    add({ .name = "high cut", .max = 128.0, .default_value = 110.0, .display_name = "hi cut", .modulatable = false });
+    add({ .name = "low cut", .max = 128.0, .default_value = 0.0, .modulatable = false });
     add({ .name = "mod rate", .min = -8.0, .max = 3.0, .default_value = -2.0, .value_scale = ValueScale::kExponential, .display_units = "hz", .display_name = "mod hz" });
     add({ .name = "mod amount", .default_value = 0.223607,  .display_multiply = 100.0, .value_scale = ValueScale::kQuadratic, .display_units = "%", .display_name = "mod" });
   }

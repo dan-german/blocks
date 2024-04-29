@@ -38,12 +38,14 @@ ChorusModule::ChorusModule(const Output* beats_per_second):
 }
 
 void ChorusModule::init() {
-  // std::cout << "ChorusModule::init()" << std::endl;
   static const cr::Value kDelayStyle(MultiDelay::kMono);
 
   voices_ = createBaseControl2({ .name = "voices", .value_scale = ValueScale::kIndexed ,.min = 1.0f, .max = 4.0f, .default_value = 4.0f });
-  Output* free_frequency = createPolyModControl2({ .name = "frequency", .value_scale = ValueScale::kExponential, .min = -6.0f, .max = 3.0f,.default_value = 6.0f });
-  frequency_ = createTempoSyncSwitch("chorus", free_frequency->owner, beats_per_second_, false);
+  Output* free_frequency = createPolyModControl2({ .name = "frequency", .value_scale = ValueScale::kExponential, .min = -6.0f, .max = 3.0f, .default_value = 6.0f });
+  // { "chorus_tempo", 0x000000, 0.0, 10.0, 4.0, 0.0, 1.0,
+  //   ValueDetails::kIndexed, false, "", "Chorus Tempo", strings::kSyncedFrequencyNames },
+  AddControlInput tempo_input = { .name = "tempo", .value_scale = ValueScale::kIndexed , .min = 0.0f, .max = 10.0f, .default_value = 4.0f };
+  frequency_ = createTempoSyncSwitch2(tempo_input, free_frequency->owner, beats_per_second_, false);
   Output* feedback = createPolyModControl2({ .name = "feedback", .min = -0.95f, .max = 0.95f, .default_value = 0.4f });
   wet_output_ = createPolyModControl2({ .name = "mix", .default_value = 0.5f });
   mod_depth_ = createPolyModControl2({ .name = "depth", .default_value = 0.5f });

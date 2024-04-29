@@ -487,8 +487,10 @@ void PluginProcessor::loadPreset(Preset preset) {
 
     auto target = synth_->getModuleManager().getModule(presetConnection.target);
     auto model = synth_->getModuleManager().addConnection(modulator, target, presetConnection.parameter, presetConnection.number);
-    model->amount_parameter_->value = presetConnection.amount;
-    model->bipolar_parameter_->value = presetConnection.bipolar;
+
+    model->parameter_map_["amount"]->value = presetConnection.amount;
+    model->parameter_map_["bipolar"]->value = presetConnection.bipolar;
+
     connectModulationFromModel(model);
   }
 
@@ -799,7 +801,9 @@ void PluginProcessor::editorStartedAdjustingParameter(ID& id, std::string& param
 }
 
 void PluginProcessor::editorAdjustedParameter(ID& id, std::string& parameter_name, float value) {
-  getModuleManager().getModule(id)->parameter_map_[parameter_name]->value_processor->set(value);
+  // auto parameter_name = 
+  // auto module = 
+  getModuleManager().getModule(id)->getParameter(parameter_name)->value_processor->set(value);
 }
 
 // std::shared_ptr<model::Module>& PluginProcessor::editorRequestsColumnControls() { 

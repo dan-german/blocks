@@ -20,22 +20,35 @@ Connection::Connection(Module* target,
   int parameterIndex,
   float magnitude,
   int number,
-  bool bipolar): source(modulator),
-  target(target),
-  number(number) {
+  bool bipolar):
+  Module("modulation", number),
+  source(modulator),
+  target(target)
+{
   name = "modulation " + std::to_string(number);
-  amount_parameter_ = std::make_shared<vital::ValueDetails>();
-  amount_parameter_->min = -1.0f;
-  amount_parameter_->value = 1.0f;
-  bipolar_parameter_ = std::make_shared<vital::ValueDetails>();
+
+  // add({ .name = "" });
+  // add({ .name = "wave", .min = 0.0, .max = 4.0, .value_scale = ValueScale::kIndexed, .string_lookup = strings::modulator_waves, .modulatable = false });
+  add({ .name = "amount", .min = -1.0, .default_value = 1.0 });
+  add({ .name = "bipolar" });
+
+  // amount_parameter_ = std::make_shared<vital::ValueDetails>();
+  // amount_parameter_->min = -1.0f;
+  // amount_parameter_->value = 1.0f;
+  // bipolar_parameter_ = std::make_shared<vital::ValueDetails>();
+  // parameters_.push_back(amount_parameter_);
+  // parameters
+
 }
 
-Connection::Connection(int number): number(number) {
+Connection::Connection(int number): Module("modulation", number) {
   name = "modulation " + std::to_string(number);
-  amount_parameter_ = std::make_shared<vital::ValueDetails>();
-  amount_parameter_->min = -1.0f;
-  amount_parameter_->value = 1.0f;
-  bipolar_parameter_ = std::make_shared<vital::ValueDetails>();
+  add({ .name = "amount", .min = -1.0, .default_value = 1.0 });
+  add({ .name = "bipolar" });
+  // amount_parameter_ = std::make_shared<vital::ValueDetails>();
+  // amount_parameter_->min = -1.0f;
+  // amount_parameter_->value = 1.0f;
+  // bipolar_parameter_ = std::make_shared<vital::ValueDetails>();
 };
 
 Connection::~Connection() { }
@@ -45,31 +58,28 @@ bool Connection::operator==(const Connection& rhs) const {
 }
 
 void Connection::reset() {
+  Module::reset();
   source = nullptr;
   target = nullptr;
 }
 
-void Connection::setMagnitude(float magnitude) {
-  // auto normalizedValue = magnitudeParameter->getNormalisableRange().convertTo0to1(magnitude);
-  // magnitudeParameter->setValue(normalizedValue);
-}
-
-void Connection::setPolarity(bool bipolar) {
-  // auto normalizedValue = bipolarParameter->getNormalisableRange().convertTo0to1(bipolar);
-  // bipolarParameter->setValue(normalizedValue);
-}
-
-bool Connection::isOscGainEnvelope() {
-  return true;
-  // using Parameters = Model::OscillatorModule::Parameters;
-  // return source->isEnvelope() && target->isOscillator() && Parameters(parameterIndex) == Parameters::pGain;
+std::string Connection::getParameterName(std::string name) {
+  return name;
+  std::string nn = this->name + " amount";
+  if (name == "amount") 
+    return nn;
 }
 
 void Connection::reset(vital::ModulationConnection* vital_connection) {
-  amount_parameter_->value_processor = vital_connection->modulation_processor->control_map_["amount"];
-  amount_parameter_->set(amount_parameter_->value);
-  bipolar_parameter_->value_processor = vital_connection->modulation_processor->control_map_["bipolar"];
-  bipolar_parameter_->set(bipolar_parameter_->value);
+  parameter_map_["amount"]->value_processor = vital_connection->modulation_processor->control_map_["amount"];
+  parameter_map_["amount"]->set(parameter_map_["amount"]->value);
+
+  parameter_map_["bipolar"]->value_processor = vital_connection->modulation_processor->control_map_["bipolar"];
+  parameter_map_["bipolar"]->set(parameter_map_["bipolar"]->value);
+
+  // bipolar_parameter_->value_processor = vital_connection->modulation_processor->control_map_["bipolar"];
+  // bipolar_parameter_->set(bipolar_parameter_->value);
+
   vital_connection_ = vital_connection;
 }
 }

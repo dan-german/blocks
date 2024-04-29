@@ -52,12 +52,27 @@ void SliderContainer::setModule(std::shared_ptr<model::Module> module) {
   module_ = module;
   sliders_.clear();
   for (auto parameter : module->parameters_) spawnSlider(*parameter, module);
+  for (auto& slider : sliders_) sliderAdjusted(&slider->box_slider_, slider->box_slider_.juce_slider_.getValue());
   resizeSliders();
 }
 
 void SliderContainer::sliderAdjusted(BlocksSlider* slider, float value) {
-  if (slider->module_id_.type == "lfo") {
+  auto model_type = slider->module_id_.type;
+  if (model_type == "lfo") {
     onLFOAdjusted(slider);
+  } else if (model_type == "delay") {
+    onDelayAdjusted(slider);
+  } else if (model_type == "phaser" || model_type == "chorus" || model_type == "flanger") {
+    bool is_changing_sync = slider->parameter_name_ == "sync";
+    if (is_changing_sync) {
+      auto tempo_slider = slider_map_.at("tempo");
+      bool is_seconds = int(value) == 0;
+      if (is_seconds) {
+        setSliderAsFrequency(tempo_slider);
+      } else {
+        setSliderAsTempo(tempo_slider);
+      }
+    }
   }
 }
 
@@ -84,7 +99,7 @@ void SliderContainer::spawnSlider(vital::ValueDetails parameter, std::shared_ptr
 
   labeled_slider->box_slider_.juce_slider_.setRange(parameter.min, parameter.max, interval);
 
-  if (parameter.min < 0) { 
+  if (parameter.min < 0) {
     labeled_slider->box_slider_.juce_slider_.getProperties().set("isCenter", true);
   }
 
@@ -96,11 +111,6 @@ void SliderContainer::spawnSlider(vital::ValueDetails parameter, std::shared_ptr
 
   labeled_slider->box_slider_.juce_slider_.setValue(value, dontSendNotification);
   labeled_slider->box_slider_.value_label_.setText(labeled_slider->box_slider_.juce_slider_.getTextFromValue(value), dontSendNotification);
-
-  if (module->id.type == "lfo") {
-    onLFOAdjusted(&labeled_slider->box_slider_);
-  }
-
   sliders_.push_back(std::move(labeled_slider));
 }
 
@@ -118,10 +128,10 @@ void SliderContainer::onLFOAdjusted(BlocksSlider* slider) const {
   }
 }
 
-void SliderContainer::setSliderAsFrequency(LabeledSlider* slider) const {
+void SliderContainer::setSliderAsFrequency(LabeledSlider* slider, std::string parameter_name) const {
   slider->label.setText("secs", dontSendNotification);
 
-  auto frequency_parameter = module_->parameter_map_["frequency"];
+  auto frequency_parameter = module_->parameter_map_[parameter_name];
   slider->box_slider_.juce_slider_.textFromValueFunction = [frequency_parameter](double value) {
     return UIUtils::getSliderTextFromValue(value, *frequency_parameter);
   };
@@ -132,11 +142,11 @@ void SliderContainer::setSliderAsFrequency(LabeledSlider* slider) const {
   slider->box_slider_.value_label_.setText(slider->box_slider_.juce_slider_.getTextFromValue(value), dontSendNotification);
 }
 
-void SliderContainer::setSliderAsTempo(LabeledSlider* slider) const {
+void SliderContainer::setSliderAsTempo(LabeledSlider* slider, std::string parameter_name) const {
   slider->label.setText("tempo", dontSendNotification);
   slider->box_slider_.juce_slider_.textFromValueFunction = [](double value) { return strings::kSyncedFrequencyNames[int(value)]; };
   slider->box_slider_.juce_slider_.setRange(0.0, 12.0, 1.0);
-  auto value = module_->parameter_map_["tempo"]->value_processor->value();
+  auto value = module_->parameter_map_[parameter_name]->value_processor->value();
   slider->box_slider_.juce_slider_.setValue(value, dontSendNotification);
   slider->box_slider_.value_label_.setText(slider->box_slider_.juce_slider_.getTextFromValue(value), dontSendNotification);
 }
@@ -157,5 +167,21 @@ void SliderContainer::addSliderListener(BlocksSlider::Listener* listener) {
 void SliderContainer::highlightModulationIndication(bool should_highlight, Colour colour) {
   for (auto& slider : sliders_) {
     slider->box_slider_.setIndicationHighlight(should_highlight, colour);
+  }
+}
+
+void SliderContainer::onDelayAdjusted(BlocksSlider* slider) const {
+  bool is_changing_sync_1 = slider->parameter_name_ == "sync";
+  bool is_changing_sync_2 = slider->parameter_name_ == "sync 2";
+  if (is_changing_sync_1 || is_changing_sync_2) {
+    std::string tempo_name = is_changing_sync_1 ? "tempo" : "tempo 2";
+    auto tempo_slider = slider_map_.at(tempo_name);
+    bool is_seconds = int(slider->juce_slider_.getValue()) == 0;
+    if (is_seconds) {
+      std::string frequency_name = is_changing_sync_1 ? "frequency" : "frequency 2";
+      setSliderAsFrequency(tempo_slider, frequency_name);
+    } else {
+      setSliderAsTempo(tempo_slider, tempo_name);
+    }
   }
 }

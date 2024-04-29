@@ -34,7 +34,8 @@ void PhaserModule::init() {
   phaser_->useOutput(output(kCutoffOutput), Phaser::kCutoffOutput);
 
   Output* phaser_free_frequency = createPolyModControl2({ .name = "frequency", .value_scale = ValueScale::kExponential, .min = -5.0f, .max = 2.0f, .default_value = -3.0f, });
-  Output* phaser_frequency = createTempoSyncSwitch("phaser", phaser_free_frequency->owner, beats_per_second_, false);
+  AddControlInput tempo_input = { .name = "tempo", .value_scale = ValueScale::kIndexed , .min = 0.0f, .max = 10.0f, .default_value = 3.0f };
+  Output* phaser_frequency = createTempoSyncSwitch2(tempo_input, phaser_free_frequency->owner, beats_per_second_, false);
   Output* phaser_feedback = createPolyModControl2({ .name = "feedback", .default_value = 0.5 });
   Output* phaser_wet = createPolyModControl2({ .name = "mix", .default_value = 1.0f });
   Output* phaser_center = createPolyModControl2({ .name = "center", .audio_rate = true, .smooth_value = true, .min = 8.0f, .max = 136.0f, .default_value = 80.0 });

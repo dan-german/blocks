@@ -54,7 +54,7 @@ Preset Preset::create(std::string name,
     modulationInfo.parameter = connection->parameter_name_;
     modulationInfo.source = connection->source->name;
     modulationInfo.target = connection->target->name;
-    modulationInfo.number = connection->number;
+    modulationInfo.number = connection->id.number;
     modulationInfo.bipolar = static_cast<bool>(connection->bipolar_parameter_->value_processor->value());
     modulationInfo.amount = connection->amount_parameter_->value_processor->value();
 

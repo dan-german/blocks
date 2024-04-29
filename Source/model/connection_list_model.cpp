@@ -29,12 +29,12 @@ Component* ModulationsListBoxModel::refreshComponentForRow(int rowNumber, bool i
   if (envelopeToOscGain) {
     component->handleOscGainEnvelope();
   } else {
-    auto magnitude_parameter = connection->amount_parameter_;
+    auto magnitude_parameter = connection->parameter_map_["amount"];  
     component->slider.juce_slider_.setRange(magnitude_parameter->min, magnitude_parameter->max);
     component->slider.juce_slider_.setValue(magnitude_parameter->value_processor->value(), dontSendNotification);
     component->slider.juce_slider_.textFromValueFunction = [magnitude_parameter](double value) { return UIUtils::getSliderTextFromValue(value, *magnitude_parameter.get()); };
 
-    bool bipolar = static_cast<bool>(connection->bipolar_parameter_->value_processor->value());
+    bool bipolar = static_cast<bool>(connection->parameter_map_["bipolar"]->value_processor->value());
     component->indicator.setBipolar(bipolar);
     component->bipolarButton.setState(bipolar);
   }
@@ -49,8 +49,8 @@ Component* ModulationsListBoxModel::refreshComponentForRow(int rowNumber, bool i
   component->source.setText(connection->source->display_name, dontSendNotification);
   component->row = rowNumber;
   component->source.setColour(Label::ColourIds::textColourId, connection->source->colour.colour);
-  component->slider.module_id_.number = connection->id;
-  component->slider.module_id_.type = "modulation";
+
+  component->slider.module_id_ = connection->id;
   component->slider.parameter_name_ = "amount";
 
   return component;

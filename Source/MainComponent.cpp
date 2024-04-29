@@ -609,7 +609,7 @@ void MainComponent::updateConnectionIndicators() {
   auto modulationConnections = delegate->getModulations();
   for (int i = 0; i < modulationConnections.size(); i++) {
     if (auto mc = dynamic_cast<ConnectionComponent*>(ui_layer_.connections.listBox.getComponentForRowNumber(i))) {
-      auto source = delegate->editorRequestsStatusOutput("modulation_amount_" + std::to_string(i + 1));
+      auto source = delegate->editorRequestsStatusOutput("modulation amount " + std::to_string(i + 1));
       mc->indicator.setCurrentValue(source->value()[0]);
     }
   }
@@ -1247,7 +1247,6 @@ void MainComponent::sliderAdjusted(BlocksSlider* slider, float value) {
 }
 
 void MainComponent::sliderGestureChanged(BlocksSlider* slider, bool started) {
-  printf("gesture changed\n");
   is_parameter_adjusting = started;
   // auto modulator = delegate->getModulator2(modulatorComponent->row);
   // delegate->editorParameterGestureChanged(modulator->name, parameter_name, started);
