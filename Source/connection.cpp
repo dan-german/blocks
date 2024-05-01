@@ -65,17 +65,22 @@ void Connection::reset() {
 
 std::string Connection::getParameterName(std::string name) {
   return name;
-  std::string nn = this->name + " amount";
-  if (name == "amount") 
-    return nn;
+  // return name == "amount" ? this->name + " amount" : name;
 }
 
 void Connection::reset(vital::ModulationConnection* vital_connection) {
-  parameter_map_["amount"]->value_processor = vital_connection->modulation_processor->control_map_["amount"];
+  parameter_map_["amount"]->value_processor = vital_connection->modulation_processor->control_map_.at("amount");
   parameter_map_["amount"]->set(parameter_map_["amount"]->value);
 
-  parameter_map_["bipolar"]->value_processor = vital_connection->modulation_processor->control_map_["bipolar"];
+  parameter_map_["bipolar"]->value_processor = vital_connection->modulation_processor->control_map_.at("bipolar");
   parameter_map_["bipolar"]->set(parameter_map_["bipolar"]->value);
+
+
+
+
+
+
+
 
   // bipolar_parameter_->value_processor = vital_connection->modulation_processor->control_map_["bipolar"];
   // bipolar_parameter_->set(bipolar_parameter_->value);

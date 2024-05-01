@@ -25,7 +25,7 @@
 
 class UILayer: public juce::Component, ComponentMovementWatcher {
 public:
-  SideMenu connections;
+  SideMenu connections_;
   ModulatorsSideMenu modulators_;
   PresetButtonComponent preset_button_;
   KeyboardComponent keyboard;

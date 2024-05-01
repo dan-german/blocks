@@ -31,10 +31,10 @@ UILayer::UILayer(juce::MidiKeyboardState& keyboard_state, BlocksSlider::Listener
 
   setupSideMenus();
 
-  matrixButton.on_click_ = [this]() { connections.setVisible(true); };
+  matrixButton.on_click_ = [this]() { connections_.setVisible(true); };
 
   setupKeyboard();
-  // connections_list_box_model_.slider_listener_ = listener;
+  connections_list_box_model_.slider_listener_ = listener;
   setInterceptsMouseClicks(false, true);
   setOpaque(false);
   update_button_.text.setText("update", dontSendNotification);
@@ -80,7 +80,7 @@ void UILayer::resized() {
 
   resizePresetButton();
   int sidePanelWidth = 260;
-  connections.setBounds(0, 0, sidePanelWidth - 20, getHeight() - keyboardHeight);
+  connections_.setBounds(0, 0, sidePanelWidth - 20, getHeight() - keyboardHeight);
   modulators_.setBounds(getWidth() - sidePanelWidth, 0, sidePanelWidth, getHeight() - keyboardHeight);
 
   resizeSaveAndNewButtons();
@@ -134,7 +134,7 @@ void UILayer::resizePresetButton() {
 }
 
 void UILayer::setupSideMenus() {
-  connections.listBox.setModel(&connections_list_box_model_);
+  connections_.listBox.setModel(&connections_list_box_model_);
   modulators_.isOnLeft = false;
 }
 
@@ -145,7 +145,7 @@ void UILayer::showModulatorsSideMenu() {
 
 void UILayer::setConnections(std::vector<std::shared_ptr<model::Connection>> modulationConnections) {
   connections_list_box_model_.setConnections(modulationConnections);
-  if (connections.listBox.isVisible()) connections.listBox.updateContent();
+  if (connections_.listBox.isVisible()) connections_.listBox.updateContent();
 }
 
 void UILayer::setModulators(std::vector<std::shared_ptr<model::Module>> newModulators) {

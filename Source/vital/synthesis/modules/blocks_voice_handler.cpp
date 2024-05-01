@@ -437,6 +437,12 @@ void BlocksVoiceHandler::clear() {
     active_processor_map_[name] = column_controls_[i];
   }
 
+  // for (int i = 0; i < vital::kMaxModulationConnections; ++i) {
+  //   ModulationConnectionProcessor* processor = modulation_bank_.atIndex(i)->modulation_processor;
+  //   std::string number = std::to_string(i + 1);
+  //   active_processor_map_["modulation " + number] = processor;
+  // }
+
   active_modulators_.clear();
   active_modulators_map_.clear();
 }

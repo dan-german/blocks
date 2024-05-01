@@ -395,6 +395,7 @@ ValueSwitch* SynthModule::getPolyModulationSwitch(std::string name) {
 }
 
 void SynthModule::updateAllModulationSwitches() {
+  std::cout << "update mods" << std::endl;
   for (auto& mod_switch : data_->mono_modulation_switches) {
     bool enable = data_->mono_mod_destinations[mod_switch.first]->connectedInputs() > 1;
     if (data_->poly_mod_destinations.count(mod_switch.first))
@@ -616,6 +617,7 @@ Output* SynthModule::createBaseModControl2(AddControlInput input) {
 
   mono_total->plugNext(base_val);
   addMonoProcessor(mono_total, false);
+  if (input.name == "amount") std::cout << " amount mono_total: " << mono_total << std::endl;
   data_->mono_mod_destinations[input.name] = mono_total;
   data_->mono_modulation_readout[input.name] = mono_total->output();
 

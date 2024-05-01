@@ -7,7 +7,7 @@ ModuleManager::~ModuleManager() {
 
 std::shared_ptr<model::Block> ModuleManager::addBlock(std::string code, Index index, int number) {
   if (index.row >= model::rows || index.column >= model::columns || slotTaken(index)) return nullptr;
-  auto block = pool.acquire_block(code, number);
+  auto block = pool.dequeueBlock(code, number);
   if (block == nullptr) return nullptr;
   block->index = index;
   name_module_map_[block->name] = block;
@@ -27,7 +27,7 @@ void ModuleManager::removeBlock(std::shared_ptr<model::Block> block) {
 }
 
 std::shared_ptr<Module> ModuleManager::addModulator(std::string code, int number, int colourId) {
-  auto modulator = pool.acquire_modulator(code, number, colourId);
+  auto modulator = pool.dequeueModulator(code, number, colourId);
   if (modulator == nullptr) { return nullptr; }
   modulators.push_back(modulator);
   name_module_map_[modulator->name] = modulator;
@@ -83,7 +83,7 @@ void ModuleManager::repositionBlock(Index oldIndex, Index newIndex) {
 
 std::shared_ptr<Connection> ModuleManager::addConnection(std::shared_ptr<Module> source, std::shared_ptr<Module> target, std::string parameter_name, int number) {
   if (connectionExists(parameter_name, source, target)) return nullptr;
-  auto connection = pool.aquire_connection(number);
+  auto connection = pool.dequeueConnection(number);
   connection->parameter_name_ = parameter_name;
   connection->source = source;
   connection->target = target;

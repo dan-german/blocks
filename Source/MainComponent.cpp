@@ -27,7 +27,7 @@ MainComponent::MainComponent(juce::MidiKeyboardState& keyboard_state, Delegate* 
   setupPresetMenu();
   setupDarkBackground(&grid_dark_background_, 3);
   addChildComponent(ui_layer_.modulators_);
-  addChildComponent(ui_layer_.connections);
+  addChildComponent(ui_layer_.connections_);
   setupTabGrid();
   setupBlockGrid();
   setupDarkBackground(&dark_background_, -1);
@@ -571,9 +571,9 @@ void MainComponent::highlightModulatableSliders(bool highlight, Colour color = C
   }
   column_controls_.highlight(highlight, color);
   if (inspector_v2_.isVisible()) inspector_v2_.highlightModulationIndication(highlight, color);
-  if (ui_layer_.connections.isVisible()) { 
+  if (ui_layer_.connections_.isVisible()) { 
     for (int i = 0; i < delegate->getModulations().size(); i++) {
-      if (auto mc = dynamic_cast<ConnectionComponent*>(ui_layer_.connections.listBox.getComponentForRowNumber(i))) {
+      if (auto mc = dynamic_cast<ConnectionComponent*>(ui_layer_.connections_.listBox.getComponentForRowNumber(i))) {
         mc->slider.setIndicationHighlight(highlight, color);
       }
     }
@@ -586,7 +586,7 @@ void MainComponent::graphicsTimerCallback(const float secondsSincelastUpdate) {
     // updateModulatorIndicators();
   }
 
-  if (ui_layer_.connections.isVisible()) {
+  if (ui_layer_.connections_.isVisible()) {
     updateConnectionIndicators();
   }
 
@@ -608,7 +608,7 @@ void MainComponent::graphicsTimerCallback(const float secondsSincelastUpdate) {
 void MainComponent::updateConnectionIndicators() {
   auto modulationConnections = delegate->getModulations();
   for (int i = 0; i < modulationConnections.size(); i++) {
-    if (auto mc = dynamic_cast<ConnectionComponent*>(ui_layer_.connections.listBox.getComponentForRowNumber(i))) {
+    if (auto mc = dynamic_cast<ConnectionComponent*>(ui_layer_.connections_.listBox.getComponentForRowNumber(i))) {
       auto source = delegate->editorRequestsStatusOutput("modulation amount " + std::to_string(i + 1));
       mc->indicator.setCurrentValue(source->value()[0]);
     }
@@ -703,7 +703,7 @@ void MainComponent::clear() {
 }
 
 void MainComponent::modulationConnectionBipolarPressed(ConnectionComponent* component, bool bipolar) {
-  auto index = ui_layer_.connections.indexOfModulationConnection(component->getParentComponent());
+  auto index = ui_layer_.connections_.indexOfModulationConnection(component->getParentComponent());
   delegate->editorChangedModulationPolarity(index, bipolar);
 
   auto connection = delegate->getModulations()[index];
@@ -724,11 +724,9 @@ void MainComponent::modulationConnectionBipolarPressed(ConnectionComponent* comp
 void MainComponent::connectionDeleted(ConnectionComponent* component) {
   auto connection = delegate->getModulations()[component->row];
   if (focused_grid_item_) {
-    auto focused = delegate->getBlock2(focused_grid_item_->index);
-    auto target = connection->target;
-
-    if (target->name != focused->name) return;
-
+    // auto focused = delegate->getBlock2(focused_grid_item_->index);
+    // auto target = connection->target;
+    // if (target->name == focused->name) return;
     // int index = target->parameters[connection->parameterIndex]->getIndexOfConnection(connection);
     // inspector.getSliders()[connection->parameterIndex]->removeIndicator(index);
   }
@@ -747,7 +745,7 @@ void MainComponent::sliderValueChanged(Slider* slider) {
     // auto index = ui_layer_.modulators_.listBox.getRowNumberOfComponent(listItemComponent);
     // delegate->editorAdjustedModulator(index, 1, static_cast<float>(slider->getValue()));
   } else {
-    auto index = ui_layer_.connections.indexOfModulationConnection(slider->getParentComponent()->getParentComponent());
+    auto index = ui_layer_.connections_.indexOfModulationConnection(slider->getParentComponent()->getParentComponent());
     auto value = static_cast<float>(slider->getValue());
     delegate->editorChangedModulationMagnitude(index, static_cast<float>(slider->getValue()));
   }

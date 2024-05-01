@@ -52,6 +52,7 @@ Component* ModulationsListBoxModel::refreshComponentForRow(int rowNumber, bool i
 
   component->slider.module_id_ = connection->id;
   component->slider.parameter_name_ = "amount";
+  component->slider.addListener(slider_listener_);
 
   return component;
 }
