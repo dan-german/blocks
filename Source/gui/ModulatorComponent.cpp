@@ -70,7 +70,6 @@ void ModulatorComponent::drawBottomLine(Graphics& g) const {
 
 void ModulatorComponent::resized() {
   bounds = getLocalBounds();
-  std::cout << "modulator bounds " << bounds.toString() << std::endl;
 
   resizeDragIndicator();
   resizeSliderContainer();
