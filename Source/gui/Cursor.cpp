@@ -22,6 +22,11 @@ void Cursor::setupAnimation() {
 }
 
 void Cursor::paint(juce::Graphics& g) {
-  g.setColour(colour);
-  g.fillEllipse(getLocalBounds().toFloat());
+  if (is_selecting_) {
+    g.setColour(Colours::white);
+    g.fillEllipse(getLocalBounds().reduced(2, 2).toFloat());
+  } else {
+    g.setColour(colour);
+    g.fillEllipse(getLocalBounds().toFloat());
+  }
 }

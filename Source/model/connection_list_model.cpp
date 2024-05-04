@@ -9,6 +9,7 @@
 */
 
 #include "model/connection_list_model.h"
+#include "ui_utils.h"
 
 int ModulationsListBoxModel::getNumRows() { return connections_.size(); }
 
@@ -28,25 +29,37 @@ Component* ModulationsListBoxModel::refreshComponentForRow(int rowNumber, bool i
   if (envelopeToOscGain) {
     component->handleOscGainEnvelope();
   } else {
-    auto magnitude_parameter = connection->amount_parameter_;
-    component->slider.setRange(magnitude_parameter->min, magnitude_parameter->max);
-    component->slider.setValue(magnitude_parameter->value_processor->value(), dontSendNotification);
+    auto magnitude_parameter = connection->parameter_map_["amount"];  
+    component->slider.juce_slider_.setRange(magnitude_parameter->min, magnitude_parameter->max);
+    component->slider.juce_slider_.setValue(magnitude_parameter->value_processor->value(), dontSendNotification);
+    component->slider.juce_slider_.textFromValueFunction = [magnitude_parameter](double value) { return UIUtils::getSliderTextFromValue(value, *magnitude_parameter.get()); };
 
-    bool bipolar = static_cast<bool>(connection->bipolar_parameter_->value_processor->value());
+    bool bipolar = static_cast<bool>(connection->parameter_map_["bipolar"]->value_processor->value());
     component->indicator.setBipolar(bipolar);
     component->bipolarButton.setState(bipolar);
   }
 
   auto parameter_name = connection->parameter_name_;
-  auto target_name = connection->target->display_name;
+  auto parameter_display_name = connection->target->parameter_map_[parameter_name]->display_name;
 
-  component->target.setText(target_name + " " + parameter_name, dontSendNotification);
-  component->slider.setNumDecimalPlacesToDisplay(3);
-  component->slider.addListener(this->slider_listener_);
+
+  auto target_name = connection->target->display_name;
+  std::string final_name = target_name + " " + parameter_display_name;
+
+  if (target_name.find("modulation") != std::string::npos) { 
+    final_name = "mod " + std::to_string(connection->target->id.number);
+  }
+
+  component->target.setText(final_name, dontSendNotification);
   component->delegate = delegate_;
   component->indicator.setColour(connection->source->colour.colour);
-  component->source.setText(connection->source->display_name , dontSendNotification);
+  component->source.setText(connection->source->display_name, dontSendNotification);
   component->row = rowNumber;
+  component->source.setColour(Label::ColourIds::textColourId, connection->source->colour.colour);
+
+  component->slider.module_id_ = connection->id;
+  component->slider.parameter_name_ = "amount";
+  component->slider.addListener(slider_listener_);
 
   return component;
 }

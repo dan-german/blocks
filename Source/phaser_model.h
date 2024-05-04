@@ -8,8 +8,8 @@ public:
     add({ .name = "mix", .default_value = 1.0 });
     add({ .name = "feedback", .default_value = 0.5 });
     add({ .name = "depth", .max = 48.0, .default_value = 24.0 });
+    add({ .name = "sync", .max = 3.0f,.default_value = 1.0f, .value_scale = ValueScale::kIndexed , .string_lookup = strings::kFrequencySyncNames, .modulatable = false });
     add({ .name = "tempo", .max = 10.0f, .value_scale = ValueScale::kIndexed, .string_lookup = strings::kSyncedFrequencyNames });
-    add({ .name = "sync", .max = 3.0f,.default_value = 1.0f, .value_scale = ValueScale::kIndexed , .string_lookup = strings::kFrequencySyncNames });
     add({ .name = "offset", .default_value = 0.333333 });
     add({ .name = "center", .min = 8.0f, .max = 136.0f, .default_value = 80.0f });
     add({ .name = "blend", .max = 2.0, .default_value = 1.0 });
@@ -20,6 +20,11 @@ public:
     bool is_tempo_or_secs = index == 3;
     if (is_tempo_or_secs) return parameters_[4]->value_processor->value() < 1.0 ? "frequency" : "tempo";
     return Block::getParameterName(index);
+  }
+
+  std::string getParameterName(std::string name) override {
+    if (name == "tempo") return parameter_map_["sync"]->value_processor->value() < 1.0 ? "frequency" : "tempo";
+    return Block::getParameterName(name);
   }
 };
 }

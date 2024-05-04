@@ -1,33 +1,35 @@
 #include "gui/base/BaseButton.h"
-
 #include "gui/ThemeManager.h"
 
 BaseButton::BaseButton() {
-  timer.callback = [this](float) { if (orbit) this->updateOrbitEffect(); };
-  timer.start();
+  // timer.callback = [this](float) { if (orbit) this->updateOrbitEffect(); };
+  // timer.start();
+  setName("BaseButton");
+  setMouseCursor(MouseCursor::PointingHandCursor);
 }
 
 void BaseButton::mouseEnter(const juce::MouseEvent& event) {
   isMouseHovering = true;
   startSelectedAnimation();
-  setMouseCursor(MouseCursor::PointingHandCursor);
 }
 
 void BaseButton::mouseUp(const juce::MouseEvent& event) {
+  bool is_outside = !getLocalBounds().contains(event.getPosition());
+  if (is_outside) return;
   if (on_click_) on_click_();
 }
 
 void BaseButton::mouseExit(const juce::MouseEvent& event) {
   isMouseHovering = false;
   startDeselectedAnimation();
-  setMouseCursor(MouseCursor::NormalCursor);
 }
 
 void BaseButton::resized() {
-  getContent()->setBounds(getLocalBounds().reduced(borderSize));
+  getContent()->setBounds(getLocalBounds().reduced(reduction_));
 }
 
 void BaseButton::startSelectedAnimation() {
+  // printf("startSelectedAnimation\n");
   if (getContent() == nullptr) return;
 
   EasingAnimator::AnimateInput input;
@@ -95,10 +97,11 @@ void BaseButton::selectedCompletion() {
 }
 
 void BaseButton::deselectedCompletion() {
-  getContent()->setBounds(getLocalBounds().reduced(1));
+  getContent()->setBounds(getLocalBounds().reduced(reduction_));
   setButtonColour(colour.brighter());
 }
 
 void BaseButton::paint(juce::Graphics& g) {
-  colour = ThemeManager::shared()->getCurrent().one;
+  auto current = ThemeManager::shared()->getCurrent();
+  colour = current.dark ? current.one.brighter(0.2f) : current.one.brighter(0.8f);
 }

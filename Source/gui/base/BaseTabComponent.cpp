@@ -16,11 +16,9 @@ BaseTabComponent::~BaseTabComponent() {
 void BaseTabComponent::paint(juce::Graphics& g) {
   const juce::Graphics::ScopedSaveState save(g);
   auto parentRect = getLocalArea(grid, grid->getLocalBounds());
-
   path.clear();
   path.addRoundedRectangle(parentRect.toFloat(), 7.5f, 7.5f);
   g.reduceClipRegion(path);
-
   g.fillAll(bgColour);
 }
 

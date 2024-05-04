@@ -41,10 +41,10 @@ const std::string kOversamplingNames[] = {
 };
 
 const std::string kDelayStyleNames[] = {
-  "Mono",
-  "Stereo",
-  "Ping Pong",
-  "Mid Ping Pong",
+  "mono",
+  "stereo",
+  "ping pong",
+  "mid ping pong",
 };
 
 const std::string kCompressorBandNames[] = {

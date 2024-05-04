@@ -1,20 +1,26 @@
 #include "gui/SideMenu.h"
 #include "settings/Constants.h"
+#include "BinaryData.h"
 #include "gui/ThemeManager.h"
 
 int SideMenu::indexOfModulationConnection(Component* component) { return listBox.getRowNumberOfComponent(component); }
 SideMenu::~SideMenu() { }
 
 SideMenu::SideMenu() {
-  addAndMakeVisible(exitButton);
-  exitButton.onClick = [this]() { setVisible(false); };
+  exit_button_.on_click_ = [this]() { setVisible(false); };
   setupList();
+  setupSVGButton(exit_button_, BinaryData::x_svg, BinaryData::x_svgSize);
+}
+
+void SideMenu::setupSVGButton(SVGButton& button, const char* raw_data, size_t size) {
+  button.setSVG(raw_data, size);
+  addAndMakeVisible(button);
 }
 
 void SideMenu::setupList() {
   listBox.getVerticalScrollBar().setColour(ScrollBar::ColourIds::thumbColourId, Colour(60, 60, 60));
   listBox.setColour(ListBox::ColourIds::backgroundColourId, Colours::transparentBlack);
-  listBox.setRowHeight(80);
+  listBox.setRowHeight(76);
   addAndMakeVisible(listBox);
 }
 
@@ -40,7 +46,7 @@ void SideMenu::resizeListBox() {
 }
 
 void SideMenu::resizeExitButton() {
-  int buttonSize = 12;
-  int insets = 16;
-  exitButton.setBounds(insets + borderSize, insets + borderSize, buttonSize, buttonSize);
+  int buttonSize = 18;
+  int insets = 12;
+  exit_button_.setBounds(insets + borderSize, insets + borderSize, buttonSize, buttonSize);
 }

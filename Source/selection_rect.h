@@ -1,6 +1,6 @@
 #pragma once
 #include <juce_gui_basics/juce_gui_basics.h>
-#include "gui/controls/BoxSlider.h"
+#include "gui/controls/blocks_slider.h"
 #include "gui/ThemeListener.h"
 
 class SelectionRect: public juce::Component, ThemeListener {

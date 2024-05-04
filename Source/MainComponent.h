@@ -21,7 +21,10 @@
 #include "gui/column_controls_container.h"
 #include "selection_rect.h"
 #include "gui/controls/SavePopup.h"
+#include "gui/slider_container.h"
+#include "gui/modulation_state_manager.h"
 
+namespace gui {
 class MainComponent final: public Component,
   InspectorComponent::Listener,
   Slider::Listener,
@@ -30,13 +33,15 @@ class MainComponent final: public Component,
   GridComponent::Listener,
   NoteLogger::Listener,
   ColumnControlsContainer::Listener,
+  BlocksSlider::Listener,
+  ModulationStateManager::Listener,
   KeyListener {
 public:
   struct Delegate;
   Delegate* delegate;
   MainComponent(juce::MidiKeyboardState& keyboard_state, Delegate* delegate);
+  void setupColumnControls();
   ~MainComponent() override;
-  void mouseDrag(const MouseEvent& event) override;
 
   BlocksLookAndFeel blocks_laf_;
   UILayer ui_layer_;
@@ -50,20 +55,25 @@ protected:
   // MouseListener
   void mouseDown(const MouseEvent& event) override;
   void mouseUp(const MouseEvent& event) override;
+  void mouseDrag(const MouseEvent& event) override;
+
   void handlePastePopup(const juce::MouseEvent& event);
-  bool keyPressed (const KeyPress& key, Component* originatingComponent) override;
+  bool keyPressed(const KeyPress& key, Component* originatingComponent) override;
 private:
   DarkBackground dark_background_;
   DarkBackground grid_dark_background_;
   BlockGridComponent block_grid_;
   TabContainerComponent tab_grid_;
-  InspectorComponent inspector_;
+  SliderContainer inspector_v2_;
   SavePopup save_popup_;
   GraphicsTimer timer_;
   ColumnControlsContainer column_controls_;
   SelectionRect selection_rect_;
+  ModulationStateManager modulation_state_manager_;
   std::vector<model::Block> copied_blocks_;
   std::vector<GridItemComponent*> currently_selected_items_;
+  bool is_modulator_adjusting_ = false;
+  bool is_parameter_adjusting = false;
 
   Array<BlockComponent*> blocks;
   GridItemComponent* focused_grid_item_ = nullptr;
@@ -82,14 +92,19 @@ private:
   ButtonGridPopup presets_popup_;
   ButtonGridPopup copy_delete_popup_;
   ButtonGridPopup paste_popup_;
+
   bool multiple_selection_ = false;
   bool is_adjusting_inspector_ = false;
 
+  void hovered(BlocksSlider* blocks_slider, const ModulatorComponent* modulator_component) override;
+  void unhovered(BlocksSlider* blocks_slider, const ModulatorComponent* modulator_component) override;
+
+  void handleUpdateButton();
   void setupInspector();
   void clear();
   void resizeGrid();
   void resizeTabContainer();
-  void ResizeInspector();
+  void resizeInspector();
   void clickOnModulatorsPopup(Index index);
   void loadPreset(int index);
   void setupPopupMenus();
@@ -97,6 +112,7 @@ private:
   void setupDarkBackground(DarkBackground* component, int layer);
   void resetDownFlowingDots();
   void copy();
+  void highlightModulatableSliders(bool highlight, Colour color);
 
   void resizeSelectionRect(const juce::MouseEvent& event);
   void toggleGridItemSelection(GridComponent* grid, GridItemComponent* item, bool selected);
@@ -123,6 +139,10 @@ private:
   void notesStarted(Array<int> notes) override;
   void notesEnded(Array<int> notes) override;
 
+  // BlocksSlider::Listener
+  void sliderAdjusted(BlocksSlider* slider, float value) override;
+  void sliderGestureChanged(BlocksSlider* slider, bool started) override;
+
   // InspectorComponent::Listener
   void inspectorChangedParameter(int sliderIndex, float value) override;
   void inspectorGestureChanged(std::string parameter_name, bool started) override;
@@ -148,8 +168,6 @@ private:
   void modulatorEndedDrag(ModulatorComponent* modulatorComponent, const MouseEvent& event) override;
   void modulatorIsDragging(ModulatorComponent* modulatorComponent, const MouseEvent& event) override;
   void modulatorStartedDrag(ModulatorComponent* component, const MouseEvent& event) override;
-  void modulatorStartedAdjusting(ModulatorComponent* modulatorComponent, int index) override;
-  void modulatorEndedAdjusting(ModulatorComponent* modulatorComponent, int index) override;
   void modulatorIsAdjusting(ModulatorComponent* component, std::string parameter_name, float value) override;
   void modulatorGestureChanged(ModulatorComponent* modulatorComponent, std::string parameter_name, bool started) override;
 
@@ -165,8 +183,6 @@ private:
   void presetButtonClicked();
 
   void sliderValueChanged(Slider* slider) override;
-  // void sliderDragStarted(Slider* slider) override;
-  // void sliderDragEnded(Slider* slider) override;
 
   void columnControlAdjusted(ColumnControlsContainer::ControlType control, int column, float value) override;
   void columnControlStartedAdjusting(ColumnControlsContainer::ControlType control, int column) override;
@@ -187,14 +203,18 @@ struct MainComponent::Delegate {
   virtual void editorAdjustedTab(int column, int parameterIndex, float value) = 0;
   virtual void editorAdjustedModulator(std::string parameter_name, int index, float value) = 0;
   virtual void editorConnectedModulation(int modulator_index, std::string target_name, std::string parameter) = 0;
+  virtual void editorChangedModulationMagnitude(int modulationConnectionIndex, float magnitude) = 0;
+  virtual void editorChangedModulationPolarity(int index, bool bipolar) = 0;
+  virtual void editorDisconnectedModulation(int index) = 0;
+  virtual void editorDisconnectedModulation(ID source_id, std::string target_name, std::string paramter) = 0;
+
+  virtual void editorStartedAdjustingParameter(ID& id, std::string& parameter_name, bool started) = 0;
+  virtual void editorAdjustedParameter(ID& id, std::string& parameter_name, float value) = 0;
 
   virtual void editorStartedAdjustingColumn(std::string control, int column) = 0;
   virtual void editorEndedAdjustingColumn(std::string control, int column) = 0;
   virtual void editorAdjustedColumn(std::string contorl, int column, float value) = 0;
 
-  virtual void editorChangedModulationMagnitude(int modulationConnectionIndex, float magnitude) = 0;
-  virtual void editorChangedModulationPolarity(int index, bool bipolar) = 0;
-  virtual void editorDisconnectedModulation(int index) = 0;
   virtual void editorParameterGestureChanged(std::string module_name, std::string paramter_name, bool started) = 0;
   virtual void editorRemovedModulator(int index) = 0;
   virtual void editorChangedBlockLength(Index index, int times) = 0;
@@ -217,8 +237,8 @@ struct MainComponent::Delegate {
   virtual Array<int> editorRequestsActiveColumns() = 0;
   virtual std::vector<std::shared_ptr<model::Module>> getModulators2() = 0;
   virtual std::vector<std::shared_ptr<model::Connection>> getModulations() = 0;
-  // virtual Array<std::shared_ptr<Modulation>> getConnectionsOfSource(std::shared_ptr<Module> source) = 0;
   virtual const vital::StatusOutput* editorRequestsStatusOutput(std::string name) = 0;
 
   virtual ~Delegate() = default;
 };
+}

@@ -20,6 +20,9 @@ public:
     bool enablePlaceholder;
   };
 
+  inline static const GridComponent::Config tab_config = { Constants::tabHeight, Constants::Functions::tabWidth(), 0, 0, 1, Constants::columns, false };
+  inline static const GridComponent::Config blocks_config = { Constants::blockHeight, Constants::blockWidth, Constants::gridEdgeSpacing, Constants::moduleSpacing, Constants::rows, Constants::columns, true };
+
   struct Listener;
   Listener* listener;
 
@@ -39,7 +42,7 @@ public:
   void gridItemStartedDrag(GridItemComponent* item, const MouseEvent& event) override;
 
   GridComponent(Config config);
-  ~GridComponent() override;  
+  ~GridComponent() override;
   void paint(Graphics&) override;
 
   Rectangle<int> boundsForItem(GridItemComponent* item, bool resetBounds = false);

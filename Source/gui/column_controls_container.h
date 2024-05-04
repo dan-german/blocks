@@ -1,9 +1,9 @@
 #pragma once
 #include <juce_gui_basics/juce_gui_basics.h>
-#include "gui/controls/BoxSlider.h"
+#include "gui/controls/blocks_slider.h"
 #include "gui/ThemeListener.h"
 
-class ColumnControlsContainer: public juce::Component, ThemeListener, Slider::Listener {
+class ColumnControlsContainer: public juce::Component {
 public:
   enum class ControlType {
     level,
@@ -13,24 +13,19 @@ public:
   class Listener;
   Listener* listener;
 
-  ColumnControlsContainer();
+  ColumnControlsContainer(BlocksSlider::Listener* blocks_slider_listener);
   ~ColumnControlsContainer();
   void paint(juce::Graphics&) override;
   float plusLineLength = 10;
   float plusLineWidth = 2;
-  std::vector<std::unique_ptr<BoxSlider>> level_sliders_;
-  std::vector<std::unique_ptr<BoxSlider>> pan_sliders_;
+  std::vector<std::unique_ptr<BlocksSlider>> level_sliders_;
+  std::vector<std::unique_ptr<BlocksSlider>> pan_sliders_;
   void resized() override;
   void reset();
-  // Colour colour = Colour(66, 66, 66);
+  void highlight(bool highlight, Colour color);
 private:
-
-  void sliderValueChanged(Slider* slider) override;
-  void sliderDragStarted(Slider* slider) override;
-  void sliderDragEnded(Slider* slider) override;
-
-  void themeChanged(Theme theme) override;
-  std::unique_ptr<BoxSlider> createSlider(std::string title, int column);
+  // void themeChanged(Theme theme) override;
+  std::unique_ptr<BlocksSlider> createSlider(std::string title, int column, BlocksSlider::Listener* listener);
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ColumnControlsContainer)
 };
 

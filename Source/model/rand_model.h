@@ -8,12 +8,20 @@ class RandModel: public Module {
 public:
   RandModel(int number): Module("random", number) {
     display_name = "rand " + std::to_string(number);
-    add({ .name = "style", .min = 0.0, .max = vital::RandomLfo::kNumStyles - 1, .value_scale = ValueScale::kIndexed, .string_lookup = strings::kRandomNamesShort });
-    add({ .name = "tempo", .min = -7.0, .max = 12.0, .display_name = "rate" });
-    add({ .name = "sync", .min = 0.0, .max = 4.0, .value_scale = ValueScale::kIndexed, .string_lookup = strings::kFrequencySyncNames });
-    add({ .name = "stereo", .value_scale = ValueScale::kIndexed, .string_lookup = strings::kStereo });
-    add({ .name = "frequency", .min = -7.0, .max = 9.0, .value_scale = ValueScale::kExponential, .display_invert = true, .display_name = "rate", .decimal_places = 3, .hidden = true });
+    add({ .name = "style", .min = 0.0, .max = vital::RandomLfo::kNumStyles - 1, .value_scale = ValueScale::kIndexed, .string_lookup = strings::kRandomNamesShort, .modulatable = false });
+    add({ .name = "tempo", .min = -7.0, .max = 12.0 });
+    add({ .name = "sync", .min = 0.0, .max = 4.0, .value_scale = ValueScale::kIndexed, .string_lookup = strings::kFrequencySyncNames, .modulatable = false });
+    add({ .name = "stereo", .value_scale = ValueScale::kIndexed, .string_lookup = strings::kStereo, .modulatable = false });
+    add({ .name = "frequency", .min = -7.0, .max = 9.0, .value_scale = ValueScale::kExponential, .display_invert = true, .display_name = "secs", .decimal_places = 3, .hidden = true, .modulatable = false });
   }
+
+  std::string getParameterName(std::string name) override {
+    if (name == "tempo") {
+      bool is_changing_seconds = parameter_map_["sync"]->value_processor->value() == 0.0f;
+      return is_changing_seconds ? "frequency" : "tempo";
+    }
+    return Module::getParameterName(name);
+  };
 };
 }
 

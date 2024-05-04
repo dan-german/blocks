@@ -10,18 +10,18 @@
 
 #pragma once
 
-#include "gui/controls/BoxSlider.h"
+#include "gui/controls/blocks_slider.h"
 #include "gui/ThemeManager.h"
 
 class LabeledSlider: public juce::Component, ThemeListener {
 public:
-  LabeledSlider();
-  ~LabeledSlider() override;
-
-  void resized() override;
   Label label;
-  BoxSlider box_slider_;
+  BlocksSlider box_slider_;
+
+  LabeledSlider(BlocksSlider::Listener* blocks_slider_listener);
+  ~LabeledSlider() override;
+  void resized() override;
   void themeChanged(Theme theme) override;
-private:
-  JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(LabeledSlider)
+  void paint(juce::Graphics& g) override { 
+  };
 };

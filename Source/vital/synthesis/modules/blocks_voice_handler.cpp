@@ -89,6 +89,7 @@ void BlocksVoiceHandler::addModulator(std::shared_ptr<model::Module> modulator) 
   processor->setModule(modulator);
   active_modulators_.push_back(processor);
   active_modulators_map_[modulator->name] = processor;
+  active_processor_map_[modulator->name] = processor;
 }
 
 void BlocksVoiceHandler::repositionBlock(Index from, Index to) {
@@ -109,7 +110,7 @@ void BlocksVoiceHandler::connectAll() {
       }
     }
     if (current) {
-      column_nodes_[column]->plug(current);
+      column_controls_[column]->plug(current);
     }
     current = nullptr;
   }
@@ -130,7 +131,7 @@ void BlocksVoiceHandler::unplugAll() {
     processor->unplug(processor->input()->source);
   }
 
-  for (auto node : column_nodes_) {
+  for (auto node : column_controls_) {
     node->unplug(node->input()->source);
   }
 }
@@ -171,10 +172,14 @@ void BlocksVoiceHandler::init() {
     ModulationConnectionProcessor* processor = modulation_bank_.atIndex(i)->modulation_processor;
     processor->plug(reset(), ModulationConnectionProcessor::kReset);
     std::string number = std::to_string(i + 1);
-    std::string amount_name = "modulation_" + number + "_amount";
-    Output* modulation_amount = createPolyModControl2({ .name = "amount", .min = -1.0f });
+    std::string amount_name = "modulation " + number + " amount";
+
+    Output* modulation_amount = createPolyModControl2({ .name = amount_name, .min = -1.0f, .default_value = 0.5f });
     processor->plug(modulation_amount, ModulationConnectionProcessor::kModulationAmount);
     processor->initializeBaseValue(data_->controls[amount_name]);
+    processor->control_map_["amount"] = control_map_[amount_name];
+    active_processor_map_["modulation " + number] = processor; // hack to make the modulation processors available for modulation
+
     Output* modulation_power = createPolyModControl2({ .name = "power", .min = -10.0f, .max = 10.0f });
     processor->plug(modulation_power, ModulationConnectionProcessor::kModulationPower);
     addProcessor(processor);
@@ -217,7 +222,7 @@ void BlocksVoiceHandler::init() {
   createStatusOutput("num_voices", &num_voices_);
 
   std::string modulation_source_prefix = "modulation_source_";
-  std::string modulation_amount_prefix = "modulation_amount_";
+  std::string modulation_amount_prefix = "modulation amount ";
   for (int i = 0; i < vital::kMaxModulationConnections; ++i) {
     ModulationConnectionProcessor* processor = modulation_bank_.atIndex(i)->modulation_processor;
     std::string number = std::to_string(i + 1);
@@ -228,16 +233,17 @@ void BlocksVoiceHandler::init() {
   }
   initializeDefaultAmpEnvs();
 
-  for (auto node : column_nodes_) {
+  for (auto node : column_controls_) {
     master_node_->plugNext(node);
   }
 }
 
 void BlocksVoiceHandler::initializeDefaultAmpEnvs() {
   for (auto processor : processors_with_default_env) {
-    // continue;
     auto source = default_amp_env_->output();
     auto modulation_connection_processor = new ModulationConnectionProcessor(1000);
+    auto val = new Value(1.0f);
+    modulation_connection_processor->plug(val, ModulationConnectionProcessor::kModulationAmount);
     addProcessor(modulation_connection_processor);
     modulation_connection_processor->plug(default_amp_env_->output(), ModulationConnectionProcessor::kModulationInput);
     modulation_connection_processor->init();
@@ -267,7 +273,7 @@ void BlocksVoiceHandler::connectAllDefaultEnvs() {
     auto destination = osc->getPolyModulationDestination("amp env destination");
     processor->setDestinationScale(1.0f);
     processor->setPolyphonicModulation(true);
-    processor->control_map_["amount"]->set(1.0f);
+    // processor->control_map_["amount"]->set(1.0f);
     destination->plugNext(processor);
     processor->process(1);
     destination->process(1);
@@ -379,6 +385,7 @@ void BlocksVoiceHandler::removeBlock(Index index, std::shared_ptr<model::Block> 
 
   processor_pool_[block->id.type].push_back(processor);
   processor_matrix_[index.column][index.row] = nullptr;
+  // active_processor_map_[block->name] = nullptr;
 }
 
 void BlocksVoiceHandler::addBlock(std::shared_ptr<model::Block> block) {
@@ -429,6 +436,17 @@ void BlocksVoiceHandler::clear() {
 
   active_processors_.clear();
   active_processor_map_.clear();
+
+  for (int i = 0; i < Constants::columns; i++) { // this is a lame hack
+    std::string name = "column control " + std::to_string(i + 1);
+    active_processor_map_[name] = column_controls_[i];
+  }
+
+  for (int i = 0; i < vital::kMaxModulationConnections; ++i) {
+    ModulationConnectionProcessor* processor = modulation_bank_.atIndex(i)->modulation_processor;
+    std::string number = std::to_string(i + 1);
+    active_processor_map_["modulation " + number] = processor;
+  }
 
   active_modulators_.clear();
   active_modulators_map_.clear();
@@ -579,8 +597,12 @@ void BlocksVoiceHandler::createVoiceOutput() {
   addProcessor(amplitude_);
 
   for (int i = 0; i < Constants::columns; i++) {
-    column_nodes_.push_back(new ColumnMasterModule());
-    addProcessor(column_nodes_[i]);
+    auto column = new ColumnMasterModule();
+    column_controls_.push_back(column);
+    std::string name = "column control " + std::to_string(i + 1);
+    active_processor_map_[name] = column;
+    addSubmodule(column);
+    addProcessor(column);
   }
 }
 

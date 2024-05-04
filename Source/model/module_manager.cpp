@@ -7,10 +7,10 @@ ModuleManager::~ModuleManager() {
 
 std::shared_ptr<model::Block> ModuleManager::addBlock(std::string code, Index index, int number) {
   if (index.row >= model::rows || index.column >= model::columns || slotTaken(index)) return nullptr;
-  auto block = pool.getBlock(code, number);
+  auto block = pool.dequeueBlock(code, number);
   if (block == nullptr) return nullptr;
   block->index = index;
-  nameToModuleMap[block->name] = block;
+  name_module_map_[block->name] = block;
   blockMatrix[index.column][index.row] = block;
   blocks.push_back(block);
   return block;
@@ -20,17 +20,17 @@ void ModuleManager::removeBlock(std::shared_ptr<model::Block> block) {
   for (auto connection : getConnectionsOfTarget(block)) {
     removeConnection(connection);
   }
-  nameToModuleMap.erase(block->name);
+  name_module_map_.erase(block->name);
   blockMatrix[block->index.column][block->index.row] = nullptr;
   blocks.erase(std::remove(blocks.begin(), blocks.end(), block), blocks.end());
   pool.retire(block);
 }
 
 std::shared_ptr<Module> ModuleManager::addModulator(std::string code, int number, int colourId) {
-  auto modulator = pool.getModulator(code, number, colourId);
+  auto modulator = pool.dequeueModulator(code, number, colourId);
   if (modulator == nullptr) { return nullptr; }
   modulators.push_back(modulator);
-  nameToModuleMap[modulator->name] = modulator;
+  name_module_map_[modulator->name] = modulator;
   return modulator;
 }
 
@@ -42,6 +42,15 @@ std::vector<std::shared_ptr<Connection>> ModuleManager::getConnectionsOfSource(s
       sourceConnections.push_back(connection);
 
   return sourceConnections;
+}
+
+std::shared_ptr<model::Connection> ModuleManager::getConnection(ID source_id, std::string target_name, std::string parameter) {
+  for (auto connection : connections) {
+    if (connection->target->name == target_name && connection->target->getParameterName(parameter) == connection->parameter_name_ && connection->source->id == source_id) {
+      return connection;
+    }
+  }
+  return nullptr;
 }
 
 std::vector<std::shared_ptr<Connection>> ModuleManager::getConnectionsOfTarget(std::shared_ptr<Module> target) {
@@ -62,27 +71,23 @@ void ModuleManager::removeModulator(int index) {
     removeConnection(connection);
 
   pool.retire(modulator);
-  nameToModuleMap.erase(modulator->name);
+  name_module_map_.erase(modulator->name);
 }
 
 void ModuleManager::repositionBlock(Index oldIndex, Index newIndex) {
   auto block = getBlock(oldIndex);
-
   block->index = newIndex;
-
   blockMatrix[newIndex.column][newIndex.row] = block;
   blockMatrix[oldIndex.column][oldIndex.row] = {};
 }
 
 std::shared_ptr<Connection> ModuleManager::addConnection(std::shared_ptr<Module> source, std::shared_ptr<Module> target, std::string parameter_name, int number) {
   if (connectionExists(parameter_name, source, target)) return nullptr;
-
-  auto connection = pool.getConnection(number);
+  auto connection = pool.dequeueConnection(number);
   connection->parameter_name_ = parameter_name;
   connection->source = source;
   connection->target = target;
   connections.push_back(connection);
-  // target->parameters[parameterIndex]->connections.push_back(connection);
   return connection;
 }
 

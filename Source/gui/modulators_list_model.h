@@ -15,19 +15,27 @@
 
 // using Module = Model::Module;
 
-class ModulatorsListModel: public ListBoxModel {
+class ModulatorsListModel: public ListBoxModel, BlocksSlider::Listener {
 private:
-  std::vector<std::shared_ptr<model::Module>> modulators;
-  void setupModulatorComponent(std::shared_ptr<model::Module> model, ModulatorComponent& component) const;
-  void onEnvelopeParameterChanged(float value, std::shared_ptr<model::Module> model, int index, ModulatorComponent& component) const;
-  void onLFOParameterChange(std::shared_ptr<model::Module> module, ModulatorComponent& component, int index, float value) const;
+  std::vector<std::shared_ptr<model::Module>> modulators_;
+  std::unordered_map<std::string, std::shared_ptr<model::Module>> model_map_;
+  std::unordered_map<std::string, ModulatorComponent*> modulator_component_map_;
+
+  void setModelToComponent(std::shared_ptr<model::Module> model, ModulatorComponent& component) const;
+  void onEnvelopeAdjusted(std::shared_ptr<model::Module> module, std::string parameter_name, float value) const;
+  void onLFOAdjusted(std::shared_ptr<model::Module> module, std::string parameter_name, float value) const;
   void setSliderAsFrequency(std::shared_ptr<model::Module> module, LabeledSlider* slider) const;
   void setSliderAsTempo(std::shared_ptr<model::Module> module, LabeledSlider* slider) const;
+  void sliderAdjusted(BlocksSlider* slider, float value) override;
 public:
   ~ModulatorsListModel() override = default;
+  ModulatorsListModel(BlocksSlider::Listener* listener);
   Component* refreshComponentForRow(int rowNumber, bool isRowSelected, Component* existingComponentToUpdate) override;
-  Slider::Listener* sliderListener;
+
+  // Slider::Listener* sliderListener;
   ModulatorComponent::Listener* modulator_listener;
+  BlocksSlider::Listener* slider_listener_;
+
 
   int getNumRows() override;
   void remove(int index);

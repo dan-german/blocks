@@ -15,24 +15,26 @@
 #include "gui/EnvelopePath.h"
 #include "gui/controls/ExitButton.h"
 #include "gui/ThemeManager.h"
+#include "gui/slider_container.h"
 
 class ModulatorComponent: public Component, Slider::Listener, ThemeListener {
 private:
   ExitButton exitButton;
-  DragIndicatorComponent dragIndicatorComponent;
-  Component modulatorDragComponent;
+  DragIndicatorComponent drag_indicator_;
+  Component drag_hitbox_;
   Component slidersContainer;
   Rectangle<int> bounds;
-  const int sliderHeight = 19;
+  const int sliderHeight = 23;
   const int dragIndicatorHeight = 21;
   const int dragIndicatorBottomSpacing = 6;
-  const int sliderSpacing = 6;
+  const int sliderSpacing = 2;
   const int columns = 2;
   const int topSpacing = 16;
   const int sliderHorizontalSpacing = 3;
   const int offset = 0;
   int sliderHorizontalInsets = 6;
   Colour colour;
+  BlocksSlider::Listener* blocks_slider_listener;
 
   void sliderValueChanged(Slider* slider) override;
   void sliderDragStarted(Slider* slider) override;
@@ -40,6 +42,7 @@ private:
 
   int currentSliderIndex = -1;
 public:
+  gui::SliderContainer slider_container_;
   std::map<Slider*, std::string> slider_parameter_name_map_;
   struct Listener;
   Listener* delegate_;
@@ -47,16 +50,17 @@ public:
   Label title;
   EnvelopePath envelopePath;
   OscillatorPainter oscillatorPainter;
-  std::function<void(int, float)> onSliderValueChange;
+  // std::function<void(int, float)> onSliderValueChange;
   int row = -1;
+  ID model_id_;
 
-  ModulatorComponent();
+  ModulatorComponent(BlocksSlider::Listener* listener);
   ~ModulatorComponent() override;
 
   int calculateHeight();
   void paint(Graphics& g) override;
   void resized() override;
-  void resizeSliders() const;
+  void resizeSliders();
   void resizeTitle();
   void setupTitle();
   void setupSliders();
@@ -83,9 +87,7 @@ struct ModulatorComponent::Listener {
   virtual void modulatorEndedDrag(ModulatorComponent* modulatorComponent, const MouseEvent& event) = 0;
   virtual void modulatorIsDragging(ModulatorComponent* modulatorComponent, const MouseEvent& event) = 0;
   virtual void modulatorStartedDrag(ModulatorComponent* modulatorComponent, const MouseEvent& event) = 0;
-  virtual void modulatorStartedAdjusting(ModulatorComponent* modulatorComponent, int index) = 0;
-  virtual void modulatorEndedAdjusting(ModulatorComponent* modulatorComponent, int index) = 0;
-  virtual void modulatorIsAdjusting(ModulatorComponent* modulatorComponent, std::string parameter_name, float value) = 0;
   virtual void modulatorRemoved(ModulatorComponent* modulatorComponent) = 0;
+  virtual void modulatorIsAdjusting(ModulatorComponent* modulatorComponent, std::string parameter_name, float value) = 0;
   virtual void modulatorGestureChanged(ModulatorComponent* modulatorComponent, std::string paramter_name, bool started) = 0;
 };

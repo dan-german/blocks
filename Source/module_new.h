@@ -25,24 +25,21 @@ public:
   bool isChild = false;
   int length = 1;
 
-  inline bool isModulator() { return category == Category::modulator; }
-  inline bool isEnvelope() { return id.type == "envelope"; }
-  inline bool isOscillator() { return id.type == "osc"; }
-
   Module(std::string prefix, int number): name(prefix + " " + std::to_string(number)) {
     id = { prefix, number };
     display_name = prefix + " " + std::to_string(number);
   }
 
   virtual std::string getParameterName(int index) { return parameters_[index]->name; }
+  virtual std::string getParameterName(std::string name) { return name; }
+  virtual std::shared_ptr<vital::ValueDetails> getParameter(std::string name) { return parameter_map_[getParameterName(name)]; }
 
   void add(vital::ValueDetails parameter) {
     parameter.display_name = parameter.display_name != "" ? parameter.display_name : parameter.name;
-    std::string short_name = parameter.name;
-    parameter.name = short_name;
     auto shared_ptr = std::make_shared<vital::ValueDetails>(parameter);
     parameters_.push_back(shared_ptr);
-    parameter_map_[short_name] = shared_ptr;
+    parameter_map_[parameter.name] = shared_ptr;
+    parameter_map_[parameter.name]->value  = parameter.default_value;
   }
 
   virtual void reset() {

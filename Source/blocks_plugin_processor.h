@@ -28,7 +28,7 @@
 
 class ValueBridge;
 
-class PluginProcessor: public SynthBase, public juce::AudioProcessor, public ValueBridge::Listener, public MainComponent::Delegate, public SynthGuiInterface {
+class PluginProcessor: public SynthBase, public juce::AudioProcessor, public ValueBridge::Listener, public gui::MainComponent::Delegate, public SynthGuiInterface {
 public:
   static constexpr int kSetProgramWaitMilliseconds = 500;
 
@@ -94,18 +94,22 @@ public:
   void editorParameterGestureChanged(std::string module_name, std::string paramter_name, bool started) override;
   void editorChangedModulationPolarity(int index, bool bipolar) override;
   void editorDisconnectedModulation(int index) override;
+  void editorDisconnectedModulation(ID source_id, std::string target_name, std::string parameter) override;
   void editorSavedPreset(std::string name) override;
   void editorConnectedModulation(int modulatorIndex, std::string target_name, std::string parameter) override;
   void editorChangedBlockLength(Index index, int length) override;
   void editorAdjustedModulator(std::string parameter_name, int modulator, float value) override;
   void editorRemovedModulator(int index) override;
-  std::optional<Preset> editorNavigatedPreset(bool next) override; 
+  std::optional<Preset> editorNavigatedPreset(bool next) override;
 
   void editorStartedAdjustingColumn(std::string control, int column) override;
   void editorEndedAdjustingColumn(std::string control, int column) override;
   void editorAdjustedColumn(std::string contorl, int column, float value) override;
 
   void disconnect(std::shared_ptr<model::Connection>& connection);
+
+  void editorStartedAdjustingParameter(ID& id, std::string& parameter_name, bool started) override;
+  void editorAdjustedParameter(ID& id, std::string& parameter_name, float value) override;
 
   std::shared_ptr<model::Block> getBlock2(Index index) override;
   // std::shared_ptr<Tab> getTab(int column) override;
@@ -135,7 +139,7 @@ private:
   ValueBridge* bypass_parameter_;
   double last_seconds_time_;
   MidiKeyboardState keyboard_state_;
-  MainComponent* main_component_;
+  gui::MainComponent* main_component_;
   PresetManager preset_manager_;
   void loadPreset(Preset preset);
   void setValue(std::string module_id, std::string parameter, float value);

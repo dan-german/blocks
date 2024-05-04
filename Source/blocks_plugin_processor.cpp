@@ -27,7 +27,7 @@ PluginProcessor::PluginProcessor(): juce::AudioProcessor(BusesProperties().withO
 
   // for getVoiceHandler()->column_nodes_
   for (auto column_control : synth_->getModuleManager().pool.column_controls_) {
-    auto processor = getVoiceHandler()->column_nodes_[column_control->id.number - 1];
+    auto processor = getVoiceHandler()->column_controls_[column_control->id.number - 1];
     for (auto& pair : column_control->parameter_map_) {
       column_control->parameter_map_[pair.first]->value_processor = processor->control_map_[pair.first];
     }
@@ -320,15 +320,7 @@ juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter() {
 // MainComponent::Delegate
 void PluginProcessor::editorAdjustedModulator(std::string parameter_name, int index, float value) {
   auto modulator = synth_->getModuleManager().getModulator(index);
-
-  if (modulator->id.type != "envelope" && parameter_name == "tempo") {
-    bool is_changing_seconds = modulator->parameter_map_["sync"]->value_processor->value() == 0.0f;
-    parameter_name = is_changing_seconds ? "frequency" : "tempo";
-    modulator->parameter_map_[parameter_name]->set(value);
-    return;
-  }
-
-  modulator->parameter_map_[parameter_name]->set(value);
+  modulator->parameter_map_[modulator->getParameterName(parameter_name)]->set(value);
 }
 
 void PluginProcessor::editorAdjustedBlock(Index index, int parameter, float value) {
@@ -349,26 +341,25 @@ void PluginProcessor::editorAdjustedBlock(Index index, int parameter, float valu
   bool is_changing_delay_tempo = block->id.type == "delay" && parameter == 4;
   bool is_changing_mod_tempo = (block->id.type == "phaser" || block->id.type == "chorus" || block->id.type == "flanger") && parameter == 3;
   if (is_changing_delay_tempo || is_changing_mod_tempo) {
-      auto sync = block->parameter_map_["sync"]->value_processor->value();
-      bool is_changing_seconds = block->parameter_map_["sync"]->value_processor->value() == 0.0f;
-      if (is_changing_seconds) {
-        block->parameter_map_["frequency"]->value_processor->set(value);
-      } else {
-        block->parameter_map_["tempo"]->value_processor->set(value);
-      }
-      return;
+    auto sync = block->parameter_map_["sync"]->value_processor->value();
+    bool is_changing_seconds = block->parameter_map_["sync"]->value_processor->value() == 0.0f;
+    if (is_changing_seconds) {
+      block->parameter_map_["frequency"]->value_processor->set(value);
+    } else {
+      block->parameter_map_["tempo"]->value_processor->set(value);
+    }
+    return;
   }
 
   block->parameters_[parameter]->set(value);
 }
 
 void PluginProcessor::editorChangedModulationMagnitude(int index, float magnitude) {
-  synth_->getModuleManager().getConnection(index)->amount_parameter_->set(magnitude);
+  // synth_->getModuleManager().getConnection(index)->amount_parameter_->set(magnitude);
 }
 
 void PluginProcessor::editorChangedModulationPolarity(int index, bool bipolar) {
-  synth_->getModuleManager().getConnection(index)->bipolar_parameter_->set(bipolar);
-  // moduleManager.getConnection(index)->setPolarity(bipolar);
+  synth_->getModuleManager().getConnection(index)->getParameter("bipolar")->set(bipolar);
 }
 
 void PluginProcessor::editorAdjustedTab(int column, int parameter, float value) {
@@ -432,8 +423,11 @@ void PluginProcessor::editorRepositionedBlock(Index from, Index to) {
 
 void PluginProcessor::editorConnectedModulation(int modulatorIndex, std::string target_name, std::string parameter) {
   synth_->connectModulation(modulatorIndex, target_name, parameter);
-  // Analytics::shared()->countAction("Modulation Connected");
-  // connect(modulatorIndex, targetName, parameter);
+}
+
+void PluginProcessor::editorDisconnectedModulation(ID source_id, std::string target_name, std::string parameter) { // remove modulator index and add source id
+  auto connection = synth_->getModuleManager().getConnection(source_id, target_name, parameter);
+  disconnect(connection);
 }
 
 void PluginProcessor::editorDisconnectedModulation(int index) {
@@ -492,8 +486,10 @@ void PluginProcessor::loadPreset(Preset preset) {
 
     auto target = synth_->getModuleManager().getModule(presetConnection.target);
     auto model = synth_->getModuleManager().addConnection(modulator, target, presetConnection.parameter, presetConnection.number);
-    model->amount_parameter_->value = presetConnection.amount;
-    model->bipolar_parameter_->value = presetConnection.bipolar;
+
+    model->parameter_map_["amount"]->value = presetConnection.amount;
+    model->parameter_map_["bipolar"]->value = presetConnection.bipolar;
+
     connectModulationFromModel(model);
   }
 
@@ -789,11 +785,22 @@ std::vector<std::shared_ptr<model::Block>> PluginProcessor::editorPastedIndices(
       auto modulator = synth_->getModuleManager().getModule(connection->source->name);
       auto target = synth_->getModuleManager().getModule(new_block->name);
       auto model = synth_->getModuleManager().addConnection(modulator, target, connection->parameter_name_);
-      model->amount_parameter_->value = connection->amount_parameter_->value;
-      model->bipolar_parameter_->value = connection->bipolar_parameter_->value;
+      model->parameter_map_["amount"]->value_processor->set(connection->parameter_map_["amount"]->value);
+      model->parameter_map_["bipolar"]->value_processor->set(connection->parameter_map_["bipolar"]->value);
       connectModulationFromModel(model);
     }
   }
   block_updates_++;
   return new_blocks;
+}
+
+void PluginProcessor::editorStartedAdjustingParameter(ID& id, std::string& parameter_name, bool started) {
+
+}
+
+void PluginProcessor::editorAdjustedParameter(ID& id, std::string& parameter_name, float value) {
+  auto m = synth_->getModuleManager().getModule(id);
+  auto pname = m->getParameterName(parameter_name);
+  auto parameter = m->parameter_map_[pname];
+  parameter->value_processor->set(value);
 }

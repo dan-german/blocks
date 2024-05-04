@@ -12,7 +12,7 @@ public:
   GraphicsTimer timer;
   EasingAnimator animator;
   bool orbit = true;
-  int borderSize = 1;
+  int reduction_ = 1;
 
   const float MAX_ORBIT_BRIGHTNESS = 0.1f;
 
@@ -21,7 +21,6 @@ public:
 
   Colour colour;
   BaseButton();
-
 protected:
   void mouseEnter(const juce::MouseEvent& event) override;
   void mouseExit(const juce::MouseEvent& event) override;

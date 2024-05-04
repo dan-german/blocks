@@ -18,7 +18,7 @@ private:
   PluginProcessor& processor;
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PluginEditor)
 public:
-  MainComponent mainComponent;
+  gui::MainComponent mainComponent;
   PluginEditor(juce::MidiKeyboardState& keyboard_state, PluginProcessor& processor);
   void paint(Graphics&) override;
   void resized() override;

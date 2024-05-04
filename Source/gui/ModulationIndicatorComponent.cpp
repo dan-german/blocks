@@ -9,6 +9,9 @@ ModulationIndicatorComponent::ModulationIndicatorComponent(float initalMagnitude
   currentValuePointPath.setFill(FillType(currentPointColour));
   addAndMakeVisible(currentValuePointPath);
 
+  line_.setStrokeFill(FillType(currentPointColour));
+  addAndMakeVisible(line_);
+
   setMagnitude(magnitude, false);
 
   bipolar = false;
@@ -54,17 +57,14 @@ void ModulationIndicatorComponent::resizeCurrentValuePoint() { // this should be
 
     Path p;
     p.addRoundedRectangle(x, y, pointSize, pointSize, pointSize / 2);
-
     currentValuePointPath.setPath(p);
   }
 }
 
 void ModulationIndicatorComponent::setCurrentValue(float value) {
   if (std::isnan(value)) value = 0.0f;
-
   currentValueY = value;
   rawCurrentValue = value;
-
   resizeCurrentValuePoint();
   repaint();
 }
