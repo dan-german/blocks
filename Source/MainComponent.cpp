@@ -1098,12 +1098,6 @@ void MainComponent::columnControlEndedAdjusting(ColumnControlsContainer::Control
   }
 }
 
-// void MainComponent::modulatorGestureChanged(ModulatorComponent* modulatorComponent, std::string parameter_name, bool started) {
-//   is_modulator_adjusting_ = started;
-//   auto modulator = delegate->getModulator2(modulatorComponent->row);
-//   delegate->editorParameterGestureChanged(modulator->name, parameter_name, started);
-// }
-
 void MainComponent::copy() {
   copied_blocks_.clear();
   auto items = block_grid_.getItems();

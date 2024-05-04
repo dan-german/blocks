@@ -44,8 +44,6 @@ UILayer::UILayer(juce::MidiKeyboardState& keyboard_state, BlocksSlider::Listener
     connections_.setVisible(false);
   };
 
-  // auto initialized = UserSettings::shared()->getString("ProfileInitialized", falseString);
-  // if (initialized == "true") return;o
   auto empty_string = juce::String("");
   if (UserSettings::shared()->getString("connections_menu_visible", empty_string) == "true" ) connections_.setVisible(true);
   if (UserSettings::shared()->getString("modulators_menu_visible", empty_string) == "true") modulators_.setVisible(true);
@@ -176,7 +174,6 @@ void UILayer::setupSideMenus() {
 void UILayer::setConnections(std::vector<std::shared_ptr<model::Connection>> modulationConnections) {
   connections_list_box_model_.setConnections(modulationConnections);
   if (connections_.listBox.isVisible()) {
-    std::cout << "very very" << std::endl;
     connections_.listBox.updateContent();
   }
 }
