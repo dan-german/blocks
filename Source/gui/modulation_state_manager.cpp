@@ -33,7 +33,7 @@ void ModulationStateManager::handleModulationHoverEnd(const ModulatorComponent* 
 
 void ModulationStateManager::handleModulationHover(const ModulatorComponent* modulator_component) {
   auto slider = dynamic_cast<BlocksSlider*>(last_hovered_slider_->getParentComponent()->getParentComponent());
-  for (auto& modulation : current_connections_) {
+  for (auto modulation : current_connections_) {
     bool same_source = modulation->source->id == modulator_component->model_id_;
     bool same_target = modulation->target->id == slider->module_id_;
     bool same_parameter = modulation->parameter_name_ == slider->parameter_name_;

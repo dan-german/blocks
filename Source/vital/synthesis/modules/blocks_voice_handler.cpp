@@ -385,7 +385,7 @@ void BlocksVoiceHandler::removeBlock(Index index, std::shared_ptr<model::Block> 
 
   processor_pool_[block->id.type].push_back(processor);
   processor_matrix_[index.column][index.row] = nullptr;
-  active_processor_map_[block->name] = nullptr;
+  // active_processor_map_[block->name] = nullptr;
 }
 
 void BlocksVoiceHandler::addBlock(std::shared_ptr<model::Block> block) {

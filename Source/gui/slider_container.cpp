@@ -99,9 +99,13 @@ void SliderContainer::spawnSlider(vital::ValueDetails parameter, std::shared_ptr
 
   labeled_slider->box_slider_.juce_slider_.setRange(parameter.min, parameter.max, interval);
 
-  if (parameter.min < 0) {
-    labeled_slider->box_slider_.juce_slider_.getProperties().set("isCenter", true);
+  bool centered = false;
+  if (parameter.name == "tempo") {
+    centered = false;
+  } else if (parameter.min < 0) {
+    centered = true;
   }
+  labeled_slider->box_slider_.juce_slider_.getProperties().set("isCenter", centered);
 
   if (parameter.string_lookup) {
     labeled_slider->box_slider_.juce_slider_.textFromValueFunction = [parameter](double value) { return juce::String(parameter.string_lookup[(int)value]); };

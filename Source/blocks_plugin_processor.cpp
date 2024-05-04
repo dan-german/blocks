@@ -355,13 +355,11 @@ void PluginProcessor::editorAdjustedBlock(Index index, int parameter, float valu
 }
 
 void PluginProcessor::editorChangedModulationMagnitude(int index, float magnitude) {
-  synth_->getModuleManager().getConnection(index)->amount_parameter_->set(magnitude);
+  // synth_->getModuleManager().getConnection(index)->amount_parameter_->set(magnitude);
 }
 
 void PluginProcessor::editorChangedModulationPolarity(int index, bool bipolar) {
-  // synth_->getModuleManager().getConnection(index)->bipolar_parameter_->set(bipolar);
   synth_->getModuleManager().getConnection(index)->getParameter("bipolar")->set(bipolar);
-  // moduleManager.getConnection(index)->setPolarity(bipolar);
 }
 
 void PluginProcessor::editorAdjustedTab(int column, int parameter, float value) {
@@ -427,7 +425,7 @@ void PluginProcessor::editorConnectedModulation(int modulatorIndex, std::string 
   synth_->connectModulation(modulatorIndex, target_name, parameter);
 }
 
-void PluginProcessor::editorDisconnectedModulation(int modulator_index, std::string target_name, std::string parameter) {
+void PluginProcessor::editorDisconnectedModulation(int modulator_index, std::string target_name, std::string parameter) { // remove modulator index and add source id
   auto connection = synth_->getModuleManager().getConnection(modulator_index, target_name, parameter);
   disconnect(connection);
 }
@@ -788,8 +786,8 @@ std::vector<std::shared_ptr<model::Block>> PluginProcessor::editorPastedIndices(
       auto modulator = synth_->getModuleManager().getModule(connection->source->name);
       auto target = synth_->getModuleManager().getModule(new_block->name);
       auto model = synth_->getModuleManager().addConnection(modulator, target, connection->parameter_name_);
-      model->amount_parameter_->value = connection->amount_parameter_->value;
-      model->bipolar_parameter_->value = connection->bipolar_parameter_->value;
+      model->parameter_map_["amount"]->value_processor->set(connection->parameter_map_["amount"]->value);
+      model->parameter_map_["bipolar"]->value_processor->set(connection->parameter_map_["bipolar"]->value);
       connectModulationFromModel(model);
     }
   }
