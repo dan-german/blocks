@@ -2,8 +2,8 @@
 #include "gui/ThemeManager.h"
 
 BaseButton::BaseButton() {
-  timer.callback = [this](float) { if (orbit) this->updateOrbitEffect(); };
-  timer.start();
+  // timer.callback = [this](float) { if (orbit) this->updateOrbitEffect(); };
+  // timer.start();
   setName("BaseButton");
   setMouseCursor(MouseCursor::PointingHandCursor);
 }

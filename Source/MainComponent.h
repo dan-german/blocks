@@ -109,6 +109,7 @@ private:
   void hovered(BlocksSlider* blocks_slider, const ModulatorComponent* modulator_component) override;
   void unhovered(BlocksSlider* blocks_slider, const ModulatorComponent* modulator_component) override;
 
+  void handleUpdateButton();
   void setupInspector();
   void clear();
   void resizeGrid();

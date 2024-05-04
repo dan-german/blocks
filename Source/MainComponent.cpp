@@ -36,14 +36,20 @@ MainComponent::MainComponent(juce::MidiKeyboardState& keyboard_state, Delegate* 
   addAndMakeVisible(selection_rect_);
   note_logger_.listener = this;
   ThemeManager::shared()->set(UserSettings::shared()->getInt("theme", 0));
+  handleUpdateButton();
+}
 
-  auto req = [this] {
-    auto options = juce::URL::InputStreamOptions(juce::URL::ParameterHandling::inAddress);
-    auto version = juce::URL("https://blocksbucket.s3.us-east-2.amazonaws.com/version").createInputStream(options)->readEntireStreamAsString().toStdString();
-    juce::MessageManager::callAsync([this, version] { ui_layer_.update_button_.setVisible(version != BLOCKS_VERSION);});
-  };
-
-  juce::Thread::launch(req);
+void gui::MainComponent::handleUpdateButton() {
+  try {
+    auto req = [this] {
+      auto options = juce::URL::InputStreamOptions(juce::URL::ParameterHandling::inAddress);
+      auto version = juce::URL("https://blocksbucket.s3.us-east-2.amazonaws.com/version").createInputStream(options)->readEntireStreamAsString().toStdString();
+      juce::MessageManager::callAsync([this, version] { ui_layer_.update_button_.setVisible(version != BLOCKS_VERSION);});
+    };
+    juce::Thread::launch(req);
+  } catch (const std::exception& e) {
+    std::cout << e.what() << std::endl;
+  }
 }
 
 void MainComponent::setupColumnControls() {
