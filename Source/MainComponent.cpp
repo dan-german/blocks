@@ -42,9 +42,8 @@ MainComponent::MainComponent(juce::MidiKeyboardState& keyboard_state, Delegate* 
 void gui::MainComponent::handleUpdateButton() {
   auto req = [this] {
     auto options = juce::URL::InputStreamOptions(juce::URL::ParameterHandling::inAddress);
-    auto input_stream = juce::URL("https://blocksbucket.s3.us-east-2.amazonaws.com/version").createInputStream(options);
-    if (input_stream) {
-      auto version = input_stream->readEntireStreamAsString().toStdString();
+    if (auto inputStream = juce::URL("https://blocksbucket.s3.us-east-2.amazonaws.com/version").createInputStream(options); inputStream != nullptr) {
+      const auto version = inputStream->readEntireStreamAsString();
       juce::MessageManager::callAsync([this, version] { ui_layer_.update_button_.setVisible(version != BLOCKS_VERSION);});
     }
   };
