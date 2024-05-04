@@ -425,8 +425,8 @@ void PluginProcessor::editorConnectedModulation(int modulatorIndex, std::string 
   synth_->connectModulation(modulatorIndex, target_name, parameter);
 }
 
-void PluginProcessor::editorDisconnectedModulation(int modulator_index, std::string target_name, std::string parameter) { // remove modulator index and add source id
-  auto connection = synth_->getModuleManager().getConnection(modulator_index, target_name, parameter);
+void PluginProcessor::editorDisconnectedModulation(ID source_id, std::string target_name, std::string parameter) { // remove modulator index and add source id
+  auto connection = synth_->getModuleManager().getConnection(source_id, target_name, parameter);
   disconnect(connection);
 }
 
@@ -565,7 +565,7 @@ void PluginProcessor::disconnect(std::shared_ptr<model::Connection>& connection)
     getVoiceHandler()->setDefaultAmpEnvState(connection->target->name, true);
   }
 
-  printf("disconnecting %s %s %s\n", connection->source->name.c_str(), connection->target->name.c_str(), connection->parameter_name_.c_str());
+  // printf("disconnecting %s %s %s\n", connection->source->name.c_str(), connection->target->name.c_str(), connection->parameter_name_.c_str());
   synth_->disconnectModulation(connection->vital_connection_);
   getModuleManager().removeConnection(connection);
 }

@@ -14,7 +14,6 @@
 #include "BinaryData.h"
 
 void ConnectionComponent::paint(juce::Graphics& g) {
-  // g.fillAll(Colours::transparentBlack); 
   g.setColour(ThemeManager::shared()->getCurrent().one.withAlpha(0.5f));
   float y = getHeight() - 2.0f;
   float insets = horizontalInsets * 2.0f;
@@ -69,23 +68,24 @@ void ConnectionComponent::setupBipolarButton() {
 }
 
 void ConnectionComponent::resized() {
-  int y = 8;
-  source.setBounds(slider.getX() - 2, y, 100, 20);
   int target_width = 100;
+  int y = 8;
   target.setBounds(getWidth() - target_width - 7, y, target_width, 20);
+  // source.setBounds(slider.getX() - 2, y, 100, 20);
+  source.setBounds(7, y, 100, 20);
 
-  resizeIndicator();
   resizeSlider();
+  resizeIndicator();
   resizeBipolarButton();
   resizeExitButton();
-  int value_label_width = 80;
-  value_label_.setBounds(getWidth() / 2 - value_label_width / 2, slider.getBottom() + 6, value_label_width, 12);
 }
 
 void ConnectionComponent::resizeSlider() {
   int height = 12;
   int y = source.getBounds().getBottom() + 10;
   slider.setBounds(horizontalInsets, y, getWidth() - horizontalInsets * 2, height);
+  int value_label_width = 80;
+  value_label_.setBounds(getWidth() / 2 - value_label_width / 2, slider.getBottom() + 6, value_label_width, 12);
 }
 
 void ConnectionComponent::resizeIndicator() {

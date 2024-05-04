@@ -45,7 +45,7 @@ public:
 
   std::shared_ptr<model::Connection> addConnection(std::shared_ptr<Module> source, std::shared_ptr<Module> target, std::string parameter_name, int number = -1);
   std::shared_ptr<model::Connection> getConnection(int index) { return connections[index]; }
-  std::shared_ptr<model::Connection> getConnection(int modulator_index, std::string target_name, std::string parameter);
+  std::shared_ptr<model::Connection> getConnection(ID source_id, std::string target_name, std::string parameter);
   std::vector<std::shared_ptr<model::Connection>> getConnectionsOfSource(std::shared_ptr<Module> source);
   std::vector<std::shared_ptr<model::Connection>> getConnectionsOfTarget(std::shared_ptr<Module> target);
   std::vector<std::shared_ptr<model::Connection>> getConnections();

@@ -145,7 +145,10 @@ void UILayer::showModulatorsSideMenu() {
 
 void UILayer::setConnections(std::vector<std::shared_ptr<model::Connection>> modulationConnections) {
   connections_list_box_model_.setConnections(modulationConnections);
-  if (connections_.listBox.isVisible()) connections_.listBox.updateContent();
+  if (connections_.listBox.isVisible()) {
+    std::cout << "very very" << std::endl;
+    connections_.listBox.updateContent();
+  }
 }
 
 void UILayer::setModulators(std::vector<std::shared_ptr<model::Module>> newModulators) {

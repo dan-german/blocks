@@ -220,7 +220,7 @@ struct MainComponent::Delegate {
   virtual void editorChangedModulationMagnitude(int modulationConnectionIndex, float magnitude) = 0;
   virtual void editorChangedModulationPolarity(int index, bool bipolar) = 0;
   virtual void editorDisconnectedModulation(int index) = 0;
-  virtual void editorDisconnectedModulation(int modulator_index, std::string target_name, std::string paramter) = 0;
+  virtual void editorDisconnectedModulation(ID source_id, std::string target_name, std::string paramter) = 0;
 
   virtual void editorStartedAdjustingParameter(ID& id, std::string& parameter_name, bool started) = 0;
   virtual void editorAdjustedParameter(ID& id, std::string& parameter_name, float value) = 0;

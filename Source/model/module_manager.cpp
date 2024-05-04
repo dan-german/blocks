@@ -44,9 +44,9 @@ std::vector<std::shared_ptr<Connection>> ModuleManager::getConnectionsOfSource(s
   return sourceConnections;
 }
 
-std::shared_ptr<model::Connection> ModuleManager::getConnection(int modulator_index, std::string target_name, std::string parameter) {
+std::shared_ptr<model::Connection> ModuleManager::getConnection(ID source_id, std::string target_name, std::string parameter) {
   for (auto connection : connections) {
-    if (connection->target->name == target_name && connection->target->getParameterName(parameter) == connection->parameter_name_) {
+    if (connection->target->name == target_name && connection->target->getParameterName(parameter) == connection->parameter_name_ && connection->source->id == source_id) {
       return connection;
     }
   }

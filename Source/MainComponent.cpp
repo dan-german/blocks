@@ -1155,7 +1155,7 @@ void MainComponent::hovered(BlocksSlider* blocks_slider, const ModulatorComponen
 }
 
 void MainComponent::unhovered(BlocksSlider* blocks_slider, const ModulatorComponent* modulator_component) {
-  delegate->editorDisconnectedModulation(modulator_component->row, blocks_slider->module_id_.getName(), blocks_slider->parameter_name_);
+  delegate->editorDisconnectedModulation(modulator_component->model_id_, blocks_slider->module_id_.getName(), blocks_slider->parameter_name_);
   blocks_slider->stopModulationSelectionAnimation();
   cursor.setSelectionMode(false);
 }
