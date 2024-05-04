@@ -15,6 +15,7 @@
 #include "module_new.h"
 #include "version_config.h"
 #include "gui/ThemeManager.h"
+#include "settings/UserSettings.h"
 
 UILayer::UILayer(juce::MidiKeyboardState& keyboard_state, BlocksSlider::Listener* listener):
   ComponentMovementWatcher(this),
@@ -33,7 +34,21 @@ UILayer::UILayer(juce::MidiKeyboardState& keyboard_state, BlocksSlider::Listener
 
   setupSideMenus();
 
-  matrixButton.on_click_ = [this]() { connections_.setVisible(true); };
+  matrixButton.on_click_ = [this]() {
+    UserSettings::shared()->set("connections_menu_visible", juce::String("true"));
+    connections_.setVisible(true);
+  };
+
+  connections_.exit_button_.on_click_ = [this]() {
+    UserSettings::shared()->set("connections_menu_visible", juce::String("false"));
+    connections_.setVisible(false);
+  };
+
+  // auto initialized = UserSettings::shared()->getString("ProfileInitialized", falseString);
+  // if (initialized == "true") return;o
+  auto empty_string = juce::String("");
+  if (UserSettings::shared()->getString("connections_menu_visible", empty_string) == "true" ) connections_.setVisible(true);
+  if (UserSettings::shared()->getString("modulators_menu_visible", empty_string) == "true") modulators_.setVisible(true);
 
   setupKeyboard();
   connections_list_box_model_.slider_listener_ = listener;
@@ -67,8 +82,15 @@ void UILayer::addSVGButton(SVGButton& button, const char* rawData, size_t size) 
 void UILayer::addModulatorsButton() {
   modulatorsButton.reset(new ModulatorsButton());
   addAndMakeVisible(*modulatorsButton);
+  modulatorsButton->on_click_ = [this]() {
+    UserSettings::shared()->set("modulators_menu_visible", juce::String("true"));
+    modulators_.setVisible(true);
+  };
 
-  modulatorsButton->on_click_ = [this]() { modulators_.setVisible(true); };
+  modulators_.exit_button_.on_click_ = [this]() {
+    UserSettings::shared()->set("modulators_menu_visible", juce::String("false"));
+    modulators_.setVisible(false);
+  };
 }
 
 void UILayer::setupSettingsButton() {
@@ -149,11 +171,6 @@ void UILayer::resizePresetButton() {
 void UILayer::setupSideMenus() {
   connections_.listBox.setModel(&connections_list_box_model_);
   modulators_.isOnLeft = false;
-}
-
-void UILayer::showModulatorsSideMenu() {
-  modulators_.listBox.updateContent();
-  modulators_.setVisible(false);
 }
 
 void UILayer::setConnections(std::vector<std::shared_ptr<model::Connection>> modulationConnections) {

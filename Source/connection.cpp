@@ -70,6 +70,7 @@ std::string Connection::getParameterName(std::string name) {
 
 void Connection::reset(vital::ModulationConnection* vital_connection) {
   parameter_map_["amount"]->value_processor = vital_connection->modulation_processor->control_map_.at("amount");
+  std::cout << "setting amount to " << parameter_map_["amount"]->value << "\n";
   parameter_map_["amount"]->set(parameter_map_["amount"]->value);
 
   parameter_map_["bipolar"]->value_processor = vital_connection->modulation_processor->control_map_.at("bipolar");

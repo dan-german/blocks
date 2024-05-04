@@ -61,7 +61,6 @@ private:
   void setupSettingsButton();
   void addModulatorsButton();
   void resizeModulatorsButton();
-  void showModulatorsSideMenu();
   void resizeSettingsButton();
   void resizeSaveAndNewButtons();
   void themeChanged(Theme theme) override;
