@@ -40,20 +40,16 @@ MainComponent::MainComponent(juce::MidiKeyboardState& keyboard_state, Delegate* 
 }
 
 void gui::MainComponent::handleUpdateButton() {
-  try {
-    auto req = [this] {
-      try {
-        auto options = juce::URL::InputStreamOptions(juce::URL::ParameterHandling::inAddress);
-        auto version = juce::URL("https://blocksbucket.s3.us-east-2.amazonaws.com/version").createInputStream(options)->readEntireStreamAsString().toStdString();
-        juce::MessageManager::callAsync([this, version] { ui_layer_.update_button_.setVisible(version != BLOCKS_VERSION);});
-      } catch {
-        std::cout << e.what() << std::endl;
-      }
-    };
-    juce::Thread::launch(req);
-  } catch (const std::exception& e) {
-    std::cout << e.what() << std::endl;
-  }
+  auto req = [this] {
+    auto options = juce::URL::InputStreamOptions(juce::URL::ParameterHandling::inAddress);
+    auto input_stream = juce::URL("https://blocksbucket.s3.us-east-2.amazonaws.com/version").createInputStream(options);
+    if (input_stream) {
+      auto version = input_stream->readEntireStreamAsString().toStdString();
+      juce::MessageManager::callAsync([this, version] { ui_layer_.update_button_.setVisible(version != BLOCKS_VERSION);});
+    }
+    // auto version = juce::URL("https://blocksbucket.s3.us-east-2.amazonaws.com/version").createInputStream(options)->
+  };
+  juce::Thread::launch(req);
 }
 
 void MainComponent::setupColumnControls() {
