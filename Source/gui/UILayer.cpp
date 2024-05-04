@@ -13,6 +13,8 @@
 #include "model/ModelConstants.h"
 #include "BinaryData.h"
 #include "module_new.h"
+#include "version_config.h"
+#include "gui/ThemeManager.h"
 
 UILayer::UILayer(juce::MidiKeyboardState& keyboard_state, BlocksSlider::Listener* listener):
   ComponentMovementWatcher(this),
@@ -40,6 +42,21 @@ UILayer::UILayer(juce::MidiKeyboardState& keyboard_state, BlocksSlider::Listener
   update_button_.text.setText("update", dontSendNotification);
   addChildComponent(update_button_);
   update_button_.on_click_ = [this]() { juce::URL("https://www.soonth.com").launchInDefaultBrowser(); };
+  addAndMakeVisible(version_label_);
+  version_label_.setText(BLOCKS_VERSION, dontSendNotification);
+  version_label_.setFont(juce::Font(13));
+  version_label_.setAlpha(0.25);
+  ThemeManager::shared()->addListener(this);
+}
+
+UILayer::~UILayer() {
+  removeAllChildren();
+  keyboard.setLookAndFeel(nullptr);
+  ThemeManager::shared()->removeListener(this);
+}
+
+void UILayer::themeChanged(Theme theme) {
+  version_label_.setColour(Label::textColourId, theme.two.brighter(0.4));
 }
 
 void UILayer::addSVGButton(SVGButton& button, const char* rawData, size_t size) {
@@ -69,11 +86,6 @@ void UILayer::setupKeyboard() {
   addAndMakeVisible(keyboard);
 }
 
-UILayer::~UILayer() {
-  removeAllChildren();
-  keyboard.setLookAndFeel(nullptr);
-}
-
 void UILayer::resized() {
   int keyboardHeight = 55;
   keyboard.setBounds(0, getHeight() - keyboardHeight, getWidth(), keyboardHeight);
@@ -96,6 +108,7 @@ void UILayer::resized() {
   int themeButtonSize = 24;
   int y = keyboard.getY() - themeButtonSize - edgeMargin;
   theme_button_.setBounds(edgeMargin, y, themeButtonSize, themeButtonSize);
+  version_label_.setBounds(theme_button_.getRight() + 5, y, 100, themeButtonSize);
 }
 
 void UILayer::resizeSaveAndNewButtons() {

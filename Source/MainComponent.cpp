@@ -1134,6 +1134,10 @@ bool MainComponent::keyPressed(const KeyPress& key, Component* originatingCompon
 
 void MainComponent::sliderAdjusted(BlocksSlider* slider, float value) {
   delegate->editorAdjustedParameter(slider->module_id_, slider->parameter_name_, value);
+
+  if (slider->module_id_.type == "osc" && slider->parameter_name_ == "wave") {
+    changeModulePainter((int)value);
+  }
 }
 
 void MainComponent::sliderGestureChanged(BlocksSlider* slider, bool started) {

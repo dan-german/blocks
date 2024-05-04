@@ -22,8 +22,9 @@
 #include <juce_gui_basics/juce_gui_basics.h>
 #include "gui/controls/SVGButton.h"
 #include "connection.h"
+#include "ThemeListener.h"
 
-class UILayer: public juce::Component, ComponentMovementWatcher {
+class UILayer: public juce::Component, ComponentMovementWatcher, ThemeListener  {
 public:
   SideMenu connections_;
   ModulatorsSideMenu modulators_;
@@ -38,6 +39,7 @@ public:
 
   std::unique_ptr<ModulatorsButton> modulatorsButton;
   LabelButton update_button_;
+  juce::Label version_label_;
 
   ModulationsListBoxModel connections_list_box_model_;
 
@@ -51,6 +53,7 @@ public:
   void componentPeerChanged() override {};
   void componentVisibilityChanged() override {};
 private:
+  int edgeMargin = 16;
   void addSVGButton(SVGButton& button, const char* rawData, size_t size);
   void resizePresetButton();
   void setupSideMenus();
@@ -61,9 +64,6 @@ private:
   void showModulatorsSideMenu();
   void resizeSettingsButton();
   void resizeSaveAndNewButtons();
-
-private:
-  int edgeMargin = 16;
-
+  void themeChanged(Theme theme) override;
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(UILayer)
 };
