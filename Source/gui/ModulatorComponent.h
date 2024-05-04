@@ -17,7 +17,7 @@
 #include "gui/ThemeManager.h"
 #include "gui/slider_container.h"
 
-class ModulatorComponent: public Component, Slider::Listener, ThemeListener {
+class ModulatorComponent: public Component, ThemeListener {
 private:
   ExitButton exitButton;
   DragIndicatorComponent drag_indicator_;
@@ -35,10 +35,6 @@ private:
   int sliderHorizontalInsets = 6;
   Colour colour;
   BlocksSlider::Listener* blocks_slider_listener;
-
-  void sliderValueChanged(Slider* slider) override;
-  void sliderDragStarted(Slider* slider) override;
-  void sliderDragEnded(Slider* slider) override;
 
   int currentSliderIndex = -1;
 public:
@@ -88,6 +84,4 @@ struct ModulatorComponent::Listener {
   virtual void modulatorIsDragging(ModulatorComponent* modulatorComponent, const MouseEvent& event) = 0;
   virtual void modulatorStartedDrag(ModulatorComponent* modulatorComponent, const MouseEvent& event) = 0;
   virtual void modulatorRemoved(ModulatorComponent* modulatorComponent) = 0;
-  virtual void modulatorIsAdjusting(ModulatorComponent* modulatorComponent, std::string parameter_name, float value) = 0;
-  virtual void modulatorGestureChanged(ModulatorComponent* modulatorComponent, std::string paramter_name, bool started) = 0;
 };

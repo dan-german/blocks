@@ -10,10 +10,6 @@
 
 #include "gui/ModulatorComponent.h"
 
-void ModulatorComponent::sliderDragEnded(Slider* slider) {
-  delegate_->modulatorGestureChanged(this, slider_parameter_name_map_[slider], false);
-}
-
 ModulatorComponent::~ModulatorComponent() {
   sliders.clear(true);
   ThemeManager::shared()->removeListener(this);
@@ -51,7 +47,6 @@ void ModulatorComponent::setupSliders() {
     auto slider = new LabeledSlider(blocks_slider_listener);
     sliders.add(slider);
     slidersContainer.addAndMakeVisible(slider);
-    slider->box_slider_.juce_slider_.addListener(this);
   }
 }
 
@@ -191,22 +186,6 @@ void ModulatorComponent::setColour(Colour colour) {
   oscillatorPainter.waveColour = colour;
   envelopePath.colour = colour;
   slider_container_.setSlidersColour(colour);
-}
-
-void ModulatorComponent::sliderDragStarted(Slider* slider) {
-  for (int i = 0; i < sliders.size(); i++)
-    if (&sliders[i]->box_slider_.juce_slider_ == slider) {
-      currentSliderIndex = i;
-      break;
-    }
-  delegate_->modulatorGestureChanged(this, slider_parameter_name_map_[slider], true);
-}
-
-void ModulatorComponent::sliderValueChanged(Slider* slider) {
-  float value = static_cast<float>(slider->getValue());
-  // if (onSliderValueChange) onSliderValueChange(currentSliderIndex, value);
-  auto name = slider_parameter_name_map_[slider];
-  delegate_->modulatorIsAdjusting(this, name, value);
 }
 
 void ModulatorComponent::themeChanged(Theme theme) {

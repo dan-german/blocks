@@ -168,8 +168,6 @@ private:
   void modulatorEndedDrag(ModulatorComponent* modulatorComponent, const MouseEvent& event) override;
   void modulatorIsDragging(ModulatorComponent* modulatorComponent, const MouseEvent& event) override;
   void modulatorStartedDrag(ModulatorComponent* component, const MouseEvent& event) override;
-  void modulatorIsAdjusting(ModulatorComponent* component, std::string parameter_name, float value) override;
-  void modulatorGestureChanged(ModulatorComponent* modulatorComponent, std::string parameter_name, bool started) override;
 
   void presentModulationOptionsMenu(int modulatorIndex, Index& indexUnderMouse, BlockComponent* block);
   void updateDotPosition(const Point<int> position);
