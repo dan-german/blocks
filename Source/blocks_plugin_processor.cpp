@@ -799,8 +799,5 @@ void PluginProcessor::editorStartedAdjustingParameter(ID& id, std::string& param
 }
 
 void PluginProcessor::editorAdjustedParameter(ID& id, std::string& parameter_name, float value) {
-  auto m = synth_->getModuleManager().getModule(id);
-  auto pname = m->getParameterName(parameter_name);
-  auto parameter = m->parameter_map_[pname];
-  parameter->value_processor->set(value);
+  synth_->getModuleManager().getModule(id)->getParameter(parameter_name)->set(value);
 }

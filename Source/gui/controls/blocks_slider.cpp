@@ -175,7 +175,9 @@ void BlocksSlider::startModulationSelectionAnimation() {
 }
 
 void BlocksSlider::stopModulationSelectionAnimation() {
-  value_label_.setColour(Label::ColourIds::textColourId, ThemeManager::shared()->getCurrent().two.brighter(0.4f));
+  auto theme = ThemeManager::shared()->getCurrent();
+  Colour value_label_colour = theme.dark ? theme.two.brighter(0.7f) : theme.background.brighter(0.4);
+  value_label_.setColour(Label::ColourIds::textColourId, value_label_colour);
   modulation_selection_highlight_.setVisible(false);
   modulation_indication_highlight_.setVisible(true);
   juce_slider_.setAlpha(1.0f);

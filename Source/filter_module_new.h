@@ -6,7 +6,7 @@ namespace model {
 class FilterModule: public Block {
 public:
   FilterModule(int number): Block("filter", number) {
-    add({ .name = "model", .max = 7.0, .value_scale = ValueScale::kIndexed , .string_lookup = strings::kFilterModelNames });
+    add({ .name = "model", .max = 7.0, .value_scale = ValueScale::kIndexed , .string_lookup = strings::kFilterModelNames, .modulatable = false });
     add({ .name = "style", .max = 4.0, .value_scale = ValueScale::kIndexed , .string_lookup = strings::kFilterStyleNames, .modulatable = false });
     add({ .name = "cutoff", .min = 8.0, .max = 136.0, .default_value = 30.0, .post_offset = -60.0 });
     add({ .name = "resonance", .max = 1.0, .default_value = 0.5, .display_multiply = 100.0, .display_units = "%", .display_name = "Q" });

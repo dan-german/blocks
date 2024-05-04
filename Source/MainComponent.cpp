@@ -60,10 +60,6 @@ void MainComponent::updateDotPosition(const Point<int> position) {
   repaint();
 }
 
-void MainComponent::modulatorIsAdjusting(ModulatorComponent* component, std::string parameter_name, float value) {
-  delegate->editorAdjustedModulator(parameter_name, component->row, value);
-}
-
 void MainComponent::paint(juce::Graphics& g) {
   g.fillAll(ThemeManager::shared()->getCurrent().background);
 }
@@ -1100,12 +1096,6 @@ void MainComponent::columnControlEndedAdjusting(ColumnControlsContainer::Control
   } else if (control == ColumnControlsContainer::ControlType::pan) {
     delegate->editorEndedAdjustingColumn("pan", column);
   }
-}
-
-void MainComponent::modulatorGestureChanged(ModulatorComponent* modulatorComponent, std::string parameter_name, bool started) {
-  is_modulator_adjusting_ = started;
-  auto modulator = delegate->getModulator2(modulatorComponent->row);
-  delegate->editorParameterGestureChanged(modulator->name, parameter_name, started);
 }
 
 void MainComponent::copy() {
