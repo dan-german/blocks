@@ -42,9 +42,13 @@ MainComponent::MainComponent(juce::MidiKeyboardState& keyboard_state, Delegate* 
 void gui::MainComponent::handleUpdateButton() {
   try {
     auto req = [this] {
-      auto options = juce::URL::InputStreamOptions(juce::URL::ParameterHandling::inAddress);
-      auto version = juce::URL("https://blocksbucket.s3.us-east-2.amazonaws.com/version").createInputStream(options)->readEntireStreamAsString().toStdString();
-      juce::MessageManager::callAsync([this, version] { ui_layer_.update_button_.setVisible(version != BLOCKS_VERSION);});
+      try {
+        auto options = juce::URL::InputStreamOptions(juce::URL::ParameterHandling::inAddress);
+        auto version = juce::URL("https://blocksbucket.s3.us-east-2.amazonaws.com/version").createInputStream(options)->readEntireStreamAsString().toStdString();
+        juce::MessageManager::callAsync([this, version] { ui_layer_.update_button_.setVisible(version != BLOCKS_VERSION);});
+      } catch {
+        std::cout << e.what() << std::endl;
+      }
     };
     juce::Thread::launch(req);
   } catch (const std::exception& e) {
