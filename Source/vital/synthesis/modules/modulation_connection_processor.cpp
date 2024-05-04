@@ -37,12 +37,6 @@ ModulationConnectionProcessor::ModulationConnectionProcessor(int index):
 }
 
 void ModulationConnectionProcessor::init() {
-
-  // Output* modulation_amount = createPolyModControl2({ .name = "amount", .min = -1.0f });
-  // initializeBaseValue(control_map_["amount"]);
-  // plug(modulation_amount, ModulationConnectionProcessor::kModulationAmount);
-  
-
   bipolar_ = createBaseControl2({ .name = "bipolar" });
   stereo_ = createBaseControl2({ .name = "stereo" });
   bypass_ = createBaseControl2({ .name = "bypass" });

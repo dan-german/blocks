@@ -40,9 +40,6 @@ void LfoModule::init() {
   Value* sync_type = createBaseControl2({ .name = "sync type", .value_scale = ValueScale::kIndexed, .max = 5.0f });
   Value* smooth_mode = createBaseControl2({ .name = "smooth mode", .value_scale = ValueScale::kIndexed, .default_value = 1.0f });
   Output* smooth_time = createPolyModControl2({ .name = "smooth time", .value_scale = ValueScale::kExponential , .min = -10.0f, .max = 4.0f, .default_value = -7.5f });
-  // Output* frequency = createTempoSyncSwitch(prefix_, free_frequency->owner, beats_per_second_, true, input(kMidi));
-  // AddControlInput aux_tempo_input = { .name = "tempo 2", .value_scale = ValueScale::kIndexed , .min = -2.0f, .max = 9.0f, .default_value = 9.0f };
-  // { "tempo", 0x000000, 0.0, 12.0, 7.0, 0.0, 1.0, ValueDetails::kIndexed, false, "", "Tempo", strings::kSyncedFrequencyNames },
   AddControlInput i = { .name = "tempo", .value_scale = ValueScale::kIndexed, .min = 0.0f, .max = 12.0f, .default_value = 7.0f };
   Output* frequency = createTempoSyncSwitch2(i, free_frequency->owner, beats_per_second_, true, input(kMidi));
 

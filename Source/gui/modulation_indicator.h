@@ -40,14 +40,7 @@ public:
       int width = getWidth() / 2 * (i + 1);
       g.fillRect(getWidth() / 2, y, width, height);
     }
-    // int height = getHeight() / 6;
-    // g.fillRect(getWidth() / 2, parentRect.getHeight() - height, getHeight() / 2, height);
   }
 private:
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ModulationIndicator)
 };
-
-// class ModulationIndicator::IndicatorModel {
-//   bool bipolar_;
-//   float value_;
-// };

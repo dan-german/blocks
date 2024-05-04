@@ -1,5 +1,4 @@
 #include "gui/slider_container.h"
-// #include "gui/controls/LabelledS"
 #include "vital/synth_strings.h"
 
 using namespace gui;
@@ -10,7 +9,6 @@ SliderContainer::SliderContainer(BlocksSlider::Listener* slider_listener, Config
 {}
 
 void SliderContainer::paint(juce::Graphics& g) {
-  // g.fillAll(juce::Colours::red);
 }
 
 void SliderContainer::resized() {

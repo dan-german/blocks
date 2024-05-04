@@ -25,9 +25,7 @@ void BoxSliderLooksAndFeel::drawLinearSlider(juce::Graphics& g,
   juce::Slider& slider)
 {
   auto theme = ThemeManager::shared()->getCurrent();
-  // Colour track_colour = theme.dark ? theme.two : theme.two.brighter(0.40f);
   Colour track_colour = theme.dark ? ThemeManager::shared()->getCurrent().one : theme.two.brighter(0.40f);
-  // g.setColour(ThemeManager::shared()->getCurrent().one);
   g.setColour(track_colour);
   const float corner_radius = height / 4.5f;
   auto bounds = slider.getBounds();

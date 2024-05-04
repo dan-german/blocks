@@ -58,18 +58,6 @@ void ModulationIndicatorComponent::resizeCurrentValuePoint() { // this should be
     Path p;
     p.addRoundedRectangle(x, y, pointSize, pointSize, pointSize / 2);
     currentValuePointPath.setPath(p);
-
-
-    // make a rect from the middle to the point
-    // Path line;
-    // line.startNewSubPath(getWidth() / 2.0f, getHeight() / 2.0f);
-    // line.addRectangle(x + pointSize / 2.0f, y + pointSize / 2.0f, 1.0f, 1.0f);
-    // line.addRectangle(getBounds().getCentreX(), 0, 
-    // line.lineTo(x + pointSize / 2.0f, y + pointSize / 2.0f);
-    // line_.setPath(line);
-
-    // line_ = line;
-
   }
 }
 

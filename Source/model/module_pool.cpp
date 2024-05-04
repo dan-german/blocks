@@ -72,16 +72,4 @@ std::shared_ptr<model::Module> ModulePool::dequeueModulator(std::string code, in
   if (modulator) modulator->colour = colourPool.get(colourId);
   return modulator;
 }
-
-// std::shared_ptr<Connection> ModulePool::dequeueConnection(int number) {
-//   int index = 0;
-//   for (int i = 0; i < connections.size(); i++) {
-//     if (connections[i]->id.number == number) {
-//       index = 0;
-//     }
-//   }
-//   auto connection = connections[index];
-//   connections.erase(connections.begin());
-//   return connection;
-// }
 } // namespace model

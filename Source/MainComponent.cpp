@@ -47,7 +47,6 @@ void gui::MainComponent::handleUpdateButton() {
       auto version = input_stream->readEntireStreamAsString().toStdString();
       juce::MessageManager::callAsync([this, version] { ui_layer_.update_button_.setVisible(version != BLOCKS_VERSION);});
     }
-    // auto version = juce::URL("https://blocksbucket.s3.us-east-2.amazonaws.com/version").createInputStream(options)->
   };
   juce::Thread::launch(req);
 }
@@ -61,16 +60,6 @@ void MainComponent::updateDotPosition(const Point<int> position) {
   cursor.setBounds(position.getX(), position.getY(), cursor.size, cursor.size);
   repaint();
 }
-
-// void MainComponent::modulatorStartedAdjusting(ModulatorComponent* modulatorComponent, int index) {
-//   is_modulator_adjusting_ = true;
-  // delegate->editorParameterGestureChanged(delegate->getModulator(modulatorComponent->row)->name, index, true);
-// }
-
-// void MainComponent::modulatorEndedAdjusting(ModulatorComponent* modulatorComponent, int index) {
-//   is_modulator_adjusting_ = false;
-  // delegate->editorParameterGestureChanged(delegate->getModulator(modulatorComponent->row)->name, index, false);
-// }
 
 void MainComponent::modulatorIsAdjusting(ModulatorComponent* component, std::string parameter_name, float value) {
   delegate->editorAdjustedModulator(parameter_name, component->row, value);

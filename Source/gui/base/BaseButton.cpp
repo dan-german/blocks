@@ -11,7 +11,6 @@ BaseButton::BaseButton() {
 void BaseButton::mouseEnter(const juce::MouseEvent& event) {
   isMouseHovering = true;
   startSelectedAnimation();
-  // setMouseCursor(MouseCursor::PointingHandCursor);
 }
 
 void BaseButton::mouseUp(const juce::MouseEvent& event) {

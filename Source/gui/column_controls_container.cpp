@@ -22,12 +22,9 @@ ColumnControlsContainer::ColumnControlsContainer(BlocksSlider::Listener* listene
     slider->parameter_name_ = "pan";
     pan_sliders_.push_back(std::move(slider));
   }
-
-  // ThemeManager::shared()->addListener(this);
 }
 
 ColumnControlsContainer::~ColumnControlsContainer() {
-  // ThemeManager::shared()->removeListener(this);
 }
 
 std::unique_ptr<BlocksSlider> ColumnControlsContainer::createSlider(std::string title, int column, BlocksSlider::Listener* listener) {
@@ -57,17 +54,7 @@ void ColumnControlsContainer::resized() {
 }
 
 void ColumnControlsContainer::paint(juce::Graphics& g) {
-  // g.fillAll(juce::Colours::red);
 }
-
-// void ColumnControlsContainer::themeChanged(Theme theme) {
-//   for (auto& slider : level_sliders_) {
-//     slider->juce_slider_.setColour(Slider::ColourIds::trackColourId, theme.two);
-//   }
-//   for (auto& slider : pan_sliders_) {
-//     slider->juce_slider_.setColour(Slider::ColourIds::trackColourId, theme.two);
-//   }
-// }
 
 void ColumnControlsContainer::reset() {
   for (auto& slider : level_sliders_) { slider->juce_slider_.setValue(1.0f); }

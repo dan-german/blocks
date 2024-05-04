@@ -71,10 +71,6 @@ void BlocksSlider::setupIndicationAnimator() {
   };
 }
 
-// void BoxSlider::paint(juce::Graphics& g) {
-  // g.setColour(Colours::red);
-// }
-
 void BlocksSlider::resized() {
   BaseButton::resized();
   juce_slider_.setBounds(getContent()->getLocalBounds());

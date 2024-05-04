@@ -23,6 +23,5 @@ public:
   void resized() override;
   void themeChanged(Theme theme) override;
   void paint(juce::Graphics& g) override { 
-    // g.fillAll(Colours::red);
   };
 };

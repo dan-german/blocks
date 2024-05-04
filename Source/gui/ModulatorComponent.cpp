@@ -50,7 +50,6 @@ void ModulatorComponent::setupSliders() {
   for (int i = 0; i < 4; i++) {
     auto slider = new LabeledSlider(blocks_slider_listener);
     sliders.add(slider);
-    // addAndMakeVisible(slidersContainer);
     slidersContainer.addAndMakeVisible(slider);
     slider->box_slider_.juce_slider_.addListener(this);
   }
@@ -65,7 +64,6 @@ void ModulatorComponent::setupTitle() {
 
 void ModulatorComponent::paint(Graphics& g) {
   drawBottomLine(g);
-  // g.fillAll(Colours::blueviolet);
 }
 
 void ModulatorComponent::drawBottomLine(Graphics& g) const {
@@ -146,33 +144,6 @@ void ModulatorComponent::resizeSliders() {
   int horizontal_insets = 4;
   slider_container_.config_.slider_width = getWidth() / 2 - horizontal_insets * 2; // 4 on both sides
   slider_container_.setBounds(horizontal_insets, yOffset, getWidth(), height_left);
-  // slidr
-
-  // slider_container_.setBounds(0, 0, 20, 20);
-
-  // for (int row = 0; row < rows; row++) {
-  //   for (int column = 0; column < columns; column++) {
-  //     int index2 = row + column + acc;
-
-  //     printf("%d %d\n", pls, row + column + acc);
-  //     pls++;
-  //     auto slider = sliders[row + column + acc];
-  //     int x = column * sliderWidth + sliderHorizontalSpacing;
-  //     int y = row * sliderHeight + sliderSpacing * row;
-  //     slider->setBounds(x, y, sliderWidth - sliderHorizontalSpacing * 2, sliderHeight);
-  //   }
-  //   acc++;
-  // }
-
-  // for (int i = 0; i < remainder; i++) {
-  //   auto slider = sliders[count - remainder + i];
-  //   int x = i * sliderWidth;
-
-  //   for (int column = 0; column < columns; column++) {
-  //     int y = rows * sliderHeight + yOffset + sliderSpacing * column;
-  //     slider->setBounds(x, y, sliderWidth, sliderHeight);
-  //   }
-  // }
 }
 
 int ModulatorComponent::calculateHeight() {

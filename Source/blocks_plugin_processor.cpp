@@ -565,7 +565,6 @@ void PluginProcessor::disconnect(std::shared_ptr<model::Connection>& connection)
     getVoiceHandler()->setDefaultAmpEnvState(connection->target->name, true);
   }
 
-  // printf("disconnecting %s %s %s\n", connection->source->name.c_str(), connection->target->name.c_str(), connection->parameter_name_.c_str());
   synth_->disconnectModulation(connection->vital_connection_);
   getModuleManager().removeConnection(connection);
 }
@@ -805,7 +804,3 @@ void PluginProcessor::editorAdjustedParameter(ID& id, std::string& parameter_nam
   auto parameter = m->parameter_map_[pname];
   parameter->value_processor->set(value);
 }
-
-// std::shared_ptr<model::Module>& PluginProcessor::editorRequestsColumnControls() { 
-//   return getModuleManager().pool.column_controls_;
-// }

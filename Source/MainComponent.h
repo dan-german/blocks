@@ -93,19 +93,9 @@ private:
   ButtonGridPopup copy_delete_popup_;
   ButtonGridPopup paste_popup_;
 
-  // Component* last_hovered_slider_ = nullptr; 
-  // bool is_currently_modulating_slider_ = false;
-
   bool multiple_selection_ = false;
   bool is_adjusting_inspector_ = false;
 
-  // void handleModulationHoverEnd(const ModulatorComponent* modulator_component);
-  // void handleModulationHover(const ModulatorComponent* modulator_component);
-  // void handleNoComponentFound(const ModulatorComponent* modulator_component);
-  // void handleModulatings(const ModulatorComponent* modulator_component, const juce::MouseEvent& event);
-
-  // void hovered(BlocksSlider* slider, ModulatorComponent* modulator, const MouseEvent& event) override;
-  // void unhovered(BlocksSlider* slider, ModulatorComponent* modulator, const MouseEvent& event) override;
   void hovered(BlocksSlider* blocks_slider, const ModulatorComponent* modulator_component) override;
   void unhovered(BlocksSlider* blocks_slider, const ModulatorComponent* modulator_component) override;
 
@@ -177,10 +167,7 @@ private:
 
   void modulatorEndedDrag(ModulatorComponent* modulatorComponent, const MouseEvent& event) override;
   void modulatorIsDragging(ModulatorComponent* modulatorComponent, const MouseEvent& event) override;
-  // void NewFunction(const juce::MouseEvent& event, bool& retFlag);
   void modulatorStartedDrag(ModulatorComponent* component, const MouseEvent& event) override;
-  // void modulatorStartedAdjusting(ModulatorComponent* modulatorComponent, int index) override;
-  // void modulatorEndedAdjusting(ModulatorComponent* modulatorComponent, int index) override;
   void modulatorIsAdjusting(ModulatorComponent* component, std::string parameter_name, float value) override;
   void modulatorGestureChanged(ModulatorComponent* modulatorComponent, std::string parameter_name, bool started) override;
 
@@ -196,8 +183,6 @@ private:
   void presetButtonClicked();
 
   void sliderValueChanged(Slider* slider) override;
-  // void sliderDragStarted(Slider* slider) override;
-  // void sliderDragEnded(Slider* slider) override;
 
   void columnControlAdjusted(ColumnControlsContainer::ControlType control, int column, float value) override;
   void columnControlStartedAdjusting(ColumnControlsContainer::ControlType control, int column) override;
@@ -244,7 +229,6 @@ struct MainComponent::Delegate {
 
   virtual std::pair<float, float> editorRequestsModulatorValue(Index moduleIndex, int parameterIndex, int modulatorIndex) = 0;
   virtual std::pair<float, float> editorRequestsModulatorValue(int modulationConnectionIndex) = 0;
-  // virtual std::shared_ptr<model::Module>& editorRequestsColumnControls() = 0;
   // virtual std::shared_ptr<Tab> getTab(int column) = 0;
   virtual std::shared_ptr<model::Module> getModulator2(int index) = 0;
   virtual std::shared_ptr<model::Module> editorAddedModulator2(std::string code) = 0;
@@ -253,7 +237,6 @@ struct MainComponent::Delegate {
   virtual Array<int> editorRequestsActiveColumns() = 0;
   virtual std::vector<std::shared_ptr<model::Module>> getModulators2() = 0;
   virtual std::vector<std::shared_ptr<model::Connection>> getModulations() = 0;
-  // virtual Array<std::shared_ptr<Modulation>> getConnectionsOfSource(std::shared_ptr<Module> source) = 0;
   virtual const vital::StatusOutput* editorRequestsStatusOutput(std::string name) = 0;
 
   virtual ~Delegate() = default;
