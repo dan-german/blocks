@@ -158,6 +158,12 @@ vital::modulation_change SynthBase::createModulationChange(vital::ModulationConn
   auto target_processor = getVoiceHandler()->active_processor_map_[connection->destination_name];
 
   change.source = source->output();
+  
+  if (connection->parameter_name.find("amount") != std::string::npos) { // this hack allows for the modulation of the amount of a modulation
+    connection->parameter_name = connection->destination_name + " amount";
+    target_processor = getVoiceHandler();
+  }
+
   change.mono_destination = target_processor->getMonoModulationDestination(connection->parameter_name);
   change.mono_modulation_switch = target_processor->getMonoModulationSwitch(connection->parameter_name);
 

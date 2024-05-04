@@ -25,9 +25,6 @@ struct Connection: Module {
   std::shared_ptr<vital::ValueDetails> bipolar_parameter_;
   vital::ModulationConnection* vital_connection_;
 
-  // int id = 0;
-  // int number;
-  // std::string name;
   std::shared_ptr<Module> source;
   std::shared_ptr<Module> target;
   std::string parameter_name_;

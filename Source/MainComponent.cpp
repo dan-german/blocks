@@ -12,7 +12,8 @@ MainComponent::MainComponent(juce::MidiKeyboardState& keyboard_state, Delegate* 
   tab_grid_(GridComponent::tab_config),
   block_grid_(GridComponent::blocks_config),
   column_controls_(this), // should this be a SliderContainer?
-  inspector_v2_(this, SliderContainer::inspector_config)
+  inspector_v2_(this, SliderContainer::inspector_config),
+  modulation_state_manager_(this, *this)
 {
   setWantsKeyboardFocus(false);
 
@@ -74,7 +75,7 @@ void MainComponent::paint(juce::Graphics& g) {
 }
 
 void MainComponent::inspectorGestureChanged(std::string parameter_name, bool started) {
-  is_adjusting_inspector_ = started;
+  // is_adjusting_inspector_ = started;
   std::shared_ptr<model::Module> focusedModule = delegate->getBlock2(focused_grid_item_->index);
 
   // auto isTab = tabGrid.containsItem(focusedGridItem);
@@ -268,11 +269,11 @@ void MainComponent::mouseUp(const MouseEvent& event) {
   if (event.eventComponent == &ui_layer_.modulators_.plus_button_) return;
   // if (component_name == "ModulatorsPlusButton") return;
 
-  if (modulator_drag_mode_) {
-    previous_slider_under_mouse_ = {};
-    modulator_drag_mode_ = false;
-    return;
-  }
+  // if (modulator_drag_mode_) {
+  //   previous_slider_under_mouse_ = {};
+  //   modulator_drag_mode_ = false;
+  //   return;
+  // }
 
   selection_rect_.setBounds(Rectangle<int>());
   auto grid_relative_position = event.getEventRelativeTo(&block_grid_).getPosition();
@@ -438,9 +439,9 @@ void MainComponent::dismissPopup(ButtonGridPopup& popup) {
 
 void MainComponent::removeTab(GridItemComponent* tab) {
   if (tab == focused_grid_item_) {
-    inspector_.setVisible(false);
+    inspector_v2_.setVisible(false);
     focused_grid_item_ = nullptr;
-  } else if (inspector_.isVisible()) {
+  } else if (inspector_v2_.isVisible()) {
     refreshInspector();
   }
 
@@ -456,9 +457,9 @@ void MainComponent::removeTab(GridItemComponent* tab) {
 void MainComponent::removeBlock(GridItemComponent* block) {
   auto item = static_cast<BlockComponent*>(block);
   if (item == focused_grid_item_) {
-    inspector_.setVisible(false);
+    inspector_v2_.setVisible(false);
     focused_grid_item_ = nullptr;
-  } else if (inspector_.isVisible()) {
+  } else if (inspector_v2_.isVisible()) {
     refreshInspector();
   }
   blocks.removeFirstMatchingValue(item);
@@ -571,7 +572,7 @@ void MainComponent::highlightModulatableSliders(bool highlight, Colour color = C
   }
   column_controls_.highlight(highlight, color);
   if (inspector_v2_.isVisible()) inspector_v2_.highlightModulationIndication(highlight, color);
-  if (ui_layer_.connections_.isVisible()) { 
+  if (ui_layer_.connections_.isVisible()) {
     for (int i = 0; i < delegate->getModulations().size(); i++) {
       if (auto mc = dynamic_cast<ConnectionComponent*>(ui_layer_.connections_.listBox.getComponentForRowNumber(i))) {
         mc->slider.setIndicationHighlight(highlight, color);
@@ -682,7 +683,7 @@ void MainComponent::clear() {
   copied_blocks_ = {};
   currently_selected_items_ = {};
   focused_grid_item_ = nullptr;
-  inspector_.setVisible(false);
+  inspector_v2_.setVisible(false);
 
   for (auto mc : block_grid_.getItems())
     removeChildComponent(mc);
@@ -734,7 +735,7 @@ void MainComponent::connectionDeleted(ConnectionComponent* component) {
   delegate->editorDisconnectedModulation(component->row);
   ui_layer_.setConnections(delegate->getModulations());
 
-  if (inspector_.isVisible()) inspector_.setConfiguration(delegate->getBlock2(focused_grid_item_->index));
+  // if (inspector_.isVisible()) inspector_.setConfiguration(delegate->getBlock2(focused_grid_item_->index));
   for (auto block : blocks) block->setConfig(delegate->getBlock2(block->index), delegate->getModulations());
 }
 
@@ -779,142 +780,56 @@ void MainComponent::loadState(Preset preset) {
 
 void MainComponent::modulatorIsDragging(ModulatorComponent* modulator_component, const MouseEvent& event) {
   updateDotPosition(event.getEventRelativeTo(this).getPosition());
-
-  handleModulatings(modulator_component, event);
-
-  if (inspector_.isVisible()) {
-    auto relativePosition = event.getEventRelativeTo(&inspector_).getPosition();
-    bool draggingInsideInspector = inspector_.contains(relativePosition);
-
-    if (draggingInsideInspector) {
-      int sliderIndexUnderMouse = (int)ceilf(relativePosition.getX() / inspector_.sliderWidth);
-      if (sliderIndexUnderMouse == previous_slider_under_mouse_) return;
-
-      if (previous_slider_under_mouse_.has_value())
-        inspector_.getSliders()[*previous_slider_under_mouse_]->setHighlighted(false);
-
-      previous_slider_under_mouse_ = sliderIndexUnderMouse;
-
-      auto target = getFocusedModule();
-
-      if (target->parameters_[sliderIndexUnderMouse]->modulatable) {
-        auto slider = inspector_.getSliders()[sliderIndexUnderMouse];
-        slider->setHighlighted(true, modulator_component->getColour());
-      }
-      // } else {
-        // if (previousSliderUnderMouse.has_value()) {
-        //   inspector.getSliders()[*previousSliderUnderMouse]->setHighlighted(false);
-        //   previousSliderUnderMouse = {};
-        // }
-    }
-  }
-
-  // auto pos = event.getEventRelativeTo(&ui_layer_.modulators_.listBox).getPosition();
-
-  // std::cout << "x: " << pos.getX() << " y: " << pos.getY() << std::endl;
-  // auto component_under_mouse = getComponentAt
-
-  // bool dragging_inside_modulators = ui_layer_.modulators_.listBox.contains(pos);
-  // if (dragging_inside_modulators) {
-  //   if (ui_layer_.modulators_.modulators_list_model_.getNumRows() == 0) return;
-  //   int itemHeight = ui_layer_.modulators_.listBox.getRowHeight();
-  //   int index = (int)ceilf(pos.getY() / itemHeight);
-  //   if (auto modulator_at_index = dynamic_cast<ModulatorComponent*>(ui_layer_.modulators_.listBox.getComponentForRowNumber(index))) {
-  //     auto component_under_mouse = modulator_at_index->getComponentAt(pos);
-  //     // std::cout << "component under mouse: " << component_under_mouse << std::endl;
-  //     if (auto slider = dynamic_cast<BlocksSlider*>(component_under_mouse)) {
-  //       std::cout << "slider name: " << slider << std::endl;
-        // auto parameter_name = modulator_at_index->getParameterName(slider->getName().getIntValue());
-        // modulatorIsAdjusting(modulatorComponent, parameter_name, slider->getValue());
-      // }
-      // auto 
-      // std::cout << "sup" << std::endl;
-      // modulator_at_index->sliders
-      // auto relative_pos = event.getEventRelativeTo(modulator_at_index).getPosition();
-      // auto slider_at_pos = modulator_at_index->getComponentAt(relative_pos);
-      // if (auto slider = dynamic_cast<LabeledSlider*>(slider_at_pos)) {
-      //   std::cout << "slider name: " << slider->label.getText() << std::endl;
-        // auto parameter_name = modulator_at_index->getParameterName(slider->getName().getIntValue());
-        // modulatorIsAdjusting(modulatorComponent, parameter_name, slider->getValue());
-      // }
-  //   }
-  // }
+  modulation_state_manager_.process(modulator_component, event);
 }
 
-// void MainComponent::handleModulatings(const juce::MouseEvent& event) {
-//   auto relative_event = event.getEventRelativeTo(this);
-//   auto component_under_mouse = getComponentAt(relative_event.getPosition());
-//   if (!component_under_mouse) return;
+// void MainComponent::handleModulatings(const ModulatorComponent* modulator_component, const juce::MouseEvent& event) {
+//   auto component_under_mouse = getComponentAt(event.getEventRelativeTo(this).getPosition());
+//   if (!component_under_mouse || component_under_mouse->getName() != "blocks_core_slider") {
+//     handleNoComponentFound(modulator_component);
+//     return;
+//   }
+//   if (component_under_mouse == last_hovered_slider_) return;
+//   handleModulationHoverEnd(modulator_component);
+//   last_hovered_slider_ = component_under_mouse;
+//   handleModulationHover(modulator_component);
+// }
 
-//   if (component_under_mouse->getName() == "blocks_core_slider") {
-//     if (component_under_mouse == last_hovered_slider_) {
-//       return;
-//     }
+// void MainComponent::handleNoComponentFound(const ModulatorComponent* modulator_component) {
+//   handleModulationHoverEnd(modulator_component);
+//   last_hovered_slider_ = nullptr;
+// }
 
-//     if (last_hovered_slider_) {
-//       if (auto previous_box_slider = dynamic_cast<BlocksSlider*>(last_hovered_slider_->getParentComponent()->getParentComponent())) {
-//         if (auto previous_box_slider = dynamic_cast<BoxSlider*>(last_hovered_slider_->getParentComponent()->getParentComponent())) {
-//           previous_box_slider->stopModulationSelectionAnimation();
-//         }
-//       }
+// void MainComponent::handleModulationHoverEnd(const ModulatorComponent* modulator_component) {
+//   if (last_hovered_slider_ && is_currently_modulating_slider_) {
+//     auto last_box_slider = dynamic_cast<BlocksSlider*>(last_hovered_slider_->getParentComponent()->getParentComponent());
+//     if (last_box_slider && last_box_slider->modulatable) {
+//       delegate->editorDisconnectedModulation(modulator_component->row, last_box_slider->module_id_.getName(), last_box_slider->parameter_name_);
+//       last_box_slider->stopModulationSelectionAnimation();
+//       cursor.setSelectionMode(false);
+//       is_currently_modulating_slider_ = false;
 //     }
-
-//     last_hovered_slider_ = component_under_mouse;
-
-//     if (auto box_slider = dynamic_cast<BlocksSlider*>(component_under_mouse->getParentComponent()->getParentComponent())) {
-//       if (box_slider->modulatable) {
-//         box_slider->startModulationSelectionAnimation();
-//       }
-//     }
-//     auto parent = component_under_mouse->getParentComponent()->getName().toStdString();
-//   } else {
-//     if (last_hovered_slider_) {
-//       if (auto previous_box_slider = dynamic_cast<BoxSlider*>(last_hovered_slider_->getParentComponent()->getParentComponent())) {
-//         if (previous_box_slider->modulatable) {
-//           previous_box_slider->stopModulationSelectionAnimation();
-//         }
-//       }
-//     }
-//     last_hovered_slider_ = nullptr;
 //   }
 // }
 
-void MainComponent::handleModulatings(const ModulatorComponent* modulator_component, const juce::MouseEvent& event) {
-  auto component_under_mouse = getComponentAt(event.getEventRelativeTo(this).getPosition());
-  if (!component_under_mouse || component_under_mouse->getName() != "blocks_core_slider") {
-    handleNoComponentFound(modulator_component);
-    return;
-  }
-  if (component_under_mouse == last_hovered_slider_) return;
-  handleModulationHoverEnd(modulator_component);
-  last_hovered_slider_ = component_under_mouse;
-  handleModulationHover(modulator_component);
-}
+// void MainComponent::handleModulationHover(const ModulatorComponent* modulator_component) {
+//   auto box_slider = dynamic_cast<BlocksSlider*>(last_hovered_slider_->getParentComponent()->getParentComponent());
+//   for (auto& modulation : delegate->getModulations()) {
+//     bool same_source = modulation->source->id == modulator_component->model_id_;
+//     bool same_target = modulation->target->id == box_slider->module_id_;
+//     bool same_parameter = modulation->parameter_name_ == box_slider->parameter_name_;
+//     if (same_source && same_target && same_parameter) {
+//       return;
+//     }
+//   }
 
-void MainComponent::handleNoComponentFound(const ModulatorComponent* modulator_component) {
-  handleModulationHoverEnd(modulator_component);
-  last_hovered_slider_ = nullptr;
-}
-
-void MainComponent::handleModulationHoverEnd(const ModulatorComponent* modulator_component) {
-  if (last_hovered_slider_) {
-    auto last_box_slider = dynamic_cast<BlocksSlider*>(last_hovered_slider_->getParentComponent()->getParentComponent());
-    if (last_box_slider && last_box_slider->modulatable) {
-      delegate->editorDisconnectedModulation(modulator_component->row, last_box_slider->module_id_.getName(), last_box_slider->parameter_name_);
-      last_box_slider->stopModulationSelectionAnimation();
-      cursor.setSelectionMode(false);
-    }
-  }
-}
-
-void MainComponent::handleModulationHover(const ModulatorComponent* modulator_component) {
-  auto box_slider = dynamic_cast<BlocksSlider*>(last_hovered_slider_->getParentComponent()->getParentComponent());
-  if (box_slider && box_slider->modulatable) {
-    delegate->editorConnectedModulation(modulator_component->row, box_slider->module_id_.getName(), box_slider->parameter_name_);
-    box_slider->startModulationSelectionAnimation();
-    cursor.setSelectionMode(true);
-  }
-}
+//   if (box_slider && box_slider->modulatable) {
+//     is_currently_modulating_slider_ = true;
+//     delegate->editorConnectedModulation(modulator_component->row, box_slider->module_id_.getName(), box_slider->parameter_name_);
+//     box_slider->startModulationSelectionAnimation();
+//     cursor.setSelectionMode(true);
+//   }
+// }
 
 std::shared_ptr<model::Module> MainComponent::getFocusedModule() {
   return delegate->getBlock2(focused_grid_item_->index);
@@ -922,10 +837,8 @@ std::shared_ptr<model::Module> MainComponent::getFocusedModule() {
 
 void MainComponent::modulatorEndedDrag(ModulatorComponent* modulator_component, const MouseEvent& event) {
   exitModulatorDragMode();
-
   ui_layer_.setConnections(delegate->getModulations());
   auto grid_relative_pos = event.getEventRelativeTo(&block_grid_).getPosition();
-  auto inspector_relative_pos = event.getEventRelativeTo(&inspector_).getPosition();
   auto modulator_index = ui_layer_.modulators_.listBox.getRowNumberOfComponent(modulator_component->getParentComponent());
 
   if (block_grid_.contains(grid_relative_pos)) {
@@ -937,39 +850,25 @@ void MainComponent::modulatorEndedDrag(ModulatorComponent* modulator_component, 
       return;
     }
   }
-  // else if (inspector_.contains(inspector_relative_pos)) {
-  //   int parameter_index = (int)ceilf(inspector_relative_pos.getX() / inspector_.sliderWidth);
-
-  //   auto focused_module = getFocusedModule();
-  //   if (focused_module == nullptr) return;
-
-  //   auto is_modulatable = focused_module->parameters_[parameter_index]->modulatable;
-  //   if (!is_modulatable) return;
-
-  //   auto parameter_name = focused_module->getParameterName(parameter_index);
-  //   delegate->editorConnectedModulation(modulator_component->row, focused_module->name, parameter_name);
-  //   ui_layer_.setConnections(delegate->getModulations());
-  //   refreshInspector();
-  //   auto focused_block = block_matrix_[focused_grid_item_->index.column][focused_grid_item_->index.row];
-  //   focused_block->setConfig(focused_module, delegate->getModulations());
-  //   ui_layer_.connections.setVisible(true);
-  // }
 }
 
 void MainComponent::exitModulatorDragMode() {
   setMouseCursor(MouseCursor::NormalCursor);
   dark_background_.setVisible(false);
   cursor.setVisible(false);
+  cursor.setSelectionMode(false);
   highlightModulatableSliders(false);
-  if (last_hovered_slider_) {
-    if (auto box_slider = dynamic_cast<BlocksSlider*>(last_hovered_slider_->getParentComponent()->getParentComponent())) {
-      if (box_slider->modulatable) {
-        box_slider->stopModulationSelectionAnimation();
-        box_slider->setIndicationHighlight(false, {});
-      }
-    }
-  }
-  last_hovered_slider_ = nullptr;
+  modulation_state_manager_.deactivate();
+  // if (last_hovered_slider_) {
+  //   if (auto box_slider = dynamic_cast<BlocksSlider*>(last_hovered_slider_->getParentComponent()->getParentComponent())) {
+  //     if (box_slider->modulatable) {
+  //       box_slider->stopModulationSelectionAnimation();
+  //       box_slider->setIndicationHighlight(false, {});
+  //     }
+  //   }
+  // }
+  // last_hovered_slider_ = nullptr;
+  // is_currently_modulating_slider_ = false;
 }
 
 void MainComponent::presentModulationOptionsMenu(int modulatorIndex, Index& indexUnderMouse, BlockComponent* block) {
@@ -987,14 +886,13 @@ void MainComponent::presentModulationOptionsMenu(int modulatorIndex, Index& inde
 }
 
 void MainComponent::enterModulatorDragMode(Colour colour) {
-  // dark_background_.setVisible(true);
+  modulation_state_manager_.activate(delegate->getModulations());
+  // inspector_.setAlwaysOnTop(true);
   cursor.colour = colour;
   cursor.setVisible(true);
-  inspector_.setAlwaysOnTop(true);
   cursor.setAlwaysOnTop(true);
   modulator_drag_mode_ = true;
   highlightModulatableSliders(true, colour);
-  // ui_layer_.modulators_.mode
 }
 
 void MainComponent::modulatorRemoved(ModulatorComponent* component) {
@@ -1248,4 +1146,16 @@ void MainComponent::sliderGestureChanged(BlocksSlider* slider, bool started) {
   is_parameter_adjusting = started;
   // auto modulator = delegate->getModulator2(modulatorComponent->row);
   // delegate->editorParameterGestureChanged(modulator->name, parameter_name, started);
+}
+
+void MainComponent::hovered(BlocksSlider* blocks_slider, const ModulatorComponent* modulator_component) {
+  delegate->editorConnectedModulation(modulator_component->row, blocks_slider->module_id_.getName(), blocks_slider->parameter_name_);
+  blocks_slider->startModulationSelectionAnimation();
+  cursor.setSelectionMode(true);
+}
+
+void MainComponent::unhovered(BlocksSlider* blocks_slider, const ModulatorComponent* modulator_component) {
+  delegate->editorDisconnectedModulation(modulator_component->row, blocks_slider->module_id_.getName(), blocks_slider->parameter_name_);
+  blocks_slider->stopModulationSelectionAnimation();
+  cursor.setSelectionMode(false);
 }

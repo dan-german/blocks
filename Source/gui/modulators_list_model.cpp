@@ -50,6 +50,7 @@ void ModulatorsListModel::sliderAdjusted(BlocksSlider* slider, float value) {
 }
 
 void ModulatorsListModel::setModelToComponent(std::shared_ptr<model::Module> model, ModulatorComponent& component) const {
+  component.model_id_ = model->id;
   component.title.setText(model->display_name, dontSendNotification);
   component.delegate_ = modulator_listener;
   component.setColour(model->colour.colour);

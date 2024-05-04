@@ -52,6 +52,7 @@ public:
   OscillatorPainter oscillatorPainter;
   // std::function<void(int, float)> onSliderValueChange;
   int row = -1;
+  ID model_id_;
 
   ModulatorComponent(BlocksSlider::Listener* listener);
   ~ModulatorComponent() override;

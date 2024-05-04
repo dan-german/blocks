@@ -395,7 +395,6 @@ ValueSwitch* SynthModule::getPolyModulationSwitch(std::string name) {
 }
 
 void SynthModule::updateAllModulationSwitches() {
-  std::cout << "update mods" << std::endl;
   for (auto& mod_switch : data_->mono_modulation_switches) {
     bool enable = data_->mono_mod_destinations[mod_switch.first]->connectedInputs() > 1;
     if (data_->poly_mod_destinations.count(mod_switch.first))

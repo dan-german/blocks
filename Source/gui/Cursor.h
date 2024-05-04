@@ -23,7 +23,6 @@ public:
   bool is_selecting_ = false;
   void setSelectionMode(bool isSelecting) {
     is_selecting_ = isSelecting;
-    // colour = isSelecting ? Colours::black : Colours::white;
     repaint();
   }
 private:

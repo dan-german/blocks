@@ -359,7 +359,8 @@ void PluginProcessor::editorChangedModulationMagnitude(int index, float magnitud
 }
 
 void PluginProcessor::editorChangedModulationPolarity(int index, bool bipolar) {
-  synth_->getModuleManager().getConnection(index)->bipolar_parameter_->set(bipolar);
+  // synth_->getModuleManager().getConnection(index)->bipolar_parameter_->set(bipolar);
+  synth_->getModuleManager().getConnection(index)->getParameter("bipolar")->set(bipolar);
   // moduleManager.getConnection(index)->setPolarity(bipolar);
 }
 
@@ -801,9 +802,10 @@ void PluginProcessor::editorStartedAdjustingParameter(ID& id, std::string& param
 }
 
 void PluginProcessor::editorAdjustedParameter(ID& id, std::string& parameter_name, float value) {
-  // auto parameter_name = 
-  // auto module = 
-  getModuleManager().getModule(id)->getParameter(parameter_name)->value_processor->set(value);
+  auto m = synth_->getModuleManager().getModule(id);
+  auto pname = m->getParameterName(parameter_name);
+  auto parameter = m->parameter_map_[pname];
+  parameter->value_processor->set(value);
 }
 
 // std::shared_ptr<model::Module>& PluginProcessor::editorRequestsColumnControls() { 

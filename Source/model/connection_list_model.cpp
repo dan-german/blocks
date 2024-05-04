@@ -41,9 +41,16 @@ Component* ModulationsListBoxModel::refreshComponentForRow(int rowNumber, bool i
 
   auto parameter_name = connection->parameter_name_;
   auto parameter_display_name = connection->target->parameter_map_[parameter_name]->display_name;
-  auto target_name = connection->target->display_name;
 
-  component->target.setText(target_name + " " + parameter_display_name, dontSendNotification);
+
+  auto target_name = connection->target->display_name;
+  std::string final_name = target_name + " " + parameter_display_name;
+
+  if (target_name.find("modulation") != std::string::npos) { 
+    final_name = "mod " + std::to_string(connection->target->id.number);
+  }
+
+  component->target.setText(final_name, dontSendNotification);
   component->delegate = delegate_;
   component->indicator.setColour(connection->source->colour.colour);
   component->source.setText(connection->source->display_name, dontSendNotification);

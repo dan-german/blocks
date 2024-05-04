@@ -22,6 +22,7 @@
 #include "selection_rect.h"
 #include "gui/controls/SavePopup.h"
 #include "gui/slider_container.h"
+#include "gui/modulation_state_manager.h"
 
 namespace gui {
 class MainComponent final: public Component,
@@ -33,6 +34,7 @@ class MainComponent final: public Component,
   NoteLogger::Listener,
   ColumnControlsContainer::Listener,
   BlocksSlider::Listener,
+  ModulationStateManager::Listener,
   KeyListener {
 public:
   struct Delegate;
@@ -62,12 +64,12 @@ private:
   DarkBackground grid_dark_background_;
   BlockGridComponent block_grid_;
   TabContainerComponent tab_grid_;
-  InspectorComponent inspector_;
   SliderContainer inspector_v2_;
   SavePopup save_popup_;
   GraphicsTimer timer_;
   ColumnControlsContainer column_controls_;
   SelectionRect selection_rect_;
+  ModulationStateManager modulation_state_manager_;
   std::vector<model::Block> copied_blocks_;
   std::vector<GridItemComponent*> currently_selected_items_;
   bool is_modulator_adjusting_ = false;
@@ -90,15 +92,22 @@ private:
   ButtonGridPopup presets_popup_;
   ButtonGridPopup copy_delete_popup_;
   ButtonGridPopup paste_popup_;
-  ID last_hovered_slider_id_;
-  Component* last_hovered_slider_ = nullptr; // todo: figure out memory management
+
+  // Component* last_hovered_slider_ = nullptr; 
+  // bool is_currently_modulating_slider_ = false;
+
   bool multiple_selection_ = false;
   bool is_adjusting_inspector_ = false;
 
-  void handleModulationHoverEnd(const ModulatorComponent* modulator_component);
-  void handleModulationHover(const ModulatorComponent* modulator_component);
-  void handleNoComponentFound(const ModulatorComponent* modulator_component);
-  void handleModulatings(const ModulatorComponent* modulator_component, const juce::MouseEvent& event);
+  // void handleModulationHoverEnd(const ModulatorComponent* modulator_component);
+  // void handleModulationHover(const ModulatorComponent* modulator_component);
+  // void handleNoComponentFound(const ModulatorComponent* modulator_component);
+  // void handleModulatings(const ModulatorComponent* modulator_component, const juce::MouseEvent& event);
+
+  // void hovered(BlocksSlider* slider, ModulatorComponent* modulator, const MouseEvent& event) override;
+  // void unhovered(BlocksSlider* slider, ModulatorComponent* modulator, const MouseEvent& event) override;
+  void hovered(BlocksSlider* blocks_slider, const ModulatorComponent* modulator_component) override;
+  void unhovered(BlocksSlider* blocks_slider, const ModulatorComponent* modulator_component) override;
 
   void setupInspector();
   void clear();
@@ -212,7 +221,7 @@ struct MainComponent::Delegate {
   virtual void editorChangedModulationPolarity(int index, bool bipolar) = 0;
   virtual void editorDisconnectedModulation(int index) = 0;
   virtual void editorDisconnectedModulation(int modulator_index, std::string target_name, std::string paramter) = 0;
-  
+
   virtual void editorStartedAdjustingParameter(ID& id, std::string& parameter_name, bool started) = 0;
   virtual void editorAdjustedParameter(ID& id, std::string& parameter_name, float value) = 0;
 
