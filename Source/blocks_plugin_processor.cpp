@@ -286,7 +286,6 @@ void PluginProcessor::setStateInformation(const void* data, int size_in_bytes) {
   if (auto preset = preset_manager_.stringToPreset(preset_string.toStdString())) {
     if (engine_prepared_) {
       loadPreset(*preset);
-      if (editor_ready_) main_component_->loadState(*preset);
     } else {
       pending_preset_ = preset;
       // synth.presetToLoadOnInit = *preset;
@@ -473,6 +472,7 @@ void PluginProcessor::loadPreset(Preset preset) {
     // if (presetBlock.length > 1) {
       // expand(block->index, presetBlock.length - 1, true);
     // }
+    if (editor_ready_) main_component_->loadState(preset);
   }
 
   for (auto presetModulator : preset.modulators) {
