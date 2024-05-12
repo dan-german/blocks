@@ -77,8 +77,6 @@ void PresetManager::removePreset(std::string& name) {
   for (int i = 0; i < presets.size(); i++) {
     if (presets[i].name == name) {
       presetsDirectory.getChildFile(name).withFileExtension("blocks").deleteFile();
-      // presets.remove(i);
-      // remove the preset from the vector
       presets.erase(presets.begin() + i);
       break;
     }

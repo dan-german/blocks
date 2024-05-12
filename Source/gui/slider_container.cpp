@@ -142,6 +142,7 @@ void SliderContainer::setSliderAsFrequency(LabeledSlider* slider, std::string pa
   auto value = frequency_parameter->value_processor->value();
   slider->box_slider_.juce_slider_.setValue(value, dontSendNotification);
   slider->box_slider_.value_label_.setText(slider->box_slider_.juce_slider_.getTextFromValue(value), dontSendNotification);
+  slider->box_slider_.parameter_name_ = parameter_name;
 }
 
 void SliderContainer::setSliderAsTempo(LabeledSlider* slider, std::string parameter_name) const {
@@ -151,6 +152,7 @@ void SliderContainer::setSliderAsTempo(LabeledSlider* slider, std::string parame
   auto value = module_->parameter_map_[parameter_name]->value_processor->value();
   slider->box_slider_.juce_slider_.setValue(value, dontSendNotification);
   slider->box_slider_.value_label_.setText(slider->box_slider_.juce_slider_.getTextFromValue(value), dontSendNotification);
+  slider->box_slider_.parameter_name_ = parameter_name;
 }
 
 void SliderContainer::setSlidersColour(Colour& colour) {
