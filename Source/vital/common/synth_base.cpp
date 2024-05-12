@@ -847,13 +847,12 @@ std::shared_ptr<model::Connection> SynthBase::createConnectionModel(int modulato
 void SynthBase::connectModulation(int modulator_index, std::string target_name, std::string parameter_name) {
   auto connection_model = createConnectionModel(modulator_index, target_name, parameter_name);
   if (!connection_model) return;
-  // std::cout << "connecting " << connection_model->source->name << " to " << connection_model->target->name << " " << connection_model->parameter_name_ << std::endl;
 
-  auto parameter = connection_model->target->parameter_map_[parameter_name];
+  auto parameter = connection_model->target->parameter_map_[connection_model->parameter_name_];
   auto destination_scale = parameter->max - parameter->min;
 
   bool is_env_to_osc_level = connection_model->source->id.type == "envelope" && connection_model->target->id.type == "osc" && connection_model->parameter_name_ == "level";
-  parameter_name = is_env_to_osc_level ? "amp env destination" : parameter_name;
+  parameter_name = is_env_to_osc_level ? "amp env destination" : connection_model->parameter_name_;
 
   if (is_env_to_osc_level) {
     getVoiceHandler()->setDefaultAmpEnvState(connection_model->target->name, false);
@@ -871,8 +870,6 @@ vital::ModulationConnection* SynthBase::createConnection(std::string modulator_n
     connection = getModulationBank().createConnection(modulator_name, target_name, parameter_name);
     connection->destination_scale = destination_scale;
     connectModulation(connection);
-  } else {
-    std::cout << "got connection " << connection->modulation_processor << std::endl;
   }
   return connection;
 }

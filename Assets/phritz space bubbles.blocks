@@ -1,0 +1,238 @@
+{
+  "blocks": [
+    {
+      "index": [
+        0,
+        0
+      ],
+      "length": 1,
+      "name": "osc 2",
+      "parameters": {
+        "amp env destination": 0,
+        "level": 1,
+        "pan": 0.0005859375232830644,
+        "transpose": 0,
+        "tune": 0,
+        "unison detune": 2.2360680103302,
+        "unison voices": 1,
+        "wave": 1
+      }
+    },
+    {
+      "index": [
+        1,
+        0
+      ],
+      "length": 1,
+      "name": "osc 1",
+      "parameters": {
+        "amp env destination": 0,
+        "level": 1,
+        "pan": 0,
+        "transpose": 7,
+        "tune": 0,
+        "unison detune": 2.491438388824463,
+        "unison voices": 3,
+        "wave": 1
+      }
+    },
+    {
+      "index": [
+        2,
+        0
+      ],
+      "length": 1,
+      "name": "osc 3",
+      "parameters": {
+        "amp env destination": 0,
+        "level": 1,
+        "pan": 0,
+        "transpose": 24,
+        "tune": 0,
+        "unison detune": 2.2360680103302,
+        "unison voices": 6,
+        "wave": 1
+      }
+    },
+    {
+      "index": [
+        1,
+        1
+      ],
+      "length": 1,
+      "name": "filter 1",
+      "parameters": {
+        "blend": 0,
+        "cutoff": 8,
+        "mix": 0,
+        "model": 0,
+        "resonance": 0.5,
+        "style": 0
+      }
+    },
+    {
+      "index": [
+        1,
+        2
+      ],
+      "length": 1,
+      "name": "phaser 1",
+      "parameters": {
+        "blend": 1.9514126777648926,
+        "center": 80,
+        "depth": 33.35702133178711,
+        "feedback": 0.713934063911438,
+        "frequency": -3,
+        "mix": 1,
+        "offset": 0.33333298563957214,
+        "sync": 1,
+        "tempo": 3
+      }
+    },
+    {
+      "index": [
+        1,
+        3
+      ],
+      "length": 1,
+      "name": "delay 1",
+      "parameters": {
+        "cutoff": 100.56507110595703,
+        "feedback": 0.5,
+        "frequency": 2,
+        "frequency 2": 2,
+        "mix": 1,
+        "style": 2,
+        "sync": 1,
+        "sync 2": 1,
+        "tempo": 9,
+        "tempo 2": 9
+      }
+    },
+    {
+      "index": [
+        2,
+        3
+      ],
+      "length": 1,
+      "name": "delay 2",
+      "parameters": {
+        "cutoff": 60,
+        "feedback": 0.5,
+        "frequency": 2,
+        "frequency 2": 2,
+        "mix": 1,
+        "style": 2,
+        "sync": 1,
+        "sync 2": 2,
+        "tempo": -0.1772260218858719,
+        "tempo 2": 9
+      }
+    }
+  ],
+  "column controls": [
+    {
+      "name": "column control 1",
+      "parameters": {
+        "level": 1,
+        "pan": 0
+      }
+    },
+    {
+      "name": "column control 2",
+      "parameters": {
+        "level": 1,
+        "pan": 0
+      }
+    },
+    {
+      "name": "column control 3",
+      "parameters": {
+        "level": 1,
+        "pan": 0
+      }
+    },
+    {
+      "name": "column control 4",
+      "parameters": {
+        "level": 1,
+        "pan": 0
+      }
+    },
+    {
+      "name": "column control 5",
+      "parameters": {
+        "level": 1,
+        "pan": 0
+      }
+    }
+  ],
+  "format_version": 0,
+  "modulations": [
+    {
+      "amount": 0.4350878596305847,
+      "bipolar": false,
+      "number": 11,
+      "parameter": "cutoff",
+      "source": "envelope 1",
+      "target": "filter 1"
+    },
+    {
+      "amount": 0.4435843825340271,
+      "bipolar": false,
+      "number": 2,
+      "parameter": "level",
+      "source": "envelope 1",
+      "target": "osc 2"
+    },
+    {
+      "amount": 0.11275921761989594,
+      "bipolar": false,
+      "number": 20,
+      "parameter": "level",
+      "source": "envelope 1",
+      "target": "osc 3"
+    },
+    {
+      "amount": 0.5034922361373901,
+      "bipolar": false,
+      "number": 13,
+      "parameter": "level",
+      "source": "envelope 1",
+      "target": "osc 1"
+    },
+    {
+      "amount": 0.12345190346240997,
+      "bipolar": false,
+      "number": 14,
+      "parameter": "tempo",
+      "source": "lfo 1",
+      "target": "delay 2"
+    }
+  ],
+  "modulators": [
+    {
+      "color": 0,
+      "name": "envelope 1",
+      "parameters": {
+        "attack": 0,
+        "decay": 0.6903167963027954,
+        "release": 1.0849087238311768,
+        "sustain": 0.0005859375232830644
+      }
+    },
+    {
+      "color": 4,
+      "name": "lfo 1",
+      "parameters": {
+        "frequency": 0,
+        "mode": 1,
+        "sync": 4,
+        "tempo": 0,
+        "wave": 0
+      }
+    }
+  ],
+  "name": "phritz space bubbles",
+  "tabs": []
+}

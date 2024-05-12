@@ -1,0 +1,230 @@
+{
+  "blocks": [
+    {
+      "index": [
+        0,
+        0
+      ],
+      "length": 1,
+      "name": "osc 1",
+      "parameters": {
+        "amp env destination": 0,
+        "level": 0.7071067690849304,
+        "pan": 0,
+        "transpose": 0,
+        "tune": 0,
+        "unison detune": 2.2360680103302,
+        "unison voices": 1,
+        "wave": 2
+      }
+    },
+    {
+      "index": [
+        0,
+        2
+      ],
+      "length": 1,
+      "name": "filter 1",
+      "parameters": {
+        "blend": 0,
+        "cutoff": 28.72833251953125,
+        "mix": 1,
+        "model": 0,
+        "resonance": 0.25,
+        "style": 0
+      }
+    },
+    {
+      "index": [
+        0,
+        3
+      ],
+      "length": 1,
+      "name": "delay 1",
+      "parameters": {
+        "cutoff": 34.69416809082031,
+        "feedback": 0.5,
+        "frequency": 1.399999976158142,
+        "frequency 2": 1.399999976158142,
+        "mix": 0.37968748807907104,
+        "style": 2,
+        "sync": 1,
+        "sync 2": 1,
+        "tempo": 9,
+        "tempo 2": 9
+      }
+    },
+    {
+      "index": [
+        0,
+        4
+      ],
+      "length": 1,
+      "name": "reverb 1",
+      "parameters": {
+        "delay": 0,
+        "high cut": 110,
+        "low cut": 0,
+        "mix": 0.6442708373069763,
+        "mod amount": 0.22360700368881226,
+        "mod rate": -0.4776041805744171,
+        "size": 0.5,
+        "time": 2.0606250762939453
+      }
+    },
+    {
+      "index": [
+        0,
+        1
+      ],
+      "length": 1,
+      "name": "osc 2",
+      "parameters": {
+        "amp env destination": 0,
+        "level": 0.7071067690849304,
+        "pan": 0,
+        "transpose": 7,
+        "tune": 0.1525000035762787,
+        "unison detune": 2.2360680103302,
+        "unison voices": 1,
+        "wave": 2
+      }
+    }
+  ],
+  "column controls": [
+    {
+      "name": "column control 1",
+      "parameters": {
+        "level": 1,
+        "pan": 0
+      }
+    },
+    {
+      "name": "column control 2",
+      "parameters": {
+        "level": 1,
+        "pan": 0
+      }
+    },
+    {
+      "name": "column control 3",
+      "parameters": {
+        "level": 1,
+        "pan": 0
+      }
+    },
+    {
+      "name": "column control 4",
+      "parameters": {
+        "level": 1,
+        "pan": 0
+      }
+    },
+    {
+      "name": "column control 5",
+      "parameters": {
+        "level": 1,
+        "pan": 0
+      }
+    }
+  ],
+  "format_version": 0,
+  "modulations": [
+    {
+      "amount": 1,
+      "bipolar": true,
+      "number": 1,
+      "parameter": "cutoff",
+      "source": "random 1",
+      "target": "filter 1"
+    },
+    {
+      "amount": 1,
+      "bipolar": true,
+      "number": 2,
+      "parameter": "tempo",
+      "source": "random 2",
+      "target": "delay 1"
+    },
+    {
+      "amount": 1,
+      "bipolar": true,
+      "number": 3,
+      "parameter": "cutoff",
+      "source": "random 3",
+      "target": "delay 1"
+    },
+    {
+      "amount": 1,
+      "bipolar": false,
+      "number": 4,
+      "parameter": "wave",
+      "source": "random 3",
+      "target": "osc 1"
+    },
+    {
+      "amount": 1,
+      "bipolar": true,
+      "number": 5,
+      "parameter": "size",
+      "source": "random 4",
+      "target": "reverb 1"
+    },
+    {
+      "amount": 1,
+      "bipolar": false,
+      "number": 6,
+      "parameter": "wave",
+      "source": "random 3",
+      "target": "osc 2"
+    }
+  ],
+  "modulators": [
+    {
+      "color": 8,
+      "name": "random 1",
+      "parameters": {
+        "frequency": 1,
+        "stereo": 1,
+        "style": 0,
+        "sync": 1,
+        "tempo": 8
+      }
+    },
+    {
+      "color": 12,
+      "name": "random 2",
+      "parameters": {
+        "frequency": 1,
+        "stereo": 0,
+        "style": 0,
+        "sync": 1,
+        "tempo": 2.7591946125030518
+      }
+    },
+    {
+      "color": 3,
+      "name": "random 3",
+      "parameters": {
+        "frequency": 1,
+        "stereo": 0,
+        "style": 0,
+        "sync": 1,
+        "tempo": 6.382211685180664
+      }
+    },
+    {
+      "color": 13,
+      "name": "random 4",
+      "parameters": {
+        "frequency": 1,
+        "stereo": 0,
+        "style": 0,
+        "sync": 1,
+        "tempo": 3.4351563453674316
+      }
+    }
+  ],
+  "name": "phritz cosmo swim",
+  "tabs": []
+}

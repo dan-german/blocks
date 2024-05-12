@@ -1,0 +1,180 @@
+{
+  "blocks": [
+    {
+      "index": [
+        0,
+        0
+      ],
+      "length": 1,
+      "name": "osc 1",
+      "parameters": {
+        "amp env destination": 0,
+        "level": 0.7071067690849304,
+        "pan": 0,
+        "transpose": -12,
+        "tune": 0,
+        "unison detune": 2.2360680103302,
+        "unison voices": 1,
+        "wave": 0
+      }
+    },
+    {
+      "index": [
+        1,
+        0
+      ],
+      "length": 1,
+      "name": "osc 2",
+      "parameters": {
+        "amp env destination": 0,
+        "level": 0.7071067690849304,
+        "pan": 0,
+        "transpose": 7,
+        "tune": 0,
+        "unison detune": 2.301368236541748,
+        "unison voices": 9,
+        "wave": 0
+      }
+    },
+    {
+      "index": [
+        0,
+        1
+      ],
+      "length": 1,
+      "name": "filter 1",
+      "parameters": {
+        "blend": 0,
+        "cutoff": 76.03285217285156,
+        "mix": 1,
+        "model": 0,
+        "resonance": 0.06027388945221901,
+        "style": 0
+      }
+    },
+    {
+      "index": [
+        1,
+        2
+      ],
+      "length": 1,
+      "name": "filter 2",
+      "parameters": {
+        "blend": 0,
+        "cutoff": 108.99724578857422,
+        "mix": 1,
+        "model": 0,
+        "resonance": 0.19178082048892975,
+        "style": 0
+      }
+    },
+    {
+      "index": [
+        1,
+        1
+      ],
+      "length": 1,
+      "name": "drive 1",
+      "parameters": {
+        "drive": 0.2465653121471405,
+        "mix": 0.16438356041908264,
+        "type": 2
+      }
+    },
+    {
+      "index": [
+        0,
+        2
+      ],
+      "length": 1,
+      "name": "drive 2",
+      "parameters": {
+        "drive": 2.8767123222351074,
+        "mix": 1,
+        "type": 0
+      }
+    }
+  ],
+  "column controls": [
+    {
+      "name": "column control 1",
+      "parameters": {
+        "level": 1,
+        "pan": 0
+      }
+    },
+    {
+      "name": "column control 2",
+      "parameters": {
+        "level": 1,
+        "pan": 0
+      }
+    },
+    {
+      "name": "column control 3",
+      "parameters": {
+        "level": 1,
+        "pan": 0
+      }
+    },
+    {
+      "name": "column control 4",
+      "parameters": {
+        "level": 1,
+        "pan": 0
+      }
+    },
+    {
+      "name": "column control 5",
+      "parameters": {
+        "level": 1,
+        "pan": 0
+      }
+    }
+  ],
+  "format_version": 0,
+  "modulations": [
+    {
+      "amount": 0.5059908628463745,
+      "bipolar": false,
+      "number": 1,
+      "parameter": "drive",
+      "source": "lfo 1",
+      "target": "drive 1"
+    },
+    {
+      "amount": 0.10783407092094421,
+      "bipolar": true,
+      "number": 2,
+      "parameter": "tune",
+      "source": "lfo 2",
+      "target": "osc 2"
+    }
+  ],
+  "modulators": [
+    {
+      "color": 1,
+      "name": "lfo 1",
+      "parameters": {
+        "frequency": -3.9811320304870605,
+        "mode": 0,
+        "sync": 0,
+        "tempo": 7,
+        "wave": 0
+      }
+    },
+    {
+      "color": 3,
+      "name": "lfo 2",
+      "parameters": {
+        "frequency": 1,
+        "mode": 0,
+        "sync": 1,
+        "tempo": 7,
+        "wave": 0
+      }
+    }
+  ],
+  "name": "emily a BA piercer",
+  "tabs": []
+}

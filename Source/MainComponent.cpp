@@ -849,6 +849,7 @@ void MainComponent::exitModulatorDragMode() {
   cursor.setSelectionMode(false);
   highlightModulatableSliders(false);
   modulation_state_manager_.deactivate();
+  modulator_drag_mode_ = false;
   // if (last_hovered_slider_) {
   //   if (auto box_slider = dynamic_cast<BlocksSlider*>(last_hovered_slider_->getParentComponent()->getParentComponent())) {
   //     if (box_slider->modulatable) {
@@ -912,7 +913,7 @@ void MainComponent::presetButtonClicked() {
   auto presetButtonBounds = ui_layer_.preset_button_.getBounds();
   auto y = presetButtonBounds.getY() + presetButtonBounds.getHeight() + 6;
 
-  auto width = 140;
+  auto width = 180;
   auto x = presetButtonBounds.getCentreX() - width / 2;
 
   int presetCount = delegate->editorRequestsPresetNames().size();
@@ -1132,8 +1133,6 @@ void MainComponent::sliderAdjusted(BlocksSlider* slider, float value) {
 
 void MainComponent::sliderGestureChanged(BlocksSlider* slider, bool started) {
   is_parameter_adjusting = started;
-  // auto modulator = delegate->getModulator2(modulatorComponent->row);
-  // delegate->editorParameterGestureChanged(modulator->name, parameter_name, started);
 }
 
 void MainComponent::hovered(BlocksSlider* blocks_slider, const ModulatorComponent* modulator_component) {

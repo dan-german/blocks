@@ -1,0 +1,161 @@
+{
+  "blocks": [
+    {
+      "index": [
+        0,
+        0
+      ],
+      "length": 1,
+      "name": "osc 1",
+      "parameters": {
+        "amp env destination": 0,
+        "level": 0.8105208277702332,
+        "pan": 0,
+        "transpose": 0,
+        "tune": 0,
+        "unison detune": 4.995312690734863,
+        "unison voices": 3,
+        "wave": 0
+      }
+    },
+    {
+      "index": [
+        0,
+        1
+      ],
+      "length": 1,
+      "name": "osc 2",
+      "parameters": {
+        "amp env destination": 0,
+        "level": 0.9410416483879089,
+        "pan": 0,
+        "transpose": 0,
+        "tune": 0.06395833194255829,
+        "unison detune": 3.0838541984558105,
+        "unison voices": 2,
+        "wave": 0
+      }
+    },
+    {
+      "index": [
+        0,
+        2
+      ],
+      "length": 1,
+      "name": "filter 1",
+      "parameters": {
+        "blend": 0,
+        "cutoff": 30,
+        "mix": 0,
+        "model": 0,
+        "resonance": 0.5,
+        "style": 0
+      }
+    },
+    {
+      "index": [
+        0,
+        5
+      ],
+      "length": 1,
+      "name": "drive 1",
+      "parameters": {
+        "drive": 20.353124618530273,
+        "mix": 1,
+        "type": 0
+      }
+    },
+    {
+      "index": [
+        0,
+        3
+      ],
+      "length": 1,
+      "name": "flanger 1",
+      "parameters": {
+        "center": 64,
+        "depth": 0.5,
+        "feedback": 0.5,
+        "frequency": -3.862135410308838,
+        "mix": 0.08255208283662796,
+        "offset": 0.33333298563957214,
+        "sync": 0,
+        "tempo": 4
+      }
+    },
+    {
+      "index": [
+        0,
+        4
+      ],
+      "length": 1,
+      "name": "filter 2",
+      "parameters": {
+        "blend": 0,
+        "cutoff": 90.54000091552734,
+        "mix": 1,
+        "model": 2,
+        "resonance": 0.5,
+        "style": 0
+      }
+    },
+    {
+      "index": [
+        0,
+        6
+      ],
+      "length": 1,
+      "name": "filter 3",
+      "parameters": {
+        "blend": 0.7370833158493042,
+        "cutoff": 127.95333099365234,
+        "mix": 0.2865104079246521,
+        "model": 6,
+        "resonance": 0.46296873688697815,
+        "style": 1
+      }
+    }
+  ],
+  "column controls": [
+    {
+      "name": "column control 1",
+      "parameters": {
+        "level": 0.627223551273346,
+        "pan": 0
+      }
+    },
+    {
+      "name": "column control 2",
+      "parameters": {
+        "level": 1,
+        "pan": 0
+      }
+    },
+    {
+      "name": "column control 3",
+      "parameters": {
+        "level": 1,
+        "pan": 0
+      }
+    },
+    {
+      "name": "column control 4",
+      "parameters": {
+        "level": 1,
+        "pan": 0
+      }
+    },
+    {
+      "name": "column control 5",
+      "parameters": {
+        "level": 1,
+        "pan": 0
+      }
+    }
+  ],
+  "format_version": 0,
+  "modulations": [],
+  "modulators": [],
+  "name": "phritz dnb reese",
+  "tabs": []
+}

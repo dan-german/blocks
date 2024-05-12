@@ -1,0 +1,208 @@
+{
+  "blocks": [
+    {
+      "index": [
+        0,
+        0
+      ],
+      "length": 1,
+      "name": "osc 1",
+      "parameters": {
+        "amp env destination": 0,
+        "level": 0.6846874952316284,
+        "pan": 0,
+        "transpose": 0,
+        "tune": 0,
+        "unison detune": 2.2360680103302,
+        "unison voices": 1,
+        "wave": 1
+      }
+    },
+    {
+      "index": [
+        0,
+        1
+      ],
+      "length": 1,
+      "name": "filter 1",
+      "parameters": {
+        "blend": 1.0549999475479126,
+        "cutoff": 55.9466667175293,
+        "mix": 1,
+        "model": 6,
+        "resonance": 0.9140625,
+        "style": 0
+      }
+    },
+    {
+      "index": [
+        0,
+        2
+      ],
+      "length": 1,
+      "name": "drive 1",
+      "parameters": {
+        "drive": -8.625,
+        "mix": 0,
+        "type": 0
+      }
+    }
+  ],
+  "column controls": [
+    {
+      "name": "column control 1",
+      "parameters": {
+        "level": 0.8539663553237915,
+        "pan": 0
+      }
+    },
+    {
+      "name": "column control 2",
+      "parameters": {
+        "level": 0.9991210699081421,
+        "pan": 0
+      }
+    },
+    {
+      "name": "column control 3",
+      "parameters": {
+        "level": 1,
+        "pan": 0
+      }
+    },
+    {
+      "name": "column control 4",
+      "parameters": {
+        "level": 1,
+        "pan": 0
+      }
+    },
+    {
+      "name": "column control 5",
+      "parameters": {
+        "level": 1,
+        "pan": 0
+      }
+    }
+  ],
+  "format_version": 0,
+  "modulations": [
+    {
+      "amount": 1,
+      "bipolar": true,
+      "number": 1,
+      "parameter": "blend",
+      "source": "random 1",
+      "target": "filter 1"
+    },
+    {
+      "amount": 1,
+      "bipolar": true,
+      "number": 2,
+      "parameter": "blend",
+      "source": "random 2",
+      "target": "filter 1"
+    },
+    {
+      "amount": 1,
+      "bipolar": false,
+      "number": 3,
+      "parameter": "cutoff",
+      "source": "random 3",
+      "target": "filter 1"
+    },
+    {
+      "amount": 10,
+      "bipolar": false,
+      "number": 4,
+      "parameter": "level",
+      "source": "envelope 1",
+      "target": "osc 1"
+    },
+    {
+      "amount": 0.21418042480945587,
+      "bipolar": false,
+      "number": 5,
+      "parameter": "drive",
+      "source": "random 4",
+      "target": "drive 1"
+    },
+    {
+      "amount": 1,
+      "bipolar": true,
+      "number": 6,
+      "parameter": "mix",
+      "source": "random 5",
+      "target": "drive 1"
+    }
+  ],
+  "modulators": [
+    {
+      "color": 11,
+      "name": "random 1",
+      "parameters": {
+        "frequency": 1,
+        "stereo": 0,
+        "style": 0,
+        "sync": 1,
+        "tempo": 8
+      }
+    },
+    {
+      "color": 2,
+      "name": "random 2",
+      "parameters": {
+        "frequency": 1,
+        "stereo": 0,
+        "style": 0,
+        "sync": 1,
+        "tempo": 7.081009387969971
+      }
+    },
+    {
+      "color": 7,
+      "name": "random 3",
+      "parameters": {
+        "frequency": 1,
+        "stereo": 0,
+        "style": 0,
+        "sync": 1,
+        "tempo": 6.271454334259033
+      }
+    },
+    {
+      "color": 3,
+      "name": "envelope 1",
+      "parameters": {
+        "attack": 0.6817947030067444,
+        "decay": 1,
+        "release": 0.9226383566856384,
+        "sustain": 0.5393028855323792
+      }
+    },
+    {
+      "color": 10,
+      "name": "random 4",
+      "parameters": {
+        "frequency": 1,
+        "stereo": 0,
+        "style": 0,
+        "sync": 4,
+        "tempo": 8
+      }
+    },
+    {
+      "color": 12,
+      "name": "random 5",
+      "parameters": {
+        "frequency": 1,
+        "stereo": 0,
+        "style": 0,
+        "sync": 1,
+        "tempo": 8
+      }
+    }
+  ],
+  "name": "phritz subtle sine",
+  "tabs": []
+}

@@ -1,0 +1,253 @@
+{
+  "blocks": [
+    {
+      "index": [
+        0,
+        0
+      ],
+      "length": 1,
+      "name": "osc 1",
+      "parameters": {
+        "amp env destination": 0,
+        "level": 0.7071067690849304,
+        "pan": 0,
+        "transpose": 0,
+        "tune": 0,
+        "unison detune": 1.4246567487716675,
+        "unison voices": 1,
+        "wave": 0
+      }
+    },
+    {
+      "index": [
+        0,
+        1
+      ],
+      "length": 1,
+      "name": "noise 1",
+      "parameters": {
+        "level": 0.25205472111701965,
+        "pan": 0
+      }
+    },
+    {
+      "index": [
+        0,
+        2
+      ],
+      "length": 1,
+      "name": "filter 1",
+      "parameters": {
+        "blend": 0,
+        "cutoff": 29.742454528808594,
+        "mix": 1,
+        "model": 3,
+        "resonance": 0.16986292600631714,
+        "style": 0
+      }
+    },
+    {
+      "index": [
+        0,
+        3
+      ],
+      "length": 1,
+      "name": "chorus 1",
+      "parameters": {
+        "depth": 0.4493148922920227,
+        "feedback": 0.16397228837013245,
+        "frequency": 6,
+        "mix": 0.5,
+        "sync": 1,
+        "tempo": 5,
+        "voices": 1
+      }
+    },
+    {
+      "index": [
+        1,
+        0
+      ],
+      "length": 1,
+      "name": "osc 2",
+      "parameters": {
+        "amp env destination": 0,
+        "level": 0.6246576309204102,
+        "pan": 0.00821884348988533,
+        "transpose": 0,
+        "tune": 0,
+        "unison detune": 2.2360680103302,
+        "unison voices": 1,
+        "wave": 1
+      }
+    },
+    {
+      "index": [
+        1,
+        1
+      ],
+      "length": 1,
+      "name": "reverb 1",
+      "parameters": {
+        "delay": 0,
+        "high cut": 110,
+        "low cut": 0,
+        "mix": 0.679452121257782,
+        "mod amount": 0.22360700368881226,
+        "mod rate": -2,
+        "size": 0.5,
+        "time": 1.3643815517425537
+      }
+    },
+    {
+      "index": [
+        1,
+        2
+      ],
+      "length": 1,
+      "name": "drive 1",
+      "parameters": {
+        "drive": 2.8767123222351074,
+        "mix": 1,
+        "type": 0
+      }
+    }
+  ],
+  "column controls": [
+    {
+      "name": "column control 1",
+      "parameters": {
+        "level": 1,
+        "pan": 0
+      }
+    },
+    {
+      "name": "column control 2",
+      "parameters": {
+        "level": 0.6516132950782776,
+        "pan": 0
+      }
+    },
+    {
+      "name": "column control 3",
+      "parameters": {
+        "level": 1,
+        "pan": 0
+      }
+    },
+    {
+      "name": "column control 4",
+      "parameters": {
+        "level": 1,
+        "pan": 0
+      }
+    },
+    {
+      "name": "column control 5",
+      "parameters": {
+        "level": 1,
+        "pan": 0
+      }
+    }
+  ],
+  "format_version": 0,
+  "modulations": [
+    {
+      "amount": 0.6092166304588318,
+      "bipolar": false,
+      "number": 1,
+      "parameter": "cutoff",
+      "source": "envelope 1",
+      "target": "filter 1"
+    },
+    {
+      "amount": 0.12258066982030869,
+      "bipolar": true,
+      "number": 2,
+      "parameter": "tune",
+      "source": "lfo 1",
+      "target": "osc 1"
+    },
+    {
+      "amount": 0.21843315660953522,
+      "bipolar": true,
+      "number": 3,
+      "parameter": "tune",
+      "source": "lfo 2",
+      "target": "osc 2"
+    },
+    {
+      "amount": 1,
+      "bipolar": true,
+      "number": 4,
+      "parameter": "pan",
+      "source": "lfo 3",
+      "target": "osc 2"
+    },
+    {
+      "amount": 1,
+      "bipolar": false,
+      "number": 5,
+      "parameter": "level",
+      "source": "envelope 2",
+      "target": "osc 2"
+    }
+  ],
+  "modulators": [
+    {
+      "color": 3,
+      "name": "envelope 1",
+      "parameters": {
+        "attack": 0.14949999749660492,
+        "decay": 1.3103781938552856,
+        "release": 0.5475999712944031,
+        "sustain": 0
+      }
+    },
+    {
+      "color": 8,
+      "name": "lfo 1",
+      "parameters": {
+        "frequency": -0.11696638911962509,
+        "mode": 0,
+        "sync": 0,
+        "tempo": 7,
+        "wave": 0
+      }
+    },
+    {
+      "color": 13,
+      "name": "lfo 2",
+      "parameters": {
+        "frequency": 2.5396151542663574,
+        "mode": 0,
+        "sync": 0,
+        "tempo": 7,
+        "wave": 0
+      }
+    },
+    {
+      "color": 6,
+      "name": "lfo 3",
+      "parameters": {
+        "frequency": -1.5660377740859985,
+        "mode": 1,
+        "sync": 0,
+        "tempo": 7,
+        "wave": 0
+      }
+    },
+    {
+      "color": 14,
+      "name": "envelope 2",
+      "parameters": {
+        "attack": 0.14949999749660492,
+        "decay": 1.3103781938552856,
+        "release": 0.5475999712944031,
+        "sustain": 0
+      }
+    }
+  ],
+  "name": "emily a KEY late night drive",
+  "tabs": []
+}

@@ -1,0 +1,187 @@
+{
+  "blocks": [
+    {
+      "index": [
+        0,
+        0
+      ],
+      "length": 1,
+      "name": "osc 1",
+      "parameters": {
+        "amp env destination": 0,
+        "level": 0.7071067690849304,
+        "pan": 0,
+        "transpose": -12,
+        "tune": 0,
+        "unison detune": 2.2360680103302,
+        "unison voices": 1,
+        "wave": 2
+      }
+    },
+    {
+      "index": [
+        0,
+        1
+      ],
+      "length": 1,
+      "name": "filter 1",
+      "parameters": {
+        "blend": 0,
+        "cutoff": 17.643835067749023,
+        "mix": 1,
+        "model": 4,
+        "resonance": 0.5616438388824463,
+        "style": 1
+      }
+    },
+    {
+      "index": [
+        1,
+        0
+      ],
+      "length": 1,
+      "name": "osc 2",
+      "parameters": {
+        "amp env destination": 0,
+        "level": 0.7071067690849304,
+        "pan": 0,
+        "transpose": 19,
+        "tune": 0,
+        "unison detune": 2.2360680103302,
+        "unison voices": 1,
+        "wave": 2
+      }
+    },
+    {
+      "index": [
+        1,
+        1
+      ],
+      "length": 1,
+      "name": "filter 2",
+      "parameters": {
+        "blend": 0.6027397513389587,
+        "cutoff": 9.753424644470215,
+        "mix": 1,
+        "model": 1,
+        "resonance": 0.13013698160648346,
+        "style": 0
+      }
+    },
+    {
+      "index": [
+        0,
+        2
+      ],
+      "length": 1,
+      "name": "drive 1",
+      "parameters": {
+        "drive": 4.109589099884033,
+        "mix": 1,
+        "type": 0
+      }
+    },
+    {
+      "index": [
+        0,
+        6
+      ],
+      "length": 1,
+      "name": "filter 3",
+      "parameters": {
+        "blend": 2,
+        "cutoff": 75.50685119628906,
+        "mix": 1,
+        "model": 0,
+        "resonance": 0.45205479860305786,
+        "style": 4
+      }
+    }
+  ],
+  "column controls": [
+    {
+      "name": "column control 1",
+      "parameters": {
+        "level": 0.9354838728904724,
+        "pan": 0
+      }
+    },
+    {
+      "name": "column control 2",
+      "parameters": {
+        "level": 0.6935483813285828,
+        "pan": 0
+      }
+    },
+    {
+      "name": "column control 3",
+      "parameters": {
+        "level": 1,
+        "pan": 0
+      }
+    },
+    {
+      "name": "column control 4",
+      "parameters": {
+        "level": 1,
+        "pan": 0
+      }
+    },
+    {
+      "name": "column control 5",
+      "parameters": {
+        "level": 1,
+        "pan": 0
+      }
+    }
+  ],
+  "format_version": 0,
+  "modulations": [
+    {
+      "amount": 0.6405529975891113,
+      "bipolar": false,
+      "number": 2,
+      "parameter": "cutoff",
+      "source": "envelope 1",
+      "target": "filter 2"
+    },
+    {
+      "amount": 0.5299538969993591,
+      "bipolar": false,
+      "number": 3,
+      "parameter": "cutoff",
+      "source": "envelope 1",
+      "target": "filter 1"
+    },
+    {
+      "amount": 1,
+      "bipolar": false,
+      "number": 4,
+      "parameter": "level",
+      "source": "envelope 1",
+      "target": "osc 1"
+    },
+    {
+      "amount": 1,
+      "bipolar": false,
+      "number": 5,
+      "parameter": "level",
+      "source": "envelope 1",
+      "target": "osc 2"
+    }
+  ],
+  "modulators": [
+    {
+      "color": 14,
+      "name": "envelope 1",
+      "parameters": {
+        "attack": 0.14949999749660492,
+        "decay": 0.8975170254707336,
+        "release": 0.5475999712944031,
+        "sustain": 0
+      }
+    }
+  ],
+  "name": "emily a BA in the house",
+  "tabs": []
+}

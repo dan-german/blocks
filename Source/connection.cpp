@@ -27,28 +27,14 @@ Connection::Connection(Module* target,
 {
   name = "modulation " + std::to_string(number);
 
-  // add({ .name = "" });
-  // add({ .name = "wave", .min = 0.0, .max = 4.0, .value_scale = ValueScale::kIndexed, .string_lookup = strings::modulator_waves, .modulatable = false });
   add({ .name = "amount", .min = -1.0, .default_value = 1.0 });
   add({ .name = "bipolar" });
-
-  // amount_parameter_ = std::make_shared<vital::ValueDetails>();
-  // amount_parameter_->min = -1.0f;
-  // amount_parameter_->value = 1.0f;
-  // bipolar_parameter_ = std::make_shared<vital::ValueDetails>();
-  // parameters_.push_back(amount_parameter_);
-  // parameters
-
 }
 
 Connection::Connection(int number): Module("modulation", number) {
   name = "modulation " + std::to_string(number);
   add({ .name = "amount", .min = -1.0, .default_value = 1.0 });
   add({ .name = "bipolar" });
-  // amount_parameter_ = std::make_shared<vital::ValueDetails>();
-  // amount_parameter_->min = -1.0f;
-  // amount_parameter_->value = 1.0f;
-  // bipolar_parameter_ = std::make_shared<vital::ValueDetails>();
 };
 
 Connection::~Connection() { }
