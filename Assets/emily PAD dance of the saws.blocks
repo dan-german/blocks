@@ -1,0 +1,449 @@
+{
+  "blocks": [
+    {
+      "index": [
+        0,
+        0
+      ],
+      "length": 1,
+      "name": "osc 1",
+      "parameters": {
+        "amp env destination": 0,
+        "level": 0.7071067690849304,
+        "pan": 0,
+        "transpose": 0,
+        "tune": 0,
+        "unison detune": 4.1643829345703125,
+        "unison voices": 5,
+        "wave": 0
+      }
+    },
+    {
+      "index": [
+        1,
+        0
+      ],
+      "length": 1,
+      "name": "osc 2",
+      "parameters": {
+        "amp env destination": 0,
+        "level": 0.7071067690849304,
+        "pan": 0,
+        "transpose": 12,
+        "tune": 0,
+        "unison detune": 2.2360680103302,
+        "unison voices": 4,
+        "wave": 0
+      }
+    },
+    {
+      "index": [
+        2,
+        0
+      ],
+      "length": 1,
+      "name": "osc 3",
+      "parameters": {
+        "amp env destination": 0,
+        "level": 0.7071067690849304,
+        "pan": 0,
+        "transpose": 19,
+        "tune": 0,
+        "unison detune": 1.315069317817688,
+        "unison voices": 2,
+        "wave": 0
+      }
+    },
+    {
+      "index": [
+        3,
+        0
+      ],
+      "length": 1,
+      "name": "osc 4",
+      "parameters": {
+        "amp env destination": 0,
+        "level": 0.7071067690849304,
+        "pan": 0,
+        "transpose": 24,
+        "tune": 0,
+        "unison detune": 2.2360680103302,
+        "unison voices": 1,
+        "wave": 0
+      }
+    },
+    {
+      "index": [
+        0,
+        1
+      ],
+      "length": 1,
+      "name": "drive 1",
+      "parameters": {
+        "drive": -0.4109589159488678,
+        "mix": 1,
+        "type": 0
+      }
+    },
+    {
+      "index": [
+        1,
+        1
+      ],
+      "length": 1,
+      "name": "drive 2",
+      "parameters": {
+        "drive": 12.410964012145996,
+        "mix": 1,
+        "type": 0
+      }
+    },
+    {
+      "index": [
+        2,
+        1
+      ],
+      "length": 1,
+      "name": "drive 3",
+      "parameters": {
+        "drive": 10.109579086303711,
+        "mix": 1,
+        "type": 0
+      }
+    },
+    {
+      "index": [
+        3,
+        1
+      ],
+      "length": 1,
+      "name": "drive 4",
+      "parameters": {
+        "drive": 10.109579086303711,
+        "mix": 1,
+        "type": 0
+      }
+    },
+    {
+      "index": [
+        0,
+        2
+      ],
+      "length": 1,
+      "name": "filter 1",
+      "parameters": {
+        "blend": 0,
+        "cutoff": 62.00545883178711,
+        "mix": 1,
+        "model": 0,
+        "resonance": 0.25,
+        "style": 0
+      }
+    },
+    {
+      "index": [
+        1,
+        2
+      ],
+      "length": 1,
+      "name": "filter 2",
+      "parameters": {
+        "blend": 0,
+        "cutoff": 72.52600860595703,
+        "mix": 1,
+        "model": 0,
+        "resonance": 0.25,
+        "style": 0
+      }
+    },
+    {
+      "index": [
+        2,
+        2
+      ],
+      "length": 1,
+      "name": "filter 3",
+      "parameters": {
+        "blend": 0,
+        "cutoff": 98.47672271728516,
+        "mix": 1,
+        "model": 0,
+        "resonance": 0.25,
+        "style": 0
+      }
+    },
+    {
+      "index": [
+        3,
+        2
+      ],
+      "length": 1,
+      "name": "filter 4",
+      "parameters": {
+        "blend": 0,
+        "cutoff": 56.39453125,
+        "mix": 1,
+        "model": 0,
+        "resonance": 0.25,
+        "style": 0
+      }
+    },
+    {
+      "index": [
+        4,
+        0
+      ],
+      "length": 1,
+      "name": "osc 5",
+      "parameters": {
+        "amp env destination": 0,
+        "level": 0.7071067690849304,
+        "pan": 0,
+        "transpose": 12,
+        "tune": 0,
+        "unison detune": 2.2360680103302,
+        "unison voices": 1,
+        "wave": 0
+      }
+    },
+    {
+      "index": [
+        4,
+        1
+      ],
+      "length": 1,
+      "name": "reverb 1",
+      "parameters": {
+        "delay": 0,
+        "high cut": 110,
+        "low cut": 0,
+        "mix": 0.5260273218154907,
+        "mod amount": 0.22360700368881226,
+        "mod rate": -2,
+        "size": 0.5,
+        "time": 3.07397198677063
+      }
+    }
+  ],
+  "column controls": [
+    {
+      "name": "column control 1",
+      "parameters": {
+        "level": 0.6967743635177612,
+        "pan": -0.5096770524978638
+      }
+    },
+    {
+      "name": "column control 2",
+      "parameters": {
+        "level": 0.7032263875007629,
+        "pan": 0.535485029220581
+      }
+    },
+    {
+      "name": "column control 3",
+      "parameters": {
+        "level": 0.7354844808578491,
+        "pan": -0.1741923689842224
+      }
+    },
+    {
+      "name": "column control 4",
+      "parameters": {
+        "level": 0.7677425146102905,
+        "pan": 0.14838828146457672
+      }
+    },
+    {
+      "name": "column control 5",
+      "parameters": {
+        "level": 1,
+        "pan": 0
+      }
+    }
+  ],
+  "format_version": 0,
+  "modulations": [
+    {
+      "amount": 1,
+      "bipolar": true,
+      "number": 1,
+      "parameter": "level",
+      "source": "lfo 1",
+      "target": "osc 1"
+    },
+    {
+      "amount": 1,
+      "bipolar": true,
+      "number": 2,
+      "parameter": "level",
+      "source": "lfo 2",
+      "target": "osc 2"
+    },
+    {
+      "amount": -1,
+      "bipolar": true,
+      "number": 5,
+      "parameter": "level",
+      "source": "lfo 1",
+      "target": "osc 4"
+    },
+    {
+      "amount": -0.9686635732650757,
+      "bipolar": true,
+      "number": 6,
+      "parameter": "level",
+      "source": "lfo 2",
+      "target": "osc 3"
+    },
+    {
+      "amount": -0.2682027518749237,
+      "bipolar": true,
+      "number": 7,
+      "parameter": "cutoff",
+      "source": "lfo 1",
+      "target": "filter 1"
+    },
+    {
+      "amount": 0.4691244959831238,
+      "bipolar": true,
+      "number": 8,
+      "parameter": "cutoff",
+      "source": "lfo 2",
+      "target": "filter 2"
+    },
+    {
+      "amount": 1,
+      "bipolar": true,
+      "number": 9,
+      "parameter": "cutoff",
+      "source": "lfo 1",
+      "target": "filter 3"
+    },
+    {
+      "amount": -0.6147465109825134,
+      "bipolar": true,
+      "number": 10,
+      "parameter": "cutoff",
+      "source": "lfo 2",
+      "target": "filter 4"
+    },
+    {
+      "amount": 0.06602879613637924,
+      "bipolar": true,
+      "number": 11,
+      "parameter": "tune",
+      "source": "lfo 3",
+      "target": "osc 1"
+    },
+    {
+      "amount": 0.10430631041526794,
+      "bipolar": true,
+      "number": 12,
+      "parameter": "tune",
+      "source": "lfo 4",
+      "target": "osc 2"
+    },
+    {
+      "amount": 0.19617225229740143,
+      "bipolar": true,
+      "number": 13,
+      "parameter": "tune",
+      "source": "lfo 3",
+      "target": "osc 3"
+    },
+    {
+      "amount": 0.043062202632427216,
+      "bipolar": true,
+      "number": 14,
+      "parameter": "tune",
+      "source": "lfo 4",
+      "target": "osc 4"
+    },
+    {
+      "amount": 0.125,
+      "bipolar": false,
+      "number": 15,
+      "parameter": "transpose",
+      "source": "lfo 5",
+      "target": "osc 5"
+    },
+    {
+      "amount": 1,
+      "bipolar": false,
+      "number": 16,
+      "parameter": "level",
+      "source": "envelope 1",
+      "target": "osc 5"
+    }
+  ],
+  "modulators": [
+    {
+      "color": 4,
+      "name": "lfo 1",
+      "parameters": {
+        "frequency": 1,
+        "mode": 0,
+        "sync": 2,
+        "tempo": 6,
+        "wave": 1
+      }
+    },
+    {
+      "color": 11,
+      "name": "lfo 2",
+      "parameters": {
+        "frequency": 1,
+        "mode": 0,
+        "sync": 2,
+        "tempo": 7,
+        "wave": 1
+      }
+    },
+    {
+      "color": 3,
+      "name": "lfo 3",
+      "parameters": {
+        "frequency": 1.5735923051834106,
+        "mode": 0,
+        "sync": 0,
+        "tempo": 7,
+        "wave": 0
+      }
+    },
+    {
+      "color": 12,
+      "name": "lfo 4",
+      "parameters": {
+        "frequency": 2.5396151542663574,
+        "mode": 0,
+        "sync": 0,
+        "tempo": 7,
+        "wave": 0
+      }
+    },
+    {
+      "color": 13,
+      "name": "lfo 5",
+      "parameters": {
+        "frequency": -0.8415020704269409,
+        "mode": 3,
+        "sync": 0,
+        "tempo": 9,
+        "wave": 3
+      }
+    },
+    {
+      "color": 10,
+      "name": "envelope 1",
+      "parameters": {
+        "attack": 0.6641647815704346,
+        "decay": 1,
+        "release": 1.238572359085083,
+        "sustain": 0.611321210861206
+      }
+    }
+  ],
+  "name": "emily a PAD dance of the saws",
+  "tabs": []
+}

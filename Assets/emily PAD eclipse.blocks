@@ -1,0 +1,294 @@
+{
+  "blocks": [
+    {
+      "index": [
+        0,
+        0
+      ],
+      "length": 1,
+      "name": "osc 1",
+      "parameters": {
+        "amp env destination": 0,
+        "level": 0.690410852432251,
+        "pan": 0,
+        "transpose": 0,
+        "tune": 0,
+        "unison detune": 2.2360680103302,
+        "unison voices": 3,
+        "wave": 0
+      }
+    },
+    {
+      "index": [
+        0,
+        1
+      ],
+      "length": 1,
+      "name": "filter 1",
+      "parameters": {
+        "blend": 0,
+        "cutoff": 64.81095123291016,
+        "mix": 1,
+        "model": 0,
+        "resonance": 0.25,
+        "style": 0
+      }
+    },
+    {
+      "index": [
+        1,
+        0
+      ],
+      "length": 1,
+      "name": "osc 2",
+      "parameters": {
+        "amp env destination": 0,
+        "level": 0.5863012075424194,
+        "pan": 0,
+        "transpose": 0,
+        "tune": 0,
+        "unison detune": 2.2360680103302,
+        "unison voices": 5,
+        "wave": 0
+      }
+    },
+    {
+      "index": [
+        1,
+        1
+      ],
+      "length": 1,
+      "name": "filter 2",
+      "parameters": {
+        "blend": 0,
+        "cutoff": 8,
+        "mix": 1,
+        "model": 0,
+        "resonance": 0.5753424763679504,
+        "style": 0
+      }
+    },
+    {
+      "index": [
+        2,
+        0
+      ],
+      "length": 1,
+      "name": "osc 3",
+      "parameters": {
+        "amp env destination": 0,
+        "level": 0.7071067690849304,
+        "pan": 0,
+        "transpose": 7,
+        "tune": 0,
+        "unison detune": 2.1917808055877686,
+        "unison voices": 7,
+        "wave": 0
+      }
+    },
+    {
+      "index": [
+        2,
+        1
+      ],
+      "length": 1,
+      "name": "delay 1",
+      "parameters": {
+        "cutoff": 92.16438293457031,
+        "feedback": 0.5,
+        "frequency": -0.6739744544029236,
+        "frequency 2": 1.399999976158142,
+        "mix": 0.465753436088562,
+        "style": 2,
+        "sync": 1,
+        "sync 2": 1,
+        "tempo": 9,
+        "tempo 2": 9
+      }
+    },
+    {
+      "index": [
+        2,
+        2
+      ],
+      "length": 1,
+      "name": "filter 3",
+      "parameters": {
+        "blend": 1.0191775560379028,
+        "cutoff": 56.39453125,
+        "mix": 1,
+        "model": 0,
+        "resonance": 0.378082275390625,
+        "style": 0
+      }
+    },
+    {
+      "index": [
+        0,
+        6
+      ],
+      "length": 1,
+      "name": "filter 4",
+      "parameters": {
+        "blend": 2,
+        "cutoff": 8,
+        "mix": 1,
+        "model": 0,
+        "resonance": 0,
+        "style": 0
+      }
+    },
+    {
+      "index": [
+        1,
+        6
+      ],
+      "length": 1,
+      "name": "filter 5",
+      "parameters": {
+        "blend": 2,
+        "cutoff": 8,
+        "mix": 1,
+        "model": 0,
+        "resonance": 0,
+        "style": 0
+      }
+    }
+  ],
+  "column controls": [
+    {
+      "name": "column control 1",
+      "parameters": {
+        "level": 1,
+        "pan": 0
+      }
+    },
+    {
+      "name": "column control 2",
+      "parameters": {
+        "level": 1,
+        "pan": 0
+      }
+    },
+    {
+      "name": "column control 3",
+      "parameters": {
+        "level": 1,
+        "pan": 0
+      }
+    },
+    {
+      "name": "column control 4",
+      "parameters": {
+        "level": 1,
+        "pan": 0
+      }
+    },
+    {
+      "name": "column control 5",
+      "parameters": {
+        "level": 1,
+        "pan": 0
+      }
+    }
+  ],
+  "format_version": 0,
+  "modulations": [
+    {
+      "amount": 0.3437788188457489,
+      "bipolar": false,
+      "number": 1,
+      "parameter": "cutoff",
+      "source": "envelope 1",
+      "target": "filter 1"
+    },
+    {
+      "amount": 0.6755760908126831,
+      "bipolar": false,
+      "number": 2,
+      "parameter": "cutoff",
+      "source": "envelope 2",
+      "target": "filter 2"
+    },
+    {
+      "amount": 1,
+      "bipolar": false,
+      "number": 3,
+      "parameter": "level",
+      "source": "envelope 3",
+      "target": "osc 2"
+    },
+    {
+      "amount": 1,
+      "bipolar": false,
+      "number": 4,
+      "parameter": "level",
+      "source": "envelope 3",
+      "target": "osc 1"
+    },
+    {
+      "amount": 0.24792635440826416,
+      "bipolar": true,
+      "number": 6,
+      "parameter": "tune",
+      "source": "lfo 1",
+      "target": "osc 3"
+    }
+  ],
+  "modulators": [
+    {
+      "color": 11,
+      "name": "envelope 1",
+      "parameters": {
+        "attack": 1.3103781938552856,
+        "decay": 0.9154684543609619,
+        "release": 0.9872687458992004,
+        "sustain": 0.17358629405498505
+      }
+    },
+    {
+      "color": 14,
+      "name": "envelope 2",
+      "parameters": {
+        "attack": 1.2744752168655396,
+        "decay": 0.9513713121414185,
+        "release": 0.8436682224273682,
+        "sustain": 0.3094344139099121
+      }
+    },
+    {
+      "color": 0,
+      "name": "envelope 3",
+      "parameters": {
+        "attack": 0.9513713121414185,
+        "decay": 1,
+        "release": 1.5975792407989502,
+        "sustain": 1
+      }
+    },
+    {
+      "color": 8,
+      "name": "lfo 1",
+      "parameters": {
+        "frequency": 0.849056601524353,
+        "mode": 0,
+        "sync": 0,
+        "tempo": 4,
+        "wave": 0
+      }
+    },
+    {
+      "color": 9,
+      "name": "lfo 2",
+      "parameters": {
+        "frequency": 1.0905808210372925,
+        "mode": 0,
+        "sync": 4,
+        "tempo": 0,
+        "wave": 3
+      }
+    }
+  ],
+  "name": "emily a PAD eclipse",
+  "tabs": []
+}

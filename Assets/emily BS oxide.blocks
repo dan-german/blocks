@@ -1,0 +1,155 @@
+{
+  "blocks": [
+    {
+      "index": [
+        0,
+        0
+      ],
+      "length": 1,
+      "name": "osc 1",
+      "parameters": {
+        "amp env destination": 0,
+        "level": 0.7071067690849304,
+        "pan": 0,
+        "transpose": 0,
+        "tune": 0,
+        "unison detune": 0.5479452013969421,
+        "unison voices": 3,
+        "wave": 2
+      }
+    },
+    {
+      "index": [
+        0,
+        1
+      ],
+      "length": 1,
+      "name": "osc 2",
+      "parameters": {
+        "amp env destination": 0,
+        "level": 0.7071067690849304,
+        "pan": 0,
+        "transpose": -12,
+        "tune": 0,
+        "unison detune": 2.2360680103302,
+        "unison voices": 1,
+        "wave": 0
+      }
+    },
+    {
+      "index": [
+        0,
+        3
+      ],
+      "length": 1,
+      "name": "filter 1",
+      "parameters": {
+        "blend": 0,
+        "cutoff": 66.91507720947266,
+        "mix": 1,
+        "model": 4,
+        "resonance": 0.18630145490169525,
+        "style": 0
+      }
+    },
+    {
+      "index": [
+        0,
+        2
+      ],
+      "length": 1,
+      "name": "osc 3",
+      "parameters": {
+        "amp env destination": 0,
+        "level": 0.7071067690849304,
+        "pan": 0,
+        "transpose": 12,
+        "tune": 0,
+        "unison detune": 2.2360680103302,
+        "unison voices": 1,
+        "wave": 3
+      }
+    }
+  ],
+  "column controls": [
+    {
+      "name": "column control 1",
+      "parameters": {
+        "level": 1,
+        "pan": 0
+      }
+    },
+    {
+      "name": "column control 2",
+      "parameters": {
+        "level": 1,
+        "pan": 0
+      }
+    },
+    {
+      "name": "column control 3",
+      "parameters": {
+        "level": 1,
+        "pan": 0
+      }
+    },
+    {
+      "name": "column control 4",
+      "parameters": {
+        "level": 1,
+        "pan": 0
+      }
+    },
+    {
+      "name": "column control 5",
+      "parameters": {
+        "level": 1,
+        "pan": 0
+      }
+    }
+  ],
+  "format_version": 0,
+  "modulations": [
+    {
+      "amount": 0.47649767994880676,
+      "bipolar": false,
+      "number": 1,
+      "parameter": "cutoff",
+      "source": "envelope 1",
+      "target": "filter 1"
+    },
+    {
+      "amount": 0.19631339609622955,
+      "bipolar": true,
+      "number": 2,
+      "parameter": "tune",
+      "source": "lfo 1",
+      "target": "osc 3"
+    }
+  ],
+  "modulators": [
+    {
+      "color": 14,
+      "name": "envelope 1",
+      "parameters": {
+        "attack": 0.5923618078231812,
+        "decay": 1,
+        "release": 0.5475999712944031,
+        "sustain": 0
+      }
+    },
+    {
+      "color": 3,
+      "name": "lfo 1",
+      "parameters": {
+        "frequency": 1,
+        "mode": 0,
+        "sync": 1,
+        "tempo": 7,
+        "wave": 0
+      }
+    }
+  ],
+  "name": "emily a BS oxide",
+  "tabs": []
+}

@@ -1,0 +1,174 @@
+{
+  "blocks": [
+    {
+      "index": [
+        0,
+        0
+      ],
+      "length": 1,
+      "name": "osc 1",
+      "parameters": {
+        "amp env destination": 0,
+        "level": 0.7071067690849304,
+        "pan": 0,
+        "transpose": 0,
+        "tune": 0,
+        "unison detune": 2.2360680103302,
+        "unison voices": 1,
+        "wave": 0
+      }
+    },
+    {
+      "index": [
+        0,
+        1
+      ],
+      "length": 1,
+      "name": "osc 2",
+      "parameters": {
+        "amp env destination": 0,
+        "level": 0.7071067690849304,
+        "pan": 0,
+        "transpose": 5,
+        "tune": 0,
+        "unison detune": 2.2360680103302,
+        "unison voices": 1,
+        "wave": 0
+      }
+    },
+    {
+      "index": [
+        0,
+        2
+      ],
+      "length": 1,
+      "name": "osc 3",
+      "parameters": {
+        "amp env destination": 0,
+        "level": 0.7071067690849304,
+        "pan": 0,
+        "transpose": 16,
+        "tune": 0,
+        "unison detune": 2.2360680103302,
+        "unison voices": 1,
+        "wave": 0
+      }
+    },
+    {
+      "index": [
+        0,
+        3
+      ],
+      "length": 1,
+      "name": "filter 1",
+      "parameters": {
+        "blend": 0,
+        "cutoff": 14.13698673248291,
+        "mix": 0.9931507110595703,
+        "model": 4,
+        "resonance": 0.31506848335266113,
+        "style": 0
+      }
+    },
+    {
+      "index": [
+        0,
+        4
+      ],
+      "length": 1,
+      "name": "delay 1",
+      "parameters": {
+        "cutoff": 100.05479431152344,
+        "feedback": 0.4794520437717438,
+        "frequency": 1.399999976158142,
+        "frequency 2": 1.399999976158142,
+        "mix": 0.25342464447021484,
+        "style": 1,
+        "sync": 2,
+        "sync 2": 1,
+        "tempo": 9,
+        "tempo 2": 9
+      }
+    },
+    {
+      "index": [
+        0,
+        5
+      ],
+      "length": 1,
+      "name": "reverb 1",
+      "parameters": {
+        "delay": 0.06780821830034256,
+        "high cut": 110,
+        "low cut": 48.21917724609375,
+        "mix": 0.2945205569267273,
+        "mod amount": 0.1438356190919876,
+        "mod rate": -3.253424644470215,
+        "size": 0.7260273694992065,
+        "time": 1.9726027250289917
+      }
+    }
+  ],
+  "column controls": [
+    {
+      "name": "column control 1",
+      "parameters": {
+        "level": 1,
+        "pan": 0
+      }
+    },
+    {
+      "name": "column control 2",
+      "parameters": {
+        "level": 1,
+        "pan": 0
+      }
+    },
+    {
+      "name": "column control 3",
+      "parameters": {
+        "level": 1,
+        "pan": 0
+      }
+    },
+    {
+      "name": "column control 4",
+      "parameters": {
+        "level": 1,
+        "pan": 0
+      }
+    },
+    {
+      "name": "column control 5",
+      "parameters": {
+        "level": 1,
+        "pan": 0
+      }
+    }
+  ],
+  "format_version": 0,
+  "modulations": [
+    {
+      "amount": 0.9907833933830261,
+      "bipolar": false,
+      "number": 1,
+      "parameter": "cutoff",
+      "source": "envelope 1",
+      "target": "filter 1"
+    }
+  ],
+  "modulators": [
+    {
+      "color": 0,
+      "name": "envelope 1",
+      "parameters": {
+        "attack": 0.14949999749660492,
+        "decay": 0.8077653050422668,
+        "release": 0.5475999712944031,
+        "sustain": 0
+      }
+    }
+  ],
+  "name": "emily a STB unravel",
+  "tabs": []
+}

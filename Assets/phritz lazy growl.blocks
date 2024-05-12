@@ -1,0 +1,297 @@
+{
+  "blocks": [
+    {
+      "index": [
+        0,
+        1
+      ],
+      "length": 1,
+      "name": "flanger 1",
+      "parameters": {
+        "center": 8,
+        "depth": 0.9176041483879089,
+        "feedback": 0.6190624833106995,
+        "frequency": 0.25072917342185974,
+        "mix": 0.5,
+        "offset": 0.33333298563957214,
+        "sync": 0,
+        "tempo": 9
+      }
+    },
+    {
+      "index": [
+        0,
+        2
+      ],
+      "length": 1,
+      "name": "filter 1",
+      "parameters": {
+        "blend": 1.0070832967758179,
+        "cutoff": 39.2933349609375,
+        "mix": 1,
+        "model": 6,
+        "resonance": 0.829114556312561,
+        "style": 4
+      }
+    },
+    {
+      "index": [
+        0,
+        3
+      ],
+      "length": 1,
+      "name": "phaser 1",
+      "parameters": {
+        "blend": 1,
+        "center": 80,
+        "depth": 24,
+        "feedback": 0.7183853983879089,
+        "frequency": -3,
+        "mix": 1,
+        "offset": 0.33333298563957214,
+        "sync": 0,
+        "tempo": 6
+      }
+    },
+    {
+      "index": [
+        0,
+        0
+      ],
+      "length": 1,
+      "name": "osc 1",
+      "parameters": {
+        "amp env destination": 0,
+        "level": 0.7071067690849304,
+        "pan": 0,
+        "transpose": 0,
+        "tune": 0,
+        "unison detune": 2.2360680103302,
+        "unison voices": 1,
+        "wave": 1
+      }
+    },
+    {
+      "index": [
+        1,
+        0
+      ],
+      "length": 1,
+      "name": "osc 2",
+      "parameters": {
+        "amp env destination": 0,
+        "level": 0.7071067690849304,
+        "pan": 0,
+        "transpose": 0,
+        "tune": 0,
+        "unison detune": 0.6197916865348816,
+        "unison voices": 4,
+        "wave": 0
+      }
+    },
+    {
+      "index": [
+        1,
+        3
+      ],
+      "length": 1,
+      "name": "filter 2",
+      "parameters": {
+        "blend": 0,
+        "cutoff": 49.61333465576172,
+        "mix": 1,
+        "model": 6,
+        "resonance": 1,
+        "style": 1
+      }
+    },
+    {
+      "index": [
+        1,
+        2
+      ],
+      "length": 1,
+      "name": "filter 3",
+      "parameters": {
+        "blend": 0,
+        "cutoff": 36.08000183105469,
+        "mix": 0.013437500223517418,
+        "model": 5,
+        "resonance": 0.5,
+        "style": 1
+      }
+    },
+    {
+      "index": [
+        1,
+        1
+      ],
+      "length": 1,
+      "name": "osc 3",
+      "parameters": {
+        "amp env destination": 0,
+        "level": 0.5759896039962769,
+        "pan": 0,
+        "transpose": 0,
+        "tune": 0,
+        "unison detune": 4.594791889190674,
+        "unison voices": 2,
+        "wave": 0
+      }
+    },
+    {
+      "index": [
+        1,
+        4
+      ],
+      "length": 1,
+      "name": "drive 1",
+      "parameters": {
+        "drive": 14.3125,
+        "mix": 1,
+        "type": 0
+      }
+    }
+  ],
+  "column controls": [
+    {
+      "name": "column control 1",
+      "parameters": {
+        "level": 0.6202524304389954,
+        "pan": 0
+      }
+    },
+    {
+      "name": "column control 2",
+      "parameters": {
+        "level": 0.48750001192092896,
+        "pan": 0
+      }
+    },
+    {
+      "name": "column control 3",
+      "parameters": {
+        "level": 1,
+        "pan": 0
+      }
+    },
+    {
+      "name": "column control 4",
+      "parameters": {
+        "level": 1,
+        "pan": 0
+      }
+    },
+    {
+      "name": "column control 5",
+      "parameters": {
+        "level": 1,
+        "pan": 0
+      }
+    }
+  ],
+  "format_version": 0,
+  "modulations": [
+    {
+      "amount": 1,
+      "bipolar": true,
+      "number": 1,
+      "parameter": "cutoff",
+      "source": "random 1",
+      "target": "filter 1"
+    },
+    {
+      "amount": 1,
+      "bipolar": true,
+      "number": 2,
+      "parameter": "frequency",
+      "source": "random 2",
+      "target": "phaser 1"
+    },
+    {
+      "amount": 1,
+      "bipolar": true,
+      "number": 3,
+      "parameter": "resonance",
+      "source": "random 2",
+      "target": "filter 1"
+    },
+    {
+      "amount": 1,
+      "bipolar": true,
+      "number": 4,
+      "parameter": "tune",
+      "source": "random 3",
+      "target": "osc 1"
+    },
+    {
+      "amount": 1,
+      "bipolar": false,
+      "number": 5,
+      "parameter": "cutoff",
+      "source": "random 1",
+      "target": "filter 2"
+    },
+    {
+      "amount": 1,
+      "bipolar": false,
+      "number": 6,
+      "parameter": "resonance",
+      "source": "random 2",
+      "target": "filter 2"
+    },
+    {
+      "amount": 1,
+      "bipolar": true,
+      "number": 7,
+      "parameter": "cutoff",
+      "source": "random 3",
+      "target": "filter 2"
+    },
+    {
+      "amount": 1,
+      "bipolar": false,
+      "number": 8,
+      "parameter": "mix",
+      "source": "random 2",
+      "target": "filter 3"
+    }
+  ],
+  "modulators": [
+    {
+      "color": 12,
+      "name": "random 1",
+      "parameters": {
+        "frequency": 0.7221754789352417,
+        "stereo": 0,
+        "style": 2,
+        "sync": 0,
+        "tempo": 0
+      }
+    },
+    {
+      "color": 6,
+      "name": "random 2",
+      "parameters": {
+        "frequency": 0.11700721085071564,
+        "stereo": 0,
+        "style": 0,
+        "sync": 0,
+        "tempo": 0
+      }
+    },
+    {
+      "color": 13,
+      "name": "random 3",
+      "parameters": {
+        "frequency": 0,
+        "stereo": 0,
+        "style": 0,
+        "sync": 0,
+        "tempo": 0
+      }
+    }
+  ],
+  "name": "phritz lazy growl",
+  "tabs": []
+}
