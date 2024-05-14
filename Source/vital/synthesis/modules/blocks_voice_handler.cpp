@@ -51,7 +51,7 @@ BlocksVoiceHandler::BlocksVoiceHandler(Output* beats_per_second):
   pitch_wheel_(nullptr), filters_module_(nullptr), lfos_(), envelopes_(), lfo_sources_(), random_(nullptr),
   random_lfos_(), note_mapping_(nullptr), velocity_mapping_(nullptr), aftertouch_mapping_(nullptr),
   slide_mapping_(nullptr), lift_mapping_(nullptr), mod_wheel_mapping_(nullptr),
-  pitch_wheel_mapping_(nullptr), stereo_(nullptr), note_percentage_(nullptr), last_active_voice_mask_(0) {
+  pitch_wheel_mapping_(nullptr), stereo_(nullptr), note_percentage_(nullptr), last_active_voice_mask_(0), processor_pool_v2_() {
   output_ = new Multiply();
   registerOutput(output_->output());
 
@@ -138,16 +138,35 @@ void BlocksVoiceHandler::unplugAll() {
 
 void BlocksVoiceHandler::init() {
   createNoteArticulation();
-  createOscillators();
-  createReverbs();
-  createDistortions();
-  createChoruses();
-  createFlangers();
-  createNoises();
-  createPhasers();
-  createDelays();
+
+  ProcessorPool::SetupInput setup_input { 
+    .parent = this,
+    .reset = reset(),
+    .active_mask = active_mask(),
+    .retrigger = retrigger(),
+    .bent_midi = bent_midi_,
+    .beats_per_second = beats_per_second_,
+    .note_count = note_count(),
+    .note_from_ref = note_from_reference_->output()
+  };
+
+  processor_pool_v2_.spawn(setup_input);
+  for (auto p : processor_pool_v2_.oscillators_) { 
+    processors_with_default_env.push_back(p);
+  }
+
+  // createOscillators();
+  // createReverbs();
+  // createDistortions();
+  // createChoruses();
+  // createFlangers();
+  // createNoises();
+  // createPhasers();
+  // createDelays();
+
   createModulators();
-  createFilters(note_from_reference_->output());
+  processor_pool_v2_.spawnProcessors("filter", setup_input);
+  // createFilters(note_from_reference_->output());
   createVoiceOutput();
 
   master_node_ = new VariableAdd(5);
@@ -188,7 +207,6 @@ void BlocksVoiceHandler::init() {
   }
 
   VoiceHandler::init();
-
 
   // disable all processors
   for (const auto& pair : processor_pool_) {
@@ -273,7 +291,6 @@ void BlocksVoiceHandler::connectAllDefaultEnvs() {
     auto destination = osc->getPolyModulationDestination("amp env destination");
     processor->setDestinationScale(1.0f);
     processor->setPolyphonicModulation(true);
-    // processor->control_map_["amount"]->set(1.0f);
     destination->plugNext(processor);
     processor->process(1);
     destination->process(1);
@@ -393,9 +410,10 @@ void BlocksVoiceHandler::addBlock(std::shared_ptr<model::Block> block) {
 }
 
 SynthModule* BlocksVoiceHandler::createProcessorForBlock(std::shared_ptr<model::Block> module) {
-  SynthModule* processor = processor_pool_[module->id.type][0];
-  processor_pool_[module->id.type].erase(processor_pool_[module->id.type].begin());
-  processor->enable(true);
+  // SynthModule* processor = processor_pool_[module->id.type][0];
+  SynthModule* processor = processor_pool_v2_.fetch(module->id.type);
+  // processor_pool_[module->id.type].erase(processor_pool_[module->id.type].begin());
+  // processor->enable(true);
   if (processor->control_map_.count("on")) {
     processor->control_map_["on"]->set(1.0f);
   }
@@ -421,7 +439,9 @@ void BlocksVoiceHandler::createOscillators() {
     osc->plug(retrigger(), OscillatorModule::kRetrigger);
     osc->plug(bent_midi_, OscillatorModule::kMidi);
     osc->plug(active_mask(), OscillatorModule::kActiveVoices);
+
     osc->enable(false);
+
     addSubmodule(osc);
     addProcessor(osc);
 
@@ -456,7 +476,7 @@ void BlocksVoiceHandler::createModulators() {
   for (int i = 0; i < model::MAX_MODULES_PER_TYPE; ++i) {
     lfo_sources_[i].setLoop(false);
     lfo_sources_[i].initSin();
-    std::string prefix = std::string("lfo");
+    std::string prefix = "lfo";
     auto lfo = new LfoModule(prefix, &lfo_sources_[i], beats_per_second_);
     lfo->enable(false);
     addSubmodule(lfo);

@@ -29,11 +29,11 @@
 #include "model/Index.h"
 #include <vector>
 #include "ModuleContainer.h"
- // #include "osc.h"
 #include "vital/synthesis/modules/oscillator_module.h"
 #include "model/module_manager.h"
 #include "model/id.h"
 #include "vital/synthesis/modules/column_master_module.h"
+#include "vital/synthesis/utilities/processor_pool.h"
 
 namespace vital {
 class AudioRateEnvelope;
@@ -65,7 +65,8 @@ public:
 
   output_map& getPolyModulations() override;
   ModulationConnectionBank& getModulationBank() { return modulation_bank_; }
-  Wavetable* getWavetable(int index) { return oscillators_[index]->getWavetable(); }
+  // Wavetable* getWavetable(int index) { return oscillators_[index]->getWavetable(); }
+  Wavetable* getWavetable(int index) { return processor_pool_v2_.oscillators_[index]->getWavetable(); }
   Sample* getSample() { return nullptr; } // removed
   LineGenerator* getLfoSource(int index) { return &lfo_sources_[index]; }
   Output* getDirectOutput() { return getAccumulatedOutput(direct_output_->output()); }
@@ -138,6 +139,7 @@ private:
   std::vector<std::vector<SynthModule*>> processor_matrix_;
   std::vector<OscillatorModule*> oscillators_;
   std::vector<SynthModule*> processors_with_default_env;
+  ProcessorPool processor_pool_v2_;
 public:
   std::vector<ColumnMasterModule*> column_controls_;
   void setDefaultAmpEnvState(std::string target_name, bool enable);
