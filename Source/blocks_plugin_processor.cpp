@@ -472,7 +472,6 @@ void PluginProcessor::loadPreset(Preset preset) {
     // if (presetBlock.length > 1) {
       // expand(block->index, presetBlock.length - 1, true);
     // }
-    if (editor_ready_) main_component_->loadState(preset);
   }
 
   for (auto presetModulator : preset.modulators) {
@@ -493,6 +492,7 @@ void PluginProcessor::loadPreset(Preset preset) {
     connectModulationFromModel(model);
   }
 
+
   for (auto column_control : preset.column_controls) {
     auto index = column_control.id.number - 1;
     for (auto const& [key, val] : column_control.parameters) {
@@ -501,6 +501,7 @@ void PluginProcessor::loadPreset(Preset preset) {
   }
 
   block_updates_++;
+  if (editor_ready_) main_component_->loadState(preset);
   pauseProcessing(false);
 }
 
