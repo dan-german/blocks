@@ -261,6 +261,7 @@ void BlocksVoiceHandler::initializeDefaultAmpEnvs() {
     auto source = default_amp_env_->output();
     auto modulation_connection_processor = new ModulationConnectionProcessor(1000);
     auto val = new Value(1.0f);
+    modulation_connection_processor->addIdleProcessor(val);
     modulation_connection_processor->plug(val, ModulationConnectionProcessor::kModulationAmount);
     addProcessor(modulation_connection_processor);
     modulation_connection_processor->plug(default_amp_env_->output(), ModulationConnectionProcessor::kModulationInput);
