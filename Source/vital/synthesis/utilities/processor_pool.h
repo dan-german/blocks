@@ -10,6 +10,7 @@ public:
   void spawn(SetupInput& input);
   vital::SynthModule* fetch(std::string& code);
   void spawnProcessors(std::string code, SetupInput& input);
+  void enableAll(bool enable);
 private:
   std::unordered_map<std::string, std::vector<vital::SynthModule*>> map_;
   // LineGenerator lfo_sources_[model::MAX_MODULES_PER_TYPE];

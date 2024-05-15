@@ -207,15 +207,7 @@ void BlocksVoiceHandler::init() {
   }
 
   VoiceHandler::init();
-
-  // disable all processors
-  for (const auto& pair : processor_pool_) {
-    const std::string& key = pair.first;
-    const std::vector<SynthModule*>& modules = pair.second;
-    for (const auto& modulePtr : modules) {
-      modulePtr->enable(false);
-    }
-  }
+  processor_pool_v2_.enableAll(false);
 
   setupPolyModulationReadouts();
 

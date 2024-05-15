@@ -20,6 +20,7 @@ void ProcessorPool::spawn(SetupInput& input) {
 void ProcessorPool::spawnProcessors(std::string code, ProcessorPool::SetupInput& input) {
   for (int i = 0; i < model::MAX_MODULES_PER_TYPE; i++) {
     auto processor = processorFromCode(code, input);
+    if (!processor) continue;
     input.parent->addSubmodule(processor);
     input.parent->addProcessor(processor);
     map_[code].push_back(processor);
@@ -49,7 +50,6 @@ vital::SynthModule* ProcessorPool::processorFromCode(std::string code, SetupInpu
     processor->plug(input.retrigger, vital::OscillatorModule::kRetrigger);
     processor->plug(input.bent_midi, vital::OscillatorModule::kMidi);
     processor->plug(input.active_mask, vital::OscillatorModule::kActiveVoices);
-    processor->enable(false);
   } else if (code == "filter") {
     processor = new vital::FilterModule(code);
     processor->plug(input.reset, vital::FilterModule::kReset);
@@ -70,7 +70,6 @@ vital::SynthModule* ProcessorPool::processorFromCode(std::string code, SetupInpu
   } else if (code == "delay") {
     processor = new vital::DelayModule(input.beats_per_second);
     processor->plug(input.reset, vital::DelayModule::kReset);
-    processor->enable(false);
   } else if (code == "reverb") {
     processor = new vital::ReverbModule();
     processor->plug(input.reset, vital::ReverbModule::kReset);
@@ -81,7 +80,14 @@ vital::SynthModule* ProcessorPool::processorFromCode(std::string code, SetupInpu
     processor = new vital::DistortionModule();
     processor->plug(input.reset, vital::DistortionModule::kReset);
   } else {
-    std::cout << "ProcessorPool::processorFromCode: unsupported code " << code << std::endl;
   }
   return processor;
+}
+
+void ProcessorPool::enableAll(bool enable) {
+  for (auto& pair : map_) {
+    for (auto processor : pair.second) {
+      processor->enable(enable);
+    }
+  }
 }
