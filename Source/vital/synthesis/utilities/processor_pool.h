@@ -9,10 +9,14 @@ public:
   class SetupInput;
   void spawn(SetupInput& input);
   vital::SynthModule* fetch(std::string& code);
+  void retire(vital::SynthModule* processor, std::shared_ptr<model::Block> block);
   void spawnProcessors(std::string code, SetupInput& input);
   void enableAll(bool enable);
+
+  void load(std::unordered_map<std::string, int> count);
 private:
   std::unordered_map<std::string, std::vector<vital::SynthModule*>> map_;
+  std::unordered_map<std::string, int> processor_count_map_;
   // LineGenerator lfo_sources_[model::MAX_MODULES_PER_TYPE];
   vital::SynthModule* processorFromCode(std::string code, SetupInput& input);
 };

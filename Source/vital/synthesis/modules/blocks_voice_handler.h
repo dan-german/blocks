@@ -105,17 +105,8 @@ public:
   void connectAllDefaultEnvs();
 private:
   void createNoteArticulation();
-  void createOscillators();
   void createModulators();
   void createVoiceOutput();
-  void createFilters(Output* keytrack);
-  void createReverbs();
-  void createDistortions();
-  void createChoruses();
-  void createFlangers();
-  void createNoises();
-  void createPhasers();
-  void createDelays();
   void setupPolyModulationReadouts();
 
   SynthModule* createProcessorForBlock(std::shared_ptr<model::Block> module);

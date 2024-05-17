@@ -20,27 +20,13 @@ void ProcessorPool::spawn(SetupInput& input) {
 void ProcessorPool::spawnProcessors(std::string code, ProcessorPool::SetupInput& input) {
   for (int i = 0; i < model::MAX_MODULES_PER_TYPE; i++) {
     auto processor = processorFromCode(code, input);
-    if (!processor) continue;
     input.parent->addSubmodule(processor);
     input.parent->addProcessor(processor);
     map_[code].push_back(processor);
-    std::cout << "ProcessorPool::spawnProcessors: " << code << std::endl;
   }
-}
-
-vital::SynthModule* ProcessorPool::fetch(std::string& code) {
-  auto& processors = map_[code];
-  if (processors.size() == 0) {
-    return nullptr;
-  }
-  auto processor = processors.back();
-  processors.pop_back();
-  processor->enable(true);
-  return processor;
 }
 
 vital::SynthModule* ProcessorPool::processorFromCode(std::string code, SetupInput& input) {
-  std::cout << "ProcessorPool::processorFromCode: " << code << std::endl;
   vital::SynthModule* processor = nullptr;
   if (code == "osc") {
     auto osc = new vital::OscillatorModule();
@@ -88,6 +74,35 @@ void ProcessorPool::enableAll(bool enable) {
   for (auto& pair : map_) {
     for (auto processor : pair.second) {
       processor->enable(enable);
+      if (processor->control_map_.count("on"))
+        processor->control_map_["on"]->set(0.0f);
     }
   }
+}
+
+vital::SynthModule* ProcessorPool::fetch(std::string& code) {
+  auto& processors = map_[code];
+  if (processors.size() == 0) {
+    return nullptr;
+  }
+  auto processor = processors.back();
+  processors.pop_back();
+  processor->enable(true);
+  return processor;
+}
+
+void ProcessorPool::retire(vital::SynthModule* processor, std::shared_ptr<model::Block> block) {
+  processor->enable(false);
+  map_[block->id.type].push_back(processor);
+  if (processor->control_map_.count("on"))
+    processor->control_map_["on"]->set(0.0f);
+}
+
+void ProcessorPool::load(std::unordered_map<std::string, int> count) {
+  //  for (int i = 0; i < processor_count_map_[code]; i++) {
+  //   auto processor = processorFromCode(code, input);
+  //   input.parent->addSubmodule(processor);
+  //   input.parent->addProcessor(processor);
+  //   map_[code].push_back(processor);
+  // } 
 }

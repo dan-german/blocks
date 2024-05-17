@@ -300,92 +300,6 @@ void BlocksVoiceHandler::prepareDestroy() {
   }
 }
 
-void BlocksVoiceHandler::createFilters(Output* keytrack) {
-  for (int i = 0; i < model::MAX_MODULES_PER_TYPE; i++) {
-    auto filter = new FilterModule("filter");
-    filter->plug(reset(), FilterModule::kReset);
-    filter->plug(bent_midi_, FilterModule::kMidi);
-    filter->plug(keytrack, FilterModule::kKeytrack);
-    addSubmodule(filter);
-    addProcessor(filter);
-    processor_pool_["filter"].push_back(filter);
-  }
-}
-
-void BlocksVoiceHandler::createDistortions() {
-  for (int i = 0; i < model::MAX_MODULES_PER_TYPE; i++) {
-    auto distortion = new DistortionModule();
-    distortion->plug(reset(), DistortionModule::kReset);
-    addSubmodule(distortion);
-    addProcessor(distortion);
-    processor_pool_["drive"].push_back(distortion);
-  }
-}
-
-void BlocksVoiceHandler::createChoruses() {
-  for (int i = 0; i < model::MAX_MODULES_PER_TYPE; i++) {
-    auto chorus = new ChorusModule(beats_per_second_);
-    chorus->plug(reset(), ChorusModule::kReset);
-    addSubmodule(chorus);
-    addProcessor(chorus);
-    processor_pool_["chorus"].push_back(chorus);
-  }
-}
-
-void BlocksVoiceHandler::createPhasers() {
-  for (int i = 0; i < model::MAX_MODULES_PER_TYPE; i++) {
-    auto phaser = new PhaserModule(beats_per_second_);
-    addSubmodule(phaser);
-    addProcessor(phaser);
-    processor_pool_["phaser"].push_back(phaser);
-  }
-}
-
-void BlocksVoiceHandler::createFlangers() {
-  for (int i = 0; i < model::MAX_MODULES_PER_TYPE; i++) {
-    auto flanger = new FlangerModule(beats_per_second_);
-    addSubmodule(flanger);
-    addProcessor(flanger);
-    processor_pool_["flanger"].push_back(flanger);
-  }
-}
-
-void BlocksVoiceHandler::createNoises() {
-  for (int i = 0; i < model::MAX_MODULES_PER_TYPE; i++) {
-    auto noise = new SampleModule();
-    addSubmodule(noise);
-    addProcessor(noise);
-    noise->plug(reset(), SampleModule::kReset);
-    noise->plug(note_count(), SampleModule::kNoteCount);
-    noise->plug(bent_midi_, SampleModule::kMidi);
-    processor_pool_["noise"].push_back(noise);
-    processors_with_default_env.push_back(noise);
-  }
-}
-
-
-void BlocksVoiceHandler::createReverbs() {
-  for (int i = 0; i < model::MAX_MODULES_PER_TYPE; i++) {
-    auto reverb = new ReverbModule();
-    addSubmodule(reverb);
-    addProcessor(reverb);
-    reverb->plug(reset(), ReverbModule::kReset);
-    reverb->enable(false);
-    processor_pool_["reverb"].push_back(reverb);
-  }
-}
-
-void BlocksVoiceHandler::createDelays() {
-  for (int i = 0; i < model::MAX_MODULES_PER_TYPE; i++) {
-    auto delay = new DelayModule(beats_per_second_);
-    delay->plug(reset(), DelayModule::kReset);
-    addSubmodule(delay);
-    addProcessor(delay);
-    delay->enable(false);
-    processor_pool_["delay"].push_back(delay);
-  }
-}
-
 void BlocksVoiceHandler::removeBlock(Index index, std::shared_ptr<model::Block> block) {
   auto processor = processor_matrix_[index.column][index.row];
   processor->enable(false);
@@ -421,27 +335,6 @@ SynthModule* BlocksVoiceHandler::createProcessorForBlock(std::shared_ptr<model::
   active_processors_.push_back(processor);
   processor->setModule(module);
   return processor;
-}
-
-void BlocksVoiceHandler::createOscillators() {
-  std::string type = "osc";
-  for (int i = 0; i < model::MAX_MODULES_PER_TYPE; i++) {
-    auto osc = new OscillatorModule();
-
-    osc->plug(reset(), OscillatorModule::kReset);
-    osc->plug(retrigger(), OscillatorModule::kRetrigger);
-    osc->plug(bent_midi_, OscillatorModule::kMidi);
-    osc->plug(active_mask(), OscillatorModule::kActiveVoices);
-
-    osc->enable(false);
-
-    addSubmodule(osc);
-    addProcessor(osc);
-
-    processor_pool_[type].push_back(osc);
-    oscillators_.push_back(osc);
-    processors_with_default_env.push_back(osc);
-  }
 }
 
 void BlocksVoiceHandler::clear() {

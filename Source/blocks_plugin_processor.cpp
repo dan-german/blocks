@@ -492,7 +492,6 @@ void PluginProcessor::loadPreset(Preset preset) {
     connectModulationFromModel(model);
   }
 
-
   for (auto column_control : preset.column_controls) {
     auto index = column_control.id.number - 1;
     for (auto const& [key, val] : column_control.parameters) {
