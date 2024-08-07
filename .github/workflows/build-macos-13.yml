@@ -32,21 +32,18 @@ jobs:
           codesign --force -s "${{ secrets.DEVELOPER_ID_APPLICATION }}" -v /Users/runner/work/blocks/blocks/build/blocks_artefacts/Release/Standalone/blocks.app --deep --strict --options=runtime --timestamp
           codesign --force -s "${{ secrets.DEVELOPER_ID_APPLICATION }}" -v /Users/runner/work/blocks/blocks/build/blocks_artefacts/Release/AU/blocks.component --deep --strict --options=runtime --timestamp
           codesign --force -s "${{ secrets.DEVELOPER_ID_APPLICATION }}" -v /Users/runner/work/blocks/blocks/build/blocks_artefacts/Release/VST3/blocks.vst3 --deep --strict --options=runtime --timestamp
-          codesign --force -s "${{ secrets.DEVELOPER_ID_APPLICATION }}" -v /Users/runner/work/blocks/blocks/build/blocks_artefacts/Release/LV2/blocks.lv2 --deep --strict --options=runtime --timestamp
       - name: Create DMG, Notarize and Staple (macOS)
         run: |
           npm install -g appdmg
           mkdir -p packaging/dmg
 
           # Create directories for the dmg symlinks
-          sudo mkdir -m 755 -p /Library/Audio/Plug-Ins/Components && sudo mkdir -m 755 -p /Library/Audio/Plug-Ins/VST3 && sudo mkdir -m 755 -p /Library/Audio/Plug-Ins/lv2 && sudo mkdir -m 755 -p /Applications
+          sudo mkdir -m 755 -p /Library/Audio/Plug-Ins/Components && sudo mkdir -m 755 -p /Library/Audio/Plug-Ins/VST3 && sudo mkdir -m 755 -p /Applications
           ln -s /Library/Audio/Plug-Ins/Components "packaging/dmg/Your Mac's Component folder"
           ln -s /Library/Audio/Plug-Ins/VST3 "packaging/dmg/Your Mac's VST3 folder"
-          ln -s /Library/Audio/Plug-Ins/LV2 "packaging/dmg/Your Mac's LV2 folder"
           ln -s /Applications "packaging/dmg/Your Mac's Applications folder"
 
           mv "/Users/runner/work/blocks/blocks/build/blocks_artefacts/Release/VST3/blocks.vst3" packaging/dmg
-          mv "/Users/runner/work/blocks/blocks/build/blocks_artefacts/Release/LV2/blocks.lv2" packaging/dmg
           mv "/Users/runner/work/blocks/blocks/build/blocks_artefacts/Release/AU/blocks.component" packaging/dmg
           mv "/Users/runner/work/blocks/blocks/build/blocks_artefacts/Release/Standalone/blocks.app" packaging/dmg
 
