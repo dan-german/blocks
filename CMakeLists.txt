@@ -46,37 +46,21 @@ add_subdirectory(JUCE)                    # If you've put JUCE in a subdirectory
 # the formats specified by the FORMATS arguments. This function accepts many optional arguments.
 # Check the readme at `docs/CMake API.md` in the JUCE repo for the full list.
 
-if(NOT "${CMAKE_SYSTEM_NAME}" STREQUAL "Linux") # is there a nicer way to achieve this?
-    juce_add_plugin(blocks
-        # ICON_BIG ...                              # ICON_* arguments specify a path to an image file to use as an icon for the Standalone
-        # ICON_SMALL ...
-        COMPANY_NAME soonth                          # Specify the name of the plugin's author
-        IS_SYNTH TRUE                       # Is this a synth or an effect?
-        NEEDS_MIDI_INPUT TRUE               # Does the plugin need midi input?
-        NEEDS_MIDI_OUTPUT FALSE              # Does the plugin need midi output?
-        IS_MIDI_EFFECT FALSE                 # Is this plugin a MIDI effect?
-        # EDITOR_WANTS_KEYBOARD_FOCUS TRUE/FALSE    # Does the editor need keyboard focus?
-        # COPY_PLUGIN_AFTER_BUILD TRUE/FALSE        # Should the plugin be installed to a default location after building?
-        PLUGIN_MANUFACTURER_CODE Soon               # A four-character manufacturer id with at least one upper-case character
-        PLUGIN_CODE Bloc                            # A unique four-character plugin id with exactly one upper-case character
-                                                    # GarageBand 10.3 requires the first letter to be upper-case, and the remaining letters to be lower-case
-        FORMATS AU VST3 LV2 Standalone              # The formats to build. Other valid formats are: AAX Unity VST AU AUv3
-        PRODUCT_NAME "blocks"        # The name of the final executable, which can differ from the target name
-        LV2URI "https://github.com/dan-german/blocks")
-else()
-    juce_add_plugin(blocks
-        COMPANY_NAME soonth                          
-        IS_SYNTH TRUE                       
-        NEEDS_MIDI_INPUT TRUE               
-        NEEDS_MIDI_OUTPUT FALSE             
-        IS_MIDI_EFFECT FALSE                
-        PLUGIN_MANUFACTURER_CODE Soon
-        PLUGIN_CODE Bloc             
-                                     
-        FORMATS AU VST3 Standalone   
-        PRODUCT_NAME "blocks")
-endif()
-
+juce_add_plugin(blocks
+    # ICON_BIG ...                              # ICON_* arguments specify a path to an image file to use as an icon for the Standalone
+    # ICON_SMALL ...
+    COMPANY_NAME soonth                          # Specify the name of the plugin's author
+    IS_SYNTH TRUE                       # Is this a synth or an effect?
+    NEEDS_MIDI_INPUT TRUE               # Does the plugin need midi input?
+    NEEDS_MIDI_OUTPUT FALSE              # Does the plugin need midi output?
+    IS_MIDI_EFFECT FALSE                 # Is this plugin a MIDI effect?
+    # EDITOR_WANTS_KEYBOARD_FOCUS TRUE/FALSE    # Does the editor need keyboard focus?
+    # COPY_PLUGIN_AFTER_BUILD TRUE/FALSE        # Should the plugin be installed to a default location after building?
+    PLUGIN_MANUFACTURER_CODE Soon               # A four-character manufacturer id with at least one upper-case character
+    PLUGIN_CODE Bloc                            # A unique four-character plugin id with exactly one upper-case character
+                                                # GarageBand 10.3 requires the first letter to be upper-case, and the remaining letters to be lower-case
+    FORMATS AU VST3 Standalone                  # The formats to build. Other valid formats are: AAX Unity VST AU AUv3
+    PRODUCT_NAME "blocks")        # The name of the final executable, which can differ from the target name
 
 # `juce_generate_juce_header` will create a JuceHeader.h for a given target, which will be generated
 # into your build tree. This should be included with `#include <JuceHeader.h>`. The include path for
