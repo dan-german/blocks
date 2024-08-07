@@ -59,8 +59,9 @@ juce_add_plugin(blocks
     PLUGIN_MANUFACTURER_CODE Soon               # A four-character manufacturer id with at least one upper-case character
     PLUGIN_CODE Bloc                            # A unique four-character plugin id with exactly one upper-case character
                                                 # GarageBand 10.3 requires the first letter to be upper-case, and the remaining letters to be lower-case
-    FORMATS AU VST3 Standalone                  # The formats to build. Other valid formats are: AAX Unity VST AU AUv3
-    PRODUCT_NAME "blocks")        # The name of the final executable, which can differ from the target name
+    FORMATS AU VST3 LV2 Standalone              # The formats to build. Other valid formats are: AAX Unity VST AU AUv3
+    PRODUCT_NAME "blocks"        # The name of the final executable, which can differ from the target name
+    LV2URI "https://github.com/dan-german/blocks")
 
 # `juce_generate_juce_header` will create a JuceHeader.h for a given target, which will be generated
 # into your build tree. This should be included with `#include <JuceHeader.h>`. The include path for
